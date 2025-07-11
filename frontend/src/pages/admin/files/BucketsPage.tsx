@@ -1,16 +1,16 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { IconPlus } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { BucketDto, useApi } from 'src/api';
-import { Icon, Page } from 'src/components';
+import { Page } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
-import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { Bucket } from './Bucket';
 import { EmptyPage } from './EmptyPage';
 import { FilesPage } from './FilesPage';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
+import { useDeletingBucket } from './hooks';
 import { useBucketstore } from './state';
 
 export function BucketsPage() {
@@ -32,17 +32,10 @@ export function BucketsPage() {
     }
   }, [loadedBuckets, setBuckets]);
 
-  const deleting = useMutation({
-    mutationFn: (bucket: BucketDto) => {
-      return api.files.deleteBucket(bucket.id);
-    },
-    onSuccess: (_, bucket) => {
-      removeBucket(bucket.id);
-      navigate('/admin/files/');
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.files.removeBucketFailed, error));
-    },
+  const deleting = useDeletingBucket({
+    apiCall: (id) => api.files.deleteBucket(id),
+    removeBucket,
+    navigation: () => navigate('/admin/files/'),
   });
 
   const doCreate = useEventCallback((bucket: BucketDto) => {
@@ -62,16 +55,16 @@ export function BucketsPage() {
             <h3 className="grow text-xl">{texts.files.buckets}</h3>
 
             <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
-              <Icon icon="plus" size={16} />
+              <IconPlus size={16} />
             </button>
           </div>
 
-          <div className="grow overflow-y-auto p-8 pt-4">
-            <ul aria-labelledby={texts.files.buckets} className="nav-menu nav-menu-dotted">
+          <div className="grow overflow-y-auto p-4 pt-4">
+            <div aria-labelledby={texts.files.buckets} className="nav-menu flex flex-col">
               {buckets.map((bucket) => (
                 <Bucket key={bucket.id} bucket={bucket} onDelete={deleting.mutate} onUpdate={setToUpdate} />
               ))}
-            </ul>
+            </div>
 
             {buckets.length === 0 && isFetched && <div className="pt-4 text-sm text-gray-400">{texts.files.bucketsEmpty}</div>}
           </div>
