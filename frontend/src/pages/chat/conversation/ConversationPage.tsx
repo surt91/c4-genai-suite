@@ -40,8 +40,6 @@ export function ConversationPage(props: ConversationPageProps) {
 
   const isNewConversation = messages.length === 0 && !!history;
 
-  const llmLogo = assistant?.extensions?.find((x) => x.type === 'llm')?.logo;
-
   const agentName = useMemo(() => {
     return assistant?.agentName || theme.agentName || texts.chat.sourceAI;
   }, [assistant?.agentName, theme.agentName]);
@@ -71,7 +69,7 @@ export function ConversationPage(props: ConversationPageProps) {
         </>
       )}
       <div className="bg-white p-3">
-        <Configuration canEditConfiguration={isNewConversation} />
+        <Configuration canEditConfiguration={true} />
       </div>
       {isChatLoading ? (
         <div className="fade-in w-full bg-white" style={{ height: 'calc(100vh - 4rem)' }} />
@@ -84,7 +82,7 @@ export function ConversationPage(props: ConversationPageProps) {
               }
               ref={containerRef}
             >
-              <ChatHistory agentName={agentName} llmLogo={llmLogo} selectDocument={selectDocument} editMessage={submitMessage} />
+              <ChatHistory agentName={agentName} selectDocument={selectDocument} editMessage={submitMessage} />
             </div>
           )}
           <div className={`${!messages.length && 'grow'} flex shrink-0 flex-col items-center justify-center px-4`}>
