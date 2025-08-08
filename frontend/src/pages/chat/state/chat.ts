@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
 import {
   ChatUICallbackResultDto,
   ConversationDtoRatingEnum,
@@ -265,4 +266,24 @@ export const useStateOfIsAiWriting = () => {
   const chatDataMap = useChatStore((s) => s.chatDataMap);
   const chatData = chatDataMap.get(currentChatId);
   return chatData?.isAiWriting || false;
+};
+
+export const useStateOfSelectedDocument = () => {
+  const selectedDocument = useChatStore((state) => state.selectedDocument);
+  const setSelectedDocument = useChatStore((state) => state.setSelectedDocument);
+
+  return {
+    selectedDocument,
+    setSelectedDocument,
+  };
+};
+
+export const useStateOfSelectedSource = () => {
+  const selectedSource = useChatStore((state) => state.selectedSource);
+  const setSelectedSource = useChatStore((state) => state.setSelectedSource);
+
+  return {
+    selectedSource,
+    setSelectedSource,
+  };
 };

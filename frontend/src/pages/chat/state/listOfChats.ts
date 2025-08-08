@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+
 import { ConversationDto, useApi } from 'src/api';
 import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
@@ -39,12 +40,12 @@ export const useListOfChatsInit = () => {
 
 export const useStateMutateDuplicateChat = () => {
   const api = useApi();
-  const refetchListOfChats = useListOfChatsStore((s) => s.refetch);
+  const refetchChatsList = useListOfChatsStore((s) => s.refetch);
 
   return useMutation({
     mutationFn: (id: number) => api.conversations.duplicateConversation(id),
     onSuccess: () => {
-      refetchListOfChats();
+      refetchChatsList();
       toast.success(texts.chat.duplicateConversationSuccess);
     },
     onError: async () => {

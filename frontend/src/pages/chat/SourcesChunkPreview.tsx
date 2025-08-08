@@ -23,6 +23,7 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
     document.messageId,
     document.documentUri,
   );
+
   const container = (children: ReactNode) => (
     <Card withBorder mt="sm" mr="xs" ml="6">
       <Card.Section withBorder inheritPadding py="xs">
@@ -36,6 +37,7 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
       {children}
     </Card>
   );
+
   if (isError)
     return container(
       <Alert text={t('common.errorLoading')} className="mt-4">
@@ -44,7 +46,9 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
         </Button>
       </Alert>,
     );
+
   if (isPending) return container(<Loader className="mx-auto my-32" />);
+
   return container(
     data.map((chunk, index) => (
       <Blockquote key={index} mt="lg" p="md" className="overflow-clip">

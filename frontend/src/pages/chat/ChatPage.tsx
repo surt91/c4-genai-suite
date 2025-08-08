@@ -1,10 +1,12 @@
-import { Button } from '@mantine/core';
+import { Button, Tabs } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Route, Routes } from 'react-router-dom';
+
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
+import { PdfViewer } from 'src/components/PdfViewer';
 import { useSidebarState, useTheme } from 'src/hooks';
 import { useConversationFiles } from 'src/hooks/api/files';
 import { useListOfAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
@@ -12,10 +14,15 @@ import { texts } from 'src/texts';
 import { isMobile } from '../utils';
 import { ConversationItems } from './ConversationItems';
 import { NewChatRedirect } from './NewChatRedirect';
-import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
+import { SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
-import { useStateOfSelectedAssistantId, useStateOfSelectedChatId } from './state/chat';
+import {
+  useStateOfSelectedAssistantId,
+  useStateOfSelectedChatId,
+  useStateOfSelectedDocument,
+  useStateOfSelectedSource,
+} from './state/chat';
 import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
 import { useUserBucket } from './useUserBucket';
 
@@ -24,6 +31,7 @@ const CustomResizeHandle = () => (
     <div className="h-6 w-full rounded group-hover:bg-white" />
   </PanelResizeHandle>
 );
+
 const getPanelSizes = (isRightPanelOpen: boolean) => {
   const leftBarRatio = 15;
   const rightBarRatio = 20;
@@ -31,6 +39,7 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
   const isMobileView = isMobile();
   const mobileSideBarRatio = 90;
   const mobileContentRatio = 100 - mobileSideBarRatio;
+
   return {
     left: {
       defaultSize: isMobileView ? mobileSideBarRatio : leftBarRatio,
@@ -48,13 +57,20 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
     },
   };
 };
+
 export function ChatPage() {
   const { theme } = useTheme();
+
   const isMobileView = isMobile();
   useListOfAssistantsInit();
   useListOfChatsInit();
 
-  const [selectedDocument, setSelectedDocument] = useState<DocumentSource | undefined>();
+  const { selectedDocument, setSelectedDocument } = useStateOfSelectedDocument();
+  const { selectedSource, setSelectedSource } = useStateOfSelectedSource();
+
+  const isSourcePdfFile = selectedSource?.document?.mimeType === 'application/pdf';
+  const isSourceAvailable = selectedSource?.document?.downloadAvailable ?? false;
+
   const selectedAssistantId = useStateOfSelectedAssistantId();
   const { userBucket } = useUserBucket(selectedAssistantId);
   const checkIfEmptyChat = useStateOfChatEmptiness();
@@ -68,6 +84,7 @@ export function ChatPage() {
   const panelSizes = getPanelSizes(rightPanelVisible);
 
   const { clear: clearBucketFiles } = useConversationFiles(selectedChatId);
+
   useEffect(() => {
     clearBucketFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,7 +100,10 @@ export function ChatPage() {
   };
 
   // close the sources tab everytime the user selects another conversation
-  useEffect(() => setSelectedDocument(undefined), [selectedChatId]);
+  useEffect(() => {
+    setSelectedDocument(undefined);
+    setSelectedSource(undefined);
+  }, [selectedChatId, setSelectedDocument, setSelectedSource]);
 
   return (
     <div className="flex h-screen flex-col">
@@ -136,18 +156,7 @@ export function ChatPage() {
             ) : (
               <Routes>
                 <Route path="" element={<NewChatRedirect />} />
-                <Route
-                  path=":id"
-                  element={
-                    <ConversationPage
-                      textareaRef={textareaRef}
-                      selectDocument={(conversationId, messageId, documentUri) => {
-                        setSelectedDocument({ conversationId, messageId, documentUri });
-                        setSidebarRight(true);
-                      }}
-                    />
-                  }
-                />
+                <Route path=":id" element={<ConversationPage textareaRef={textareaRef} />} />
               </Routes>
             )}
             {(!isMobileView || !rightPanelVisible) && (
@@ -181,7 +190,27 @@ export function ChatPage() {
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
               {selectedDocument ? (
-                <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
+                <Tabs defaultValue="sources-chunk-preview">
+                  <Tabs.List>
+                    <Tabs.Tab value="sources-chunk-preview">{texts.chat.sources.content}</Tabs.Tab>
+                    <Tabs.Tab value="source-document-viewer" hidden={!(isSourcePdfFile && isSourceAvailable)}>
+                      {texts.chat.sources.viewer}
+                    </Tabs.Tab>
+                  </Tabs.List>
+
+                  <Tabs.Panel value="sources-chunk-preview">
+                    <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
+                  </Tabs.Panel>
+                  {isSourcePdfFile && isSourceAvailable && (
+                    <Tabs.Panel value="source-document-viewer">
+                      <PdfViewer
+                        selectedDocument={selectedDocument}
+                        selectedSource={selectedSource}
+                        onClose={() => setSelectedDocument(undefined)}
+                      />
+                    </Tabs.Panel>
+                  )}
+                </Tabs>
               ) : (
                 userBucket && (
                   <Files configurationId={selectedAssistantId} userBucket={userBucket} conversationId={selectedChatId} />

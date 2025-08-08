@@ -3,6 +3,7 @@ import { IconArrowDown } from '@tabler/icons-react';
 import { RefObject, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
+
 import { FileDto } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
 import { useScrollToBottom } from 'src/hooks/useScrollToBottom';
@@ -21,11 +22,10 @@ const transformMimeTypes = (mimeTypes: string[]) => Object.fromEntries(mimeTypes
 
 interface ConversationPageProps {
   textareaRef: RefObject<HTMLTextAreaElement>;
-  selectDocument: (chatId: number, messageId: number, documentUri: string) => void;
 }
 
 export function ConversationPage(props: ConversationPageProps) {
-  const { textareaRef, selectDocument } = props;
+  const { textareaRef } = props;
 
   const chatParam = useParams<'id'>();
   const chatId = +chatParam.id!;
@@ -82,7 +82,7 @@ export function ConversationPage(props: ConversationPageProps) {
               }
               ref={containerRef}
             >
-              <ChatHistory agentName={agentName} selectDocument={selectDocument} editMessage={submitMessage} />
+              <ChatHistory agentName={agentName} editMessage={submitMessage} />
             </div>
           )}
           <div className={`${!messages.length && 'grow'} flex shrink-0 flex-col items-center justify-center px-4`}>

@@ -9,6 +9,8 @@ import {
   ElicitRequestSchema,
   ListToolsResultSchema,
   McpError,
+  ReadResourceRequest,
+  ReadResourceResultSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
@@ -351,6 +353,27 @@ export class MCPToolsExtension implements Extension<Configuration> {
     }
 
     return spec;
+  }
+
+  async getDocument(configuration: Configuration, documentUri: string) {
+    const { client } = (await this.getTools(configuration)) ?? [];
+    const req: ReadResourceRequest = {
+      method: 'resources/read',
+      params: { uri: documentUri },
+    };
+    const res = await client.request(req, ReadResourceResultSchema);
+    const content = res.contents[0];
+
+    const base64String = content.blob as string;
+    const binaryString = atob(base64String);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const file = new File([bytes], content.uri, { type: content.mimeType });
+
+    return Promise.resolve(file);
   }
 
   async test(configuration: Configuration) {

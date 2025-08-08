@@ -15,7 +15,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiExtraModels, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 import { LocalAuthGuard } from 'src/domain/auth';
@@ -42,6 +50,7 @@ import {
   UpdateConversation,
   UpdateConversationResponse,
 } from 'src/domain/chat';
+import { GetDocument, GetDocumentResponse } from 'src/domain/chat/use-cases/get-document';
 import {
   ChatUICallbackResultDto,
   ConversationDto,
@@ -178,6 +187,61 @@ export class ConversationsController {
       new GetDocumentContent(req.user, conversationId, messageId, documentUri),
     );
     return result.documentContent;
+  }
+
+  @Get(':id/messages/:messageId/documents/:documentUri')
+  @ApiOperation({
+    operationId: 'getDocument',
+    description: 'Get the original document specified by the documentUri from an extension',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'messageId',
+    description: 'The ID of the ai message.',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'documentUri',
+    description: 'The URI identifying the document.',
+    required: true,
+    type: String,
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+  })
+  @ApiProduces('application/octet-stream')
+  async getDocument(
+    @Req() req: Request,
+    @Res() response: Response,
+    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('documentUri') documentUri: string,
+  ) {
+    const result: GetDocumentResponse = await this.queryBus.execute(
+      new GetDocument(req.user, conversationId, messageId, documentUri),
+    );
+
+    const document = result.document;
+    if (!document) {
+      response.status(404).send('Document not found');
+      return;
+    }
+    const contentType = document.type ?? 'application/octet-stream';
+    const bytes = await document.bytes();
+
+    response.setHeader('Content-Type', contentType);
+    response.setHeader('Content-Disposition', `attachment; filename="${document.name ?? 'document'}"`);
+
+    response.send(bytes);
   }
 
   private async streamResponse(

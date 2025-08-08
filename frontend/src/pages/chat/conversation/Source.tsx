@@ -1,8 +1,10 @@
 import { Anchor } from '@mantine/core';
 import React, { useState } from 'react';
+
 import { SourceDto } from 'src/api';
 import { Icon } from 'src/components';
 import { texts } from 'src/texts';
+import { useStateOfSelectedSource } from '../state/chat';
 
 const Source: React.FC<{
   source: SourceDto;
@@ -14,6 +16,9 @@ const Source: React.FC<{
   const hasMetadata = metadataEntries.length > 0;
   const toggle = () => setIsExpanded((e) => !e);
   const sourceChunksAvailable = !!source.document?.uri;
+
+  const { setSelectedSource } = useStateOfSelectedSource();
+
   return (
     <li className="mb-1 cursor-pointer rounded p-2 hover:bg-gray-100" onClick={toggle}>
       <div className="flex items-center justify-between text-sm">
@@ -26,13 +31,14 @@ const Source: React.FC<{
               size="sm"
               onClick={(e) => {
                 selectDocument(source.document?.uri ?? '');
+                setSelectedSource(source);
                 e.stopPropagation();
               }}
             >
-              {source.title}
+              {source.metadata?.title ? source.metadata?.title : source.title}
             </Anchor>
           ) : (
-            <span>{source.title}</span>
+            <span>{source.metadata?.title ? source.metadata?.title : source.title}</span>
           )}
         </div>
         {source.document?.link && (

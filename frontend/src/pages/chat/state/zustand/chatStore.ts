@@ -1,6 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
-import { AppClient, ConversationDto, FileDto, MessageDto, StreamEventDto } from 'src/api';
+import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
+import { DocumentSource } from '../../SourcesChunkPreview';
 import { ChatMessage } from '../types';
 
 type ChatData = {
@@ -16,6 +17,12 @@ type ChatState = {
   currentChatId: number;
   chatDataMap: Map<number, ChatData>;
 
+  // sources selected to be shown in the viewer
+  selectedDocument: DocumentSource | undefined;
+  selectedSource: SourceDto | undefined;
+};
+
+type ChatActions = {
   setMessages: (chatId: number, messages: ChatMessage[], preserveIfNewer?: boolean) => void;
   addMessage: (chatId: number, message: ChatMessage) => void;
   updateMessage: (
@@ -23,14 +30,16 @@ type ChatState = {
     messageId: number,
     messageUpdate: Partial<ChatMessage> | ((oldMessage: ChatMessage) => Partial<ChatMessage>),
   ) => void;
-  appendToStreamingMessage: (chatId: number, text: string) => void;
+
   setChat: (chatId: number, chat: ConversationDto) => void;
+  initializeChatIfNeeded: (chatId: number) => void;
+  switchToChat: (chatId: number) => void;
+
   setIsAiWriting: (chatId: number, isAiWriting: boolean) => void;
   setStreamingMessageId: (chatId: number, messageId?: number) => void;
+  appendToStreamingMessage: (chatId: number, text: string) => void;
   setActiveStreamSubscription: (chatId: number, subscription?: Subscription) => void;
   cancelActiveStream: (chatId: number) => void;
-  switchToChat: (chatId: number) => void;
-  initializeChatIfNeeded: (chatId: number) => void;
   getStream: (
     chatId: number,
     input: string,
@@ -38,6 +47,9 @@ type ChatState = {
     api: AppClient,
     editMessageId: number | undefined,
   ) => Observable<StreamEventDto>;
+
+  setSelectedDocument: (document: DocumentSource | undefined) => void;
+  setSelectedSource: (source: SourceDto | undefined) => void;
 };
 
 const createEmptyChatData = (chatId: number): ChatData => ({
@@ -49,10 +61,13 @@ const createEmptyChatData = (chatId: number): ChatData => ({
   hasLoadedFromServer: false,
 });
 
-export const useChatStore = create<ChatState>()((set, get) => {
+export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
   return {
     currentChatId: 0,
     chatDataMap: new Map(),
+
+    selectedDocument: undefined,
+    selectedSource: undefined,
 
     initializeChatIfNeeded: (chatId) => {
       set((state) => {
@@ -198,5 +213,12 @@ export const useChatStore = create<ChatState>()((set, get) => {
         });
         return { chatDataMap: newMap };
       }),
+
+    setSelectedDocument: (selectedDocument) => {
+      set({ selectedDocument });
+    },
+    setSelectedSource: (selectedSource) => {
+      set({ selectedSource });
+    },
   };
 });

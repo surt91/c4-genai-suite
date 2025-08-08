@@ -232,6 +232,43 @@
         "tags": ["conversation"]
       }
     },
+    "/api/conversations/{id}/messages/{messageId}/documents/{documentUri}": {
+      "get": {
+        "description": "Get the original document specified by the documentUri from an extension",
+        "operationId": "getDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "messageId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the ai message.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "documentUri",
+            "required": true,
+            "in": "path",
+            "description": "The URI identifying the document.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
     "/api/conversations/{id}/messages/{messageId}/sse": {
       "put": {
         "description": "Updates an existing message message of the converation and handles it.",
@@ -1424,7 +1461,11 @@
           "name": { "type": "string", "description": "Name of the document" },
           "mimeType": { "type": "string", "description": "MIME type of the document", "example": "application/pdf" },
           "size": { "type": "number", "description": "Size of the document in bytes" },
-          "link": { "type": "string", "description": "Link to the document, if available" }
+          "link": { "type": "string", "description": "Link to the document, if available" },
+          "downloadAvailable": {
+            "type": "boolean",
+            "description": "Can the document be downloaded via the `getDocument` endpoint."
+          }
         },
         "required": ["uri", "mimeType"]
       },
