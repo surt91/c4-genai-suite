@@ -11,6 +11,8 @@ updates:
       - "/dev/oauth-mock"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "node"
 
   - package-ecosystem: "docker-compose"
     directories:
