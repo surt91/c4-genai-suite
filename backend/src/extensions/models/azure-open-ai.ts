@@ -64,6 +64,16 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           format: 'slider',
           description: this.i18n.t('texts.extensions.common.presencePenaltyHint'),
         },
+        topP: {
+          type: 'number',
+          title: this.i18n.t('texts.extensions.common.topP'),
+          minimum: 0,
+          maximum: 1,
+          multipleOf: 0.1,
+          default: 1,
+          format: 'slider',
+          description: this.i18n.t('texts.extensions.azure.topPHint'),
+        },
         frequencyPenalty: {
           type: 'number',
           title: this.i18n.t('texts.extensions.common.frequencyPenalty'),
@@ -106,7 +116,8 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
     callbacks?: CallbackHandlerMethods[],
     streaming = false,
   ) {
-    const { apiKey, apiVersion, deploymentName, frequencyPenalty, instanceName, presencePenalty, temperature } = configuration;
+    const { apiKey, apiVersion, deploymentName, frequencyPenalty, instanceName, presencePenalty, temperature, topP } =
+      configuration;
 
     const llm = new AzureChatOpenAI({
       azureOpenAIApiDeploymentName: deploymentName,
@@ -118,6 +129,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
       presencePenalty,
       streaming,
       temperature,
+      topP,
     });
 
     return llm;
@@ -133,4 +145,5 @@ type AzureOpenAIModelExtensionConfiguration = ExtensionConfiguration & {
   seed: number;
   presencePenalty: number;
   frequencyPenalty: number;
+  topP: number;
 };

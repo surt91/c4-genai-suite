@@ -7,6 +7,7 @@
       "instanceName": "Instance Name",
       "apiVersion": "API-Version",
       "temperature": "Temperatur",
+      "effort": "Effort",
       "seed": "Seed",
       "presencePenalty": "Presence Penalty",
       "frequencyPenalty": "Frequency Penalty",
@@ -39,11 +40,13 @@
       "temperatureHint": "Höhere Werte wie 0.8 machen die Ausgabe zufälliger, während niedrigere Werte wie 0.2 die Ausgabe fokussierter und deterministischer machen.",
       "seedHint": "Dieses Feature befindet sich in der Beta-Phase. Wenn angegeben, wird OpenAI versuchen, deterministisch zu arbeiten, sodass wiederholte Anfragen mit demselben Seed und denselben Parametern das gleiche Ergebnis liefern sollten.",
       "presencePenaltyHint": "Positive Werte bestrafen neue Tokens basierend darauf, ob sie bisher im Text vorkommen, und erhöhen die Wahrscheinlichkeit, dass das Modell über neue Themen spricht.",
-      "frequencyPenaltyHint": "Positive Werte bestrafen neue Tokens basierend auf ihrer bisherigen Häufigkeit im Text und verringern die Wahrscheinlichkeit, dass das Modell dieselbe Zeile wörtlich wiederholt."
+      "frequencyPenaltyHint": "Positive Werte bestrafen neue Tokens basierend auf ihrer bisherigen Häufigkeit im Text und verringern die Wahrscheinlichkeit, dass das Modell dieselbe Zeile wörtlich wiederholt.",
+      "topPHint": "Tokens werden von den wahrscheinlichsten bis zu den unwahrscheinlichsten ausgewählt, bis die Summe ihrer Wahrscheinlichkeiten dem Top-p-Wert entspricht.\nBeispielsweise, wenn die Tokens A, B und C eine Wahrscheinlichkeit von 0,3, 0,2 und 0,1 haben und der Top-p-Wert 0,5 beträgt, dann wählt das Modell entweder A oder B als nächstes Token aus (unter Verwendung der Temperatur)."
     },
     "azure": {
       "title": "Azure OpenAI",
-      "description": "OpenAI LLM-Integration"
+      "description": "OpenAI LLM-Integration",
+      "topPHint": "Eine Alternative zum Sampling mit Temperature ist das sogenannte Nucleus Sampling, bei dem das Modell nur die Ergebnisse der Tokens mit Top_p probability mass berücksichtigt. Ein Wert von 0,1 bedeutet also, dass nur die Tokens in Betracht gezogen werden, die zusammen die obersten 10 % der probability mass ausmachen. Wir empfehlen in der Regel, entweder diesen Wert oder Temperature anzupassen – jedoch nicht beide gleichzeitig."
     },
     "azure-o": {
       "title": "Azure OpenAI Reasoning",
