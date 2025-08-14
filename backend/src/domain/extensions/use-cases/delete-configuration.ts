@@ -22,7 +22,6 @@ export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfigu
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      //TODO: refactor logic in frontend to avoid spamming empty conversations when "New Chat" is clicked
       await queryRunner.manager.delete(ConversationEntity, { configurationId: command.id, llm: IsNull(), name: IsNull() });
       result = await queryRunner.manager.delete(ConfigurationEntity, { id: command.id });
       await queryRunner.commitTransaction();
