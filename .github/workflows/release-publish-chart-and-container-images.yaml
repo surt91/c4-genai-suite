@@ -1,4 +1,4 @@
-name: Publish Release
+name: Publish Helm Chart and Container Images
 
 permissions:
   contents: read
