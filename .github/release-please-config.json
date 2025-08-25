@@ -32,7 +32,7 @@
         "confluence-importer",
         "reis"
       ],
-      "updateAllPackages": false
+      "updateAllPackages": true
     }
   ],
   "last-release-sha": "b661fdb7ed75f99884936816d6e4838fdd2c9090",
