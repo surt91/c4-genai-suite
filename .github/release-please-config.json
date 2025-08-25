@@ -24,7 +24,7 @@
   "plugins": [
     {
       "type": "linked-versions",
-      "groupName": "mono",
+      "groupName": "c4-genai-suite",
       "components": [
         "backend",
         "frontend",
