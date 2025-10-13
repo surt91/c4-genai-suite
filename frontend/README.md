@@ -23,6 +23,8 @@ Following tech is used by our tests:
 
 For other types of tests, e.g. pure unit tests without ui and external connection, feel free to add them to vite.config.ts
 
+asdasddasasd
+
 ### UI Unit Tests
 
 marked as *componentName.ui-unit.spec.tsx*
