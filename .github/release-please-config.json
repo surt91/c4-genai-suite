@@ -10,5 +10,6 @@
   "last-release-sha": "b661fdb7ed75f99884936816d6e4838fdd2c9090",
   "include-v-in-tag": true,
   "separate-pull-requests": false,
-  "grouppull-request-title-pattern": "chore${scope}: release ${version} [skip ci]"
+  "pull-request-title-pattern": "chore($component): release ${version} [skip ci]",
+  "group-pull-request-title-pattern": "chore: release ${version} [skip ci]"
 }
