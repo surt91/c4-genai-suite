@@ -23,9 +23,6 @@ $ npm run start
 $ npm run start:dev
 ```
 
-ASDASDASDASDA
-asdasdasdasdasdasdasd
-
 ## Create migrations
 
 Migrations are used to keep the database in sync with the entities.
