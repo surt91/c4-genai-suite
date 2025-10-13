@@ -1,5 +1,13 @@
 # Changelog
 
+## [10.0.1](https://github.com/surt91/c4-genai-suite/compare/v10.0.0...v10.0.1) (2025-10-13)
+
+
+### Bug Fixes
+
+* frontend fix ([5018dfa](https://github.com/surt91/c4-genai-suite/commit/5018dfa85a84ac7931df57d4828d2d281ee9a32e))
+* frontend fix ([7d34abc](https://github.com/surt91/c4-genai-suite/commit/7d34abcfc44fb52f9095042e45f60b0aea3a81e0))
+
 ## [10.0.0](https://github.com/surt91/c4-genai-suite/compare/v9.0.0...v10.0.0) (2025-10-13)
 
 
