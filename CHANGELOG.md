@@ -1,5 +1,17 @@
 # Changelog
 
+## [10.2.0](https://github.com/surt91/c4-genai-suite/compare/v10.1.0...v10.2.0) (2025-10-13)
+
+
+### Features
+
+* backup-feature ([#10](https://github.com/surt91/c4-genai-suite/issues/10)) ([103de48](https://github.com/surt91/c4-genai-suite/commit/103de48bd928ac7c19c9839a275088a0bd184660))
+
+
+### Bug Fixes
+
+* fix rp ([#12](https://github.com/surt91/c4-genai-suite/issues/12)) ([67d0079](https://github.com/surt91/c4-genai-suite/commit/67d0079fb4b4f67465c67d9f4bb9e4b84309ebba))
+
 ## [10.1.0](https://github.com/surt91/c4-genai-suite/compare/v10.0.1...v10.1.0) (2025-10-13)
 
 
