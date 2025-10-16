@@ -25,7 +25,7 @@ jobs:
     with:
       platforms: linux/amd64,linux/arm64
       push-to-registry: true
-      
+      tag-prefix: ghcr.io/${{ github.repository }}/
 
   e2e:
     needs:
