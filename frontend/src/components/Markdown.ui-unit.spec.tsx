@@ -1,22 +1,8 @@
 import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Markdown } from 'src/components/Markdown';
-
-vi.mock('react-syntax-highlighter', () => ({
-  Prism: (props: { children: React.ReactNode; [key: string]: unknown }) => {
-    const { children, ...other } = props;
-    return (
-      <code data-testid="syntax-highlighted-code" {...other}>
-        {children}
-      </code>
-    );
-  },
-}));
-vi.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({
-  vscDarkPlus: {},
-}));
 
 describe('Markdown component', () => {
   it('renders table correctly', () => {
@@ -71,11 +57,32 @@ describe('Markdown component', () => {
 
   it('fenced code block with language has a copy button', () => {
     const content = '```javascript\nconst greeting = "Hello";\n```';
-    render(<Markdown>{content}</Markdown>);
+    const { container } = render(<Markdown>{content}</Markdown>);
 
-    expect(screen.getByText(/const greeting = "Hello";/)).toBeInTheDocument();
+    expect(container.querySelector('pre code')).toHaveTextContent('const greeting = "Hello";');
 
     const copyIcon = screen.getByTestId('copy-code-button');
     expect(copyIcon).toBeInTheDocument();
+  });
+
+  it('highlights fenced code blocks of known languages', () => {
+    const content = '```javascript\nconst greeting = "<b>Hello</b>";\n```';
+    const { container } = render(<Markdown>{content}</Markdown>);
+
+    const code = container.querySelector('pre > div > code');
+    expect(code).toHaveClass('hljs', 'language-javascript');
+    expect(code?.querySelector('.hljs-keyword')).toHaveTextContent('const');
+    expect(code).toHaveTextContent('const greeting = "<b>Hello</b>";');
+    expect(code?.querySelector('b')).toBeNull();
+  });
+
+  it('escapes code blocks of unknown languages', () => {
+    const content = '```unknownlang\n<script>alert(1)</script>\n```';
+    const { container } = render(<Markdown>{content}</Markdown>);
+
+    const code = container.querySelector('pre > div > code');
+    expect(code).toHaveClass('language-unknownlang');
+    expect(code).toHaveTextContent('<script>alert(1)</script>');
+    expect(code?.querySelector('script')).toBeNull();
   });
 });

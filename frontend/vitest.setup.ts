@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeAll, vi } from 'vitest';
-import React from 'react';
 
 // Node >= 25 ships its own (file-backed, here unconfigured) Web Storage globals that shadow jsdom's
 // implementation. Always use jsdom's storage so tests behave the same on every Node version.
@@ -11,18 +10,6 @@ for (const storage of ['localStorage', 'sessionStorage'] as const) {
     Object.defineProperty(globalThis, storage, { value: jsdomStorage, configurable: true, writable: true });
   }
 }
-
-// Mock react-syntax-highlighter to avoid ES module issues
-vi.mock('react-syntax-highlighter', () => ({
-  Prism: (props: { children: React.ReactNode; [key: string]: unknown }) => {
-    const { children, ...other } = props;
-    return React.createElement('code', { 'data-testid': 'syntax-highlighted-code', ...other }, children);
-  },
-}));
-
-vi.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({
-  vscDarkPlus: {},
-}));
 
 beforeAll(() => {
   vi.spyOn(console, 'error').mockImplementation(vi.fn());

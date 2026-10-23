@@ -1,8 +1,10 @@
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard } from '@tabler/icons-react';
+import hljs from 'highlight.js/lib/common';
+import dockerfile from 'highlight.js/lib/languages/dockerfile';
+import powershell from 'highlight.js/lib/languages/powershell';
+import 'highlight.js/styles/vs2015.css';
 import ReactMarkdown from 'react-markdown';
-import { Prism } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { toast } from 'react-toastify';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
@@ -12,6 +14,21 @@ import { useTransientNavigate } from 'src/hooks';
 import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { Icon } from './Icon';
+
+// The common highlight.js bundle (~35 languages) plus a few that are frequent in chats.
+hljs.registerLanguage('dockerfile', dockerfile);
+hljs.registerLanguage('powershell', powershell);
+
+function highlight(code: string, language: string) {
+  if (hljs.getLanguage(language)) {
+    return hljs.highlight(code, { language, ignoreIllegals: true }).value;
+  }
+  return escapeHtml(code);
+}
+
+function escapeHtml(text: string) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+}
 
 interface MarkdownProps {
   // The content to render.
@@ -116,9 +133,11 @@ function CodeBlock(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLEleme
 
   return typeof children === 'string' ? (
     <div className="group relative max-w-full overflow-x-auto">
-      <Prism {...other} language={language} style={vscDarkPlus} customStyle={{ backgroundColor: 'transparent', padding: 0 }}>
-        {children.replace(/\n$/, '')}
-      </Prism>
+      <code
+        {...other}
+        className={`hljs language-${language}`}
+        dangerouslySetInnerHTML={{ __html: highlight(children.replace(/\n$/, ''), language) }}
+      />
       <IconClipboard
         onClick={handleCopy}
         data-testid="copy-code-button"
