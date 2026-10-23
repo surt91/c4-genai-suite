@@ -4,8 +4,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/domain/auth/module';
 import { BucketEntity, CacheEntity, FileEntity } from 'src/domain/database';
+import { UserArgsExtension } from './dev-only/user-args';
 import { ContextExtension } from './examples/show-context';
-import { UserArgsExtension } from './examples/user-args';
 import { AzureOpenAIModelExtension } from './models/azure-open-ai';
 import { BedrockModelExtension } from './models/bedrock-ai';
 import { GoogleGenAIModelExtension } from './models/google-genai';
@@ -32,6 +32,9 @@ import { WholeFilesExtension } from './tools/whole-files-conversation';
 @Module({})
 export class ExtensionLibraryModule {
   static register(): DynamicModule {
+    // test fixtures for the E2E tests, never offered in production
+    const devOnlyExtensions = process.env.NODE_ENV !== 'production' ? [UserArgsExtension] : [];
+
     return {
       module: ExtensionLibraryModule,
       imports: [ConfigModule, AuthModule, CqrsModule, TypeOrmModule.forFeature([CacheEntity, BucketEntity, FileEntity])],
@@ -58,8 +61,8 @@ export class ExtensionLibraryModule {
         OpenAIModelExtension,
         SpeechToTextExtension,
         SummaryPromptExtension,
-        UserArgsExtension,
         WholeFilesExtension,
+        ...devOnlyExtensions,
       ],
     };
   }

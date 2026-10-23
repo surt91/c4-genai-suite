@@ -17,6 +17,9 @@ npx playwright test tests/administration/permissions.spec.ts  # a single file
 npx playwright test --ui                                    # interactive / debugging
 ```
 
+`NODE_ENV=development` is required: the backend only registers the test extension `user-args-test`
+(`backend/src/extensions/dev-only/`) outside of production.
+
 All tests run against a local mock LLM server (`tests/utils/mock-llm-server.ts`) started by the tests on the host,
 so no cloud credentials are needed. The backend container reaches it via `host.docker.internal`.
 Only the `chromium` project is configured.

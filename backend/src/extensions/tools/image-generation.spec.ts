@@ -31,11 +31,7 @@ describe('image generation tools', () => {
     fetchMock.mockRestore();
   });
 
-  async function callTool(
-    extension: GPTImage1Extension,
-    values: Record<string, unknown>,
-    args: Record<string, string>,
-  ) {
+  async function callTool(extension: GPTImage1Extension, values: Record<string, unknown>, args: Record<string, string>) {
     const context = {
       tools: [] as NamedStructuredTool[],
       cache: { get: (_key: string, _values: unknown, factory: () => Promise<unknown>) => factory() },
