@@ -71,10 +71,7 @@ test('Chat viewport scrolling', async ({ page, mockServerUrl, adminUser }) => {
   });
 
   await test.step('should show and allow clicking auto-scroll button when user scrolls up', async () => {
-    const chatContainer = page
-      .getByTestId('chat-item')
-      .first()
-      .locator('xpath=ancestor::div[contains(@class, "overflow-auto")][1]');
+    const chatContainer = page.getByTestId('chat-history');
     // The button hides as soon as the (smooth) scrolling is close to the bottom. Wait until the scrolling has finished,
     // otherwise it would override our scrolling below.
     await expect.poll(() => chatContainer.evaluate((e) => e.scrollHeight - e.scrollTop - e.clientHeight)).toBeLessThan(2);

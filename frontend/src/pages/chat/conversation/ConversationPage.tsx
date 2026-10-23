@@ -87,7 +87,7 @@ export function ConversationPage(props: ConversationPageProps) {
       ) : (
         <>
           {messages.length > 0 && (
-            <div className={clsx('fade-in overflow-anchor-none', classes.history)} ref={containerRef}>
+            <div className={clsx('fade-in overflow-anchor-none', classes.history)} ref={containerRef} data-testid="chat-history">
               <ChatHistory agentName={agentName} editMessage={submitMessage} />
             </div>
           )}
