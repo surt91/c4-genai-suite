@@ -42,6 +42,29 @@ describe('HumanChatItem', () => {
     expect(editMessage).toHaveBeenCalledWith('Edited', [], 5);
   });
 
+  it('starts again with the question after a cancelled edit', () => {
+    renderItem();
+    fireEvent.click(screen.getByRole('button', { name: texts.common.edit }));
+    fireEvent.change(screen.getByLabelText(texts.accessibility.editMessage), { target: { value: 'Draft' } });
+    fireEvent.keyDown(screen.getByLabelText(texts.accessibility.editMessage), { key: 'Escape' });
+
+    fireEvent.click(screen.getByRole('button', { name: texts.common.edit }));
+
+    expect(screen.getByLabelText(texts.accessibility.editMessage)).toHaveValue('Question');
+  });
+
+  it('does not send empty questions or while composing with an input method', () => {
+    const editMessage = renderItem();
+    fireEvent.click(screen.getByRole('button', { name: texts.common.edit }));
+    const textarea = screen.getByLabelText(texts.accessibility.editMessage);
+
+    fireEvent.keyDown(textarea, { key: 'Enter', isComposing: true });
+    fireEvent.change(textarea, { target: { value: '   ' } });
+    fireEvent.keyDown(textarea, { key: 'Enter' });
+
+    expect(editMessage).not.toHaveBeenCalled();
+  });
+
   it('cannot be edited while an answer is generated', () => {
     act(() => useChatStore.getState().setIsAiWriting(1, true));
     renderItem();

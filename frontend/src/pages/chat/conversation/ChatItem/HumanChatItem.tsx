@@ -31,8 +31,14 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
     toast(texts.common.copied, { type: 'info' });
   };
 
+  const cancelEdit = () => {
+    // the next edit starts with the question again
+    setEditedText(textContent);
+    setIsEditing(false);
+  };
+
   const handleSave = () => {
-    if (isAiWriting) {
+    if (isAiWriting || !editedText.trim()) {
       return;
     }
     setIsEditing(false);
@@ -40,7 +46,13 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
   };
 
   const doKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) handleSave();
+    if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey && !event.nativeEvent.isComposing) {
+      event.preventDefault();
+      handleSave();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      cancelEdit();
+    }
   });
 
   return (
@@ -57,10 +69,10 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
             aria-label={texts.accessibility.editMessage}
           />
           <div className={classes.editorActions}>
-            <Button onClick={() => setIsEditing(false)} size="xs" variant="subtle">
+            <Button onClick={cancelEdit} size="xs" variant="subtle">
               {texts.common.cancel}
             </Button>
-            <Button onClick={handleSave} size="xs" disabled={isAiWriting}>
+            <Button onClick={handleSave} size="xs" disabled={isAiWriting || !editedText.trim()}>
               {texts.common.send}
             </Button>
           </div>

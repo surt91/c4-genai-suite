@@ -128,7 +128,7 @@ export function ChatInput({
   });
 
   const doSubmit = useEventCallback((event: React.FormEvent) => {
-    if (isDisabled || !input || input.length === 0 || upload.status === 'pending') {
+    if (isDisabled || !input.trim() || upload.status === 'pending') {
       return;
     }
     doSetText(input, chatFiles);
@@ -153,7 +153,8 @@ export function ChatInput({
   });
 
   const doKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
+    // Enter also confirms the candidates of input method editors (e.g. Japanese), which must not send the message.
+    if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey && !event.nativeEvent.isComposing) {
       doSubmit(event);
     } else if (event.key === 'Escape') {
       // Esc closes the inspector first and stops the generation afterwards.
@@ -369,7 +370,7 @@ export function ChatInput({
                     <ActionIcon
                       type="submit"
                       size="lg"
-                      disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                      disabled={!input.trim() || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
                       data-testid="chat-submit-button"
                       aria-label={texts.common.send}
                     >

@@ -181,6 +181,23 @@ describe('ChatInput', () => {
     expect(screen.queryByRole('button', { name: 'Stop generating' })).toBeNull();
     expect(stopMessage).not.toHaveBeenCalled();
   });
+
+  it('should send with enter, but not while composing with an input method or without text', () => {
+    mockConversationFiles([]);
+    const submitMessage = vi.fn();
+
+    render(<ChatInput chatId={0} submitMessage={submitMessage} />);
+    const textbox = screen.getByRole('textbox');
+
+    fireEvent.change(textbox, { target: { value: '   ' } });
+    fireEvent.keyDown(textbox, { key: 'Enter' });
+    fireEvent.change(textbox, { target: { value: 'こんにちは' } });
+    fireEvent.keyDown(textbox, { key: 'Enter', isComposing: true });
+    expect(submitMessage).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(textbox, { key: 'Enter' });
+    expect(submitMessage).toHaveBeenCalledExactlyOnceWith('こんにちは', []);
+  });
 });
 
 const assertFilesInChatExtensionErrorMessageVisible = (visible: boolean) => {
