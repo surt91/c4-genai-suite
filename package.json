@@ -2,25 +2,15 @@
   "name": "gaible",
   "license": "Apache-2.0",
   "scripts": {
-    "prepare": "husky && npm run install-all && npm run env",
+    "prepare": "husky",
     "install-all": "(cd backend && npm install) && (cd frontend && npm install) && (cd services/reis && command -v uv && uv sync || echo 'uv not installed, skipping')",
-    "env": "node scripts/env-setup.js --noOverwrites",
-    "env:fix": "node scripts/env-setup.js",
-    "dev": "node scripts/run-tests.js --devSetup",
-    "dev:force": "node scripts/run-tests.js --devSetup --forceUsingRunningServices",
-    "test": "npm run test:frontend && npm run test:backend && npm run test:e2e",
-    "test:force": "node scripts/run-tests.js --forceUsingRunningServices && cd frontend && npm run test",
-    "test:e2e": "node scripts/run-tests.js",
-    "test:e2e:noKill": "node scripts/run-tests.js --noAutoKill",
-    "test:e2e:ui": "node scripts/run-tests.js --noAutoKill --ui",
-    "test:e2e:debug": "node scripts/run-tests.js --debug",
-    "test:e2e:debug:expensive": "node scripts/run-tests.js --withoutNormalTests --debug",
-    "test:e2e:expensive": "node scripts/run-tests.js --withoutNormalTests --noAutoKill",
-    "test:e2e:expensive-ui": "node scripts/run-tests.js --withoutNormalTests --noAutoKill --ui",
-    "test:e2e:codegen": "npx playwright codegen http://localhost:5173/login",
+    "up": "docker compose up --build",
+    "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "cd frontend && npm run test",
     "test:backend": "cd backend && npm run test",
     "test:reis": "cd services/reis && uv run pytest",
+    "test:e2e": "cd e2e && npx playwright test",
+    "test:e2e:ui": "cd e2e && npx playwright test --ui",
     "generate-apis": "npm run generate-specs && npm run generate-clients",
     "generate-specs": "npm run generate-specs-backend && npm run generate-specs-reis",
     "generate-clients": "npm run generate-clients-frontend && npm run generate-clients-backend",
@@ -30,16 +20,8 @@
     "generate-clients-frontend": "cd ./frontend && npm run generate-api"
   },
   "devDependencies": {
-    "detect-port": "2.1.0",
-    "dotenv": "16.5.0",
-    "fs-extra": "11.3.0",
     "husky": "9.1.7",
-    "lint-staged": "15.5.2",
-    "md5": "2.3.0",
-    "prompts": "2.4.2",
-    "tree-kill": "1.2.2",
-    "vitest": "4.1.0",
-    "wait-on": "8.0.3"
+    "lint-staged": "15.5.2"
   },
   "version": "10.0.2"
 }

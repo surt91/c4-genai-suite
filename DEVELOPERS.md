@@ -2,84 +2,69 @@
 
 ## Prerequisites
 
-- **Node.js**: Version as specified in `.nvmrc`
-  - We recommend using `nvm` to manage Node.js versions
-- **Postgres**: Automatically configured via Docker Compose
-  - Uses pgvector image for vector storage
-- **Python** (currently required): Required for REI-S (Retrieval & Ingestion Server)
-  - uv (>= 0.5.0) for dependency management ([installation guide](https://docs.astral.sh/uv/getting-started/installation/))
-  - Python version compatibility issues can be managed with `uv`
-- **JRE** (currently required): Required when changing APIs only, to run the OpenAPI Generator. Creates or updates API client files for
-  - frontend to backend access
-  - backend to REI-S access
+- **Docker** with Compose v2 – runs the whole stack and the infrastructure (Postgres/pgvector, MinIO).
+- **Node.js** in the version from `.nvmrc` (we recommend `nvm install`).
+- **uv** (>= 0.5) for the Python services ([installation guide](https://docs.astral.sh/uv/getting-started/installation/)); uv manages the Python version itself.
+- **JRE** – only needed when changing APIs, to run the OpenAPI generator.
 
-### 1. Node Setup
+Run `npm install` in the repository root once. It installs the git hooks (husky + lint-staged);
+`npm run install-all` additionally installs the dependencies of backend, frontend and REI-S.
 
-Set up the `node` version specified in the `.nvmrc` file. We recommend using `nvm install`.
+## Running the stack
 
-> [!TIP]
-> Also check your node version if you run into unexpected errors later during development.
+There is exactly one way to start Gaible: the root [`docker-compose.yml`](docker-compose.yml).
 
-### 2. Python Setup
+```bash
+docker compose up --build          # http://localhost:3333, login admin@example.com / secret
+```
 
-Make sure uv (>=0.5.0) is available. See the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for instructions. It will manage the python installation (regardless if and which version of python is installed systemwide.)
+See the [README](README.md#using-docker-compose) for the optional profiles (`ollama`, `mcp`, `eval`).
 
-### 3. Install packages
+### Hot reload while developing
 
-At the top level (repo-root) install dependencies via `npm install`. This includes (amongst others)
-* dependencies required by the pre-commit hooks enforcing coding standards and formatting.
-* dependencies required by frontend and backend.
-* dependencies required by the OpenAPI Generator to generate the API client files for frontend and backend.
-* dependencies required by the REI-S service to run the Python server and generate OpenAPI specs.
+Start only the infrastructure from the same Compose file and run the component you are working on natively:
 
-### 4. Setup the environment
+```bash
+docker compose up -d postgres minio reis
 
-Setup all your local environment files with `npm run env`.
-This will automatically create and update `.env` files based on the `.env.example` files (and backup old `.env` files if needed).
+cd backend && cp .env.example .env && npm run start:dev    # http://localhost:3000
+cd frontend && cp .env.example .env && npm run dev         # http://localhost:5173 (proxies to the backend)
+cd services/reis && cp .env.example .env && uv run fastapi dev rei_s/app.py --port 3201   # after `docker compose stop reis`
+```
 
-In this step, you might be asked for some API-Keys, e.g., for the REI-S.
+The `.env.example` files contain working defaults for this setup.
 
-> [!TIP]
-> Update your `.env` files using the same script later if a default may have changed. You will be asked to pick between overwriting or keeping your current setting.
+## Tests
 
-### 5. Verify your setup and start developing
+| Component  | Command (from the component directory)                 | Needs                        |
+| ---------- | ------------------------------------------------------ | ---------------------------- |
+| frontend   | `npm test`                                             | –                            |
+| backend    | `npm test`                                             | Postgres (`DB_URL`)          |
+| REI-S      | `uv run pytest`                                        | Postgres + MinIO for some tests |
+| eval       | `uv run pytest`                                        | Postgres                     |
+| e2e        | `npx playwright test`                                  | running stack (see below)    |
 
-Run `npm run dev` in the root of the repository to start all components locally and try them out. This will use docker for some components like the postgres database.
-Other components will directly run on your system, and **your systems ports will be used if available**. Live reloading is enabled for the react frontend.
+No test requires credentials for external services; LLMs are replaced by a mock server.
 
-To debug any issues, checkout the `./output` during, or after the run of `npm run dev`.
-Read [the dev script documentation](./scripts/README.md) to learn more.
+### E2E tests
 
-## Run tests
+The E2E tests run against the Compose stack, exactly like in CI:
 
-### Locally
+```bash
+REIS_EMBEDDINGS_TYPE=random-test-embeddings NODE_ENV=development docker compose --profile mcp up --build --wait
+cd e2e && npm ci && npx playwright install chromium
+URL=http://localhost:3333 REIS_ENDPOINT=http://reis:3201 MCP_SERVER_ENDPOINT=http://mcp-fetch:8000/sse \
+  MOCK_LLM_HOST=host.docker.internal npx playwright test
+```
 
-To run them locally use `npm run test`.
+Use `npx playwright test --ui` or the Playwright VS Code extension to debug single tests.
 
-The [E2E tests script](./scripts/README.md) is the same script we use to run `npm run dev` (just run in its E2E configuration).
+### CI
 
-To **debug the E2E tests with breakpoints** you need to run VS-Code with the Playwright extension (by Microsoft).
-Inside VS-Code press `CTRL+SHIFT+D` to open the debug panel. You will see a drop down next to a green arrow.
-Select one of these options, and run it:
-- **All-E2Es**: Run with Playwright Debug
-- **Current-E2E**: Debug Currently Open Test File
-
-Some tests use large files stored via `git lfs`. To run these tests, first install `git lfs` on your system via (e.g., `brew install git-lfs` or `apt install git-lfs`).
-Then pull the large files in the Gaible repository via `git lfs pull`.
-
-### On Github
-
-Tests are automatically performed by GitHub Actions when opening a pull request.
-
-## Run the application for development
-
-Run `npm run dev` to start frontend, backend and the required postgres docker.
-
-Access the frontend at <http://localhost:5173>, running in development mode with live updates. Use the login details in `backend/.env`.
-
-View service outputs in the `/outputs` folder.
-
-For more details, like how to run only a single test for development, see [the readme of the scripts](scripts/README.md).
+GitHub Actions ([`.github/workflows/ci.yaml`](.github/workflows/ci.yaml)) runs one job per component (lint, build, tests)
+plus the E2E tests on every pull request and on `main`. [`release.yaml`](.github/workflows/release.yaml) publishes
+container images on every push to `main` and, via release-please, versioned releases and the Helm chart.
+Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/).
 
 ## Main Building Blocks
 
@@ -102,7 +87,7 @@ For convenience you can run the following command in the root to regenerate all 
 npm run generate-apis
 ```
 
-Before generating the APIs, ensure all dependencies are installed by running either `npm install-all` or running `npm install` manually in frontend, backend and all service subdirectories.
+Before generating the APIs, ensure all dependencies are installed by running either `npm run install-all` or running `npm install` manually in frontend, backend and all service subdirectories.
 
 Some more details on the OpenAPI specifications and how to regenerate them are provided below.
 

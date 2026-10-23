@@ -49,7 +49,7 @@ To generate the specs `reis-dev-spec.json`, run `uv run python rei_s/generate_op
 
 ## Vector stores
 
-Currently REI-S supports Azure AI Search and pgvector (e.g. provided by the [Gaible docker compose dev setup](../../dev/postgres/docker-compose.yml))
+Currently REI-S supports Azure AI Search and pgvector (e.g. provided by the `postgres` service of the root [`docker-compose.yml`](../../docker-compose.yml))
 
 The used store can be specified using the environment variables:
 

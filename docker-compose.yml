@@ -1,68 +1,137 @@
-services:
-  gaible-frontend:
-    image: ghcr.io/surt91/gaible/frontend:latest
-    volumes:
-      - ./dev/Caddyfile:/etc/caddy/Caddyfile
-    ports:
-      - "3333:3080"
-    depends_on:
-      gaible-backend:
-        condition: service_started
+# The one way to run Gaible locally (and in CI for the E2E tests).
+#
+#   docker compose up --build                     # core stack on http://localhost:3333
+#   docker compose --profile ollama up --build    # + local Ollama LLM/embeddings (CPU, slow)
+#   docker compose --profile mcp up --build       # + example MCP server (mcp-server-fetch)
+#   docker compose --profile eval up --build      # + eval service (set EVAL_SERVICE_ENABLED=true)
+#
+# Without --build, Compose pulls the published images (tag: GAIBLE_TAG, default `latest`)
+# and only builds those it cannot pull.
+# Every ${VAR:-default} can be overridden via the shell or a `.env` file next to this file.
+# For hot-reload development start only the infrastructure (`docker compose up postgres minio reis`)
+# and run backend/frontend natively, see DEVELOPERS.md.
 
-  gaible-backend:
-    image: ghcr.io/surt91/gaible/backend:latest
-    hostname: gaible-backend
+name: gaible
+
+x-pg: &pg
+  POSTGRES_USER: admin
+  POSTGRES_PASSWORD: secret
+  POSTGRES_DB: gaible
+
+x-s3: &s3
+  FILE_STORE_TYPE: s3
+  FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
+  FILE_STORE_S3_ACCESS_KEY_ID: admin
+  FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
+
+services:
+  frontend:
+    image: ghcr.io/surt91/gaible/frontend:${GAIBLE_TAG:-latest}
+    build:
+      context: frontend
+      args:
+        VERSION: ${VERSION:-dev}
+    volumes:
+      - ./dev/Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - "${FRONTEND_PORT:-3333}:3080"
+    depends_on:
+      - backend
+
+  backend:
+    image: ghcr.io/surt91/gaible/backend:${GAIBLE_TAG:-latest}
+    build: backend
     environment:
-      AUTH_ENABLE_PASSWORD: true
-      BASE_URL: http://localhost:3333
-      AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
-      AUTH_INITIAL_ADMIN_PASSWORD: secret
+      BASE_URL: http://localhost:${FRONTEND_PORT:-3333}
+      NODE_ENV: ${NODE_ENV:-production}
+      VERSION: ${VERSION:-dev}
       DB_URL: postgres://admin:secret@postgres:5432/gaible
-      NODE_ENV: dev
-      SESSION_SECRET: random
+      SESSION_SECRET: ${SESSION_SECRET:-random}
+      AUTH_ENABLE_PASSWORD: "true"
+      AUTH_INITIAL_ADMIN_USERNAME: ${ADMIN_USERNAME:-admin@example.com}
+      AUTH_INITIAL_ADMIN_PASSWORD: ${ADMIN_PASSWORD:-secret}
+      EVAL_SERVICE_ENABLED: ${EVAL_SERVICE_ENABLED:-false}
+      EVAL_SERVICE_URL: http://eval:3202
+      EVAL_SERVICE_ACCOUNT_API_KEY: ${EVAL_SERVICE_ACCOUNT_API_KEY:-}
+    extra_hosts:
+      # lets the backend reach services on the host, e.g. the mock LLM of the E2E tests
+      - host.docker.internal:host-gateway
+    ports:
+      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
       test: wget --no-verbose --spider --tries=1 http://localhost:3000/api/health || exit 1
-      interval: 1s
-      timeout: 1s
-      retries: 100
+      interval: 2s
+      timeout: 2s
+      retries: 60
 
-  gaible-reis:
-    image: ghcr.io/surt91/gaible/reis:latest
-    hostname: reis
+  reis:
+    image: ghcr.io/surt91/gaible/reis:${GAIBLE_TAG:-latest}
+    build:
+      context: services/reis
     environment:
-      EMBEDDINGS_TYPE: ollama
-      EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
-      EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
+      <<: *s3
+      FILE_STORE_S3_BUCKET_NAME: reisbucket
+      VERSION: ${VERSION:-dev}
+      WORKERS: ${REIS_WORKERS:-2}
       STORE_TYPE: pgvector
       STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/gaible
-      STORE_PGVECTOR_INDEX_NAME: basisreistest
-      FILE_STORE_TYPE: s3
-      FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
-      FILE_STORE_S3_ACCESS_KEY_ID: admin
-      FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
-      FILE_STORE_S3_BUCKET_NAME: reisbucket
+      STORE_PGVECTOR_INDEX_NAME: reis
+      # use `random-test-embeddings` to run without any embedding model
+      EMBEDDINGS_TYPE: ${REIS_EMBEDDINGS_TYPE:-ollama}
+      EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
+      EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
+    ports:
+      - "3201:3201"
     depends_on:
-      ollama:
+      postgres:
         condition: service_healthy
-      ollama-models-pull:
-        condition: service_completed_successfully
+      minio:
+        condition: service_started
     healthcheck:
-      # debian slim based image has no curl/wget
-      test: python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3201/health').status == 200 else sys.exit(1)" || exit 2
+      # the image has no curl/wget
+      test: python3 -c "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://localhost:3201/health').status == 200 else 1)"
+      interval: 2s
+      timeout: 2s
+      retries: 60
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment: *pg
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d gaible"]
       interval: 1s
       timeout: 1s
-      retries: 20
+      retries: 30
 
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: secretsecret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+
+  # --- profile: ollama -------------------------------------------------------
   ollama:
     image: ollama/ollama:0.32.14
-    restart: unless-stopped
+    profiles: [ollama]
+    ports:
+      - "11434:11434"
     volumes:
       - ollama-data:/root/.ollama
     healthcheck:
-      test: [ "CMD", "ollama", "list" ]
+      test: ["CMD", "ollama", "list"]
       interval: 10s
       timeout: 30s
       retries: 5
@@ -70,6 +139,7 @@ services:
 
   ollama-models-pull:
     image: curlimages/curl:8.21.0
+    profiles: [ollama]
     depends_on:
       ollama:
         condition: service_healthy
@@ -77,33 +147,68 @@ services:
       curl -X POST ollama:11434/api/pull -d '{"name" : "llama3.2"}'
         --next -X POST ollama:11434/api/pull -d '{"name" : "all-minilm"}'
 
-  postgres:
-    image: pgvector/pgvector:pg16
-    hostname: postgres
+  # --- profile: mcp ----------------------------------------------------------
+  mcp-fetch:
+    image: ghcr.io/surt91/gaible/mcp-tool-as-server:${GAIBLE_TAG:-latest}
+    build: dev/mcp-tool-as-server
+    profiles: [mcp]
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=gaible
-      - PGPORT=5432
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d gaible" ]
-      interval: 1s
-      timeout: 1s
-      retries: 20
+      CONFIG: '{"mcpServers":{"mcp-fetch":{"command":"uvx","args":["mcp-server-fetch","--ignore-robots-txt"],"port":8000}}}'
+    ports:
+      - "8000:8000"
 
-  minio:
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
-    hostname: minio
+  # --- profile: eval ---------------------------------------------------------
+  eval: &eval
+    image: ghcr.io/surt91/gaible/eval:${GAIBLE_TAG:-latest}
+    build: services/eval
+    profiles: [eval]
+    environment: &eval-env
+      <<: *s3
+      FILE_STORE_S3_BUCKET_NAME: evalbucket
+      PG_HOST: postgres
+      PG_USER: admin
+      PG_PASSWORD: secret
+      PG_DB: gaible
+      PG_PORT: 5432
+      PG_SCHEMA: llm_eval
+      CELERY_BROKER_HOST: rabbitmq
+      CELERY_BROKER_USER: rabbit
+      CELERY_BROKER_PASSWORD: rabbit
+      LLM_EVAL_ENCRYPTION_KEY: ${LLM_EVAL_ENCRYPTION_KEY:-}
+      GAIBLE_BACKEND_URL: http://backend:3000/api
+      GAIBLE_BACKEND_API_KEY: ${EVAL_SERVICE_ACCOUNT_API_KEY:-}
+    ports:
+      - "3202:3202"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  eval-worker:
+    <<: *eval
+    environment: *eval-env
+    ports: []
+    healthcheck:
+      disable: true
+    command: celery -A llm_eval.tasks worker --loglevel=info --pool=solo
+
+  rabbitmq:
+    image: rabbitmq:4.3-management
+    profiles: [eval]
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=secretsecret
-    volumes:
-      - minio-data:/data
-    command: server /data --console-address ":9001"
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  ollama-data:
   postgres-data:
   minio-data:
+  ollama-data:

@@ -48,10 +48,23 @@ Gaible is designed for extensibility. Writing extensions is easy, as is using an
 
 ## Getting Started
 
-### Using Docker-Compose
+### Using Docker Compose
 
-- Run `docker compose up` in the project root.
-- Open the [application](http://localhost:3333) in a browser. The default login credentials are user `admin@example.com` and password `secret`.
+```bash
+docker compose up --build                   # or: npm run up
+```
+
+Open the [application](http://localhost:3333) in a browser. The default login is `admin@example.com` / `secret`.
+
+Optional components are enabled via Compose profiles, e.g. `docker compose --profile ollama --profile mcp up --build`:
+
+| Profile  | Adds                                                              |
+| -------- | ----------------------------------------------------------------- |
+| `ollama` | a local Ollama (CPU) with `llama3.2` and `all-minilm` (embeddings) |
+| `mcp`    | an example MCP server (`mcp-server-fetch`) at `http://mcp-fetch:8000/sse` |
+| `eval`   | the eval service, its worker and RabbitMQ (see [Eval Service](#eval-service)) |
+
+Settings like ports, admin credentials or the REI-S embedding type can be overridden with environment variables or a `.env` file, see the header of [`docker-compose.yml`](docker-compose.yml).
 
 ### Using Helm & Kubernetes
 
@@ -71,7 +84,7 @@ Each assistant consists of a set of extensions, which determine the LLM model an
 Now you can return to the [chat page](http://localhost:3333/chat) (click on `Gaible` in the top left) and start a new conversation with your new assistant.
 
 > [!TIP]
-> Our `docker-compose` includes a local Ollama, which runs on the CPU. You can use this for quick testing. But it will be slow and you probably want to use another model. If you want to use it, just create the following model extension in your Assistant.
+> The `ollama` Compose profile starts a local Ollama, which runs on the CPU. You can use this for quick testing. But it will be slow and you probably want to use another model. If you want to use it, just create the following model extension in your Assistant.
 > * Extension: `Ollama`
 > * Endpoint: `http://ollama:11434`
 > * Model: `llama3.2`
@@ -149,11 +162,12 @@ The REI-S supports Azure AI Search and pgvector for vector storage, allowing for
 
 The Eval service provides LLM evaluation capabilities for measuring and comparing assistant quality. It supports QA catalog management, automated evaluation execution, and a reporting dashboard.
 
-The service is **disabled by default**. To enable it, set the following in `backend/.env`:
+The service is **disabled by default**. To run it with Docker Compose, put the following into a `.env` file in the repository root and start with `docker compose --profile eval up --build`:
 
 ```bash
 EVAL_SERVICE_ENABLED=true
-EVAL_SERVICE_URL=http://localhost:3202
+EVAL_SERVICE_ACCOUNT_API_KEY=...   # openssl rand -hex 32
+LLM_EVAL_ENCRYPTION_KEY=...        # python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
 ```
 
 For full setup instructions, see the [Eval service README](services/eval/README.md).
