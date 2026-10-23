@@ -1,10 +1,11 @@
-import { createHash, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
 import { ForbiddenException, Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { DeepPartial, FindOptionsWhere, In } from 'typeorm';
+import { hashApiKey } from 'src/lib';
 import {
   BUILTIN_USER_GROUP_ADMIN,
   BUILTIN_USER_GROUP_DEFAULT,
@@ -65,7 +66,7 @@ export class AuthService implements OnModuleInit {
 
   private async setSessionUser(req: Request, user: User | UserEntity | undefined) {
     await new Promise<void>((resolve, reject) => {
-      const done = (err?: unknown) => (err ? reject(err instanceof Error ? err : new Error(String(err))) : resolve());
+      const done = (err?: unknown) => (err ? reject(err instanceof Error ? err : new Error('Session store error')) : resolve());
       if (!user) {
         req.session.destroy(done);
       } else {
@@ -149,7 +150,9 @@ export class AuthService implements OnModuleInit {
   }
 
   private async setupAdmins() {
-    const apiKey = this.configService.get<string>('AUTH_INITIALUSER_APIKEY');
+    const rawApiKey = this.configService.get<string>('AUTH_INITIALUSER_APIKEY');
+    // API keys are looked up by their SHA-256 hash (see LocalStrategy), so they must be stored hashed.
+    const apiKey = rawApiKey ? hashApiKey(rawApiKey) : undefined;
     const email = this.configService.get<string>('AUTH_INITIAL_ADMIN_USERNAME');
     const password = this.configService.get<string>('AUTH_INITIAL_ADMIN_PASSWORD');
     const adminRoleRequired = this.configService.get<string>('AUTH_INITIAL_ADMIN_ROLE_REQUIRED') === 'true';
@@ -175,7 +178,7 @@ export class AuthService implements OnModuleInit {
 
       await this.users.save(userFromDb);
 
-      this.logger.log(`Created user with email '${email}'.`);
+      this.logger.log(`Assigned the admin group to the existing user with email '${email}'.`);
     } else {
       await this.users.save({
         id: randomUUID(),
@@ -224,7 +227,7 @@ export class AuthService implements OnModuleInit {
     // Hash the raw key the same way findApiKey() does:
     // findApiKey() receives the raw value in x-api-key header and does SHA256(value)
     // So we store SHA256(raw_key) in the DB
-    const hashedKey = createHash('sha256').update(apiKey).digest('hex');
+    const hashedKey = hashApiKey(apiKey);
 
     let user = await this.users.findOne({
       where: { email },

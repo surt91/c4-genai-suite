@@ -1,11 +1,10 @@
-import { createHash } from 'crypto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
-import { assignDefined, isNull } from 'src/lib';
+import { assignDefined, hashApiKey, isNull } from 'src/lib';
 import { User } from '../interfaces';
 import { buildUser, buildUserSnapshot } from './utils';
 
@@ -53,7 +52,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
     }
 
     if (apiKey) {
-      entity.apiKey = createHash('sha256').update(apiKey).digest('hex');
+      entity.apiKey = hashApiKey(apiKey);
     } else if (isNull(apiKey)) {
       entity.apiKey = undefined;
     }

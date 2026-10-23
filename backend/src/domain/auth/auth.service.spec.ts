@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -79,6 +80,25 @@ describe('AuthService', () => {
       configService,
     };
   }
+
+  describe('setupAdmins', () => {
+    it('stores the initial API key hashed, like it is looked up by the local strategy', async () => {
+      const { service, mockUserRepo } = await buildModule({
+        AUTH_INITIALUSER_APIKEY: 'initial-key',
+        AUTH_INITIAL_ADMIN_USERNAME: 'admin@example.com',
+        AUTH_INITIAL_ADMIN_PASSWORD: 'secret',
+      });
+
+      await service.onModuleInit();
+
+      expect(mockUserRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'admin@example.com',
+          apiKey: createHash('sha256').update('initial-key').digest('hex'),
+        }),
+      );
+    });
+  });
 
   describe('setupEvalServiceAccount - API key validation', () => {
     it('should accept a valid 64-character hex API key', async () => {
