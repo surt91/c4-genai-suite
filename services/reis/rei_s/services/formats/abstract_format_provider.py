@@ -29,11 +29,6 @@ class AbstractFormatProvider(ABC):
         return True
 
     @property
-    def previewable(self) -> bool:
-        """Whether this provider offers a sensible pdf preview."""
-        return True
-
-    @property
     def may_start_separate_process_for_chunking(self) -> bool:
         """Whether this provider benefits from processing in a separate process."""
         return True

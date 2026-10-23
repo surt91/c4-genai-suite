@@ -262,21 +262,22 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         return results
 
+    def transcribe(self, file: SourceFile) -> list[Document]:
+        """`parse_file` cached on the file, such that the chunks and the pdf preview share one transcription."""
+        if file.transcription_cache is None:
+            file.transcription_cache = self.parse_file(file)
+        return [doc.model_copy(deep=True) for doc in file.transcription_cache]
+
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        results = self.parse_file(file)
+        results = self.transcribe(file)
 
         chunks = self.splitter(chunk_size, chunk_overlap).split_documents(results)
         return chunks
 
-    @property
-    def previewable(self) -> bool:
-        # a plaintext audio transcription is not a sensible pdf preview
-        return False
-
     def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        docs = self.parse_file(file)
+        docs = self.transcribe(file)
 
         plain = "\n".join([doc.page_content for doc in docs])
 

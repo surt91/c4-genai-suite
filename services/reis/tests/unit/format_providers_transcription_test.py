@@ -8,6 +8,7 @@ from langchain_core.documents import Document
 from pytest_mock import MockerFixture
 
 from rei_s.config import Config
+from rei_s.services.formats.pdf_provider import PdfProvider
 from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.formats.video_transcription_provider import VideoTranscriptionProvider
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
@@ -197,6 +198,30 @@ def generate_audio(path: Path, duration: float) -> SourceFile:
     cmd = ["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "lavfi", "-i", f"sine=frequency=440:duration={duration}"]
     subprocess.run([*cmd, str(path)], check=True, capture_output=True)
     return SourceFile(path=str(path), mime_type="", file_name=path.name)
+
+
+@pytest.mark.parametrize(
+    "provider_class,file_name", [(VoiceTranscriptionProvider, "a.mp3"), (VideoTranscriptionProvider, "a.mp4")]
+)
+def test_transcription_is_shared_by_chunks_and_preview(
+    mocker: MockerFixture,
+    audio_files: dict[str, Path],
+    provider_class: type[VoiceTranscriptionProvider],
+    file_name: str,
+) -> None:
+    parse = mocker.patch("rei_s.services.formats.voice_transcription_provider.AzureOpenAIWhisperParser.parse")
+    parse.return_value = [Document("Dagobert Duck counts his coins")]
+    source_file = SourceFile(path=str(audio_files["mp3"]), mime_type="", file_name=file_name)
+    provider = provider_class(config=get_mock_config(), default_segment_duration=7)
+
+    chunks = provider.process_file(source_file)
+    pdf = provider.convert_file_to_pdf(source_file)
+
+    # one Whisper call per segment, not two
+    assert parse.call_count == 3
+    assert "Dagobert" in chunks[0].page_content
+    assert "Dagobert" in "".join(doc.page_content for doc in PdfProvider().process_file(pdf))
+    pdf.delete()
 
 
 def test_audio_segments_are_deleted_on_failure(

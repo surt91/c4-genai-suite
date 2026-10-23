@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 from typing import Generator, Optional
 import uuid
 
+from langchain_core.documents import Document
 from pydantic import BaseModel, Field
 from rei_s.utils import get_new_file_path
 
@@ -21,6 +22,8 @@ class SourceFile(BaseModel):
     # this can be used to cache a pdf version of the file as microoptimization
     # some format providers work by converting the file to pdf first, so this avoids repeated conversions
     preview_pdf_cache: Optional["SourceFile"] = None
+    # the same for transcriptions of audio and video files, which are used for the chunks and the preview
+    transcription_cache: list[Document] | None = None
 
     @property
     def size(self) -> int:
