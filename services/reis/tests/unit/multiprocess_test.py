@@ -17,7 +17,14 @@ from rei_s.types.source_file import SourceFile, temp_file
 # The providers need to be defined at module level, such that the spawned process can import them.
 
 
-class CrashingProvider(PlainProvider):
+class TestOnlyProvider(PlainProvider):
+    @property
+    def enabled(self) -> bool:
+        # every subclass is registered as format provider, so we need to disable them for the other tests
+        return False
+
+
+class CrashingProvider(TestOnlyProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
@@ -30,14 +37,14 @@ class UnpicklableError(Exception):
         self.lock = threading.Lock()
 
 
-class UnpicklableErrorProvider(PlainProvider):
+class UnpicklableErrorProvider(TestOnlyProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
         raise UnpicklableError()
 
 
-class FailingProvider(PlainProvider):
+class FailingProvider(TestOnlyProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
