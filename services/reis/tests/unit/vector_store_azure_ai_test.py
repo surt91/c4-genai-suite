@@ -50,6 +50,12 @@ def test_upload_file(faker: Faker, client: TestClient, responses: RequestsMock) 
     content = faker.text()
 
     responses.add(index_get(endpoint, index_name, api_version))
+    # existing chunks of the id are looked up to be replaced
+    responses.add(
+        responses.POST,
+        f"{endpoint}/indexes('{index_name}')/docs/search.post.search?api-version={api_version}",
+        json={"value": []},
+    )
     responses.add(
         responses.POST,
         f"{endpoint}/indexes('{index_name}')/docs/search.index?api-version={api_version}",

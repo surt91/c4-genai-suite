@@ -209,8 +209,6 @@ def convert_file_to_pdf(
 
 
 def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_name: str | None = None) -> None:
-    file_store = get_file_store(config=config)
-
     format_ = find_format_provider(config, file)
     logger.info(f"start adding doc_id {doc_id} with format {format_.name}")
 
@@ -218,20 +216,38 @@ def add_file(config: Config, file: SourceFile, bucket: str, doc_id: str, index_n
     logger.info(f"chunked doc_id {doc_id} into {len(chunks)} chunks")
 
     file_store = get_file_store(config=config)
-    if file_store:
-        pdf_preview = convert_file_to_pdf(config, file, format_, doc_id)
-        logger.info(f"converted doc_id {doc_id} to pdf")
-        try:
-            file_store.add_document(pdf_preview)
-            logger.info(f"saved pdf for doc_id {doc_id}")
-        finally:
-            pdf_preview.delete()
-
     vector_store = get_vector_store(config=config, index_name=index_name)
-    for batch, index, num_batches in generate_batches(config, file, chunks, format_, bucket, doc_id):
-        logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
-        _add_documents_with_rate_limit_retry(vector_store, batch, doc_id=doc_id, batch_size=len(batch))
-        logger.info(f"ready with {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
+
+    # uploading an existing id (retry, update) replaces the document instead of adding a second set of chunks
+    vector_store.delete(doc_id)
+    try:
+        if file_store:
+            pdf_preview = convert_file_to_pdf(config, file, format_, doc_id)
+            logger.info(f"converted doc_id {doc_id} to pdf")
+            try:
+                file_store.add_document(pdf_preview)
+                logger.info(f"saved pdf for doc_id {doc_id}")
+            finally:
+                pdf_preview.delete()
+
+        for batch, index, num_batches in generate_batches(config, file, chunks, format_, bucket, doc_id):
+            logger.info(f"add {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
+            _add_documents_with_rate_limit_retry(vector_store, batch, doc_id=doc_id, batch_size=len(batch))
+            logger.info(f"ready with {len(batch)} chunks for doc_id {doc_id}: ({index + 1}/{num_batches})")
+    except Exception:
+        # do not leave a preview or a part of the chunks behind
+        logger.warning(f"adding doc_id {doc_id} failed, removing what was stored so far")
+        _delete_quietly(vector_store, file_store, doc_id)
+        raise
+
+
+def _delete_quietly(vector_store: VectorStoreAdapter, file_store: FileStoreAdapter | None, doc_id: str) -> None:
+    try:
+        vector_store.delete(doc_id)
+        if file_store:
+            file_store.delete(doc_id)
+    except Exception as e:
+        logger.error(f"Failed to clean up doc_id {doc_id}: {e!r}")
 
 
 def search(
