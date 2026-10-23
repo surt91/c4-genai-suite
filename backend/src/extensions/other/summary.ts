@@ -34,9 +34,10 @@ export class SummaryPromptExtension implements Extension<SummaryPromptExtensionC
   getMiddlewares(_: User, extension: ExtensionEntity<SummaryPromptExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { historyLength, prompt } = extension.values;
+        // The argument is called `historySize` (stored values), the chat context calls it `historyLength`.
+        const { historySize, prompt } = extension.values;
 
-        context.summaryConfig = { historyLength, prompt };
+        context.summaryConfig = { historyLength: historySize, prompt };
         return next(context);
       },
     };
@@ -47,5 +48,5 @@ export class SummaryPromptExtension implements Extension<SummaryPromptExtensionC
 
 type SummaryPromptExtensionConfiguration = ExtensionConfiguration & {
   prompt: string;
-  historyLength?: number;
+  historySize?: number;
 };
