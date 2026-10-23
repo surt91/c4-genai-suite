@@ -53,7 +53,8 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
     // Also escape sequences with special meaning for `like` (other sql injection will be escaped by typeORM)
     const escapedBasename = conversationEntity.name.replace(/\s*\((\d+)\)$/, '').replace(/[\\%_]/g, '\\$&');
     const conflictingEntities = await this.conversationRepository.find({
-      where: { name: Like(`${escapedBasename} (%)`) },
+      // only the user's own conversations (the chosen number must not reveal titles of other users)
+      where: { name: Like(`${escapedBasename} (%)`), userId: user.id },
       select: ['name'],
     });
     const conflictingNames = conflictingEntities.map((entity) => entity.name);

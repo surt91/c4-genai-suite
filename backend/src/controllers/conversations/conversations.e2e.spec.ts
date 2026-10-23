@@ -84,6 +84,16 @@ describe('Conversations', () => {
     expect(typedBody.id).not.toBe(conversationId);
     expect(typedBody.name).toBe('Greetings Exchange (3)');
   });
+  it('should ignore conversations of other users when numbering duplicates', async () => {
+    const other = await dataSource.getRepository(UserEntity).save({ id: 'other', name: 'other', email: 'other@example.com' });
+    await dataSource
+      .getRepository(ConversationEntity)
+      .save({ name: 'Greetings Exchange (4)', configurationId: 1, userId: other.id });
+
+    const response = await request(app.getHttpServer()).post(`/conversations/${conversationId}/duplicate`).expect(201);
+
+    expect((response.body as ConversationDto).name).toBe('Greetings Exchange (4)');
+  });
 });
 
 async function cleanDatabase(dataSource: DataSource) {
