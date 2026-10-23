@@ -14,7 +14,7 @@
     "generate-apis": "npm run generate-specs && npm run generate-clients",
     "generate-specs": "npm run generate-specs-backend && npm run generate-specs-reis",
     "generate-clients": "npm run generate-clients-frontend && npm run generate-clients-backend",
-    "generate-specs-reis": "(cd ./services/reis && command -v uv && uv run python rei_s/generate_open_api.py || echo 'uv not installed, skipping')",
+    "generate-specs-reis": "cd ./services/reis && uv run generate-api-spec",
     "generate-specs-backend": "(cd ./backend && npm run generate-openapi-dev)",
     "generate-clients-backend": "cd ./backend && npm run generate-reis",
     "generate-clients-frontend": "cd ./frontend && npm run generate-api"
