@@ -434,6 +434,18 @@ export const en = {
     },
   },
   chat: {
+    status: {
+      running: 'Running',
+      success: 'Done',
+      error: 'Failed',
+      cancelled: 'Cancelled',
+      waiting: 'Waiting for you',
+      expired: 'Expired',
+      declined: 'Declined',
+      accepted: 'Confirmed',
+      opened: 'Opened',
+      completed: 'Completed',
+    },
     assistantDeleted: 'assistant deleted',
     assistantDisabled: 'disabled',
     filters: 'Filters',

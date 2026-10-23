@@ -462,6 +462,18 @@ function load() {
       },
     },
     chat: {
+      status: {
+        running: translate('chat.status.running'),
+        success: translate('chat.status.success'),
+        error: translate('chat.status.error'),
+        cancelled: translate('chat.status.cancelled'),
+        waiting: translate('chat.status.waiting'),
+        expired: translate('chat.status.expired'),
+        declined: translate('chat.status.declined'),
+        accepted: translate('chat.status.accepted'),
+        opened: translate('chat.status.opened'),
+        completed: translate('chat.status.completed'),
+      },
       assistantDeleted: translate('chat.assistantDeleted'),
       assistantDisabled: translate('chat.assistantDisabled'),
       filters: translate('chat.filters'),

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import type { LLMEndpoint, LLMEndpointCreate, LLMEndpointDelete, LLMEndpointUpdate } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 export const UNCHANGED_API_KEY = 'd1d04d4e-38b9-441c-a6e3-68fb1e18f0c0';

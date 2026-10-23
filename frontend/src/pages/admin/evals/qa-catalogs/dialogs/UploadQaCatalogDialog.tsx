@@ -3,10 +3,10 @@ import { useForm } from '@mantine/form';
 import { IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { FormAlert, Modal } from 'src/components';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 interface UploadQaCatalogDialogProps {

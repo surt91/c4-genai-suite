@@ -42,15 +42,18 @@ export function DialogProvider(props: PropsWithChildren) {
         <Modal
           withinPortal
           size={'sm'}
-          onClose={doClose}
+          // Esc and a click outside cancel the dialog.
+          onClose={doCancel}
           header={request.title}
           footer={
+            // secondary left, primary right; only the primary button is red (destructive) and the focus is on the
+            // non-destructive button
             <Group justify="flex-end" gap={8} wrap="nowrap">
-              <Button variant="subtle" color="red" onClick={doCancel}>
+              <Button variant="default" onClick={doCancel} data-autofocus>
                 {request.cancelText || texts.common.cancel}
               </Button>
 
-              <Button color="red" onClick={doPerfom} autoFocus>
+              <Button color={request.destructive === false ? undefined : 'red'} onClick={doPerfom}>
                 {request.performText || texts.common.confirm}
               </Button>
             </Group>

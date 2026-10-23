@@ -1,0 +1,64 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--mantine-color-body);
+  outline: none;
+}
+
+.root:focus-visible {
+  box-shadow: 0 0 0 2px var(--mantine-primary-color-filled);
+}
+
+.compact {
+  gap: 0.25rem;
+  padding-block: 0.375rem;
+}
+
+.highlight {
+  border-color: var(--mantine-color-yellow-5);
+  box-shadow: 0 0 0 1px var(--mantine-color-yellow-5);
+}
+
+.header {
+  min-width: 0;
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--mantine-color-dimmed);
+}
+
+.title {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  flex-shrink: 0;
+}
+
+.body {
+  font-size: var(--mantine-font-size-sm);
+  min-width: 0;
+}
+
+.actions {
+  padding-top: 0.25rem;
+}
+
+.warning {
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-yellow-light);
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  color: var(--mantine-color-yellow-8);
+}

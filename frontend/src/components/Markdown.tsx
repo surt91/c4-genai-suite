@@ -6,12 +6,12 @@ import dockerfile from 'highlight.js/lib/languages/dockerfile';
 import powershell from 'highlight.js/lib/languages/powershell';
 import 'highlight.js/styles/vs2015.css';
 import ReactMarkdown from 'react-markdown';
-import { toast } from 'react-toastify';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 import { useTransientNavigate } from 'src/hooks';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import { Icon } from './Icon';
 import classes from './Markdown.module.css';

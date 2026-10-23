@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import type { Metric, MetricCreate, MetricDelete, MetricUpdate } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 /**

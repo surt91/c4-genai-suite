@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 interface UseTranscribeProps {

@@ -4,11 +4,11 @@ import { IconLock, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { ChangePasswordDto, useApi } from 'src/api';
 import { Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import classes from './UserProfileModal.module.css';
 

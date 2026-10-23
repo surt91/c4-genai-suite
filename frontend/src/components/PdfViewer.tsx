@@ -6,10 +6,10 @@ import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-import { toast } from 'react-toastify';
 import { SourceDto } from 'src/api/generated/models/SourceDto';
 import { useDocument } from 'src/hooks/api/files';
 import { isString } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { DocumentSource } from 'src/pages/chat/SourcesChunkPreview';
 import { Alert } from './Alert';
 import PdfControlBar from './PdfControlBar';

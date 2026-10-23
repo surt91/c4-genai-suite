@@ -1,11 +1,11 @@
 import { Button, Divider } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { Alert, Logo, Markdown } from 'src/components';
 import { useTheme } from 'src/hooks';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import classes from './Theme.module.css';
 

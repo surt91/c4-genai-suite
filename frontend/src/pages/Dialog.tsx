@@ -73,10 +73,10 @@ export function Dialog({
           </Tooltip>
         </Flex>
         <Flex gap="sm" mt="lg" align="center" justify="center">
-          <Button color="red" onClick={() => handleResult('no')} variant="outline" leftSection={<IconThumbDown size={16} />}>
+          <Button onClick={() => handleResult('no')} variant="default" leftSection={<IconThumbDown size={16} />}>
             {noLabel}
           </Button>
-          <Button color="green" onClick={() => handleResult('yes')} variant="outline" leftSection={<IconThumbUp size={16} />}>
+          <Button onClick={() => handleResult('yes')} variant="default" leftSection={<IconThumbUp size={16} />}>
             {yesLabel}
           </Button>
         </Flex>

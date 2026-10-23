@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { toast } from 'react-toastify';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 interface UseSpeechRecognitionToggleProps {

@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-
 import {
   ChatUICallbackResultDto,
   ConversationDtoRatingEnum,
@@ -13,6 +11,8 @@ import {
   UpdateConversationDto,
   useApi,
 } from 'src/api';
+import { toast } from 'src/lib/notifications';
+
 import { texts } from 'src/texts';
 import { ChatMessage } from './types';
 import { useChatStore } from './zustand/chatStore';

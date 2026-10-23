@@ -1,10 +1,11 @@
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
+import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 import {
   RouteWhenAdmin,
   RouteWhenPrivate,
@@ -35,7 +36,7 @@ const ThemeProviders = ({ children }: { children: ReactNode }) => {
           <ThemeStyle />
           <ThemeTitle />
           {children}
-          <ToastContainer />
+          <Notifications position="top-right" limit={5} />
         </DialogProvider>
       </MantineThemeProvider>
     </ThemeProvider>

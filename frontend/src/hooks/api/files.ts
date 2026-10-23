@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import { FileDto, useApi } from 'src/api';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { useUserFilesStore } from 'src/pages/chat/state/zustand/userFilesStore';
 import { texts } from 'src/texts';
 

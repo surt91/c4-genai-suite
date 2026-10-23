@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import type {
   Dto,
   EvaluationDelete,
@@ -7,6 +6,7 @@ import type {
   LlmEvalEvalEvaluationsModelsEvaluationResult,
 } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 /**

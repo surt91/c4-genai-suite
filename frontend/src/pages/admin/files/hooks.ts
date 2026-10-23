@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
-import { toast } from 'react-toastify';
 import { BucketDto, FileDto, InitOverrideFunction } from 'src/api';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 type UseUploadingFileProps = {

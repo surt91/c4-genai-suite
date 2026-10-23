@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
 
 import { ConversationDto, useApi } from 'src/api';
 import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { usePersistentState } from 'src/hooks/stored';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { useStateOfChat } from 'src/pages/chat/state/chat';
 import { useStateOfEnabledAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';

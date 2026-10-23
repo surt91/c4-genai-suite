@@ -1,10 +1,10 @@
 import { Button } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import { CreateExtensionDto, useApi } from 'src/api';
 import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 
 type TestButtonProps = { extensionId?: number; form: UseFormReturnType<CreateExtensionDto> };

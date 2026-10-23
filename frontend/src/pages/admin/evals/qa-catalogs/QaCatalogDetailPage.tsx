@@ -12,12 +12,12 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import type { QACatalogVersionHistoryItem, QAPair } from 'src/api/generated-eval';
 import { QACatalogStatus } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { ConfirmDialog, Page, Pagination } from 'src/components';
 import { useEventCallback } from 'src/hooks';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import { QaCatalogStatusChip } from './components/QaCatalogStatusChip';
 import { QaPairsTable } from './components/QaPairsTable';

@@ -5,6 +5,8 @@ export interface DialogRequest {
   text: string;
   performText?: string;
   cancelText?: string;
+  // Whether the action is destructive (red primary button), true by default.
+  destructive?: boolean;
   onPerform: () => void;
   onCancel?: () => void;
 }

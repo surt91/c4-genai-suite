@@ -583,7 +583,7 @@ export async function duplicateActiveConversation(page: Page, renameBeforeDuplic
   const dropdown = page.locator('.mantine-Menu-dropdown');
   await expect(dropdown).toBeVisible();
   await dropdown.locator('text=Duplicate').click();
-  await page.locator('text=Conversation duplicated successfully').locator('button').click();
+  await expect(page.getByText('Conversation duplicated successfully')).toBeVisible();
 }
 
 export async function selectOption(page: Page, name: string, value: string | RegExp) {

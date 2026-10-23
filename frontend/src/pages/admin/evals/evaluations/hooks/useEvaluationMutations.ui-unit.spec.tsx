@@ -13,7 +13,7 @@ import {
 } from './useEvaluationMutations';
 
 vi.mock('src/api/state/apiEvalClient');
-vi.mock('react-toastify', () => ({
+vi.mock('src/lib/notifications', () => ({
   toast: {
     success: vi.fn(),
     error: vi.fn(),

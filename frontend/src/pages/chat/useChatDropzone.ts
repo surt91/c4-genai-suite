@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { useTypedMutationStates } from 'src/hooks';
 import { useConversationBucketAvailabilities } from 'src/hooks/api/extensions';
 import { useConversationFiles } from 'src/hooks/api/files';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import { filterFilesByFileNameExtensions, matchExtension } from './conversation/chat-input-utils';
 import { useStateOfSelectedAssistantId, useStateOfSelectedChatId } from './state/chat';

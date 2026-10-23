@@ -3,12 +3,12 @@ import { IconBlocks, IconBrain, IconCopy, IconEdit, IconPlus, IconTool, IconTras
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { BucketDto, ConfigurationDto, ExtensionDto } from 'src/api/generated';
 import { Alert, ConfirmDialog, Icon } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import formClasses from '../forms.module.css';
 import { ExtensionCard } from './ExtensionCard';

@@ -16,8 +16,8 @@ vi.mock('src/api/state/apiEvalClient', () => ({
   }),
 }));
 
-// Mock react-toastify
-vi.mock('react-toastify', () => ({
+// Mock the notifications
+vi.mock('src/lib/notifications', () => ({
   toast: {
     success: vi.fn(),
     error: vi.fn(),

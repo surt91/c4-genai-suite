@@ -427,6 +427,18 @@ export const de: typeof en = {
     },
   },
   chat: {
+    status: {
+      running: 'Läuft',
+      success: 'Fertig',
+      error: 'Fehlgeschlagen',
+      cancelled: 'Abgebrochen',
+      waiting: 'Wartet auf dich',
+      expired: 'Abgelaufen',
+      declined: 'Abgelehnt',
+      accepted: 'Bestätigt',
+      opened: 'Geöffnet',
+      completed: 'Abgeschlossen',
+    },
     assistantDeleted: 'Assistent gelöscht',
     assistantDisabled: 'deaktiviert',
     filters: 'Filter',

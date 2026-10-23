@@ -2,10 +2,10 @@ import { ActionIcon, Menu } from '@mantine/core';
 import { IconCopy, IconDots, IconDownload, IconEdit, IconTrash } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import { memo } from 'react';
-import { toast } from 'react-toastify';
 import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
 import { buildError, downloadJson, sanitizeFilename } from 'src/lib';
+import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import classes from './Extensions.module.css';
 
