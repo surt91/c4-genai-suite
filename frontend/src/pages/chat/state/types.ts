@@ -1,4 +1,4 @@
-import { MessageDto, SourceDto, StreamUIRequestDto } from 'src/api';
+import { ChatInteractionDtoStatusEnum, MessageDto, SourceDto, StreamUIRequestDto } from 'src/api';
 
 export type ToolCallStatus = 'running' | 'success' | 'error' | 'cancelled';
 
@@ -12,6 +12,16 @@ export type ToolCallState = {
   error?: string;
 };
 
+export type InteractionStatus = ChatInteractionDtoStatusEnum;
+
+/** A request of the AI (form, confirmation or URL to open) shown in the answer while it is generated. */
+export type UIRequestState = {
+  request: StreamUIRequestDto;
+  status: InteractionStatus;
+  // The answers of a form.
+  data?: Record<string, unknown>;
+};
+
 type MessageMetaInfoState = {
   toolCalls: ToolCallState[];
   tokenCount?: number;
@@ -22,7 +32,8 @@ type MessageMetaInfoState = {
   reasoningInProgress: boolean;
   error?: string;
   isAiWriting?: boolean;
-  ui?: StreamUIRequestDto;
+  // The requests of the AI during the generation (the stored results are in `interactions`).
+  requests: UIRequestState[];
 };
 
 export type ChatMessage = MessageDto & Partial<MessageMetaInfoState>;

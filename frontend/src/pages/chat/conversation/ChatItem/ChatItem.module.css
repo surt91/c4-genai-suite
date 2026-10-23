@@ -160,14 +160,8 @@
 }
 
 /* User input requested by the AI */
-.userInput {
-  margin: 0.25rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  border-radius: 0.25rem;
-  border: 1px solid var(--mantine-color-gray-3);
-  padding: 0.75rem;
+.interactions {
+  margin: 0.5rem 0;
 }
 
 .userInputFields {
@@ -175,13 +169,21 @@
   flex-direction: column;
 }
 
-.userInputFooter {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.domain {
+  overflow-wrap: anywhere;
 }
 
-.userInputButtons {
-  display: flex;
-  gap: 0.5rem;
+.fullUrl {
+  margin-top: 0.25rem;
+  font-size: var(--mantine-font-size-xs);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.tools {
+  margin: 0.25rem 0;
+}
+
+.toolError {
+  overflow-wrap: anywhere;
 }

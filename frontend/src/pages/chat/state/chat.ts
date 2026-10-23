@@ -14,7 +14,7 @@ import {
 import { toast } from 'src/lib/notifications';
 
 import { texts } from 'src/texts';
-import { ChatMessage, ToolCallState } from './types';
+import { ChatMessage, InteractionStatus, ToolCallState } from './types';
 import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
@@ -152,6 +152,15 @@ export const useChatStream = (chatId: number) => {
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               toolCalls: upsertToolCall(oldMessage.toolCalls, { id: toolId(msg.tool), name: msg.tool.name, status: 'success' }),
             }));
+          case 'tool_error':
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
+              toolCalls: upsertToolCall(oldMessage.toolCalls, {
+                id: toolId(msg.tool),
+                name: msg.tool.name,
+                status: 'error',
+                error: msg.error,
+              }),
+            }));
           case 'debug':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               debug: [...(oldMessage.debug || []), msg.content],
@@ -175,7 +184,17 @@ export const useChatStream = (chatId: number) => {
             }
             return chatStore.updateMessage(chatId, getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
           case 'ui':
-            return chatStore.updateMessage(chatId, actualAiMessageId, { ui: msg.request });
+            return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
+              requests: [
+                ...(oldMessage.requests ?? []).filter((r) => r.request.id !== msg.request.id),
+                { request: msg.request, status: 'waiting' },
+              ],
+            }));
+          case 'ui_update':
+            return chatStore.updateRequest(chatId, msg.update.id, {
+              status: msg.update.status,
+              ...(msg.update.data ? { data: msg.update.data as Record<string, unknown> } : {}),
+            });
           case 'summary':
             listOfChatsStore.refetch();
         }
@@ -252,20 +271,34 @@ export const useStateMutateChat = (chatId: number) => {
   });
 };
 
+/**
+ * Answers a request of the AI (form, confirmation, URL). The server reports the result with an `ui_update` event, the
+ * local state is updated right away.
+ */
 export const useConfirmAiAction = (requestId: string) => {
   const api = useApi();
-  const chatStore = useChatStore();
-  const currentChatId = chatStore.currentChatId;
+  const currentChatId = useChatStore((s) => s.currentChatId);
+  const updateRequest = useChatStore((s) => s.updateRequest);
 
   return useMutation({
-    mutationFn: (result: ChatUICallbackResultDto) => {
+    mutationFn: ({ result }: { result: ChatUICallbackResultDto; status: InteractionStatus }) => {
       return api.conversations.confirm(currentChatId, requestId, result);
     },
-    onSuccess: () => {
-      chatStore.updateMessage(currentChatId, getMessagePlaceholderId('ai'), { ui: undefined });
+    onSuccess: (_, { result, status }) => {
+      updateRequest(currentChatId, requestId, {
+        status,
+        ...(result.data ? { data: result.data as Record<string, unknown> } : {}),
+      });
     },
   });
 };
+
+/** Whether an answer of the conversation waits for the user (e.g. a form). */
+export const useStateOfIsWaitingForUser = (chatId?: number) =>
+  useChatStore((state) => {
+    const messages = state.chatDataMap.get(chatId ?? state.currentChatId)?.messages ?? [];
+    return messages.some((m) => m.requests?.some((r) => r.status === 'waiting' || r.status === 'opened'));
+  });
 
 export const useStateMutateChatRating = (chatId: number) => {
   const api = useApi();

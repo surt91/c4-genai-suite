@@ -7,6 +7,7 @@ import {
   IconExternalLink,
   IconHandStop,
   IconHourglassHigh,
+  IconShieldX,
   IconX,
 } from '@tabler/icons-react';
 import { clsx } from 'clsx';
@@ -16,7 +17,17 @@ import classes from './ChatCard.module.css';
 
 /** The status vocabulary of everything the AI or a tool does in the conversation, with fixed colors and icons. */
 export type ChatCardStatus =
-  'running' | 'success' | 'error' | 'cancelled' | 'waiting' | 'expired' | 'declined' | 'accepted' | 'opened' | 'completed';
+  | 'running'
+  | 'success'
+  | 'error'
+  | 'cancelled'
+  | 'waiting'
+  | 'expired'
+  | 'declined'
+  | 'accepted'
+  | 'opened'
+  | 'completed'
+  | 'blocked';
 
 const STATUS: Record<ChatCardStatus, { color: string; icon: ReactNode }> = {
   running: { color: 'gray', icon: <Loader size={10} color="gray" /> },
@@ -29,6 +40,7 @@ const STATUS: Record<ChatCardStatus, { color: string; icon: ReactNode }> = {
   waiting: { color: 'yellow', icon: <IconHourglassHigh size={12} /> },
   expired: { color: 'gray', icon: <IconClockExclamation size={12} /> },
   opened: { color: 'blue', icon: <IconExternalLink size={12} /> },
+  blocked: { color: 'red', icon: <IconShieldX size={12} /> },
 };
 
 function statusText(status: ChatCardStatus) {

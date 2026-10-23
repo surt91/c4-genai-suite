@@ -34,6 +34,8 @@ interface ChatInputProps {
   isEmpty?: boolean;
   // Whether an answer is being generated, which can be stopped.
   isAiWriting?: boolean;
+  // Whether the answer waits for the user (e.g. a confirmation).
+  isWaitingForUser?: boolean;
   submitMessage: (input: string, files?: FileDto[]) => void;
   stopMessage?: () => void;
 }
@@ -44,6 +46,7 @@ export function ChatInput({
   isDisabled,
   isEmpty,
   isAiWriting,
+  isWaitingForUser,
   submitMessage,
   stopMessage,
 }: ChatInputProps) {
@@ -131,6 +134,15 @@ export function ChatInput({
   });
 
   const canStop = !!isAiWriting && !!stopMessage;
+
+  const showWaitingRequest = () => {
+    const cards = document.querySelectorAll<HTMLElement>(
+      '[data-testid="chat-card-form"][data-status="waiting"], [data-testid="chat-card-url"][data-status="waiting"], [data-testid="chat-card-url"][data-status="opened"]',
+    );
+    const card = cards[cards.length - 1];
+    card?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    card?.focus({ preventScroll: true });
+  };
 
   const doStop = useEventCallback(() => {
     stopMessage?.();
@@ -231,6 +243,20 @@ export function ChatInput({
         ))}
 
         {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={setInput} />}
+
+        {isWaitingForUser && (
+          <Button
+            variant="light"
+            color="yellow"
+            size="xs"
+            className={classes.waitingHint}
+            leftSection={<IconArrowUp size={14} />}
+            onClick={showWaitingRequest}
+            data-testid="composer-waiting-hint"
+          >
+            {texts.chat.cards.waitingHint} · {texts.chat.cards.waitingHintAction}
+          </Button>
+        )}
 
         <div className={classes.wrap}>
           {chatFiles.map((file) => (

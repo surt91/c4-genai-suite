@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { AppClient, ConversationDto, FileDto, MessageDto, StreamEventDto, StreamObserver, StreamSubscription } from 'src/api';
-import { ChatMessage } from '../types';
+import { ChatMessage, UIRequestState } from '../types';
 
 type ChatData = {
   messages: ChatMessage[];
@@ -24,6 +24,9 @@ type ChatActions = {
     messageId: number,
     messageUpdate: Partial<ChatMessage> | ((oldMessage: ChatMessage) => Partial<ChatMessage>),
   ) => void;
+
+  // Updates a request of the AI (in any message of the conversation).
+  updateRequest: (chatId: number, requestId: string, update: Partial<UIRequestState>) => void;
 
   setChat: (chatId: number, chat: ConversationDto) => void;
   initializeChatIfNeeded: (chatId: number) => void;
@@ -138,6 +141,29 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
         return { chatDataMap: newMap };
       }),
 
+    updateRequest: (chatId, requestId, update) =>
+      set((state) => {
+        const chatData = state.chatDataMap.get(chatId);
+        if (!chatData) return state;
+
+        let changed = false;
+        const messages = chatData.messages.map((message) => {
+          if (!message.requests?.some((r) => r.request.id === requestId)) {
+            return message;
+          }
+          changed = true;
+          return {
+            ...message,
+            requests: message.requests.map((r) => (r.request.id === requestId ? { ...r, ...update } : r)),
+          };
+        });
+        if (!changed) return state;
+
+        const newMap = new Map(state.chatDataMap);
+        newMap.set(chatId, { ...chatData, messages });
+        return { chatDataMap: newMap };
+      }),
+
     addMessage: (chatId, message) =>
       set((state) => {
         const chatData = state.chatDataMap.get(chatId);
@@ -229,7 +255,11 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
         const toolCalls = message.toolCalls?.map((tool) =>
           tool.status === 'running' ? { ...tool, status: 'cancelled' as const } : tool,
         );
-        return { ...message, id, stopped: true, ui: undefined, reasoningInProgress: false, toolCalls };
+        // Nobody can answer the open requests anymore.
+        const requests = message.requests?.map((r) =>
+          r.status === 'waiting' || r.status === 'opened' ? { ...r, status: 'cancelled' as const } : r,
+        );
+        return { ...message, id, stopped: true, requests, reasoningInProgress: false, toolCalls };
       });
 
       const newMap = new Map(get().chatDataMap);

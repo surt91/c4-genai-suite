@@ -35,6 +35,7 @@ function mockMutation<TData = unknown, TVariables = void>(): UseMutationResult<T
 
 vi.mock('src/pages/chat/state/chat', () => ({
   useStateOfSelectedChatId: vi.fn(),
+  useStateOfIsWaitingForUser: vi.fn(() => false),
 }));
 
 vi.mock('src/pages/chat/state/listOfChats', () => ({

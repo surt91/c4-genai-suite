@@ -1,4 +1,4 @@
-import { Button, Menu, rem } from '@mantine/core';
+import { Button, Menu, rem, Tooltip } from '@mantine/core';
 import { IconCopy, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import { FormEvent, memo, useState } from 'react';
@@ -7,7 +7,7 @@ import { ConversationDto } from 'src/api';
 import { useIsCompact } from 'src/hooks/useIsCompact';
 import { texts } from 'src/texts';
 import classes from './ConversationItem.module.css';
-import { useStateOfSelectedChatId } from './state/chat';
+import { useStateOfIsWaitingForUser, useStateOfSelectedChatId } from './state/chat';
 import { useStateMutateDuplicateChat, useStateMutateRemoveChat, useStateMutateRenameChat } from './state/listOfChats';
 
 const getInputValue = (e: FormEvent<HTMLFormElement>) => (new FormData(e.currentTarget).get('name') as string)?.trim();
@@ -25,6 +25,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRenameInput, setShowRenameInput] = useState(false);
   const isCompact = useIsCompact();
+  const isWaiting = useStateOfIsWaitingForUser(chat.id);
 
   const submitRename = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -68,6 +69,18 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
         }}
         onDoubleClick={() => isSelected && setShowRenameInput(true)}
         title={chat.name}
+        rightSection={
+          isWaiting ? (
+            <Tooltip label={texts.chat.waitingBadge}>
+              <span
+                className={classes.waitingDot}
+                aria-label={texts.chat.waitingBadge}
+                role="img"
+                data-testid="conversation-waiting"
+              />
+            </Tooltip>
+          ) : undefined
+        }
       >
         {chat.name}
       </Button>

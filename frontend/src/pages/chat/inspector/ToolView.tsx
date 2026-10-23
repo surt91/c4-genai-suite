@@ -2,6 +2,7 @@ import { Group, Stack, Text } from '@mantine/core';
 import { Markdown } from 'src/components';
 import { StatusBadge } from 'src/components/ChatCard';
 import { texts } from 'src/texts';
+import { storedToolCalls } from '../conversation/ChatItemTools';
 import { useStateOfMessage } from '../state/chat';
 import { InspectorToolEntry } from '../state/inspector';
 import classes from './Inspector.module.css';
@@ -9,7 +10,7 @@ import classes from './Inspector.module.css';
 /** The details of a tool call: its status, the error and the debug output of the answer. */
 export function ToolView({ entry }: { entry: InspectorToolEntry }) {
   const message = useStateOfMessage(entry.conversationId, entry.messageId);
-  const tool = message?.toolCalls?.find((t) => t.id === entry.toolId);
+  const tool = (message?.toolCalls ?? storedToolCalls(message?.tools, message?.interactions)).find((t) => t.id === entry.toolId);
 
   if (!tool) {
     return (

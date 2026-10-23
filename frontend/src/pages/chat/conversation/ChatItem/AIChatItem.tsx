@@ -11,13 +11,13 @@ import { useStateOfIsAiWriting, useStateOfSelectedChatId } from '../../state/cha
 import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
 import ChatItemSources from '../ChatItemSources';
-import { ChatItemTools } from '../ChatItemTools';
+import { ChatItemTools, storedToolCalls } from '../ChatItemTools';
 import { ReasoningLoadingIndicator } from '../ReasoningLoadingIndicator';
 import { AIChatItemActions } from './AIChatItemActions';
 import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItem';
 import classes from './ChatItem.module.css';
-import { ChatItemUserInput } from './ChatItemUserInput';
+import { ChatItemInteractions } from './ChatItemInteractions';
 
 export const AIChatItem = ({ agentName, message, isLast }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
@@ -61,8 +61,12 @@ export const AIChatItem = ({ agentName, message, isLast }: ChatItemProps) => {
         {assistantStatus && <small className={classes.assistantStatus}>[{assistantStatus}]</small>}
       </div>
       {message.error && <Alert text={message.error} className={classes.error} />}
-      <ChatItemTools tools={message.toolCalls ?? []} />
-      {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
+      <ChatItemTools
+        conversationId={conversationId}
+        messageId={message.id}
+        tools={message.toolCalls ?? storedToolCalls(message.tools, message.interactions)}
+      />
+      <ChatItemInteractions message={message} />
       {message.reasoning?.length && (
         <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />
       )}

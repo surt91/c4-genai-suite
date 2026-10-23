@@ -53,13 +53,18 @@ describe('stopping the generation', () => {
       question,
       {
         ...answer,
-        ui: {
-          id: 'form',
-          kind: 'form',
-          expiresAt: new Date(),
-          text: 'Confirm?',
-          schema: { type: 'object', title: 'Confirm', properties: {} },
-        },
+        requests: [
+          {
+            status: 'waiting',
+            request: {
+              id: 'form',
+              kind: 'form',
+              expiresAt: new Date(),
+              text: 'Confirm?',
+              schema: { type: 'object', title: 'Confirm', properties: {} },
+            },
+          },
+        ],
       },
     ],
   ) {
@@ -91,7 +96,7 @@ describe('stopping the generation', () => {
     const [stoppedQuestion, stoppedAnswer] = chatData.messages;
     expect(stoppedAnswer).toMatchObject({
       stopped: true,
-      ui: undefined,
+      requests: [expect.objectContaining({ status: 'cancelled' })],
       toolCalls: [{ id: 'call-1', name: 'Search', status: 'cancelled' }],
     });
     expect(stoppedAnswer.content).toEqual(answer.content);

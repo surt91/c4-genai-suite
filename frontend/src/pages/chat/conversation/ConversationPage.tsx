@@ -1,4 +1,4 @@
-import { ActionIcon, Tooltip } from '@mantine/core';
+import { ActionIcon, Tooltip, VisuallyHidden } from '@mantine/core';
 import { IconArrowDown } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -10,7 +10,13 @@ import { useEventCallback, useTheme } from 'src/hooks';
 import { useScrollToBottom } from 'src/hooks/useScrollToBottom';
 import { useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
-import { useChatStream, useStateOfChat, useStateOfIsAiWriting, useStateOfMessages } from '../state/chat';
+import {
+  useChatStream,
+  useStateOfChat,
+  useStateOfIsAiWriting,
+  useStateOfIsWaitingForUser,
+  useStateOfMessages,
+} from '../state/chat';
 import { useChatDropzone } from '../useChatDropzone';
 import { ChatHistory } from './ChatHistory';
 import { ChatInput } from './ChatInput';
@@ -32,6 +38,7 @@ export function ConversationPage(props: ConversationPageProps) {
   const chat = useStateOfChat();
   const messages = useStateOfMessages();
   const isAiWriting = useStateOfIsAiWriting();
+  const isWaitingForUser = useStateOfIsWaitingForUser();
   const assistant = useStateOfSelectedAssistant();
 
   const { theme } = useTheme();
@@ -62,6 +69,17 @@ export function ConversationPage(props: ConversationPageProps) {
     textareaRef.current?.focus();
   }, [scrollToBottom, textareaRef]);
 
+  const lastMessage = messages[messages.length - 1];
+  const liveStatus = isWaitingForUser
+    ? texts.chat.live.waiting
+    : isAiWriting
+      ? texts.chat.live.generating
+      : lastMessage?.error
+        ? texts.chat.live.error(lastMessage.error)
+        : lastMessage?.stopped
+          ? texts.chat.live.stopped
+          : '';
+
   const showRateThisConversation = !isChatLoading && !chat.rating && messages.length > 10;
   const showScrollToBottomButton = canScrollToBottom && !isAiWriting;
 
@@ -79,6 +97,9 @@ export function ConversationPage(props: ConversationPageProps) {
           {isDragReject && <DragAndDropLayout.InvalidFileFormat allowedFileNameExtensions={allowedFileNameExtensions} />}
         </>
       )}
+      <VisuallyHidden aria-live="polite" role="status" data-testid="chat-live-region">
+        {liveStatus}
+      </VisuallyHidden>
       <div className={classes.configuration}>
         <Configuration canEditConfiguration={true} />
       </div>
@@ -125,6 +146,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 configuration={assistant}
                 isDisabled={isAiWriting}
                 isAiWriting={isAiWriting}
+                isWaitingForUser={isWaitingForUser}
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}
                 stopMessage={stopMessage}
