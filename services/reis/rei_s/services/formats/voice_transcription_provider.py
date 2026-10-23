@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import math
 from pathlib import Path
 from typing import Any
 
@@ -190,24 +191,30 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
             audio_codec = "vorbis"
 
         segments_files: list[SourceFile] = []
-        segment_timestamps: list[int | float] = list(range(0, int(duration), segment_duration_seconds))
-        for n, start_time in enumerate(segment_timestamps):
-            logger.info(f"segment {n + 1} / {len(segment_timestamps)}")
+        # ceil: the last (partial) segment must not be dropped
+        segment_timestamps: list[int | float] = list(range(0, math.ceil(duration), segment_duration_seconds))
+        try:
+            for n, start_time in enumerate(segment_timestamps):
+                logger.info(f"segment {n + 1} / {len(segment_timestamps)}")
 
-            segment_file = SourceFile.new_temporary_file(extension=self.audio_codecs_to_file_extension[audio_codec])
-            try:
-                ffmpeg_utils.convert(
-                    input_path,
-                    segment_file.path,
-                    output_args,
-                    input_args=["-ss", str(start_time), "-t", str(segment_duration_seconds)],
-                )
-            except ffmpeg_utils.FfmpegError as e:  # pragma: no cover
-                message = self.build_ffmpeg_error_message(e)
-                logger.error(message)
-                raise ProcessingError(message, 400) from e
-
-            segments_files.append(segment_file)
+                extension = self.audio_codecs_to_file_extension[audio_codec]
+                segment_file = SourceFile.new_temporary_file(extension=extension)
+                segments_files.append(segment_file)
+                try:
+                    ffmpeg_utils.convert(
+                        input_path,
+                        segment_file.path,
+                        output_args,
+                        input_args=["-ss", str(start_time), "-t", str(segment_duration_seconds)],
+                    )
+                except ffmpeg_utils.FfmpegError as e:
+                    message = self.build_ffmpeg_error_message(e)
+                    logger.error(message)
+                    raise ProcessingError(message, 400) from e
+        except BaseException:
+            for segment in segments_files:
+                segment.delete()
+            raise
 
         segment_timestamps.append(duration)
 
@@ -231,25 +238,27 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         segments, segment_timestamps, _audio_codec = self.split_into_compatible_format(file.path)
 
         results = []
-        for n, segment in enumerate(segments):
-            logger.info(f"process {n + 1} / {len(segments)}")
-            try:
-                docs = self.parser.parse(segment.path)
-            except openai.APIStatusError as e:  # pragma: no cover
-                if e.status_code == 413:
-                    raise ProcessingError("File too large. The limit is 25 MiB.", e.status_code) from e
-                else:
-                    raise
-            finally:
+        try:
+            for n, segment in enumerate(segments):
+                logger.info(f"process {n + 1} / {len(segments)}")
+                try:
+                    docs = self.parser.parse(segment.path)
+                except openai.APIStatusError as e:  # pragma: no cover
+                    if e.status_code == 413:
+                        raise ProcessingError("File too large. The limit is 25 MiB.", e.status_code) from e
+                    else:
+                        raise
+
+                for doc in docs:
+                    doc.metadata["segment_begin_seconds"] = segment_timestamps[n]
+                    doc.metadata["segment_end_seconds"] = segment_timestamps[n + 1]
+                    doc.metadata["total_segments"] = len(segments)
+                    doc.metadata["total_duration"] = segment_timestamps[-1]
+
+                results.extend(docs)
+        finally:
+            for segment in segments:
                 segment.delete()
-
-            for doc in docs:
-                doc.metadata["segment_begin_seconds"] = segment_timestamps[n]
-                doc.metadata["segment_end_seconds"] = segment_timestamps[n + 1]
-                doc.metadata["total_segments"] = len(segments)
-                doc.metadata["total_duration"] = segment_timestamps[-1]
-
-            results.extend(docs)
 
         return results
 

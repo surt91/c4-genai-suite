@@ -57,24 +57,16 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         try:
             ffmpeg_utils.convert(input_video_path, audio_only_file.path, ["-vn", *output_args])
         except ffmpeg_utils.FfmpegError as e:  # pragma: no cover
+            audio_only_file.delete()
             message = self.build_ffmpeg_error_message(e)
             logger.error(message)
             raise ProcessingError(message, 400) from e
 
         return audio_only_file
 
-    def parse_file(
-        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
-    ) -> list[Document]:
+    def parse_file(self, file: SourceFile) -> list[Document]:
         audio_file = self.extract_audio_to_file(file.path)
-        docs = super().parse_file(audio_file)
-        audio_file.delete()
-        return docs
-
-    def process_file(
-        self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
-    ) -> list[Document]:
-        audio_file = self.extract_audio_to_file(file.path)
-        chunks = super().process_file(audio_file, chunk_size, chunk_overlap)
-        audio_file.delete()
-        return chunks
+        try:
+            return super().parse_file(audio_file)
+        finally:
+            audio_file.delete()

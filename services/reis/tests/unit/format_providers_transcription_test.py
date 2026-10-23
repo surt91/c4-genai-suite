@@ -1,4 +1,5 @@
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -182,3 +183,66 @@ def test_video_transcription_provider_broken_file(mocked_whisper_answer: str) ->
         "Error extracting audio track from video file for voice transcription with ffmpeg"
     )
     assert 400 <= e.value.status < 500
+
+
+@pytest.fixture
+def temp_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    directory = tmp_path / "temp"
+    directory.mkdir()
+    monkeypatch.setattr(tempfile, "tempdir", str(directory))
+    return directory
+
+
+def generate_audio(path: Path, duration: float) -> SourceFile:
+    cmd = ["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "lavfi", "-i", f"sine=frequency=440:duration={duration}"]
+    subprocess.run([*cmd, str(path)], check=True, capture_output=True)
+    return SourceFile(path=str(path), mime_type="", file_name=path.name)
+
+
+def test_audio_segments_are_deleted_on_failure(
+    mocker: MockerFixture, audio_files: dict[str, Path], temp_dir: Path
+) -> None:
+    parse = mocker.patch("rei_s.services.formats.voice_transcription_provider.AzureOpenAIWhisperParser.parse")
+    parse.side_effect = [[Document("first")], RuntimeError("whisper unavailable")]
+    source_file = SourceFile(path=str(audio_files["mp3"]), mime_type="", file_name="birthdays.mp3")
+    provider = VoiceTranscriptionProvider(config=get_mock_config(), default_segment_duration=7)
+
+    with pytest.raises(RuntimeError, match="whisper unavailable"):
+        provider.process_file(source_file)
+
+    assert list(temp_dir.iterdir()) == []
+
+
+def test_extracted_audio_is_deleted_on_failure(
+    mocker: MockerFixture, audio_files: dict[str, Path], temp_dir: Path
+) -> None:
+    parse = mocker.patch("rei_s.services.formats.voice_transcription_provider.AzureOpenAIWhisperParser.parse")
+    parse.side_effect = RuntimeError("whisper unavailable")
+    source_file = SourceFile(path=str(audio_files["mp3"]), mime_type="", file_name="birthdays.mp4")
+    provider = VideoTranscriptionProvider(config=get_mock_config())
+
+    with pytest.raises(RuntimeError, match="whisper unavailable"):
+        provider.process_file(source_file)
+
+    assert list(temp_dir.iterdir()) == []
+
+
+def test_audio_shorter_than_a_second(mocked_whisper_answer: str, tmp_path: Path) -> None:
+    source_file = generate_audio(tmp_path / "short.mp3", 0.5)
+
+    docs = VoiceTranscriptionProvider(config=get_mock_config()).process_file(source_file)
+
+    assert mocked_whisper_answer in docs[0].page_content
+
+
+def test_last_partial_segment_is_transcribed(mocker: MockerFixture, tmp_path: Path) -> None:
+    parse = mocker.patch("rei_s.services.formats.voice_transcription_provider.AzureOpenAIWhisperParser.parse")
+    parse.return_value = [Document("text")]
+    source_file = generate_audio(tmp_path / "audio.mp3", 10.5)
+
+    provider = VoiceTranscriptionProvider(config=get_mock_config(), default_segment_duration=5)
+    docs = provider.process_file(source_file)
+
+    # 0-5 s, 5-10 s and 10-10.5 s
+    assert parse.call_count == 3
+    assert docs[-1].metadata["segment_begin_seconds"] == 10
