@@ -63,7 +63,7 @@ function FileRow({ file, onDelete }: { file: FileDto; onDelete: (file: FileDto) 
           <Text size="sm" truncate title={file.fileName}>
             {file.fileName}
           </Text>
-          <Text size="xs" c="dimmed">
+          <Text size="xs" c="gray.7">
             {formatFileSize(file.fileSize)} · {formatDate(file.uploadedAt, 'Pp')}
           </Text>
         </Stack>
@@ -143,7 +143,7 @@ export function ManageFilesModal({ conversationId, onClose }: { conversationId: 
           <FileRow key={file.id} file={file} onDelete={(f) => deleteFile.mutate(f)} />
         ))}
         {data && items.length === 0 && (
-          <Text size="sm" c="dimmed">
+          <Text size="sm" c="gray.7">
             {texts.chat.myFiles.empty}
           </Text>
         )}

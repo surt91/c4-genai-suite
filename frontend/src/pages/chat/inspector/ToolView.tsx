@@ -14,7 +14,7 @@ export function ToolView({ entry }: { entry: InspectorToolEntry }) {
 
   if (!tool) {
     return (
-      <Text size="sm" c="dimmed">
+      <Text size="sm" c="gray.7">
         {texts.chat.inspector.toolNoDetails}
       </Text>
     );
@@ -32,7 +32,7 @@ export function ToolView({ entry }: { entry: InspectorToolEntry }) {
       </Group>
       {tool.error && (
         <Stack gap={4}>
-          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+          <Text size="xs" fw={600} c="gray.7" tt="uppercase">
             {texts.chat.inspector.toolError}
           </Text>
           <pre className={classes.pre}>{tool.error}</pre>
@@ -40,7 +40,7 @@ export function ToolView({ entry }: { entry: InspectorToolEntry }) {
       )}
       {debug.length > 0 && (
         <Stack gap={4}>
-          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+          <Text size="xs" fw={600} c="gray.7" tt="uppercase">
             {texts.chat.inspector.toolOutput}
           </Text>
           {debug.map((d, i) => (
@@ -49,7 +49,7 @@ export function ToolView({ entry }: { entry: InspectorToolEntry }) {
         </Stack>
       )}
       {!tool.error && debug.length === 0 && (
-        <Text size="sm" c="dimmed">
+        <Text size="sm" c="gray.7">
           {texts.chat.inspector.toolNoDetails}
         </Text>
       )}

@@ -1,5 +1,5 @@
 import { Drawer, Popover } from '@mantine/core';
-import { PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren, ReactNode, useEffect, useRef } from 'react';
 import { useIsPhone } from 'src/hooks/useIsCompact';
 import classes from './ComposerPopover.module.css';
 
@@ -13,6 +13,9 @@ interface ComposerPopoverProps extends PropsWithChildren {
   'data-testid'?: string;
 }
 
+// Dropdowns of inputs inside the popover (selects, date pickers) are rendered in portals, clicks there are inside.
+const NESTED_DROPDOWNS = '.mantine-Popover-dropdown, .mantine-Combobox-dropdown, .mantine-Modal-root, [role="listbox"]';
+
 /**
  * A popover above the composer for short selections (e.g. personal files, chat settings). On phones it is a bottom
  * sheet. Esc and a click outside close it.
@@ -20,6 +23,30 @@ interface ComposerPopoverProps extends PropsWithChildren {
 export function ComposerPopover(props: ComposerPopoverProps) {
   const { opened, onClose, target, title, width = 400, children } = props;
   const isPhone = useIsPhone();
+  const targetRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!opened || isPhone) {
+      return undefined;
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      const element = event.target as Element | null;
+      if (
+        !element ||
+        dropdownRef.current?.contains(element) ||
+        targetRef.current?.contains(element) ||
+        element.closest?.(NESTED_DROPDOWNS)
+      ) {
+        return;
+      }
+      onClose();
+    };
+
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [opened, isPhone, onClose]);
 
   if (isPhone) {
     return (
@@ -43,8 +70,8 @@ export function ComposerPopover(props: ComposerPopoverProps) {
   return (
     <Popover
       opened={opened}
-      onChange={(value) => !value && onClose()}
       onDismiss={onClose}
+      closeOnClickOutside={false}
       position="top-start"
       width={width}
       shadow="md"
@@ -52,9 +79,21 @@ export function ComposerPopover(props: ComposerPopoverProps) {
       trapFocus
       returnFocus
       withinPortal
+      // the target is a wrapper, the buttons inside describe the popup themselves
+      withRoles={false}
     >
-      <Popover.Target>{target}</Popover.Target>
-      <Popover.Dropdown aria-label={title} role="dialog" data-testid={props['data-testid']} className={classes.dropdown}>
+      <Popover.Target>
+        <div ref={targetRef} className={classes.target}>
+          {target}
+        </div>
+      </Popover.Target>
+      <Popover.Dropdown
+        ref={dropdownRef}
+        aria-label={title}
+        role="dialog"
+        data-testid={props['data-testid']}
+        className={classes.dropdown}
+      >
         <div className={classes.title}>{title}</div>
         {children}
       </Popover.Dropdown>

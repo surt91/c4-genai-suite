@@ -87,7 +87,7 @@ export function Files({ conversationId, userBucket, configurationId, onManage }:
 
   return (
     <Stack gap="xs" data-testid="my-files">
-      <Text size="xs" c="dimmed">
+      <Text size="xs" c="gray.7">
         {texts.chat.myFiles.hint}
       </Text>
       <TextInput
@@ -142,7 +142,7 @@ export function Files({ conversationId, userBucket, configurationId, onManage }:
             <Text size="sm" truncate>
               {name}
             </Text>
-            <Text size="xs" c="dimmed">
+            <Text size="xs" c="gray.7">
               {texts.files.uploading}
             </Text>
           </Group>
@@ -154,7 +154,7 @@ export function Files({ conversationId, userBucket, configurationId, onManage }:
               <Text size="sm" truncate>
                 {file.fileName}
               </Text>
-              <Text size="xs" c="dimmed">
+              <Text size="xs" c="gray.7">
                 {texts.files.uploading}
               </Text>
             </Group>
@@ -172,7 +172,7 @@ export function Files({ conversationId, userBucket, configurationId, onManage }:
           ),
         )}
         {!isPending && items.length === 0 && pendingUploads.length === 0 && (
-          <Text size="sm" c="dimmed">
+          <Text size="sm" c="gray.7">
             {debouncedSearch ? texts.chat.myFiles.noResults : texts.chat.myFiles.empty}
           </Text>
         )}

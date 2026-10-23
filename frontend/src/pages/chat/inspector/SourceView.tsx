@@ -22,7 +22,7 @@ export function SourcePassages({ entry }: { entry: InspectorSourceEntry }) {
     return source?.chunk.content ? (
       <blockquote className={classes.passage}>{source.chunk.content}</blockquote>
     ) : (
-      <Text size="sm" c="dimmed">
+      <Text size="sm" c="gray.7">
         {texts.chat.inspector.noPassages}
       </Text>
     );
@@ -44,7 +44,7 @@ export function SourcePassages({ entry }: { entry: InspectorSourceEntry }) {
 
   if (data.length === 0) {
     return (
-      <Text size="sm" c="dimmed">
+      <Text size="sm" c="gray.7">
         {texts.chat.inspector.noPassages}
       </Text>
     );
@@ -95,7 +95,7 @@ export function SourceView({ entry }: { entry: InspectorSourceEntry }) {
           >
             <IconChevronLeft size={18} />
           </ActionIcon>
-          <Text size="xs" c="dimmed" aria-live="polite">
+          <Text size="xs" c="gray.7" aria-live="polite">
             {texts.chat.inspector.sourcePosition(entry.index + 1, total)}
           </Text>
           <ActionIcon
@@ -116,7 +116,7 @@ export function SourceView({ entry }: { entry: InspectorSourceEntry }) {
             {sourceName(source)}
           </Text>
           {pages.length > 0 && (
-            <Text size="xs" c="dimmed">
+            <Text size="xs" c="gray.7">
               {texts.chat.inspector.pages(String(source.metadata?.['pages']))}
             </Text>
           )}
@@ -169,7 +169,7 @@ export function SourceView({ entry }: { entry: InspectorSourceEntry }) {
         </>
       ) : (
         <>
-          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+          <Text size="xs" fw={600} c="gray.7" tt="uppercase">
             {texts.chat.inspector.citedPassages}
           </Text>
           <SourcePassages entry={entry} />

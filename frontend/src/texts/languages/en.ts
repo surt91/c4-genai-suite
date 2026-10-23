@@ -1,5 +1,6 @@
 export const en = {
   common: {
+    notifications: 'Notifications',
     logout: 'Logout',
     collapse: 'Collapse',
     expand: 'Expand',
@@ -82,6 +83,7 @@ export const en = {
     rowsSelected: '{{rowCount}} Row(s) Selected',
   },
   accessibility: {
+    closeNotification: 'Close notification',
     openExternalLink: 'Open {{title}} in a new tab',
     toggleMetadata: 'Show metadata of {{title}}',
     pdf: {

@@ -22,6 +22,7 @@ import { RouteWhenLoggedOut } from './components/RouteWhenLoggedOut';
 import { AdminPage } from './pages/admin/AdminPage';
 import { ChatPage } from './pages/chat/ChatPage';
 import { LoginPage } from './pages/login/LoginPage';
+import { texts } from './texts';
 import { i18next } from './texts/i18n';
 
 const queryClient = new QueryClient();
@@ -36,7 +37,9 @@ const ThemeProviders = ({ children }: { children: ReactNode }) => {
           <ThemeStyle />
           <ThemeTitle />
           {children}
-          <Notifications position="top-right" limit={5} />
+          <section aria-label={texts.common.notifications}>
+            <Notifications position="top-right" limit={5} withinPortal={false} />
+          </section>
         </DialogProvider>
       </MantineThemeProvider>
     </ThemeProvider>

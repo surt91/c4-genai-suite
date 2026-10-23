@@ -250,6 +250,7 @@ export function ChatInput({
           <Button
             variant="light"
             color="yellow"
+            c="dark.8"
             size="xs"
             className={classes.waitingHint}
             leftSection={<IconArrowUp size={14} />}
@@ -316,6 +317,7 @@ export function ChatInput({
                       onChange={handleUploadFileFromInput}
                       accept={allowedFileNameExtensions?.join(', ') ?? undefined}
                       disabled={uploadLimitReached}
+                      aria-label={texts.common.attachFile}
                     />
                     <label
                       htmlFor="file-upload"
@@ -328,7 +330,7 @@ export function ChatInput({
                           variant="outline"
                           color="black"
                           disabled={uploadLimitReached}
-                          aria-label={texts.common.attachFile}
+                          aria-hidden
                           className={clsx(uploadLimitReached && classes.attachDisabled)}
                         >
                           <IconPaperclip size={16} />

@@ -100,7 +100,7 @@ function ResultLine(props: {
       status={toCardStatus(status)}
       data-testid={`chat-card-${kind}`}
     >
-      <Text size="xs" c="dimmed" data-testid="chat-card-result">
+      <Text size="xs" c="gray.7" data-testid="chat-card-result">
         {resultText(status)}
         {details && `: ${details}`}
         {text && kind === 'form' && !details && ` – ${text}`}
@@ -248,7 +248,7 @@ const UrlCard = ({ state }: { state: UIRequestState }) => {
       <Stack gap="xs">
         <Markdown>{request.text}</Markdown>
         <Group gap="xs" wrap="nowrap" align="center">
-          <Text size="xs" c="dimmed">
+          <Text size="xs" c="gray.7">
             {texts.chat.cards.target}
           </Text>
           <Text size="md" fw={700} className={classes.domain} data-testid="chat-card-domain">
@@ -267,7 +267,7 @@ const UrlCard = ({ state }: { state: UIRequestState }) => {
           </Collapse>
         </div>
         {request.domainAllowed ? (
-          <Text size="xs" c="dimmed">
+          <Text size="xs" c="gray.7">
             {texts.chat.cards.allowedHint}
           </Text>
         ) : (

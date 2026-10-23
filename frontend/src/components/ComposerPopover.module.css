@@ -16,3 +16,8 @@
   border-top-left-radius: var(--mantine-radius-lg);
   border-top-right-radius: var(--mantine-radius-lg);
 }
+
+.target {
+  display: inline-flex;
+  min-width: 0;
+}

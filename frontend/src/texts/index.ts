@@ -30,6 +30,7 @@ i18next.on('loaded', () => {
 function load() {
   return {
     common: {
+      notifications: translate('common.notifications'),
       logout: translate('common.logout'),
       collapse: translate('common.collapse'),
       expand: translate('common.expand'),
@@ -112,6 +113,7 @@ function load() {
       rowsSelected: (rowCount: number) => translate('common.rowsSelected', { rowCount }),
     },
     accessibility: {
+      closeNotification: translate('accessibility.closeNotification'),
       openExternalLink: (title: string | number) => translate('accessibility.openExternalLink', { title }),
       toggleMetadata: (title: string | number) => translate('accessibility.toggleMetadata', { title }),
       pdf: {

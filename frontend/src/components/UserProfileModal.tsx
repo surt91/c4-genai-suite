@@ -123,7 +123,7 @@ export function UserProfileModal({ isOpen, onClose, canChangePassword }: UserPro
                 <TextInput label={texts.common.name} value={profile.name} readOnly />
                 <TextInput label={texts.common.email} value={profile.email} readOnly />
                 {!canChangePassword && (
-                  <Text size="xs" c="dimmed">
+                  <Text size="xs" c="gray.7">
                     {texts.chat.settings.readOnlyHint}
                   </Text>
                 )}

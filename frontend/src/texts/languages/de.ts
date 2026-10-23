@@ -2,6 +2,7 @@ import { en } from 'src/texts/languages/en';
 
 export const de: typeof en = {
   common: {
+    notifications: 'Benachrichtigungen',
     logout: 'Abmelden',
     collapse: 'Einklappen',
     expand: 'Ausklappen',
@@ -84,6 +85,7 @@ export const de: typeof en = {
     rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
   accessibility: {
+    closeNotification: 'Benachrichtigung schließen',
     openExternalLink: '{{title}} in neuem Tab öffnen',
     toggleMetadata: 'Metadaten von {{title}} anzeigen',
     pdf: {

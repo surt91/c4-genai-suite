@@ -25,7 +25,7 @@
 
 .pending {
   padding: 0.25rem 0;
-  color: var(--mantine-color-dimmed);
+  color: var(--mantine-color-gray-7);
 }
 
 .checkboxBody {

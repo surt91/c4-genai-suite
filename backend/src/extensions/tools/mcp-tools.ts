@@ -58,6 +58,9 @@ export function toLlmInputSchema(inputSchema: JSONSchema7, isLlmAttribute: (key:
 // The error code of a tool call that needs the user to open a page first (`ErrorCode.UrlElicitationRequired`).
 const URL_ELICITATION_REQUIRED = -32042;
 
+// The timeout of a tool call: longer than the timeouts of forms and pages to open (the user can stop it anytime).
+const TOOL_CALL_TIMEOUT = 15 * 60 * 1000;
+
 /** Parses the allowed domains of the configuration (one per line or comma separated). */
 export function parseDomains(value?: string) {
   return (value ?? '')
@@ -587,7 +590,9 @@ export class MCPToolsExtension implements Extension<Configuration> {
                     params: { name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } },
                   };
                   // Aborting the request also notifies the server that the tool call has been cancelled.
-                  const call = () => client.request(req, CallToolResultSchema, { signal: context.abort.signal });
+                  // A tool may wait for the user (forms, pages to open), so allow more than the default of 60s.
+                  const call = () =>
+                    client.request(req, CallToolResultSchema, { signal: context.abort.signal, timeout: TOOL_CALL_TIMEOUT });
                   let res;
                   try {
                     res = await call();

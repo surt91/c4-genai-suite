@@ -1,5 +1,5 @@
 import { Loader } from '@mantine/core';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useDocument } from 'src/hooks/api/files';
 import { toast } from 'src/lib/notifications';
@@ -81,14 +81,17 @@ export function PdfViewer({ document, page }: PdfViewerProps) {
       />
       {pdfFileUrl && displayPdfViewer && (
         <div className={`pdf-viewport ${classes.viewport}`}>
-          <Document
-            file={pdfFileUrl}
-            options={documentOptions}
-            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-            onLoadError={console.error}
-          >
-            <Page pageNumber={pageNumber} scale={scale} />
-          </Document>
+          {/* react-pdf loads the document and the pages with Suspense */}
+          <Suspense fallback={<Loader className={classes.loader} />}>
+            <Document
+              file={pdfFileUrl}
+              options={documentOptions}
+              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+              onLoadError={console.error}
+            >
+              <Page pageNumber={pageNumber} scale={scale} />
+            </Document>
+          </Suspense>
         </div>
       )}
     </div>

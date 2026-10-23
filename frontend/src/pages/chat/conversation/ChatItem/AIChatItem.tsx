@@ -58,7 +58,7 @@ export const AIChatItem = ({ agentName, message, isLast }: ChatItemProps) => {
             |<strong>{messageAssistant.name}</strong>
           </>
         )}
-        {assistantStatus && <small className={classes.assistantStatus}>[{assistantStatus}]</small>}
+        {assistantStatus && <small className={classes.assistantStatus}> [{assistantStatus}]</small>}
       </div>
       {message.error && <Alert text={message.error} className={classes.error} />}
       <ChatItemTools

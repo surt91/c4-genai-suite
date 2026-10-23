@@ -1,6 +1,7 @@
 import { ActionIcon, Group, Title, Tooltip } from '@mantine/core';
 import { IconArrowLeft, IconX } from '@tabler/icons-react';
 import { KeyboardEvent, useEffect, useRef } from 'react';
+import { ErrorBoundary } from 'src/components/ErrorBoundary';
 import { texts } from 'src/texts';
 import { InspectorEntry, useInspectorActions, useInspectorCanGoBack, useInspectorTop } from '../state/inspector';
 import { HelpView } from './HelpView';
@@ -86,9 +87,11 @@ export function Inspector() {
         </Tooltip>
       </Group>
       <div className={classes.body}>
-        {top.type === 'source' && <SourceView entry={top} />}
-        {top.type === 'tool' && <ToolView entry={top} />}
-        {top.type === 'help' && <HelpView />}
+        <ErrorBoundary resetKey={top}>
+          {top.type === 'source' && <SourceView entry={top} />}
+          {top.type === 'tool' && <ToolView entry={top} />}
+          {top.type === 'help' && <HelpView />}
+        </ErrorBoundary>
       </div>
     </aside>
   );

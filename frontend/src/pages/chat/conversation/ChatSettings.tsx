@@ -175,7 +175,7 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
             x.type === 'object' ? (
               <Fieldset key={id} legend={x.title || texts.chat.chatSettings.assistantSettings} variant="unstyled">
                 {x.description && (
-                  <Text size="xs" c="dimmed" mb="xs">
+                  <Text size="xs" c="gray.7" mb="xs">
                     {x.description}
                   </Text>
                 )}
@@ -195,7 +195,7 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
         {extensionsWithFilter.map((x) => (
           <Fieldset key={x.name} legend={x.title} variant="unstyled">
             {x.description && (
-              <Text size="xs" c="dimmed" mb="xs">
+              <Text size="xs" c="gray.7" mb="xs">
                 {x.description}
               </Text>
             )}

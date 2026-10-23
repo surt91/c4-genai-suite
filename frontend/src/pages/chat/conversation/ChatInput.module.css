@@ -69,11 +69,22 @@
 }
 
 .fileInput {
-  display: none;
+  /* visually hidden but focusable, so that files can be attached with the keyboard */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
 }
 
 .attachLabel {
   cursor: pointer;
+  border-radius: var(--mantine-radius-md);
+}
+
+.fileInput:focus-visible + .attachLabel {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: 2px;
 }
 
 .attachDisabled {

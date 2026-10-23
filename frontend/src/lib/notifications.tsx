@@ -2,6 +2,7 @@ import { Button, Group, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconAlertTriangle, IconCheck, IconInfoCircle, IconX } from '@tabler/icons-react';
 import { ReactNode } from 'react';
+import { texts } from 'src/texts';
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 
@@ -66,6 +67,7 @@ export function notify(message: ReactNode, options: NotifyOptions = {}) {
     icon: STYLES[type].icon,
     autoClose: autoClose ?? (type === 'error' ? 8000 : 4000),
     withBorder: true,
+    closeButtonProps: { 'aria-label': texts.accessibility.closeNotification },
     onClose: () => {
       if (!actionClicked) {
         onClose?.();

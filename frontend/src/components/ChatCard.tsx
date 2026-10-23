@@ -53,11 +53,16 @@ export function StatusBadge({ status, label }: { status: ChatCardStatus; label?:
   return (
     <Badge
       variant="light"
-      color={color}
+      color="gray"
+      c="dark.7"
       size="sm"
       radius="sm"
       tt="none"
-      leftSection={icon}
+      leftSection={
+        <span className={classes.statusIcon} data-color={color}>
+          {icon}
+        </span>
+      }
       className={classes.badge}
       data-testid="chat-card-status"
       data-status={status}
@@ -108,7 +113,7 @@ export const ChatCard = forwardRef<HTMLDivElement, ChatCardProps>((props, ref) =
           {title}
         </Text>
         {meta && (
-          <Text size="xs" c="dimmed" component="div">
+          <Text size="xs" c="gray.7" component="div">
             {meta}
           </Text>
         )}

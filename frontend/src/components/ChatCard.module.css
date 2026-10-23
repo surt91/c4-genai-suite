@@ -28,7 +28,7 @@
 .icon {
   display: inline-flex;
   flex-shrink: 0;
-  color: var(--mantine-color-dimmed);
+  color: var(--mantine-color-gray-7);
 }
 
 .title {
@@ -61,4 +61,28 @@
 .warningIcon {
   flex-shrink: 0;
   color: var(--mantine-color-yellow-8);
+}
+
+.statusIcon {
+  display: inline-flex;
+}
+
+.statusIcon[data-color='green'] {
+  color: var(--mantine-color-green-8);
+}
+
+.statusIcon[data-color='red'] {
+  color: var(--mantine-color-red-8);
+}
+
+.statusIcon[data-color='yellow'] {
+  color: var(--mantine-color-yellow-8);
+}
+
+.statusIcon[data-color='blue'] {
+  color: var(--mantine-color-blue-8);
+}
+
+.statusIcon[data-color='gray'] {
+  color: var(--mantine-color-gray-7);
 }

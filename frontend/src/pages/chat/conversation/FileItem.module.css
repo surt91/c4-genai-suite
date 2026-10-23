@@ -82,7 +82,7 @@
 
 .origin {
   overflow: hidden;
-  color: var(--mantine-color-dimmed);
+  color: var(--mantine-color-gray-7);
   font-size: 0.6875rem;
   line-height: 0.875rem;
   text-overflow: ellipsis;
