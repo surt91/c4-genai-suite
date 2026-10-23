@@ -104,6 +104,11 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
     });
   }, [recordingState, transcription, extensionId, onTranscriptReceived, cleanup]);
 
+  const stopRecordingRef = useRef(stopRecording);
+  useEffect(() => {
+    stopRecordingRef.current = stopRecording;
+  }, [stopRecording]);
+
   // Start recording
   const startRecording = useCallback(async () => {
     if (recordingState !== 'idle' && recordingState !== 'error') {
@@ -158,7 +163,12 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
 
         // Auto-stop if max duration reached
         if (elapsed >= maxDurationMs) {
-          void stopRecording();
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          // the callback of this render still sees the state before the recording started
+          void stopRecordingRef.current();
           toast.info(texts.chat.transcribe.maxDurationReached);
         }
       }, 100);
@@ -171,7 +181,7 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
       setRecordingState('error');
       cleanup();
     }
-  }, [recordingState, maxDurationMs, stopRecording, cleanup]);
+  }, [recordingState, maxDurationMs, cleanup]);
 
   // Toggle recording
   const toggleRecording = useCallback(async () => {
