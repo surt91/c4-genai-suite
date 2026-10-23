@@ -66,7 +66,6 @@ test('When using suggestions gaible', async ({ page }) => {
   });
 
   await test.step('will not show the "Add suggestion" button if limit is reached for the assistant', async () => {
-    await page.waitForTimeout(1000);
     await expect(page.getByRole('button', { name: 'Add suggestion' })).toBeHidden();
   });
 
@@ -129,7 +128,6 @@ test('When using suggestions gaible', async ({ page }) => {
   });
 
   await test.step('will not show the "Add suggestion" button if limit is reached globally', async () => {
-    await page.waitForTimeout(1000);
     await expect(page.getByRole('button', { name: 'Add suggestion' })).toBeHidden();
   });
 

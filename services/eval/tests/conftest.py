@@ -4,7 +4,11 @@ import os
 import pytest
 from cryptography.fernet import Fernet
 
-from llm_eval.settings import Settings
+# The settings singleton is created on import and requires an encryption key,
+# so provide a throwaway key before importing it (no env setup needed for tests).
+os.environ["LLM_EVAL_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
+
+from llm_eval.settings import Settings  # noqa: E402
 
 
 @pytest.fixture(autouse=True)

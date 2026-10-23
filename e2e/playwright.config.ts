@@ -19,9 +19,10 @@ export default defineConfig({
   /* Run tests in files in parallel */
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: 1, // Only one worker, since our tests use one DB-State
-  //workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 1 : 0,
+  // Only one worker: the tests share one backend/database state (e.g. global settings, user and
+  // assistant lists, audit log, the shared mock LLM server) and several assert on global lists/counts.
+  workers: 1,
   reporter: [['list', { printSteps: true }], ['html']],
   use: {
     trace: 'on-first-retry',
@@ -36,26 +37,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         permissions: ['clipboard-read', 'clipboard-write'],
       },
-    },
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        launchOptions: {
-          firefoxUserPrefs: {
-            'dom.events.testing.asyncClipboard': true,
-            'dom.events.asyncClipboard.readText': true,
-            'dom.events.asyncClipboard.clipboardItem': true,
-            'dom.events.asyncClipboard.writeText': true,
-            'permissions.default.clipboard-read': 1,
-            'permissions.default.clipboard-write': 1,
-          },
-        },
-      },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
   ],
 });

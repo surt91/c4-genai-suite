@@ -22,6 +22,7 @@ from tests.conftest import get_test_config
 
 # Needed environment variables will be read the environment (not from .env files).
 # If needed environment variables are missing, the test is skipped
+# (CI runs pytest with --error-for-skips, so missing infra fails there instead of being skipped).
 
 INDEX_NAME = "test"
 OTHER_INDEX_NAME = "pg_test_index"
@@ -36,7 +37,7 @@ def get_config_override() -> Config:
             )
         )
     except ValidationError as e:
-        pytest.skip(f"Skipped! A config value is missing: {e!r}")
+        pytest.skip(f"Skipped! Set STORE_PGVECTOR_URL (postgres with the pgvector extension) to run these tests: {e!r}")
         raise  # For type checker - pytest.skip raises but type checker doesn't know
 
 

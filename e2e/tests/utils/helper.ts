@@ -415,86 +415,6 @@ export async function wait(timeout: number) {
   await new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
-async function setSliderValue(page: Page, label: string, value: number) {
-  // Find the slider container by its label
-  const sliderLabel = page.locator('label').filter({ hasText: label });
-  const sliderContainer = sliderLabel.locator('..').locator('.mantine-Slider-root');
-  const thumb = sliderContainer.locator('[role="slider"]');
-
-  // Read min and max from the slider's aria attributes
-  const min = parseFloat((await thumb.getAttribute('aria-valuemin')) || '0');
-  const max = parseFloat((await thumb.getAttribute('aria-valuemax')) || '100');
-
-  const thumbBoundingBox = await thumb.boundingBox();
-  const sliderBoundingBox = await sliderContainer.boundingBox();
-
-  if (thumbBoundingBox === null || sliderBoundingBox === null) {
-    throw new Error(`Could not find slider for label: ${label}`);
-  }
-
-  // Calculate the target percentage based on min/max/value
-  const targetPercentage = (value - min) / (max - min);
-
-  // Start from the middle of the slider's thumb
-  const startPoint = {
-    x: thumbBoundingBox.x + thumbBoundingBox.width / 2,
-    y: thumbBoundingBox.y + thumbBoundingBox.height / 2,
-  };
-
-  // Slide it to the endpoint determined by the target percentage
-  const endPoint = {
-    x: sliderBoundingBox.x + sliderBoundingBox.width * targetPercentage,
-    y: thumbBoundingBox.y + thumbBoundingBox.height / 2,
-  };
-
-  await page.mouse.move(startPoint.x, startPoint.y);
-  await page.mouse.down();
-  await page.mouse.move(endPoint.x, endPoint.y);
-  await page.mouse.up();
-}
-
-export async function addAzureModelToConfiguration(
-  page: Page,
-  configuration: { name: string },
-  azure: { deployment: string; configurable?: string[]; apiKey?: string },
-  performTest: boolean = false,
-) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
-
-  await page.getByRole('button', { name: 'Add Extension' }).click();
-
-  await page
-    .locator('*')
-    .filter({ hasText: /^Azure OpenAIOpen AI LLM integration.*$/ })
-    .nth(1)
-    .click();
-  await page.getByLabel('API Key').click();
-  await page.getByLabel('API Key').fill(azure.apiKey ?? config.AZURE_OPEN_AI_API_KEY);
-  await page.getByLabel('Deployment Name').fill(azure.deployment);
-  await page.getByLabel('Instance Name').fill('gaible-testing');
-  await page.getByLabel('Seed').fill('42');
-  await setSliderValue(page, 'Temperature', 0);
-  await page.getByRole('button', { name: 'Test' }).click();
-
-  if (azure.configurable?.length) {
-    await selectMultipleOptions(page, 'Configurable', azure.configurable);
-  }
-
-  if (performTest) {
-    const loader = page.locator('.mantine-Button-loader');
-    await loader.waitFor({ state: 'visible' });
-    await page
-      .getByRole('alert')
-      .filter({ hasText: /^Extension is valid./ })
-      .getByRole('button')
-      .click();
-    await loader.waitFor({ state: 'detached' });
-  }
-
-  await save(page);
-}
-
 export async function addMockModelToConfiguration(
   page: Page,
   configuration: { name: string },
@@ -741,11 +661,14 @@ export async function selectMultipleOptions(page: Page, name: string, values: st
 }
 
 export async function expectElementInYRange(element: Locator, min: number, max: number) {
-  const box = await element.boundingBox();
-  const highestPointY = box && box.y;
-  const lowestPointY = box && box.y + box.height;
-  expect(highestPointY).toBeGreaterThan(min);
-  expect(lowestPointY).toBeLessThan(max);
+  // retry until scrolling/rendering has settled instead of sleeping a fixed time before the check
+  await expect(async () => {
+    const box = await element.boundingBox();
+    const highestPointY = box && box.y;
+    const lowestPointY = box && box.y + box.height;
+    expect(highestPointY).toBeGreaterThan(min);
+    expect(lowestPointY).toBeLessThan(max);
+  }).toPass({ timeout: 10_000 });
 }
 
 export async function changePassword(page: Page, currentPassword: string, newPassword: string) {
@@ -771,8 +694,14 @@ export function globalConversationBucketName(): string {
 }
 
 export async function expectA11yCompliant(page: Page) {
-  // Give the browser time to wait for animations to finish
-  await page.waitForTimeout(2000);
+  // Wait for (finite) CSS animations/transitions to finish, so axe does not see intermediate styles.
+  await page
+    .waitForFunction(
+      () => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity),
+      undefined,
+      { timeout: 5_000 },
+    )
+    .catch(() => {});
 
   // Exclude react-tooltip portal from axe scan: it renders into <body> outside any landmark,
   // which violates the "region" rule. Tooltips are transient supplementary content and do not

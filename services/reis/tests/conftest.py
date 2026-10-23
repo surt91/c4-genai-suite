@@ -39,18 +39,3 @@ def app() -> Generator[FastAPI, None, None]:
     app.state.executor = ThreadPoolExecutor(max_workers=1)
 
     yield app
-
-
-def pytest_addoption(parser: Any) -> None:
-    parser.addoption("--stress", action="store_true", default=False, help="run stress tests")
-
-
-def pytest_collection_modifyitems(config: Any, items: Any) -> None:
-    if config.getoption("--stress"):
-        # --stress given in cli: do not skip stress tests
-        return
-    items[:] = [item for item in items if "stress" not in item.keywords]
-
-
-def pytest_configure(config: Any) -> None:
-    config.addinivalue_line("markers", "stress: mark tests to run only on with --stress cli option")

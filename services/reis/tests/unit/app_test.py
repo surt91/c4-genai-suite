@@ -1,3 +1,4 @@
+import random
 from fastapi import FastAPI
 import pytest
 from fastapi.testclient import TestClient
@@ -312,17 +313,18 @@ def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> No
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
-    with open("tests/data_stress/gg.pdf", "rb") as f:
-        response = client.post(
-            "/files",
-            content=f,
-            headers={
-                "id": "1",
-                "bucket": "15",
-                "fileName": "test.yaml",
-                "fileMimeType": "",
-            },
-        )
+    # ~1.5 MB of binary (non UTF-8) data, uploaded as yaml
+    content = b"%PDF-1.7\n" + random.Random(42).randbytes(1_500_000)
+    response = client.post(
+        "/files",
+        content=content,
+        headers={
+            "id": "1",
+            "bucket": "15",
+            "fileName": "test.yaml",
+            "fileMimeType": "",
+        },
+    )
     assert response.status_code == 400
     assert "Processing failed" in response.text
 

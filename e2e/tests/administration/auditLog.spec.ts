@@ -48,8 +48,6 @@ test('Audit Log', async ({ page }) => {
     await assistantFilterSelect.click();
     await page.getByRole('option', { name: configName }).click();
 
-    await page.waitForTimeout(500);
-
     // All visible rows should be related to this configuration
     const configRows = page.getByRole('table').getByRole('row').filter({ hasText: configName });
     await expect(configRows.first()).toBeVisible();
@@ -108,7 +106,6 @@ test('Audit Log', async ({ page }) => {
 
     // Check audit log
     await page.getByRole('link', { name: 'Audit Log' }).click();
-    await page.waitForTimeout(500);
 
     // Should have both create and update entries
     const createRow = page.getByRole('table').getByRole('row').filter({ hasText: groupName }).filter({ hasText: 'Create' });
@@ -179,23 +176,16 @@ test('Audit Log', async ({ page }) => {
 
     // If pagination exists, test it
     if ((await paginationNext.count()) > 0) {
-      const firstPageContent = await page.getByRole('table').locator('tbody').textContent();
+      const tableBody = page.getByRole('table').locator('tbody');
+      const firstPageContent = (await tableBody.textContent()) ?? '';
 
-      // Go to next page
+      // Go to next page: content should be different
       await paginationNext.click();
-      await page.waitForTimeout(500);
-
-      const secondPageContent = await page.getByRole('table').locator('tbody').textContent();
-
-      // Content should be different
-      expect(firstPageContent).not.toBe(secondPageContent);
+      await expect(tableBody).not.toHaveText(firstPageContent);
 
       // Go back
       await paginationPrev.click();
-      await page.waitForTimeout(500);
-
-      const backToFirstPage = await page.getByRole('table').locator('tbody').textContent();
-      expect(backToFirstPage).toBe(firstPageContent);
+      await expect(tableBody).toHaveText(firstPageContent);
     }
   });
 

@@ -3,6 +3,15 @@ import { cleanup } from '@testing-library/react';
 import { afterEach, beforeAll, vi } from 'vitest';
 import React from 'react';
 
+// Node >= 25 ships its own (file-backed, here unconfigured) Web Storage globals that shadow jsdom's
+// implementation. Always use jsdom's storage so tests behave the same on every Node version.
+for (const storage of ['localStorage', 'sessionStorage'] as const) {
+  const jsdomStorage = (globalThis as { jsdom?: { window: Window } }).jsdom?.window[storage];
+  if (jsdomStorage) {
+    Object.defineProperty(globalThis, storage, { value: jsdomStorage, configurable: true, writable: true });
+  }
+}
+
 // Mock react-syntax-highlighter to avoid ES module issues
 vi.mock('react-syntax-highlighter', () => ({
   Prism: (props: { children: React.ReactNode; [key: string]: unknown }) => {

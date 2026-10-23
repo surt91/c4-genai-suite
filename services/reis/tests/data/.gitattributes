@@ -1,5 +1,0 @@
-birthdays.wav filter=lfs diff=lfs merge=lfs -text
-birthdays.m4a filter=lfs diff=lfs merge=lfs -text
-birthdays.mp3 filter=lfs diff=lfs merge=lfs -text
-birthdays.ogg filter=lfs diff=lfs merge=lfs -text
-birthdays.flac filter=lfs diff=lfs merge=lfs -text

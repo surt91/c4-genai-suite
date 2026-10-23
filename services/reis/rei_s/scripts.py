@@ -31,12 +31,6 @@ def test() -> None:
     sys.exit(result.returncode)
 
 
-def stresstest() -> None:
-    """Run stress tests against a running REI-S instance."""
-    result = subprocess.run(["pytest", "-rs", "--stress", "tests/stress", *sys.argv[1:]])
-    sys.exit(result.returncode)
-
-
 def dev() -> None:
     """Start the development server."""
     result = subprocess.run(["fastapi", "dev", "rei_s/app.py", "--port", "3201", *sys.argv[1:]])

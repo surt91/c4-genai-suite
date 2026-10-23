@@ -1,6 +1,6 @@
 import os
 from typing import Generator
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -9,6 +9,14 @@ from llm_eval.utils.decorators import RetryError, async_retry_on_error
 
 class CustomException(Exception):
     pass
+
+
+# Do not actually wait for the exponential backoff (2**i seconds) in the tests
+@pytest.fixture(autouse=True)
+def no_backoff_sleep(monkeypatch: pytest.MonkeyPatch) -> None:
+    import anyio
+
+    monkeypatch.setattr(anyio, "sleep", AsyncMock())
 
 
 # Clear the env var after each test case to avoid side effects

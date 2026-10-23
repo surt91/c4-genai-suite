@@ -42,7 +42,6 @@ test('Chat viewport scrolling', async ({ page, mockServerUrl }) => {
     await sendMessage(page, configuration, {
       message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
     });
-    await page.waitForTimeout(1500);
     const element = page.getByText(/^Wie sagt man auf Englisch Banane.+Friendly AI/);
     await expectElementInYRange(element, -200, 116);
   });
@@ -68,17 +67,14 @@ test('Chat viewport scrolling', async ({ page, mockServerUrl }) => {
   await test.step('should hide auto-scroll button when scrolled to bottom', async () => {
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
     await autoScrollButton.click();
-    await page.waitForTimeout(1000);
     await expect(autoScrollButton).toHaveCSS('opacity', '0');
   });
 
   await test.step('should show and allow clicking auto-scroll button when user scrolls up', async () => {
     await page.mouse.wheel(0, -800);
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
-    await page.waitForTimeout(1000);
     await expect(autoScrollButton).toHaveCSS('opacity', '1');
     await autoScrollButton.click();
-    await page.waitForTimeout(1000);
     await expect(autoScrollButton).toHaveCSS('opacity', '0');
   });
 
@@ -86,12 +82,10 @@ test('Chat viewport scrolling', async ({ page, mockServerUrl }) => {
     await sendMessage(page, configuration, {
       message: 'Write a two-column table with the upper case letters from A to Z followed by a random short word in the rows.',
     });
-    await page.waitForTimeout(1500);
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
     await expect(autoScrollButton).toHaveCSS('opacity', '1');
     // Start a new chat - with mock LLM server the backend creates real conversations
     await page.getByRole('button', { name: 'New chat' }).click();
-    await page.waitForTimeout(1500);
     await expect(autoScrollButton).toHaveCSS('opacity', '0');
   });
 });

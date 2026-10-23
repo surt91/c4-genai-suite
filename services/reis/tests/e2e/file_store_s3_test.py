@@ -20,6 +20,7 @@ from tests.conftest import get_test_config
 
 # Needed environment variables will be read the environment (not from .env files).
 # If needed environment variables are missing, the test is skipped
+# (CI runs pytest with --error-for-skips, so missing infra fails there instead of being skipped).
 
 
 INDEX_NAME = "s3_test"
@@ -35,7 +36,10 @@ def get_config_override() -> Config:
             )
         )
     except ValidationError as e:
-        pytest.skip(f"Skipped! A config value is missing: {e!r}")
+        pytest.skip(
+            "Skipped! Set STORE_PGVECTOR_URL and FILE_STORE_S3_ENDPOINT_URL, FILE_STORE_S3_ACCESS_KEY_ID, "
+            f"FILE_STORE_S3_SECRET_ACCESS_KEY, FILE_STORE_S3_BUCKET_NAME to run these tests: {e!r}"
+        )
         raise  # For type checker - pytest.skip raises but type checker doesn't know
 
 

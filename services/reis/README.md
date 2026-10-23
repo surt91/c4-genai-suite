@@ -21,26 +21,17 @@ The tests can be run with
 uv run pytest -rs
 ```
 
-Note that end-to-end (e2e) Tests, which test the integration to a third party service (e.g., pgvector, whispher, AI Search),
-will be skipped if the corresponding connection information is not given as either an environment variable
-or in ".env.test" in the reis root directory.
+Unit tests need `ffmpeg` and LibreOffice (`soffice`) on the host, but no credentials or network services.
+The tests in `tests/e2e` need a local postgres with pgvector (`STORE_PGVECTOR_URL`) and, for the S3 file store,
+an S3 compatible store like minio (`FILE_STORE_S3_ENDPOINT_URL`, `FILE_STORE_S3_ACCESS_KEY_ID`,
+`FILE_STORE_S3_SECRET_ACCESS_KEY`, `FILE_STORE_S3_BUCKET_NAME`). They are skipped if those environment variables are
+not set (CI runs with `--error-for-skips`, so they cannot be skipped silently there).
 
 Unit tests and e2e tests can also run selectively with
 
 ```bash
 uv run pytest -rs tests/unit
 uv run pytest -rs tests/e2e
-```
-
-Also note that the stress tests are always skipped and can be run with the following command.
-They need an independent running instance of REI-S.
-The url of REI-S can be defined with the environment variable `TEST_REIS_URL` and falls back to `http://localhost:3201`.
-However be careful against which environment you run it, since it might generate costs.
-
-We suggest to run it against a local postgres with the `random-test-embeddings` embeddings provider.
-
-```bash
-uv run pytest -rs --stress tests/stress
 ```
 
 ## Open API

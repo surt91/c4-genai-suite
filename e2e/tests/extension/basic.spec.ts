@@ -68,9 +68,8 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
     await sendMessage(page, configuration, {
       message: `Can you reply with this markdown and only this markdown?: ![Image](${imageUrl})`,
     });
-    await page.waitForTimeout(500);
     const image = page.getByRole('img', { name: 'Image' }).first();
-    expect(await image.getAttribute('src')).toBe(imageUrl);
+    await expect(image).toHaveAttribute('src', imageUrl);
     await expect(image).toBeVisible();
 
     await expectA11yCompliant(page);
@@ -102,7 +101,6 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
     await sendMessage(page, configuration, {
       message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
     });
-    await page.waitForTimeout(1000);
     const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
     await expectElementInYRange(element, -200, 116);
   });
