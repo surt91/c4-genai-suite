@@ -33,6 +33,8 @@ from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFi
 
 
 lock = Lock()
+# (endpoint, index name) of indexes which are known to exist
+_known_indexes: set[tuple[str, str]] = set()
 
 FIELD_ID = "id"
 FIELD_CONTENT = "content"
@@ -148,8 +150,6 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
     def create(cls, config: Config, embeddings: Embeddings, index_name: str | None) -> "AzureAISearchStoreAdapter":
         if index_name is None:
             index_name = config.store_azure_ai_search_service_index_name
-        if index_name is None:
-            index_name = "index"
 
         # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.store_azure_ai_search_service_endpoint is None:
@@ -162,15 +162,18 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
 
         # We need to lock this, otherwise it two processes might race to create the same collection
         with lock:
-            index_client = SearchIndexClient(endpoint=endpoint, credential=credential)
-            try:
-                index_client.get_index(name=index_name)
-            except ResourceNotFoundError:
-                fields = get_index_fields(len(embeddings.embed_query("Text")))
-                index = SearchIndex(name=index_name, fields=fields, vector_search=get_vector_search())
-                index_client.create_index(index)
-            finally:
-                index_client.close()
+            # indexes are not deleted by us, so the existence check is only needed once per index
+            if (endpoint, index_name) not in _known_indexes:
+                index_client = SearchIndexClient(endpoint=endpoint, credential=credential)
+                try:
+                    index_client.get_index(name=index_name)
+                except ResourceNotFoundError:
+                    fields = get_index_fields(len(embeddings.embed_query("Text")))
+                    index = SearchIndex(name=index_name, fields=fields, vector_search=get_vector_search())
+                    index_client.create_index(index)
+                finally:
+                    index_client.close()
+                _known_indexes.add((endpoint, index_name))
 
         instance = cls()
         instance.client = SearchClient(endpoint=endpoint, index_name=index_name, credential=credential)

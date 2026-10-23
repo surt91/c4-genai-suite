@@ -39,6 +39,8 @@ def client(mocker: MockerFixture, app: FastAPI) -> TestClient:
 
     # mock embeddings to avoid calls to azure
     mocker.patch("rei_s.services.store_service.get_embeddings", return_value=RandomEmbeddings(size=1352))
+    # every test mocks the index lookup
+    mocker.patch("rei_s.services.vectorstores.azure_ai_search._known_indexes", set())
 
     client = TestClient(app)
 
@@ -94,6 +96,16 @@ def mock_search_response(responses: RequestsMock, filename: str, input_content: 
             ]
         },
     )
+
+
+def test_index_is_looked_up_once(client: TestClient, responses: RequestsMock, faker: Faker) -> None:
+    mock_search_response(responses, faker.file_name(extension="md"), faker.text())
+
+    for _ in range(3):
+        assert client.get("/files", params={"query": "test", "bucket": "1", "take": "3"}).status_code == 200
+
+    index_lookups = [call for call in responses.calls if call.request.method == "GET"]
+    assert len(index_lookups) == 1
 
 
 def test_get_files(client: TestClient, responses: RequestsMock, faker: Faker) -> None:
