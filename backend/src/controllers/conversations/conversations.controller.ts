@@ -93,7 +93,7 @@ export class ConversationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ConversationDto })
-  async getConversation(@Req() req: Request, @Param('id') id: number) {
+  async getConversation(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const result: GetConversationResponse = await this.queryBus.execute(new GetConversation(+id, req.user));
     if (!result.conversation) {
       throw new NotFoundException(`Conversation with id '${id}' was not found`);
@@ -120,7 +120,7 @@ export class ConversationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ConversationDto })
-  async duplicateConversation(@Req() req: Request, @Param('id') id: number) {
+  async duplicateConversation(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const result: DuplicateConversationResponse = await this.commandBus.execute(new DuplicateConversation(id, req.user));
     return ConversationDto.fromDomain(result.conversation);
   }
@@ -134,7 +134,7 @@ export class ConversationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ConversationDto })
-  async patchConversation(@Req() req: Request, @Param('id') id: number, @Body() body: UpdateConversationDto) {
+  async patchConversation(@Req() req: Request, @Param('id', ParseIntPipe) id: number, @Body() body: UpdateConversationDto) {
     const result: UpdateConversationResponse = await this.commandBus.execute(new UpdateConversation(+id, req.user, body));
 
     return ConversationDto.fromDomain(result.conversation);
@@ -149,7 +149,7 @@ export class ConversationsController {
     type: Number,
   })
   @ApiOkResponse({ type: MessagesDto })
-  async getMessages(@Req() req: Request, @Param('id') id: number) {
+  async getMessages(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const result: GetHistoryResponse = await this.queryBus.execute(new GetHistory(+id, req.user));
 
     return MessagesDto.fromDomain(result.history);
@@ -359,8 +359,8 @@ export class ConversationsController {
   @ApiNoContentResponse()
   async rateMessage(
     @Req() req: Request,
-    @Param('id') id: number,
-    @Param('messageId') messageId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
     @Body() request: RateMessageDto,
   ) {
     await this.commandBus.execute(new RateMessage(+id, +messageId, req.user, request.rating));
@@ -382,7 +382,7 @@ export class ConversationsController {
     type: Number,
   })
   @ApiNoContentResponse()
-  async deleteConversation(@Req() req: Request, @Param('id') id: number) {
+  async deleteConversation(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     await this.commandBus.execute(new DeleteConversation(+id, req.user));
   }
 

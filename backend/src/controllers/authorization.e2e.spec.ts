@@ -155,6 +155,11 @@ describe('Authorization', () => {
     });
   });
 
+  it('answers non-numeric ids with 400 instead of a database error', async () => {
+    await asUser(http().get('/conversations/abc')).expect(400);
+    await asAdmin(http().get('/configurations/abc')).expect(400);
+  });
+
   it('rejects a password change of a user without password with 400', async () => {
     await asUser(http().put('/users/me/password').send({ password: 'new-password', currentPassword: 'guess' })).expect(400);
   });

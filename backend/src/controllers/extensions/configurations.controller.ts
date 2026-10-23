@@ -112,7 +112,7 @@ export class ConfigurationsController {
   })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async getConfiguration(@Param('id') id: number) {
+  async getConfiguration(@Param('id', ParseIntPipe) id: number) {
     const result: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(id));
 
     return ConfigurationDto.fromDomain(result.configuration);
@@ -142,7 +142,7 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ConfigurationDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putConfiguration(@Param('id') id: number, @Body() body: UpsertConfigurationDto, @Req() req: Request) {
+  async putConfiguration(@Param('id', ParseIntPipe) id: number, @Body() body: UpsertConfigurationDto, @Req() req: Request) {
     const command = new UpdateConfiguration(id, body, req.user);
 
     const result: UpdateConfigurationResponse = await this.commandBus.execute(command);
@@ -161,7 +161,7 @@ export class ConfigurationsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteConfiguration(@Param('id') id: number, @Req() req: Request) {
+  async deleteConfiguration(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const command = new DeleteConfiguration(id, req.user);
     await this.commandBus.execute(command);
   }
@@ -175,7 +175,7 @@ export class ConfigurationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ConfigurationUserValuesDto })
-  async getConfigurationUserValues(@Param('id') id: number, @Req() req: Request) {
+  async getConfigurationUserValues(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const result: GetConfigurationUserValuesResponse = await this.queryBus.execute(
       new GetConfigurationUserValues(id, req.user.id),
     );
@@ -191,7 +191,11 @@ export class ConfigurationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ConfigurationUserValuesDto })
-  async updateConfigurationUserValues(@Param('id') id: number, @Body() body: ConfigurationUserValuesDto, @Req() req: Request) {
+  async updateConfigurationUserValues(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: ConfigurationUserValuesDto,
+    @Req() req: Request,
+  ) {
     await this.queryBus.execute(new UpdateConfigurationUserValues(id, req.user.id, body.values));
     return body;
   }
@@ -208,7 +212,7 @@ export class ConfigurationsController {
   // Admin only: the values contain endpoints, headers and prompts of (possibly restricted) assistants.
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async getExtensions(@Param('id') id: number) {
+  async getExtensions(@Param('id', ParseIntPipe) id: number) {
     const result: GetExtensionsResponse = await this.queryBus.execute(new GetExtensions(id, true));
     return ExtensionsDto.fromDomain(result.extensions, this.explorer.getExtensions().map(ConfiguredExtension.createInitial));
   }
@@ -224,7 +228,7 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ExtensionDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postExtension(@Param('id') id: number, @Body() body: CreateExtensionDto, @Req() req: Request) {
+  async postExtension(@Param('id', ParseIntPipe) id: number, @Body() body: CreateExtensionDto, @Req() req: Request) {
     const command = new CreateExtension(id, body, req.user);
     const result: CreateExtensionResponse = await this.commandBus.execute(command);
 
@@ -249,8 +253,8 @@ export class ConfigurationsController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async putExtension(
-    @Param('id') id: number,
-    @Param('extensionId') extensionId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('extensionId', ParseIntPipe) extensionId: number,
     @Body() body: UpdateExtensionDto,
     @Req() req: Request,
   ) {
@@ -278,7 +282,11 @@ export class ConfigurationsController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteExtension(@Param('id') id: number, @Param('extensionId') extensionId: number, @Req() req: Request) {
+  async deleteExtension(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('extensionId', ParseIntPipe) extensionId: number,
+    @Req() req: Request,
+  ) {
     const command = new DeleteExtension(+extensionId, req.user);
     await this.commandBus.execute(command);
   }
@@ -322,7 +330,7 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: ConfigurationDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async duplicate(@Param('id') id: number) {
+  async duplicate(@Param('id', ParseIntPipe) id: number) {
     const command = new DuplicateConfiguration(id);
 
     const result: DuplicateConfigurationResponse = await this.commandBus.execute(command);

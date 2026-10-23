@@ -148,7 +148,7 @@ export class FilesController {
   @ApiOkResponse({ type: BucketDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async putBucket(@Param('id') id: number, @Body() body: UpsertBucketDto, @Req() req: Request) {
+  async putBucket(@Param('id', ParseIntPipe) id: number, @Body() body: UpsertBucketDto, @Req() req: Request) {
     const command = new UpdateBucket(id, body, req.user);
 
     const result: UpdateBucketResponse = await this.commandBus.execute(command);
@@ -167,7 +167,7 @@ export class FilesController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteBucket(@Param('id') id: number, @Req() req: Request) {
+  async deleteBucket(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const command = new DeleteBucket(id, req.user);
     await this.commandBus.execute(command);
   }
@@ -199,7 +199,7 @@ export class FilesController {
   })
   @ApiOkResponse({ type: FilesDto })
   async getFiles(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
@@ -229,7 +229,7 @@ export class FilesController {
   @ApiOkResponse({ type: FileDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postFile(@Param('id') bucketId: number, @Res() res: Response, @UploadedFile() file: Express.Multer.File) {
+  async postFile(@Param('id', ParseIntPipe) bucketId: number, @Res() res: Response, @UploadedFile() file: Express.Multer.File) {
     const command = new UploadFile({
       buffer: file.buffer,
       mimeType: file.mimetype,
@@ -264,7 +264,7 @@ export class FilesController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async putFile(
-    @Param('id') bucketId: number,
+    @Param('id', ParseIntPipe) bucketId: number,
     @Param('fileId', ParseIntPipe) fileId: number,
     @Res() res: Response,
     @UploadedFile() file: Express.Multer.File,
@@ -302,7 +302,7 @@ export class FilesController {
   @ApiNoContentResponse()
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async deleteFile(@Param('id') id: number, @Param('fileId') fileId: number) {
+  async deleteFile(@Param('id', ParseIntPipe) id: number, @Param('fileId', ParseIntPipe) fileId: number) {
     const command = new DeleteFile(+id, +fileId);
 
     await this.commandBus.execute(command);
