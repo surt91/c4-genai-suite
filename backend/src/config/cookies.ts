@@ -1,7 +1,7 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
-import { AuthService, SessionStorage } from 'src/domain/auth';
+import { AuthConfig, AuthService, SessionStorage } from 'src/domain/auth';
 
 const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -16,18 +16,33 @@ function getSecret() {
   throw new Error('SESSION_SECRET must be defined for production');
 }
 
+/**
+ * `SameSite=Lax` keeps the cookie on top-level navigations (needed for the OAuth callbacks, which are cross-site
+ * redirects that must carry the session with the OAuth state) but not on cross-site POST/PUT/DELETE requests,
+ * which protects the cookie-authenticated API against CSRF (the API also accepts url-encoded form bodies).
+ */
+export function buildSessionCookieOptions(config: Pick<AuthConfig, 'baseUrl' | 'trustProxy'>): session.CookieOptions {
+  if (config.trustProxy) {
+    // Unchanged legacy behavior with AUTH_TRUST_PROXY: browser-session cookie, no `Secure` flag (the proxy
+    // might not forward `X-Forwarded-Proto`, then express-session would never send a secure cookie).
+    return { httpOnly: true, sameSite: 'lax' };
+  }
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: !!config.baseUrl?.startsWith('https'),
+    maxAge: SEVEN_DAYS_IN_MS,
+  };
+}
+
 export function configureSession(app: NestExpressApplication): void {
   const authService = app.get(AuthService);
 
   const secret = getSecret();
 
-  const secure = !!authService.config.baseUrl?.startsWith('https');
-  const sameSite = secure ? 'none' : 'strict';
-  const configureCookie = !authService.config.trustProxy;
-
   app.use(
     session({
-      cookie: configureCookie ? { sameSite, secure, maxAge: SEVEN_DAYS_IN_MS } : undefined,
+      cookie: buildSessionCookieOptions(authService.config),
       proxy: true,
       saveUninitialized: false,
       secret,
