@@ -9,7 +9,7 @@ import {
   GetExtensions,
   GetExtensionsResponse,
 } from 'src/domain/extensions';
-import { GetConfiguration, GetConfigurationResponse } from 'src/domain/extensions/use-cases';
+import { GetConfiguration, GetConfigurationResponse, hasUserGroupAccess } from 'src/domain/extensions/use-cases';
 import { User } from 'src/domain/users/interfaces';
 import { I18nService } from '../../../localization/i18n.service';
 import {
@@ -79,6 +79,11 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
 
     if (!configuration) {
       throw new NotFoundException(`Configuration with id '${conversation.configurationId}' not found`);
+    }
+
+    // The conversation might be older than the current access rules of the assistant.
+    if (!configuration.enabled || !hasUserGroupAccess(user, configuration.userGroupIds)) {
+      throw new ForbiddenException('The assistant of this conversation is not available.');
     }
 
     await this.assertFilesOwnedByUser(user, files);

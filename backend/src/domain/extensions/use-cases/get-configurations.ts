@@ -7,6 +7,15 @@ import { ConfigurationModel } from '../interfaces';
 import { ExplorerService } from '../services';
 import { buildConfiguration } from './utils';
 
+/** Admins can use every configuration, other users those without user groups or with one of their groups. */
+export function hasUserGroupAccess(user: Pick<User, 'userGroupIds'>, configurationUserGroupIds: string[] | undefined) {
+  return (
+    !!user.userGroupIds?.includes(BUILTIN_USER_GROUP_ADMIN) ||
+    !configurationUserGroupIds?.length ||
+    !!user.userGroupIds?.some((id) => configurationUserGroupIds.includes(id))
+  );
+}
+
 export class GetConfigurations {
   constructor(
     public readonly user: User,
@@ -37,11 +46,7 @@ export class GetConfigurationsHandler implements IQueryHandler<GetConfigurations
       },
       relations: withExtensions ? ['extensions'] : [],
     });
-    if (!user.userGroupIds?.includes(BUILTIN_USER_GROUP_ADMIN)) {
-      entities = entities.filter(
-        (e) => !e.userGroupIds || e.userGroupIds.length === 0 || user.userGroupIds.some((id) => e.userGroupIds.includes(id)),
-      );
-    }
+    entities = entities.filter((e) => hasUserGroupAccess(user, e.userGroupIds));
 
     if (enabled) {
       entities = entities.filter((e) => e.status === ConfigurationStatus.ENABLED);

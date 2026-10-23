@@ -108,6 +108,28 @@ describe('Authorization', () => {
         queryBus.execute(new SendMessage(conversation.id, aliceUser, 'hi', [{ id: bobsFile.id, fileName: 'secret.pdf' }])),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
+
+    it.each([
+      ['restricted to another user group', { status: ConfigurationStatus.ENABLED, restricted: true }],
+      ['disabled', { status: ConfigurationStatus.DISABLED, restricted: false }],
+    ])('rejects messages to an assistant that is %s now', async (_, { status, restricted }) => {
+      const group = await dataSource
+        .getRepository(UserGroupEntity)
+        .save({ id: randomUUID(), name: `Other ${randomUUID()}`, isAdmin: false, isBuiltIn: false });
+      const assistant = await dataSource.getRepository(ConfigurationEntity).save({
+        name: `Assistant ${randomUUID()}`,
+        description: '',
+        status,
+        userGroups: restricted ? [group] : [],
+      });
+      const conversation = await dataSource
+        .getRepository(ConversationEntity)
+        .save({ name: 'Old chat', configurationId: assistant.id, userId: alice.id });
+
+      await expect(queryBus.execute(new SendMessage(conversation.id, buildUser(alice), 'hi'))).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
+    });
   });
 
   describe('buckets (contain REI-S credentials)', () => {
