@@ -18,6 +18,7 @@ import {
   ConfigurationEntity,
   ConfigurationStatus,
   ConversationEntity,
+  ExtensionEntity,
   FileEntity,
   FileUploadStatus,
   UserEntity,
@@ -151,6 +152,36 @@ describe('Authorization', () => {
           .attach('file', Buffer.from('x'), 'image.png'),
       ).expect(404);
       await asUser(http().post(`/public/assistants/${assistant.id}/responses`).send({ input: 'hi' })).expect(404);
+    });
+  });
+
+  describe('user file uploads', () => {
+    const createExtension = (name: string, values: Record<string, unknown>) =>
+      dataSource.getRepository(ExtensionEntity).save({ name, enabled: true, values, configurationId: configuration.id });
+    const upload = (extensionId: number, fileName: string, conversationId?: number) =>
+      asUser(
+        http()
+          .post(`/user-files?extensionId=${extensionId}${conversationId ? `&conversationId=${conversationId}` : ''}`)
+          .attach('file', Buffer.from('x'), fileName),
+      );
+
+    it('are only accepted by file extensions', async () => {
+      const llm = await createExtension('calculator', {});
+      await upload(llm.id, 'image.png').expect(404);
+    });
+
+    it('without bucket are restricted to the file types of the extension', async () => {
+      const vision = await createExtension('files-vision', { fileNameExtensions: ['.png'], maxFiles: 3 });
+      await upload(vision.id, 'payload.html').expect(400);
+      await upload(vision.id, 'image.png').expect(201);
+    });
+
+    it('are not accepted for conversations of other users', async () => {
+      const vision = await createExtension('files-vision', { fileNameExtensions: ['.png'], maxFiles: 3 });
+      const bobsConversation = await dataSource
+        .getRepository(ConversationEntity)
+        .save({ name: 'Bob chat', configurationId: configuration.id, userId: bob.id });
+      await upload(vision.id, 'image.png', bobsConversation.id).expect(403);
     });
   });
 

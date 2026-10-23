@@ -10,6 +10,7 @@
 | NODE_ENV       | No                  | None    |                                                                          |
 | EXTENSIONS     | No                  | None    | ","-separated list of enabled extensions, when empty all enabled         |
 | PORT           | No                  | 3000    |                                                                          |
+| UPLOAD_MAX_FILE_SIZE_MB | No         | 512     | Maximum size of an uploaded file (all uploads are buffered in memory).   |
 
 
 ## Logging (LLM)

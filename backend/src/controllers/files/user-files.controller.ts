@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -28,9 +29,14 @@ import {
 import { Request, Response } from 'express';
 import { LocalAuthGuard } from 'src/domain/auth';
 import { DeleteFile, GetFiles, GetFilesResponse, UploadFile, UploadFileResponse } from 'src/domain/files';
+import { GetConversation, GetConversationResponse } from '../../domain/chat';
 import { GetExtension, GetExtensionResponse } from '../../domain/extensions';
+import { I18nService } from '../../localization/i18n.service';
 import { FileDto, FilesDto } from './dtos';
 import { keepAlive } from './keep-alive';
+
+/** Files without bucket are stored in the database (base64), so they are limited to 20 MB. */
+const MAX_FILE_SIZE_WITHOUT_BUCKET = 20 * 1024 * 1024;
 
 @Controller('user-files')
 @ApiTags('files')
@@ -39,6 +45,7 @@ export class UserFilesController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
+    private readonly i18n: I18nService,
   ) {}
 
   @Get('')
@@ -121,13 +128,44 @@ export class UserFilesController {
     @Query('extensionId', new ParseIntPipe()) extensionId: number,
     @Query('conversationId', new ParseIntPipe({ optional: true })) conversationId?: number,
   ) {
+    if (!file) {
+      throw new BadRequestException('file is missing');
+    }
+
     const result: GetExtensionResponse = await this.queryBus.execute(new GetExtension({ id: extensionId }));
-    if (!result.extension?.enabled) {
+    const extension = result.extension;
+    // Only file extensions accept uploads (any other extension would store the file without any checks).
+    if (!extension?.enabled || !extension.name.startsWith('files')) {
       throw new NotFoundException('Extension not found');
     }
 
-    const bucket = result.extension?.values?.bucket as number;
-    const vectorize = (result.extension?.values?.vectorize as boolean) ?? true;
+    if (conversationId) {
+      // throws 403 for conversations of other users
+      const { conversation }: GetConversationResponse = await this.queryBus.execute(
+        new GetConversation(conversationId, req.user),
+      );
+      if (!conversation) {
+        throw new NotFoundException('Conversation not found');
+      }
+    }
+
+    const bucket = extension.values?.bucket as number;
+    const vectorize = (extension.values?.vectorize as boolean) ?? true;
+
+    if (!bucket) {
+      // Files without bucket (e.g. images for vision models) are stored in the database; the bucket checks
+      // (file types, sizes, quota) do not apply, so the extension's file types and a size limit are enforced here.
+      const fileNameExtensions: unknown = extension.values?.fileNameExtensions;
+      const allowed =
+        Array.isArray(fileNameExtensions) &&
+        fileNameExtensions.some((x) => typeof x === 'string' && file.originalname.toLowerCase().endsWith(x.toLowerCase()));
+      if (!allowed) {
+        throw new BadRequestException(this.i18n.t('texts.extensions.files.errorNotAllowedFileType'));
+      }
+      if (file.size > MAX_FILE_SIZE_WITHOUT_BUCKET) {
+        throw new BadRequestException(this.i18n.t('texts.extensions.files.errorFileTooLarge'));
+      }
+    }
 
     const embedType = bucket ? (vectorize ? 'vector_and_text' : 'text') : 'none';
 

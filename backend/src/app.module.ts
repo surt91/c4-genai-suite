@@ -49,6 +49,8 @@ import { PrometheusModule } from './metrics/prometheus.module';
     FilesModule,
     I18nModule,
     MulterModule.register({
+      // Uploads are buffered in memory; reject huge files before they are read completely.
+      limits: { fileSize: Number(process.env.UPLOAD_MAX_FILE_SIZE_MB || 512) * 1024 * 1024 },
       fileFilter: (_, file, callback) => {
         file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
         callback(null, true);
