@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Counter } from '@prometheus-io/client';
 import { InjectMetric, makeCounterProvider } from '@willsoto/nestjs-prometheus';
-import { Counter } from 'prom-client';
 
 const appPrefix = 'gaible';
 
