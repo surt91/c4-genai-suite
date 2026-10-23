@@ -4,7 +4,7 @@ Scope: `backend/` at `ed920d6` (NestJS + TypeORM + ai-sdk). Paths are relative t
 Priorities: **P1** bug/security, **P2** important, **P3** nice-to-have. "Confirmed" means the code path was traced
 end to end (and, where noted, reproduced in a test or script); "unconfirmed" means plausible but not verified.
 
-The *Status* column is filled in during the fix phase (see the end of the document).
+The fix status of every finding is listed in the section *Status* at the end.
 
 ## P1 – bugs / security
 
@@ -136,4 +136,76 @@ Fix: `SameSite=Lax` (keeps the cookie on the top-level OAuth callback redirects)
 - Conversation endpoints check ownership (get, patch, delete, messages, rate, duplicate, documents, chunks,
   SendMessage via `GetConversation`); `GetFiles`/`DeleteFile` are scoped to the user.
 - Session cookie is `httpOnly` (express-session default); `SESSION_SECRET` is enforced in production.
-- Entities vs. migrations: no drift (`migration:generate` reports no changes, see verification).
+- Entities vs. migrations: no drift (`migration:run` + `migration:generate` report no changes).
+
+## Status
+
+Fixed on branch `worktree-agent-a161c03d7715338b1` (one commit per fix, regression test unless noted).
+Counts: 7 × P1, 31 × P2, 25 × P3.
+
+| ID | Status | Commit / reason |
+|----|--------|-----------------|
+| P1-1 | fixed | `0d94c8c` only allow own files when sending a message |
+| P1-2 | fixed | `f26b89c` restrict reading buckets to admins (**API: non-admins get 403**) |
+| P1-3 | fixed | `3d8a5f4` hide executor credentials from regular users |
+| P1-4 | fixed | `c6f9307` restrict reading extension configurations to admins (**API: non-admins get 403**) |
+| P1-5 | fixed | `c47ecf6` do not share OpenAPI tool instances between users |
+| P1-6 | fixed | `1cfdde8` close MCP clients after use |
+| P1-7 | fixed | `d0b9d3e` SameSite=Lax (**cookie not sent on cross-site subrequests anymore**) |
+| P2-1, P2-2 | fixed | `d845a1e` (+ `737c1ee` test) abort the generation on disconnect, end SSE after errors (**stop really stops the answer**) |
+| P2-3 | fixed | `517253f` regenerate the session id on login |
+| P2-4 | fixed | `4e80626` server-side session expiry |
+| P2-5 | fixed | `093909c` open redirect after login |
+| P2-6 | fixed | `33e0084` hash AUTH_INITIALUSER_APIKEY (+ P3-4, P3-5) |
+| P2-7, P2-8 | fixed | `2b83905` token limit message reaches the user, ratings not counted (**new message instead of "Internal error"**) |
+| P2-9 | partially fixed | `a33f831` finished steps of aborted answers and failed requests are counted, non-streaming counts all steps; the interrupted step itself is not reported by the providers |
+| P2-10 | fixed | `d65cef4` assistant access re-checked on every message (**old chats of disabled/restricted assistants fail**) |
+| P2-11 | fixed | `a676a2c` responses API checks access first (404), ignores disabled extensions; follow-ups `ad50717` (P3-10), `ab830ff` (**POST /responses returns 200 instead of 201**; external spec regenerated) |
+| P2-12 | fixed | `62d8527` reasoning effort for OpenAI compatible/NVIDIA (+ P3-8) (**`reasoning_effort` is sent when configured**) |
+| P2-13 | fixed | `6e739a6` Content-Disposition for any file name |
+| P2-14 | fixed | `ba20346` executor history types (**executors receive `system`/`user`**) and `1073258` header parsing; the executor request is aborted with the chat |
+| P2-15 | fixed | `1073258` one shared header parser for bucket/executor/OpenAPI/MCP headers |
+| P2-16 | fixed | `647abca` OpenAPI tools called by their listed name (**tool servers see the plain name**) |
+| P2-17 | fixed | `d3fc5db` unreachable MCP server: chat continues without its tools |
+| P2-18 | fixed | `2106103` summary history size |
+| P2-19 | fixed | `3c54ddf` unique external ids on import |
+| P2-20 | fixed | `01cf199` REI-S deletes use the bucket's index |
+| P2-21 | deferred | REI-S has no replace operation (re-adding the same id duplicates chunks), so the old document must be deleted before the new upload; keeping the original on failure needs a "failed" upload status (enum + migration + UI) or a replace endpoint in REI-S. Admin-only. |
+| P2-22 | fixed | `01cf199` partial uploads are removed from REI-S |
+| P2-23, P2-24 | fixed | `8c12107` UPLOAD_MAX_FILE_SIZE_MB (default 512), only `files*` extensions, bucketless uploads only with matching file types and ≤ 20 MB, conversation ownership (**larger/other uploads rejected**) |
+| P2-25 | fixed | `74af62c` duplicate numbering scoped to the user (transaction: deferred, low risk) |
+| P2-26 | fixed | `19cb2a8` eval proxy streams non-JSON bodies, keeps the query string, drops hop-by-hop headers |
+| P2-27 | deferred | Needs a decision on the cleanup strategy (delete in the use cases incl. REI-S calls vs. a periodic orphan sweep) and tests against REI-S; no quick safe fix. |
+| P2-28 | deferred | Fixing it needs a protocol change for the upload response (e.g. a JSON error object after the keep-alive newlines) and the matching frontend handling, which is being refactored on another branch. |
+| P2-29 | mitigated | `58700c6` warning at startup and documentation; restricting the e-mail matching (e.g. by provider + subject) changes the account linking and needs a migration of existing users |
+| P2-30 | deferred | Needs a product decision (reject the import, drop masked values and require re-entry, or a warning in the UI). |
+| P2-31 | fixed | `1745066` rebuild masks secrets; rebuild/test check the extension type |
+| P3-1 | fixed | `7e8ec54` same login error for unknown users and wrong passwords (**message changed**) |
+| P3-2 | fixed | `c0ceee2` 400 for password changes of users without password |
+| P3-3 | fixed | `0bf76ad` GitHub `user:email` scope |
+| P3-4, P3-5 | fixed | `33e0084` |
+| P3-6 | fixed | `3ce48ee` configuration reference synced |
+| P3-7 | deferred | Moving CompleteMiddleware outside the ExceptionMiddleware changes the event order on errors (no `completed` after `error`), which the frontend may rely on; left as is. |
+| P3-8 | fixed | `62d8527` |
+| P3-9 | fixed | `5da2215` `enabled` parsed as boolean |
+| P3-10 | fixed | `ad50717` |
+| P3-11 | fixed | `380f673` |
+| P3-12 | fixed | `9cf53a1` |
+| P3-13 | fixed | `3890730` ParseIntPipe on the id parameters (non-numeric ids → 400) |
+| P3-14 | fixed | `b74d8e7` stable order, search by name or e-mail, escaped wildcards |
+| P3-15 | fixed | `92ac4c2` (metadata only; migration:generate reports no changes) |
+| P3-16 | fixed | `c591465` blobs: only images/logos, `nosniff` |
+| P3-17 | fixed | `38db1c6` (refactor, no test) |
+| P3-18 | fixed | `4101348` (refactor) |
+| P3-19 | fixed | `df2993f` debug logging async, safe parsing, keys redacted in URL and `*key*` headers |
+| P3-20 | deferred | Enabling TLS verification breaks deployments with self-signed REI-S certificates; needs a config option (e.g. `REIS_TLS_INSECURE`) and a release note. |
+| P3-21 | deferred | Removing the user label changes existing dashboards/alerts. |
+| P3-22 | deferred | Semantics of limits for users in several groups (most restrictive vs. first) need a product decision; built-in groups cannot have limits by design. |
+| P3-23 | deferred | Splitting the DTO files and a shared base for the model providers are larger refactorings; better done separately from the security fixes. |
+| P3-24 | deferred | Low impact (only the user's own values); the command/query mix-up is cosmetic. |
+| P3-25 | deferred | Transcription access check, endpoint in MCP errors and abort support for Brave/Bing: low impact, not done in this pass. |
+
+Not touched: `e2e/` and the frontend. The frontend client did not need to be regenerated (`backend-dev-spec.json`
+is unchanged; only `backend-external-spec.json` changed for `POST /responses`). UI-visible changes that e2e tests
+might assert: the login error message, the token limit message, stop really stopping the answer, 403 for non-admins
+on `GET /buckets` and `GET /configurations/:id/extensions`, and rejected bucketless uploads of other file types.
