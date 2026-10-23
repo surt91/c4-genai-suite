@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { ConversationFileEntity } from './conversation-file';
@@ -58,6 +68,10 @@ export class ConversationEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
+
+  // Set when the conversation has been deleted. It can be restored for a while ("Undo") and is purged afterwards.
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deletedAt?: Date | null;
 
   @OneToMany(() => ConversationFileEntity, (cf) => cf.conversation)
   files!: ConversationFileEntity[];

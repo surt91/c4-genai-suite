@@ -56,17 +56,24 @@ export class CallbackService {
         continue;
       }
 
-      stored.result.complete({ action: FormActionType.CANCEL });
+      stored.result.complete({ action: FormActionType.CANCEL, expired: true });
       delete this.results[id];
     }
   }
 
-  form(owner: CallbackOwner, timeout?: number): CallbackResult<ChatUICallbackResult> {
-    return this.request(owner, timeout);
+  form(owner: CallbackOwner, timeout?: number, id?: string): CallbackResult<ChatUICallbackResult> {
+    return this.request(owner, timeout, id);
   }
 
-  private request(owner: CallbackOwner, timeout?: number) {
-    const requestId = randomUUID();
+  /** The time in ms until a request is cancelled when nobody answers. */
+  timeoutOf(timeout?: number) {
+    return timeout ?? TIMEOUT;
+  }
+
+  private request(owner: CallbackOwner, timeout?: number, id?: string) {
+    // A request can be continued with the same ID (e.g. to wait for the completion of an opened URL).
+    const requestId = id ?? randomUUID();
+    this.complete(requestId, { action: FormActionType.CANCEL });
     const result = new Result();
 
     this.results[requestId] = { result, created: this.getTime(), owner, timeout };
@@ -75,7 +82,8 @@ export class CallbackService {
   }
 }
 
-const TIMEOUT = 5 * 60 * 1000;
+// The default timeout of forms. Can be shortened for tests with CHAT_FORM_TIMEOUT_MS.
+const TIMEOUT = Number(process.env.CHAT_FORM_TIMEOUT_MS) || 5 * 60 * 1000;
 
 class Result {
   private resolve?: (value: ChatUICallbackResult) => void;

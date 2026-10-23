@@ -104,6 +104,10 @@ export interface RateMessageRequest {
     rateMessageDto: RateMessageDto;
 }
 
+export interface RestoreConversationRequest {
+    id: number;
+}
+
 /**
  * 
  */
@@ -679,6 +683,40 @@ export class ConversationApi extends runtime.BaseAPI {
      */
     async rateMessage(id: number, messageId: number, rateMessageDto: RateMessageDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.rateMessageRaw({ id: id, messageId: messageId, rateMessageDto: rateMessageDto }, initOverrides);
+    }
+
+    /**
+     * Restores a recently deleted conversation.
+     * 
+     */
+    async restoreConversationRaw(requestParameters: RestoreConversationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling restoreConversation().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/conversations/{id}/restore`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Restores a recently deleted conversation.
+     * 
+     */
+    async restoreConversation(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.restoreConversationRaw({ id: id }, initOverrides);
     }
 
 }

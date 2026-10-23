@@ -26,6 +26,12 @@ export interface StreamToolInfoDto {
      * @memberof StreamToolInfoDto
      */
     name: string;
+    /**
+     * The ID of the tool call.
+     * @type {string}
+     * @memberof StreamToolInfoDto
+     */
+    id?: string;
 }
 
 /**
@@ -47,6 +53,7 @@ export function StreamToolInfoDtoFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'name': json['name'],
+        'id': json['id'] == null ? undefined : json['id'],
     };
 }
 
@@ -57,6 +64,7 @@ export function StreamToolInfoDtoToJSON(value?: StreamToolInfoDto | null): any {
     return {
         
         'name': value['name'],
+        'id': value['id'],
     };
 }
 

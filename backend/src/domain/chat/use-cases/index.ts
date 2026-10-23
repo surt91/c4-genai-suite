@@ -1,5 +1,6 @@
 export * from './delete-conversation';
 export * from './delete-conversations';
+export * from './restore-conversation';
 export * from './get-conversation';
 export * from './get-conversations';
 export * from './get-history';

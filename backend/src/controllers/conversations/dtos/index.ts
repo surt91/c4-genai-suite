@@ -2,6 +2,8 @@ import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { IsBoolean, IsDefined, IsEnum, IsIn, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { MessageContentDto, MessageContentImageUrlDto, MessageContentTextDto, SourceDto } from 'src/controllers/shared';
 import {
+  ChatInteractionKind,
+  ChatInteractionStatus,
   Conversation,
   CONVERSATION_RATINGS,
   ConversationRating,
@@ -14,6 +16,19 @@ import {
   NormalizedMessageContents,
   StreamEvent,
 } from 'src/domain/chat';
+
+const CHAT_INTERACTION_KINDS = ['form', 'url', 'tool_error'];
+const CHAT_INTERACTION_STATUSES = [
+  'waiting',
+  'accepted',
+  'declined',
+  'cancelled',
+  'expired',
+  'opened',
+  'completed',
+  'blocked',
+  'error',
+];
 import { ExtensionArgumentObjectSpecDto } from '../../extensions/dtos';
 import { FileDto } from '../../files/dtos';
 
@@ -45,6 +60,41 @@ export class RateMessageDto {
   @IsDefined()
   @IsIn(MESSAGE_RATINGS)
   rating!: MessageRating;
+}
+
+export class ChatInteractionDto {
+  @ApiProperty({ description: 'The ID of the request or tool call.', required: true })
+  id!: string;
+
+  @ApiProperty({ description: 'The kind of the interaction.', required: true, enum: CHAT_INTERACTION_KINDS })
+  kind!: ChatInteractionKind;
+
+  @ApiProperty({ description: 'The state of the interaction.', required: true, enum: CHAT_INTERACTION_STATUSES })
+  status!: ChatInteractionStatus;
+
+  @ApiProperty({ description: 'Who asked, or the name of the tool.', required: false })
+  source?: string;
+
+  @ApiProperty({ description: 'The question.', required: false })
+  text?: string;
+
+  @ApiProperty({ description: 'The answers of a form (without secrets).', required: false, type: Object })
+  data?: Record<string, any>;
+
+  @ApiProperty({ description: 'The URL (without query).', required: false })
+  url?: string;
+
+  @ApiProperty({ description: 'The domain of the URL.', required: false })
+  domain?: string;
+
+  @ApiProperty({ description: 'The error message of a failed tool.', required: false })
+  error?: string;
+
+  @ApiProperty({ description: 'When the interaction started.', required: true, type: String, format: 'date-time' })
+  createdAt!: string;
+
+  @ApiProperty({ description: 'When the interaction was updated.', required: true, type: String, format: 'date-time' })
+  updatedAt!: string;
 }
 
 @ApiExtraModels(MessageContentTextDto, MessageContentImageUrlDto)
@@ -118,6 +168,14 @@ export class MessageDto {
   })
   stopped?: boolean;
 
+  @ApiProperty({
+    description: 'The results of interactions (answered forms, opened URLs, failed tools).',
+    required: false,
+    isArray: true,
+    type: ChatInteractionDto,
+  })
+  interactions?: ChatInteractionDto[];
+
   static fromDomain(this: void, source: Message) {
     const result = new MessageDto();
     result.id = source.id;
@@ -130,6 +188,7 @@ export class MessageDto {
     result.logging = source.logging;
     result.configurationId = source.configurationId;
     result.stopped = source.stopped;
+    result.interactions = source.interactions ?? undefined;
 
     return result;
   }
@@ -351,6 +410,12 @@ export class StreamToolInfoDto {
     required: true,
   })
   name!: string;
+
+  @ApiProperty({
+    description: 'The ID of the tool call.',
+    required: false,
+  })
+  id?: string;
 }
 
 export class StreamUIRequestDto {
@@ -367,11 +432,61 @@ export class StreamUIRequestDto {
   text!: string;
 
   @ApiProperty({
-    description: 'The schema.',
+    description: 'The kind of the request: a form (also a confirmation) or an URL to open.',
     required: true,
+    enum: ['form', 'url'],
+  })
+  kind!: 'form' | 'url';
+
+  @ApiProperty({
+    description: 'The schema of the form.',
+    required: false,
     type: ExtensionArgumentObjectSpecDto,
   })
-  schema!: ExtensionArgumentObjectSpecDto;
+  schema?: ExtensionArgumentObjectSpecDto;
+
+  @ApiProperty({
+    description: 'Who asks, e.g. the name of the MCP server.',
+    required: false,
+  })
+  source?: string;
+
+  @ApiProperty({
+    description: 'When the request is cancelled if nobody answers.',
+    required: true,
+    type: String,
+    format: 'date-time',
+  })
+  expiresAt!: string;
+
+  @ApiProperty({
+    description: 'The URL to open (only for URL requests).',
+    required: false,
+  })
+  url?: string;
+
+  @ApiProperty({
+    description: 'The host name of the URL (only for URL requests).',
+    required: false,
+  })
+  domain?: string;
+
+  @ApiProperty({
+    description: 'Whether the domain is in the allowlist of the extension (false if there is no allowlist).',
+    required: false,
+  })
+  domainAllowed?: boolean;
+}
+
+export class StreamUIUpdateDto {
+  @ApiProperty({ description: 'The ID of the request.', required: true })
+  id!: string;
+
+  @ApiProperty({ description: 'The new state of the request.', required: true, enum: CHAT_INTERACTION_STATUSES })
+  status!: ChatInteractionStatus;
+
+  @ApiProperty({ description: 'The answers of a form (without secrets).', required: false, type: Object })
+  data?: Record<string, any>;
 }
 
 export class StreamMetadataDto {
@@ -444,6 +559,28 @@ export class StreamToolEndEventDto {
     enum: [StreamToolEndEventDto.TYPE_NAME],
   })
   type!: typeof StreamToolEndEventDto.TYPE_NAME;
+}
+
+export class StreamToolErrorEventDto {
+  static TYPE_NAME = 'tool_error';
+
+  @ApiProperty({
+    description: 'The tool info.',
+    required: true,
+    type: StreamToolInfoDto,
+  })
+  tool!: StreamToolInfoDto;
+
+  @ApiProperty({
+    description: 'The error message.',
+    required: true,
+  })
+  error!: string;
+
+  @ApiProperty({
+    enum: [StreamToolErrorEventDto.TYPE_NAME],
+  })
+  type!: typeof StreamToolErrorEventDto.TYPE_NAME;
 }
 
 export class StreamMessageSavedDto {
@@ -570,6 +707,22 @@ export class StreamUIEventDto {
   type!: typeof StreamUIEventDto.TYPE_NAME;
 }
 
+export class StreamUIUpdateEventDto {
+  static TYPE_NAME = 'ui_update';
+
+  @ApiProperty({
+    description: 'The update of a request.',
+    required: true,
+    type: StreamUIUpdateDto,
+  })
+  update!: StreamUIUpdateDto;
+
+  @ApiProperty({
+    enum: [StreamUIUpdateEventDto.TYPE_NAME],
+  })
+  type!: typeof StreamUIUpdateEventDto.TYPE_NAME;
+}
+
 export class StreamCompletedEventDto {
   static TYPE_NAME = 'completed';
 
@@ -596,7 +749,9 @@ export class StreamCompletedEventDto {
   StreamTokenEventDto,
   StreamToolEndEventDto,
   StreamToolStartEventDto,
+  StreamToolErrorEventDto,
   StreamUIEventDto,
+  StreamUIUpdateEventDto,
   StreamSummaryDto,
   StreamReasoningDto,
   StreamReasoningEndDto,
@@ -615,7 +770,9 @@ export class StreamEventHolderDto {
       { $ref: getSchemaPath(StreamTokenEventDto) },
       { $ref: getSchemaPath(StreamToolEndEventDto) },
       { $ref: getSchemaPath(StreamToolStartEventDto) },
+      { $ref: getSchemaPath(StreamToolErrorEventDto) },
       { $ref: getSchemaPath(StreamUIEventDto) },
+      { $ref: getSchemaPath(StreamUIUpdateEventDto) },
       { $ref: getSchemaPath(StreamReasoningDto) },
       { $ref: getSchemaPath(StreamReasoningEndDto) },
     ],
@@ -632,7 +789,9 @@ export class StreamEventHolderDto {
         [StreamTokenEventDto.TYPE_NAME]: getSchemaPath(StreamTokenEventDto),
         [StreamToolEndEventDto.TYPE_NAME]: getSchemaPath(StreamToolEndEventDto),
         [StreamToolStartEventDto.TYPE_NAME]: getSchemaPath(StreamToolStartEventDto),
+        [StreamToolErrorEventDto.TYPE_NAME]: getSchemaPath(StreamToolErrorEventDto),
         [StreamUIEventDto.TYPE_NAME]: getSchemaPath(StreamUIEventDto),
+        [StreamUIUpdateEventDto.TYPE_NAME]: getSchemaPath(StreamUIUpdateEventDto),
         [StreamReasoningDto.TYPE_NAME]: getSchemaPath(StreamReasoningDto),
         [StreamReasoningEndDto.TYPE_NAME]: getSchemaPath(StreamReasoningEndDto),
       },

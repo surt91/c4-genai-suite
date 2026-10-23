@@ -1,11 +1,13 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
   NotFoundException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -28,11 +30,19 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { LocalAuthGuard } from 'src/domain/auth';
-import { DeleteFile, GetFiles, GetFilesResponse, UploadFile, UploadFileResponse } from 'src/domain/files';
+import {
+  DeleteFile,
+  GetFiles,
+  GetFilesResponse,
+  RenameFile,
+  RenameFileResponse,
+  UploadFile,
+  UploadFileResponse,
+} from 'src/domain/files';
 import { GetConversation, GetConversationResponse } from '../../domain/chat';
 import { GetExtension, GetExtensionResponse } from '../../domain/extensions';
 import { I18nService } from '../../localization/i18n.service';
-import { FileDto, FilesDto } from './dtos';
+import { FileDto, FilesDto, RenameFileDto } from './dtos';
 import { keepAlive } from './keep-alive';
 
 /** Files without bucket are stored in the database (base64), so they are limited to 20 MB. */
@@ -184,6 +194,21 @@ export class UserFilesController {
       const result: UploadFileResponse = await this.commandBus.execute(command);
       return FileDto.fromDomain(result.file);
     });
+  }
+
+  @Patch(':fileId')
+  @ApiOperation({ operationId: 'renameUserFile', description: 'Renames a personal file of the user.' })
+  @ApiParam({
+    name: 'fileId',
+    description: 'The ID of the file.',
+    required: true,
+    type: Number,
+  })
+  @ApiOkResponse({ type: FileDto })
+  async renameUserFile(@Req() req: Request, @Param('fileId', ParseIntPipe) fileId: number, @Body() body: RenameFileDto) {
+    const result: RenameFileResponse = await this.commandBus.execute(new RenameFile(req.user, fileId, body.fileName));
+
+    return FileDto.fromDomain(result.file);
   }
 
   @Delete(':fileId')

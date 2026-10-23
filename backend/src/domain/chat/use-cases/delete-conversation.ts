@@ -1,8 +1,12 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LessThan } from 'typeorm';
 import { ConversationEntity, ConversationRepository } from 'src/domain/database';
 import { User } from 'src/domain/users';
+
+/** How long a deleted conversation can be restored (the UI offers "Undo" for a few seconds). */
+export const CONVERSATION_RESTORE_PERIOD_MS = 5 * 60 * 1000;
 
 export class DeleteConversation {
   constructor(
@@ -13,6 +17,10 @@ export class DeleteConversation {
 
 export class DeleteConversationResponse {}
 
+/**
+ * Deletes the conversation softly, so that it can be restored for a while (see RestoreConversation). Conversations that
+ * have been deleted before the restore period are deleted permanently.
+ */
 @CommandHandler(DeleteConversation)
 export class DeleteConversationHandler implements ICommandHandler<DeleteConversation, DeleteConversationResponse> {
   constructor(
@@ -33,8 +41,14 @@ export class DeleteConversationHandler implements ICommandHandler<DeleteConversa
       throw new ForbiddenException();
     }
 
-    await this.conversations.delete({ id: entity.id });
+    await this.conversations.softDelete({ id: entity.id });
+    await purgeDeletedConversations(this.conversations);
 
     return new DeleteConversationResponse();
   }
+}
+
+/** Deletes the soft deleted conversations permanently, which cannot be restored anymore. */
+export async function purgeDeletedConversations(conversations: ConversationRepository, now = new Date()) {
+  await conversations.delete({ deletedAt: LessThan(new Date(now.getTime() - CONVERSATION_RESTORE_PERIOD_MS)) });
 }

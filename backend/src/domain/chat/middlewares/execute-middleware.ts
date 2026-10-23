@@ -93,17 +93,16 @@ export class ExecuteMiddleware implements ChatMiddleware {
       }
       if (event.type === 'tool-call') {
         const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
-        result.next({ type: 'tool_start', tool: { name: toolName } });
+        result.next({ type: 'tool_start', tool: { name: toolName, id: event.toolCallId } });
       }
       if (event.type === 'tool-result') {
         const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
-        result.next({ type: 'tool_end', tool: { name: toolName } });
+        result.next({ type: 'tool_end', tool: { name: toolName, id: event.toolCallId } });
       }
       if (event.type === 'tool-error') {
         this.logger.error({ event });
         const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
-        // TODO: maybe add a `tool_error` event type and indicate errors in the ui
-        result.next({ type: 'tool_end', tool: { name: toolName } });
+        result.next({ type: 'tool_error', tool: { name: toolName, id: event.toolCallId }, error: toolErrorMessage(event.error) });
       }
       if (event.type === 'reasoning-delta' && !llm.suppressReasoning) {
         result.next({ type: 'reasoning', content: event.text });
@@ -185,8 +184,14 @@ export class ExecuteMiddleware implements ChatMiddleware {
     for (const step of response.steps) {
       for (const toolCall of step.toolCalls) {
         const toolName = tools.find((x) => x.name === toolCall.toolName)?.displayName ?? toolCall.toolName;
-        result.next({ type: 'tool_start', tool: { name: toolName } });
-        result.next({ type: 'tool_end', tool: { name: toolName } });
+        const tool = { name: toolName, id: toolCall.toolCallId };
+        result.next({ type: 'tool_start', tool });
+        const failed = step.content.find((part) => part.type === 'tool-error' && part.toolCallId === toolCall.toolCallId);
+        if (failed && failed.type === 'tool-error') {
+          result.next({ type: 'tool_error', tool, error: toolErrorMessage(failed.error) });
+        } else {
+          result.next({ type: 'tool_end', tool });
+        }
       }
     }
 
@@ -215,6 +220,13 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     return this.handleAiSdkChainExecution(llm, context);
   }
+}
+
+/** The message of the error of a tool call, shown to the user. */
+export function toolErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error);
+  const text = message || 'Unknown error';
+  return text.length > 1000 ? `${text.slice(0, 1000)}…` : text;
 }
 
 function addTokenUsage(context: ChatContext, llm: LanguageModelContext, totalTokens: number | undefined) {

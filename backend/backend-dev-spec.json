@@ -607,6 +607,33 @@
         "tags": ["conversation"]
       }
     },
+    "/api/conversations/{id}/restore": {
+      "post": {
+        "description": "Restores a recently deleted conversation.",
+        "operationId": "restoreConversation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "There is no conversation that can be restored."
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
     "/api/conversations/{id}/confirm/{requestId}": {
       "delete": {
         "description": "Answers a pending form request (e.g. a confirmation) of the generation in the conversation.",
@@ -2084,6 +2111,45 @@
       }
     },
     "/api/user-files/{fileId}": {
+      "patch": {
+        "description": "Renames a personal file of the user.",
+        "operationId": "renameUserFile",
+        "parameters": [
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the file.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
       "delete": {
         "description": "Deletes a file.",
         "operationId": "deleteUserFile",
@@ -2817,6 +2883,10 @@
           "name": {
             "type": "string",
             "description": "The name of the tool."
+          },
+          "id": {
+            "type": "string",
+            "description": "The ID of the tool call."
           }
         },
         "required": ["name"]
@@ -2856,6 +2926,28 @@
           }
         },
         "required": ["tool", "type"]
+      },
+      "StreamToolErrorEventDto": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "description": "The tool info.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StreamToolInfoDto"
+              }
+            ]
+          },
+          "error": {
+            "type": "string",
+            "description": "The error message."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["tool_error"]
+          }
+        },
+        "required": ["tool", "error", "type"]
       },
       "ExtensionArgumentObjectSpecDto": {
         "type": "object",
@@ -2932,16 +3024,42 @@
             "type": "string",
             "description": "The text for the confirm dialog."
           },
+          "kind": {
+            "type": "string",
+            "description": "The kind of the request: a form (also a confirmation) or an URL to open.",
+            "enum": ["form", "url"]
+          },
           "schema": {
-            "description": "The schema.",
+            "description": "The schema of the form.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto"
               }
             ]
+          },
+          "source": {
+            "type": "string",
+            "description": "Who asks, e.g. the name of the MCP server."
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "When the request is cancelled if nobody answers.",
+            "format": "date-time"
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL to open (only for URL requests)."
+          },
+          "domain": {
+            "type": "string",
+            "description": "The host name of the URL (only for URL requests)."
+          },
+          "domainAllowed": {
+            "type": "boolean",
+            "description": "Whether the domain is in the allowlist of the extension (false if there is no allowlist)."
           }
         },
-        "required": ["id", "text", "schema"]
+        "required": ["id", "text", "kind", "expiresAt"]
       },
       "StreamUIEventDto": {
         "type": "object",
@@ -2960,6 +3078,43 @@
           }
         },
         "required": ["request", "type"]
+      },
+      "StreamUIUpdateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the request."
+          },
+          "status": {
+            "type": "string",
+            "description": "The new state of the request.",
+            "enum": ["waiting", "accepted", "declined", "cancelled", "expired", "opened", "completed", "blocked", "error"]
+          },
+          "data": {
+            "type": "object",
+            "description": "The answers of a form (without secrets)."
+          }
+        },
+        "required": ["id", "status"]
+      },
+      "StreamUIUpdateEventDto": {
+        "type": "object",
+        "properties": {
+          "update": {
+            "description": "The update of a request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StreamUIUpdateDto"
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["ui_update"]
+          }
+        },
+        "required": ["update", "type"]
       },
       "StreamSummaryDto": {
         "type": "object",
@@ -3036,7 +3191,13 @@
                 "$ref": "#/components/schemas/StreamToolStartEventDto"
               },
               {
+                "$ref": "#/components/schemas/StreamToolErrorEventDto"
+              },
+              {
                 "$ref": "#/components/schemas/StreamUIEventDto"
+              },
+              {
+                "$ref": "#/components/schemas/StreamUIUpdateEventDto"
               },
               {
                 "$ref": "#/components/schemas/StreamReasoningDto"
@@ -3058,7 +3219,9 @@
                 "chunk": "#/components/schemas/StreamTokenEventDto",
                 "tool_end": "#/components/schemas/StreamToolEndEventDto",
                 "tool_start": "#/components/schemas/StreamToolStartEventDto",
+                "tool_error": "#/components/schemas/StreamToolErrorEventDto",
                 "ui": "#/components/schemas/StreamUIEventDto",
+                "ui_update": "#/components/schemas/StreamUIUpdateEventDto",
                 "reasoning": "#/components/schemas/StreamReasoningDto",
                 "reasoning_end": "#/components/schemas/StreamReasoningEndDto"
               }
@@ -3214,6 +3377,60 @@
         },
         "required": ["image", "type"]
       },
+      "ChatInteractionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the request or tool call."
+          },
+          "kind": {
+            "type": "string",
+            "description": "The kind of the interaction.",
+            "enum": ["form", "url", "tool_error"]
+          },
+          "status": {
+            "type": "string",
+            "description": "The state of the interaction.",
+            "enum": ["waiting", "accepted", "declined", "cancelled", "expired", "opened", "completed", "blocked", "error"]
+          },
+          "source": {
+            "type": "string",
+            "description": "Who asked, or the name of the tool."
+          },
+          "text": {
+            "type": "string",
+            "description": "The question."
+          },
+          "data": {
+            "type": "object",
+            "description": "The answers of a form (without secrets)."
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL (without query)."
+          },
+          "domain": {
+            "type": "string",
+            "description": "The domain of the URL."
+          },
+          "error": {
+            "type": "string",
+            "description": "The error message of a failed tool."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the interaction started.",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the interaction was updated.",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "kind", "status", "createdAt", "updatedAt"]
+      },
       "MessageDto": {
         "type": "object",
         "properties": {
@@ -3288,6 +3505,13 @@
           "stopped": {
             "type": "boolean",
             "description": "Whether the generation of the answer was stopped before it was complete."
+          },
+          "interactions": {
+            "description": "The results of interactions (answered forms, opened URLs, failed tools).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatInteractionDto"
+            }
           }
         },
         "required": ["id", "configurationId", "content", "type"]
@@ -4660,6 +4884,16 @@
           }
         },
         "required": ["items"]
+      },
+      "RenameFileDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "The new name of the file."
+          }
+        },
+        "required": ["fileName"]
       },
       "UserGroupDto": {
         "type": "object",

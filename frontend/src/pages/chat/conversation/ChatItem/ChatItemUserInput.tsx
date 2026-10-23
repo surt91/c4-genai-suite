@@ -51,7 +51,7 @@ export const ChatItemUserInput = memo(({ request }: { request: StreamUIRequestDt
         <div>
           <Markdown>{request.text}</Markdown>
         </div>
-        <DynamicForm schema={request.schema} form={form} />
+        {request.schema && <DynamicForm schema={request.schema} form={form} />}
         <fieldset>
           <div className={classes.userInputFooter}>
             <div></div>

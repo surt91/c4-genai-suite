@@ -20,6 +20,12 @@ import {
     SourceDtoFromJSONTyped,
     SourceDtoToJSON,
 } from './SourceDto';
+import type { ChatInteractionDto } from './ChatInteractionDto';
+import {
+    ChatInteractionDtoFromJSON,
+    ChatInteractionDtoFromJSONTyped,
+    ChatInteractionDtoToJSON,
+} from './ChatInteractionDto';
 import type { MessageContentDto } from './MessageContentDto';
 import {
     MessageContentDtoFromJSON,
@@ -93,6 +99,12 @@ export interface MessageDto {
      * @memberof MessageDto
      */
     stopped?: boolean;
+    /**
+     * The results of interactions (answered forms, opened URLs, failed tools).
+     * @type {Array<ChatInteractionDto>}
+     * @memberof MessageDto
+     */
+    interactions?: Array<ChatInteractionDto>;
 }
 
 
@@ -150,6 +162,7 @@ export function MessageDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'sources': json['sources'] == null ? undefined : ((json['sources'] as Array<any>).map(SourceDtoFromJSON)),
         'logging': json['logging'] == null ? undefined : json['logging'],
         'stopped': json['stopped'] == null ? undefined : json['stopped'],
+        'interactions': json['interactions'] == null ? undefined : ((json['interactions'] as Array<any>).map(ChatInteractionDtoFromJSON)),
     };
 }
 
@@ -169,6 +182,7 @@ export function MessageDtoToJSON(value?: MessageDto | null): any {
         'sources': value['sources'] == null ? undefined : ((value['sources'] as Array<any>).map(SourceDtoToJSON)),
         'logging': value['logging'],
         'stopped': value['stopped'],
+        'interactions': value['interactions'] == null ? undefined : ((value['interactions'] as Array<any>).map(ChatInteractionDtoToJSON)),
     };
 }
 

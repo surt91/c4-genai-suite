@@ -21,6 +21,7 @@ import type {
   FileDto,
   FileTypesDto,
   FilesDto,
+  RenameFileDto,
   TestBucketDto,
   UpsertBucketDto,
 } from '../models/index';
@@ -35,6 +36,8 @@ import {
     FileTypesDtoToJSON,
     FilesDtoFromJSON,
     FilesDtoToJSON,
+    RenameFileDtoFromJSON,
+    RenameFileDtoToJSON,
     TestBucketDtoFromJSON,
     TestBucketDtoToJSON,
     UpsertBucketDtoFromJSON,
@@ -96,6 +99,11 @@ export interface PostUserFileRequest {
 export interface PutBucketRequest {
     id: number;
     upsertBucketDto: UpsertBucketDto;
+}
+
+export interface RenameUserFileRequest {
+    fileId: number;
+    renameFileDto: RenameFileDto;
 }
 
 export interface TestBucketRequest {
@@ -615,6 +623,51 @@ export class FilesApi extends runtime.BaseAPI {
      */
     async putBucket(id: number, upsertBucketDto: UpsertBucketDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BucketDto> {
         const response = await this.putBucketRaw({ id: id, upsertBucketDto: upsertBucketDto }, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Renames a personal file of the user.
+     * 
+     */
+    async renameUserFileRaw(requestParameters: RenameUserFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDto>> {
+        if (requestParameters['fileId'] == null) {
+            throw new runtime.RequiredError(
+                'fileId',
+                'Required parameter "fileId" was null or undefined when calling renameUserFile().'
+            );
+        }
+
+        if (requestParameters['renameFileDto'] == null) {
+            throw new runtime.RequiredError(
+                'renameFileDto',
+                'Required parameter "renameFileDto" was null or undefined when calling renameUserFile().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/user-files/{fileId}`.replace(`{${"fileId"}}`, encodeURIComponent(String(requestParameters['fileId']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RenameFileDtoToJSON(requestParameters['renameFileDto']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FileDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Renames a personal file of the user.
+     * 
+     */
+    async renameUserFile(fileId: number, renameFileDto: RenameFileDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDto> {
+        const response = await this.renameUserFileRaw({ fileId: fileId, renameFileDto: renameFileDto }, initOverrides);
         return await response.value();
     }
 

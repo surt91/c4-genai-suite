@@ -23,6 +23,7 @@ models/BucketDto.ts
 models/BucketDtoFileSizeLimits.ts
 models/BucketsDto.ts
 models/ChangePasswordDto.ts
+models/ChatInteractionDto.ts
 models/ChatSuggestionDto.ts
 models/ChatUICallbackResultDto.ts
 models/ChunkDto.ts
@@ -69,6 +70,7 @@ models/ProfileDto.ts
 models/RateMessageDto.ts
 models/RatingDto.ts
 models/RatingsDto.ts
+models/RenameFileDto.ts
 models/SendMessageDto.ts
 models/SettingsDto.ts
 models/SiteLinkDto.ts
@@ -87,10 +89,13 @@ models/StreamSourcesEvent.ts
 models/StreamSummaryDto.ts
 models/StreamTokenEventDto.ts
 models/StreamToolEndEventDto.ts
+models/StreamToolErrorEventDto.ts
 models/StreamToolInfoDto.ts
 models/StreamToolStartEventDto.ts
 models/StreamUIEventDto.ts
 models/StreamUIRequestDto.ts
+models/StreamUIUpdateDto.ts
+models/StreamUIUpdateEventDto.ts
 models/TestBucketDto.ts
 models/TestExtensionDto.ts
 models/TranscriptionDto.ts

@@ -174,7 +174,10 @@
       "sourceHint": "An welcher Stelle wird der Wert bestimmt.",
       "value": "Wert (Template)",
       "valueHint": "Wert, der beim Toolaufruf verwendet wird. Text kann Platzhalter wie `{{{{value}}}}` (der vom LLM oder Benutzer definierte Wert), `{{{{language}}}}`, `{{{{conversationId}}}}` oder `{{{{user.email}}}}` enthalten.",
-      "errorToolCall": "Es ist ein Fehler aufgetreten beim Aufruf des Tools '{tool}'"
+      "errorToolCall": "Es ist ein Fehler aufgetreten beim Aufruf des Tools '{tool}'",
+      "allowedDomains": "Erlaubte Domains für zu öffnende Seiten",
+      "allowedDomainsHint": "Domains (eine pro Zeile, inkl. Subdomains), die der Server Nutzer öffnen lassen darf, z. B. für eine Anmeldung bei einem anderen Dienst. Ohne Domains sind alle Seiten erlaubt und die Nutzer erhalten eine Warnung.",
+      "errorToolResult": "Das Tool '{{tool}}' hat einen Fehler gemeldet."
     },
     "context": {
       "title": "DEV: Contexts",

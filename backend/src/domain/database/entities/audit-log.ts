@@ -4,7 +4,15 @@ import { schema } from '../typeorm.helper';
 export type AuditLogRepository = Repository<AuditLogEntity>;
 
 export type AuditAction = 'create' | 'update' | 'delete';
-export type AuditEntityType = 'extension' | 'bucket' | 'configuration' | 'settings' | 'userGroup' | 'user';
+export type AuditEntityType =
+  | 'extension'
+  | 'bucket'
+  | 'configuration'
+  | 'settings'
+  | 'userGroup'
+  | 'user'
+  // an URL the user was asked to open in the chat (MCP elicitation in URL mode)
+  | 'urlElicitation';
 
 @Entity({ name: 'audit_log', schema })
 export class AuditLogEntity {

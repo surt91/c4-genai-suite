@@ -320,3 +320,13 @@ export class FileTypesDto {
     return result;
   }
 }
+
+export class RenameFileDto {
+  @ApiProperty({
+    description: 'The new name of the file.',
+    required: true,
+  })
+  @IsDefined()
+  @IsString()
+  fileName!: string;
+}

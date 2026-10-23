@@ -57,10 +57,72 @@ export enum FormActionType {
 export interface ChatUICallbackResult {
   action: FormActionType;
   data?: Record<string, any>;
+  // Set internally when the request has been cancelled because nobody answered in time.
+  expired?: boolean;
+}
+
+/** Who asks, e.g. the name of the MCP server. */
+export interface ChatUIRequestOptions {
+  source?: string;
+}
+
+export interface ChatUIOpenUrlRequest extends ChatUIRequestOptions {
+  // The message of the server, why the page should be opened.
+  text: string;
+  url: string;
+  // The ID of the elicitation of the server, to map its completion notification.
+  elicitationId?: string;
+  // The allowed domains (incl. subdomains). Without, every domain is allowed (and the user is warned).
+  allowedDomains?: string[];
+}
+
+/** The final state of an URL request after the user has opened the page. */
+export type ChatUIUrlCompletion = 'completed' | 'cancelled' | 'expired' | 'opened';
+
+export interface ChatUIOpenUrlResult {
+  // accept: the user has opened the page, reject: declined, cancel: dismissed, expired or not allowed
+  action: FormActionType;
+  // Resolves when the interaction outside is complete (notification of the server, the user, or timeout).
+  completion: Promise<ChatUIUrlCompletion>;
 }
 
 export interface ChatUI {
-  form(text: string, schema: ExtensionArgument): Promise<ChatUICallbackResult>;
+  form(text: string, schema: ExtensionArgument, options?: ChatUIRequestOptions): Promise<ChatUICallbackResult>;
+
+  // Asks the user to open an URL (e.g. to log in at a third party service). Only opened after the explicit consent.
+  openUrl(request: ChatUIOpenUrlRequest): Promise<ChatUIOpenUrlResult>;
+
+  // Marks an opened URL request as complete (e.g. when the server sends `notifications/elicitation/complete`).
+  completeUrl(elicitationId: string): void;
+}
+
+export type ChatInteractionKind = 'form' | 'url' | 'tool_error';
+
+export type ChatInteractionStatus =
+  'waiting' | 'accepted' | 'declined' | 'cancelled' | 'expired' | 'opened' | 'completed' | 'blocked' | 'error';
+
+/**
+ * The result of an interaction in the conversation (an answered form, an opened URL, a failed tool). It is stored with
+ * the answer, so that it is still visible after a reload.
+ */
+export interface ChatInteraction {
+  // The ID of the request (or of the tool call).
+  id: string;
+  kind: ChatInteractionKind;
+  status: ChatInteractionStatus;
+  // Who asked (e.g. the MCP server) or the name of the tool.
+  source?: string;
+  // The question.
+  text?: string;
+  // The answers of a form (without secrets).
+  data?: Record<string, any>;
+  // The URL (without query) and its domain.
+  url?: string;
+  domain?: string;
+  // The error message of a failed tool.
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export abstract class BaseMessage {
@@ -114,6 +176,8 @@ export abstract class MessagesHistory {
   public abstract addMessage(message: BaseMessage): Promise<void>;
   /** Add source annotations. */
   public abstract addSources(externalExtensionId: string, sources: Source[]): void;
+  /** Adds or updates the result of an interaction (stored with the answer, also when the answer is already stored). */
+  public abstract setInteraction(interaction: ChatInteraction): void;
 
   public addUserMessage(message: string): Promise<void> {
     return this.addMessage(new HumanMessage(message));
@@ -297,6 +361,9 @@ export interface Message {
   // Whether the generation of this (AI) message was stopped before it was complete.
   stopped?: boolean;
 
+  // The results of interactions (forms, URLs, failed tools).
+  interactions?: ChatInteraction[];
+
   configurationId: number;
 }
 
@@ -345,7 +412,9 @@ export type StreamEvent =
   | StreamTokenEvent
   | StreamToolEndEvent
   | StreamToolStartEvent
-  | StreamUIEvent;
+  | StreamToolErrorEvent
+  | StreamUIEvent
+  | StreamUIUpdateEvent;
 
 export interface StreamTokenEvent {
   type: 'chunk';
@@ -365,6 +434,13 @@ export interface StreamToolStartEvent {
 export interface StreamToolEndEvent {
   type: 'tool_end';
   tool: ToolInfo;
+}
+
+export interface StreamToolErrorEvent {
+  type: 'tool_error';
+  tool: ToolInfo;
+  // The error message.
+  error: string;
 }
 
 export interface StreamMessageSavedEvent {
@@ -393,6 +469,19 @@ export interface StreamUIEvent {
   request: ChatUIRequest;
 }
 
+export interface StreamUIUpdateEvent {
+  type: 'ui_update';
+  update: ChatUIUpdate;
+}
+
+export interface ChatUIUpdate {
+  // The ID of the request.
+  id: string;
+  status: ChatInteractionStatus;
+  // The answers of a form (without secrets).
+  data?: Record<string, any>;
+}
+
 export interface StreamSummaryEvent {
   type: 'summary';
   content: string;
@@ -416,11 +505,29 @@ export interface ChatUIRequest {
   // The request ID to handle responses.
   id: string;
 
+  // The kind of the request: a form (also a confirmation) or an URL to open.
+  kind: 'form' | 'url';
+
   // The text in markdown info.
   text: string;
 
   // The schema of the form
   schema?: ExtensionArgument;
+
+  // Who asks, e.g. the name of the MCP server.
+  source?: string;
+
+  // When the request is cancelled if nobody answers (ISO date).
+  expiresAt: string;
+
+  // The URL to open (kind url).
+  url?: string;
+
+  // The host name of the URL (kind url).
+  domain?: string;
+
+  // Whether the domain is in the allowlist of the extension (false: there is no allowlist).
+  domainAllowed?: boolean;
 }
 
 export interface ChatMetadata {
@@ -431,6 +538,9 @@ export interface ChatMetadata {
 export interface ToolInfo {
   // The display name of the tool.
   name: string;
+
+  // The ID of the tool call.
+  id?: string;
 }
 
 export type ChatNextDelegate = (context: ChatContext) => Promise<any>;

@@ -14,6 +14,7 @@ import {
   UsageRepository,
   UserGroupEntity,
 } from 'src/domain/database';
+import { AuditLogModule } from '../audit-log/module';
 import { ConversationFileEntity } from '../database/entities/conversation-file';
 import { registerRepositoryForEntity } from '../database/typeorm.helper';
 import { ChatCacheImpl } from './cache';
@@ -50,6 +51,7 @@ import {
   GetUsageHandler,
   GetUsersCountHandler,
   RateMessageHandler,
+  RestoreConversationHandler,
   SendMessageHandler,
   StartConversationHandler,
   UpdateConversationHandler,
@@ -57,6 +59,7 @@ import {
 
 @Module({
   imports: [
+    AuditLogModule,
     ConfigModule,
     CqrsModule,
     TypeOrmModule.forFeature([
@@ -80,6 +83,7 @@ import {
     CompleteMiddleware,
     DefaultPromptMiddleware,
     DeleteConversationHandler,
+    RestoreConversationHandler,
     DeleteConversationsHandler,
     DuplicateConversationHandler,
     ExceptionMiddleware,

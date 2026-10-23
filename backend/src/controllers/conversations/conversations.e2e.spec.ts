@@ -94,6 +94,37 @@ describe('Conversations', () => {
 
     expect((response.body as ConversationDto).name).toBe('Greetings Exchange (4)');
   });
+
+  it('should delete a conversation softly and restore it', async () => {
+    const created = await dataSource
+      .getRepository(ConversationEntity)
+      .save({ name: 'To be restored', configurationId: 1, userId: '1' });
+
+    await request(app.getHttpServer()).delete(`/conversations/${created.id}`).expect(200);
+    await request(app.getHttpServer()).get(`/conversations/${created.id}`).expect(404);
+    const deleted = await dataSource.getRepository(ConversationEntity).findOne({ where: { id: created.id }, withDeleted: true });
+    expect(deleted?.deletedAt).toBeInstanceOf(Date);
+
+    await request(app.getHttpServer()).post(`/conversations/${created.id}/restore`).expect(204);
+    const restored = await request(app.getHttpServer()).get(`/conversations/${created.id}`).expect(200);
+    expect((restored.body as ConversationDto).name).toBe('To be restored');
+  });
+
+  it('should not restore conversations of other users or after the restore period', async () => {
+    const repository = dataSource.getRepository(ConversationEntity);
+    const ofOther = await repository.save({ name: 'Other', configurationId: 1, userId: 'other' });
+    await repository.softDelete({ id: ofOther.id });
+    await request(app.getHttpServer()).post(`/conversations/${ofOther.id}/restore`).expect(403);
+
+    const old = await repository.save({ name: 'Old', configurationId: 1, userId: '1' });
+    await repository.update({ id: old.id }, { deletedAt: new Date(Date.now() - 60 * 60 * 1000) });
+    await request(app.getHttpServer()).post(`/conversations/${old.id}/restore`).expect(404);
+
+    // deleting another conversation purges the conversations that cannot be restored anymore
+    const next = await repository.save({ name: 'Next', configurationId: 1, userId: '1' });
+    await request(app.getHttpServer()).delete(`/conversations/${next.id}`).expect(200);
+    expect(await repository.findOne({ where: { id: old.id }, withDeleted: true })).toBeNull();
+  });
 });
 
 async function cleanDatabase(dataSource: DataSource) {

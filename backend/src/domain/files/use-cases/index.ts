@@ -2,6 +2,7 @@ export * from './create-bucket';
 export * from './delete-bucket';
 export * from './delete-bucket';
 export * from './delete-file';
+export * from './rename-file';
 export * from './get-bucket';
 export * from './get-buckets';
 export * from './get-files';

@@ -14,6 +14,7 @@ import {
   AIMessage,
   BaseMessage,
   ChatContext,
+  ChatInteraction,
   ChatMiddleware,
   ChatNextDelegate,
   GetContext,
@@ -71,6 +72,9 @@ class InternalChatHistory extends MessagesHistory {
   private sources: ExtensionSource[] = [];
   private stored?: BaseMessage[];
   private currentParentId?: number;
+  private readonly interactions = new Map<string, ChatInteraction>();
+  // The ID of the stored AI message, interactions that finish later are added to it.
+  private aiMessageId?: number;
 
   // Whether an AI message has been stored by this pipeline run.
   public hasAIMessage = false;
@@ -91,6 +95,17 @@ class InternalChatHistory extends MessagesHistory {
         this.tools.push(event.tool.name);
       } else if (event.type === 'debug') {
         this.debug.push(event.content);
+      } else if (event.type === 'tool_error') {
+        const now = new Date().toISOString();
+        this.setInteraction({
+          id: event.tool.id ?? event.tool.name,
+          kind: 'tool_error',
+          status: 'error',
+          source: event.tool.name,
+          error: event.error,
+          createdAt: now,
+          updatedAt: now,
+        });
       }
     });
   }
@@ -102,6 +117,18 @@ class InternalChatHistory extends MessagesHistory {
         extensionExternalId,
       })),
     );
+  }
+
+  setInteraction(interaction: ChatInteraction): void {
+    this.interactions.set(interaction.id, interaction);
+
+    if (this.aiMessageId) {
+      // The answer is stored already (e.g. an opened URL is completed afterwards).
+      const id = this.aiMessageId;
+      this.messages
+        .update({ id }, { interactions: [...this.interactions.values()] })
+        .catch((err) => this.logger.error('Failed to store the interaction.', err));
+    }
   }
 
   getMessages(): Promise<BaseMessage[]> {
@@ -181,6 +208,8 @@ class InternalChatHistory extends MessagesHistory {
       // The sources information are only relevant for AI messages.
       sources: message.isAI() ? this.sources : [],
       stopped: message.isAI() ? message.stopped : false,
+      // The results of forms, URLs and failed tools are only relevant for AI messages.
+      interactions: message.isAI() && this.interactions.size > 0 ? [...this.interactions.values()] : null,
     };
 
     try {
@@ -192,6 +221,7 @@ class InternalChatHistory extends MessagesHistory {
           configurationId: this.configurationId,
         });
         this.currentParentId = entity.id;
+        this.aiMessageId = entity.id;
         this.hasAIMessage = true;
         // Notify the UI about the message ID, because it is needed to rate messages.
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'ai' });

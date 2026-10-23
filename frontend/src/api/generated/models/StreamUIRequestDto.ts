@@ -40,12 +40,59 @@ export interface StreamUIRequestDto {
      */
     text: string;
     /**
-     * The schema.
+     * The kind of the request: a form (also a confirmation) or an URL to open.
+     * @type {string}
+     * @memberof StreamUIRequestDto
+     */
+    kind: StreamUIRequestDtoKindEnum;
+    /**
+     * The schema of the form.
      * @type {ExtensionArgumentObjectSpecDto}
      * @memberof StreamUIRequestDto
      */
-    schema: ExtensionArgumentObjectSpecDto;
+    schema?: ExtensionArgumentObjectSpecDto;
+    /**
+     * Who asks, e.g. the name of the MCP server.
+     * @type {string}
+     * @memberof StreamUIRequestDto
+     */
+    source?: string;
+    /**
+     * When the request is cancelled if nobody answers.
+     * @type {Date}
+     * @memberof StreamUIRequestDto
+     */
+    expiresAt: Date;
+    /**
+     * The URL to open (only for URL requests).
+     * @type {string}
+     * @memberof StreamUIRequestDto
+     */
+    url?: string;
+    /**
+     * The host name of the URL (only for URL requests).
+     * @type {string}
+     * @memberof StreamUIRequestDto
+     */
+    domain?: string;
+    /**
+     * Whether the domain is in the allowlist of the extension (false if there is no allowlist).
+     * @type {boolean}
+     * @memberof StreamUIRequestDto
+     */
+    domainAllowed?: boolean;
 }
+
+
+/**
+ * @export
+ */
+export const StreamUIRequestDtoKindEnum = {
+    Form: 'form',
+    Url: 'url'
+} as const;
+export type StreamUIRequestDtoKindEnum = typeof StreamUIRequestDtoKindEnum[keyof typeof StreamUIRequestDtoKindEnum];
+
 
 /**
  * Check if a given object implements the StreamUIRequestDto interface.
@@ -53,7 +100,8 @@ export interface StreamUIRequestDto {
 export function instanceOfStreamUIRequestDto(value: object): value is StreamUIRequestDto {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('text' in value) || value['text'] === undefined) return false;
-    if (!('schema' in value) || value['schema'] === undefined) return false;
+    if (!('kind' in value) || value['kind'] === undefined) return false;
+    if (!('expiresAt' in value) || value['expiresAt'] === undefined) return false;
     return true;
 }
 
@@ -69,7 +117,13 @@ export function StreamUIRequestDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'id': json['id'],
         'text': json['text'],
-        'schema': ExtensionArgumentObjectSpecDtoFromJSON(json['schema']),
+        'kind': json['kind'],
+        'schema': json['schema'] == null ? undefined : ExtensionArgumentObjectSpecDtoFromJSON(json['schema']),
+        'source': json['source'] == null ? undefined : json['source'],
+        'expiresAt': (new Date(json['expiresAt'])),
+        'url': json['url'] == null ? undefined : json['url'],
+        'domain': json['domain'] == null ? undefined : json['domain'],
+        'domainAllowed': json['domainAllowed'] == null ? undefined : json['domainAllowed'],
     };
 }
 
@@ -81,7 +135,13 @@ export function StreamUIRequestDtoToJSON(value?: StreamUIRequestDto | null): any
         
         'id': value['id'],
         'text': value['text'],
+        'kind': value['kind'],
         'schema': ExtensionArgumentObjectSpecDtoToJSON(value['schema']),
+        'source': value['source'],
+        'expiresAt': ((value['expiresAt']).toISOString()),
+        'url': value['url'],
+        'domain': value['domain'],
+        'domainAllowed': value['domainAllowed'],
     };
 }
 

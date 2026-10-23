@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Source } from 'src/domain/chat';
+import { ChatInteraction, Source } from 'src/domain/chat';
 import { schema } from '../typeorm.helper';
 import { ConfigurationEntity } from './configuration';
 import { ConversationEntity } from './conversation';
@@ -43,6 +43,10 @@ export class MessageEntity {
   // Whether the generation of the answer was stopped (by the user or a disconnect) before it was complete.
   @Column({ default: false })
   stopped!: boolean;
+
+  // The results of interactions during the generation (answered forms, opened URLs, failed tools).
+  @Column('json', { nullable: true })
+  interactions?: ChatInteraction[] | null;
 
   @Column('simple-json', { nullable: true })
   tools?: any;

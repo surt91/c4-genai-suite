@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Logger,
   NotFoundException,
   Param,
@@ -42,6 +43,7 @@ import {
   GetHistory,
   GetHistoryResponse,
   RateMessage,
+  RestoreConversation,
   SendMessage,
   SendMessageResponse,
   StartConversation,
@@ -385,6 +387,21 @@ export class ConversationsController {
   @ApiNoContentResponse()
   async deleteConversation(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     await this.commandBus.execute(new DeleteConversation(+id, req.user));
+  }
+
+  @Post(':id/restore')
+  @ApiOperation({ operationId: 'restoreConversation', description: 'Restores a recently deleted conversation.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: Number,
+  })
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse({ description: 'There is no conversation that can be restored.' })
+  @HttpCode(204)
+  async restoreConversation(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    await this.commandBus.execute(new RestoreConversation(+id, req.user));
   }
 
   @Delete(':id/confirm/:requestId')

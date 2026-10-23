@@ -5,7 +5,9 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import {
   CallToolRequest,
   CallToolResultSchema,
+  ElicitationCompleteNotificationSchema,
   ElicitRequestSchema,
+  ElicitRequestURLParams,
   ListToolsResult,
   ListToolsResultSchema,
   McpError,
@@ -53,6 +55,27 @@ export function toLlmInputSchema(inputSchema: JSONSchema7, isLlmAttribute: (key:
   });
 }
 
+// The error code of a tool call that needs the user to open a page first (`ErrorCode.UrlElicitationRequired`).
+const URL_ELICITATION_REQUIRED = -32042;
+
+/** Parses the allowed domains of the configuration (one per line or comma separated). */
+export function parseDomains(value?: string) {
+  return (value ?? '')
+    .split(/[\s,;]+/)
+    .map((x) => x.trim())
+    .filter((x) => !!x);
+}
+
+/** The text of a tool result that is marked as error. */
+function toolErrorText(result: { content?: unknown }) {
+  const content = Array.isArray(result.content) ? (result.content as { type?: string; text?: string }[]) : [];
+  return content
+    .filter((x) => x.type === 'text' && x.text)
+    .map((x) => x.text)
+    .join('\n')
+    .trim();
+}
+
 enum Transport {
   SSE = 'sse',
   STREAMABLE_HTTP = 'streamableHttp',
@@ -74,6 +97,8 @@ interface Configuration {
   endpoint: string;
   headers?: string;
   transport: Transport;
+  // The domains (one per line or comma separated) the server may ask users to open (URL elicitation).
+  allowedDomains?: string;
   schema?: Record<
     // one record per method
     string,
@@ -310,6 +335,13 @@ export class MCPToolsExtension implements Extension<Configuration> {
           format: 'textarea',
           required: false,
         },
+        allowedDomains: {
+          type: 'string',
+          title: this.i18n.t('texts.extensions.mcpTools.allowedDomains'),
+          description: this.i18n.t('texts.extensions.mcpTools.allowedDomainsHint'),
+          format: 'textarea',
+          required: false,
+        },
       },
     };
   }
@@ -458,23 +490,41 @@ export class MCPToolsExtension implements Extension<Configuration> {
     );
   }
 
-  private enableElicitRequests(client: Client, context: ChatContext) {
+  /** Asks the user to open the URL of an URL elicitation (e.g. a login at another service). */
+  private async openUrl(
+    context: ChatContext,
+    configuration: Configuration,
+    params: Pick<ElicitRequestURLParams, 'message' | 'url' | 'elicitationId'>,
+  ) {
+    return context.ui.openUrl({
+      text: params.message,
+      url: params.url,
+      elicitationId: params.elicitationId,
+      source: configuration.serverName,
+      allowedDomains: parseDomains(configuration.allowedDomains),
+    });
+  }
+
+  private enableElicitRequests(client: Client, context: ChatContext, configuration: Configuration) {
+    // The server reports the completion of the interaction outside (e.g. the login) asynchronously.
+    client.setNotificationHandler(ElicitationCompleteNotificationSchema, (notification) => {
+      context.ui.completeUrl(notification.params.elicitationId);
+      return Promise.resolve();
+    });
+
     client.setRequestHandler(ElicitRequestSchema, async (request) => {
-      // Check if this is a form mode request (vs URL mode)
       if (request.params.mode === 'url') {
-        this.logger.warn('URL mode elicitation is not supported, canceling request');
-        return {
-          action: 'cancel',
-          content: undefined,
-        };
+        // Accept means that the user has agreed to open the page, the server waits for the result itself.
+        const { action } = await this.openUrl(context, configuration, request.params);
+        return { action: action === FormActionType.REJECT ? 'decline' : action };
       }
 
       // Form mode (mode is optional or "form")
       const schema = toExtensionArgument(request.params.requestedSchema, {});
       if (schema) {
-        const userResponse = await context.ui.form(request.params.message, schema);
+        const userResponse = await context.ui.form(request.params.message, schema, { source: configuration.serverName });
         return {
-          action: userResponse.action,
+          action: userResponse.action === FormActionType.REJECT ? 'decline' : userResponse.action,
           content: userResponse.action === FormActionType.ACCEPT ? userResponse.data : undefined,
         };
       }
@@ -507,7 +557,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
           return next(context);
         }
         const { tools, client } = connection;
-        this.enableElicitRequests(client, context);
+        this.enableElicitRequests(client, context, extension.values);
         const schemaData = extension.values.schema ?? {};
 
         const filteredTools = tools.filter((x) => schemaData[x.name]?.enabled);
@@ -537,7 +587,22 @@ export class MCPToolsExtension implements Extension<Configuration> {
                     params: { name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } },
                   };
                   // Aborting the request also notifies the server that the tool call has been cancelled.
-                  const res = await client.request(req, CallToolResultSchema, { signal: context.abort.signal });
+                  const call = () => client.request(req, CallToolResultSchema, { signal: context.abort.signal });
+                  let res;
+                  try {
+                    res = await call();
+                  } catch (err) {
+                    // The server needs the user to open a page first (e.g. to log in). Retry once afterwards.
+                    if (!(await this.handleUrlElicitationRequired(err, context, extension.values))) {
+                      throw err;
+                    }
+                    res = await call();
+                  }
+                  if (res.isError) {
+                    throw new Error(
+                      toolErrorText(res) || this.i18n.t('texts.extensions.mcpTools.errorToolResult', { tool: name }),
+                    );
+                  }
                   const { sources, content } = transformMCPToolResponse(res);
                   if (sources.length) {
                     context.history?.addSources(extension.externalId, sources);
@@ -573,15 +638,47 @@ export class MCPToolsExtension implements Extension<Configuration> {
     return Promise.resolve([middleware]);
   }
 
+  /**
+   * Handles the error "URL elicitation required" (-32042) of a tool call: asks the user to open the pages and waits until
+   * the interactions are complete.
+   *
+   * @returns true if the tool call should be retried.
+   */
+  private async handleUrlElicitationRequired(err: unknown, context: ChatContext, configuration: Configuration) {
+    if (!(err instanceof McpError) || err.code !== URL_ELICITATION_REQUIRED) {
+      return false;
+    }
+
+    const elicitations = ((err.data as { elicitations?: ElicitRequestURLParams[] } | undefined)?.elicitations ?? []).filter(
+      (x) => x?.mode === 'url' && typeof x.url === 'string',
+    );
+    if (elicitations.length === 0) {
+      return false;
+    }
+
+    for (const elicitation of elicitations) {
+      const { action, completion } = await this.openUrl(context, configuration, elicitation);
+      if (action !== FormActionType.ACCEPT) {
+        return false;
+      }
+      const status = await completion;
+      if (status !== 'completed') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   private async getTools(configuration: Configuration) {
     const client = new Client(
       {
-        name: 'langchain-js-client',
+        name: 'gaible',
         version: '1.0.0',
       },
       {
         capabilities: {
-          elicitation: {},
+          elicitation: { form: {}, url: {} },
         },
       },
     );

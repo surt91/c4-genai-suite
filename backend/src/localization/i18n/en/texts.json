@@ -174,7 +174,10 @@
       "sourceHint": "Defines where the value should be defined.",
       "value": "Value (Template)",
       "valueHint": "Value that is used during tool call. Text may contain placeholders like `{{{{value}}}}` (the value defined by the LLM or user), `{{{{language}}}}`, `{{{{conversationId}}}}` or `{{{{user.email}}}}`.",
-      "errorToolCall": "An error occurred during the tool call '{tool}'"
+      "errorToolCall": "An error occurred during the tool call '{tool}'",
+      "allowedDomains": "Allowed domains for pages to open",
+      "allowedDomainsHint": "Domains (one per line, subdomains included) the server may ask users to open, e.g. for a login at another service. Without domains every page is allowed and the users get a warning.",
+      "errorToolResult": "The tool '{{tool}}' reported an error."
     },
     "context": {
       "title": "DEV: Contexts",

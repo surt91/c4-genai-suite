@@ -90,6 +90,13 @@ import {
     StreamToolEndEventDtoFromJSONTyped,
     StreamToolEndEventDtoToJSON,
 } from './StreamToolEndEventDto';
+import type { StreamToolErrorEventDto } from './StreamToolErrorEventDto';
+import {
+    instanceOfStreamToolErrorEventDto,
+    StreamToolErrorEventDtoFromJSON,
+    StreamToolErrorEventDtoFromJSONTyped,
+    StreamToolErrorEventDtoToJSON,
+} from './StreamToolErrorEventDto';
 import type { StreamToolStartEventDto } from './StreamToolStartEventDto';
 import {
     instanceOfStreamToolStartEventDto,
@@ -104,13 +111,20 @@ import {
     StreamUIEventDtoFromJSONTyped,
     StreamUIEventDtoToJSON,
 } from './StreamUIEventDto';
+import type { StreamUIUpdateEventDto } from './StreamUIUpdateEventDto';
+import {
+    instanceOfStreamUIUpdateEventDto,
+    StreamUIUpdateEventDtoFromJSON,
+    StreamUIUpdateEventDtoFromJSONTyped,
+    StreamUIUpdateEventDtoToJSON,
+} from './StreamUIUpdateEventDto';
 
 /**
  * @type StreamEventDto
  * 
  * @export
  */
-export type StreamEventDto = { type: 'chunk' } & StreamTokenEventDto | { type: 'completed' } & StreamCompletedEventDto | { type: 'debug' } & StreamDebugEvent | { type: 'error' } & StreamErrorEventDto | { type: 'logging' } & StreamLoggingEvent | { type: 'reasoning' } & StreamReasoningDto | { type: 'reasoning_end' } & StreamReasoningEndDto | { type: 'saved' } & StreamMessageSavedDto | { type: 'sources' } & StreamSourcesEvent | { type: 'summary' } & StreamSummaryDto | { type: 'tool_end' } & StreamToolEndEventDto | { type: 'tool_start' } & StreamToolStartEventDto | { type: 'ui' } & StreamUIEventDto;
+export type StreamEventDto = { type: 'chunk' } & StreamTokenEventDto | { type: 'completed' } & StreamCompletedEventDto | { type: 'debug' } & StreamDebugEvent | { type: 'error' } & StreamErrorEventDto | { type: 'logging' } & StreamLoggingEvent | { type: 'reasoning' } & StreamReasoningDto | { type: 'reasoning_end' } & StreamReasoningEndDto | { type: 'saved' } & StreamMessageSavedDto | { type: 'sources' } & StreamSourcesEvent | { type: 'summary' } & StreamSummaryDto | { type: 'tool_end' } & StreamToolEndEventDto | { type: 'tool_error' } & StreamToolErrorEventDto | { type: 'tool_start' } & StreamToolStartEventDto | { type: 'ui' } & StreamUIEventDto | { type: 'ui_update' } & StreamUIUpdateEventDto;
 
 export function StreamEventDtoFromJSON(json: any): StreamEventDto {
     return StreamEventDtoFromJSONTyped(json, false);
@@ -143,10 +157,14 @@ export function StreamEventDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
             return Object.assign({}, StreamSummaryDtoFromJSONTyped(json, true), { type: 'summary' } as const);
         case 'tool_end':
             return Object.assign({}, StreamToolEndEventDtoFromJSONTyped(json, true), { type: 'tool_end' } as const);
+        case 'tool_error':
+            return Object.assign({}, StreamToolErrorEventDtoFromJSONTyped(json, true), { type: 'tool_error' } as const);
         case 'tool_start':
             return Object.assign({}, StreamToolStartEventDtoFromJSONTyped(json, true), { type: 'tool_start' } as const);
         case 'ui':
             return Object.assign({}, StreamUIEventDtoFromJSONTyped(json, true), { type: 'ui' } as const);
+        case 'ui_update':
+            return Object.assign({}, StreamUIUpdateEventDtoFromJSONTyped(json, true), { type: 'ui_update' } as const);
         default:
             throw new Error(`No variant of StreamEventDto exists with 'type=${json['type']}'`);
     }
@@ -179,10 +197,14 @@ export function StreamEventDtoToJSON(value?: StreamEventDto | null): any {
             return StreamSummaryDtoToJSON(value);
         case 'tool_end':
             return StreamToolEndEventDtoToJSON(value);
+        case 'tool_error':
+            return StreamToolErrorEventDtoToJSON(value);
         case 'tool_start':
             return StreamToolStartEventDtoToJSON(value);
         case 'ui':
             return StreamUIEventDtoToJSON(value);
+        case 'ui_update':
+            return StreamUIUpdateEventDtoToJSON(value);
         default:
             throw new Error(`No variant of StreamEventDto exists with 'type=${value['type']}'`);
     }

@@ -51,7 +51,16 @@ describe('stopping the generation', () => {
   function startStream(
     messages: ChatMessage[] = [
       question,
-      { ...answer, ui: { id: 'form', text: 'Confirm?', schema: { type: 'object', title: 'Confirm', properties: {} } } },
+      {
+        ...answer,
+        ui: {
+          id: 'form',
+          kind: 'form',
+          expiresAt: new Date(),
+          text: 'Confirm?',
+          schema: { type: 'object', title: 'Confirm', properties: {} },
+        },
+      },
     ],
   ) {
     const subscription = { unsubscribe: vi.fn(), abort: vi.fn() };
