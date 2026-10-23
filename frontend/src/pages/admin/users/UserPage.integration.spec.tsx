@@ -48,7 +48,7 @@ describe('UsersPage Integration Tests', () => {
     await screen.findByText(texts.common.page(1, 3));
 
     // Navigate to the next page
-    const buttonNext = screen.getByRole('button', { name: '»' });
+    const buttonNext = screen.getByRole('button', { name: texts.accessibility.pdf.nextPage });
     await user.click(buttonNext);
     await screen.findByText(texts.common.page(2, 3));
 

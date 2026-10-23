@@ -30,13 +30,25 @@ export function Pagination(props: PaginationProps) {
   return (
     <Group justify="flex-end">
       <Button.Group mt={16}>
-        <Button variant="default" size="xs" onClick={() => onPage(page - 1)} disabled={!canGoPrev}>
+        <Button
+          variant="default"
+          size="xs"
+          onClick={() => onPage(page - 1)}
+          disabled={!canGoPrev}
+          aria-label={texts.accessibility.pdf.previousPage}
+        >
           «
         </Button>
         <Button variant="default" size="xs">
           {texts.common.page(page + 1, numberOfPages)}
         </Button>
-        <Button variant="default" size="xs" onClick={() => onPage(page + 1)} disabled={!canGoNext}>
+        <Button
+          variant="default"
+          size="xs"
+          onClick={() => onPage(page + 1)}
+          disabled={!canGoNext}
+          aria-label={texts.accessibility.pdf.nextPage}
+        >
           »
         </Button>
       </Button.Group>

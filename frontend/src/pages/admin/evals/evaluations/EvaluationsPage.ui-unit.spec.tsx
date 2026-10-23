@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'src/pages/admin/test-utils';
+import { texts } from 'src/texts';
 import { EvaluationsPage } from './EvaluationsPage';
 import { useEvaluations } from './hooks/useEvaluationQueries';
 
@@ -25,7 +26,7 @@ describe('EvaluationsPage', () => {
     render(<EvaluationsPage />);
     expect(useEvaluations).toHaveBeenLastCalledWith(1, 20, undefined);
 
-    fireEvent.click(screen.getByRole('button', { name: '»' }));
+    fireEvent.click(screen.getByRole('button', { name: texts.accessibility.pdf.nextPage }));
 
     expect(useEvaluations).toHaveBeenLastCalledWith(2, 20, undefined);
   });
