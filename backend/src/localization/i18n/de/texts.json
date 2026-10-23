@@ -16,10 +16,6 @@
       "maxOutputTokens": "Max Output Tokens",
       "modelName": "Modell-Name",
       "endpoint": "Endpunkt",
-      "index": "Index",
-      "vectorColumn": "Vektor-Spalte",
-      "select": "Auswählen",
-      "instructions": "Anweisungen",
       "topK": "Top K",
       "topP": "Top P",
       "text": "Text",
@@ -83,16 +79,6 @@
       "title": "Summary Prompt",
       "description": "Definiert den Zusammenfassungs-Prompt, der für die Gesprächsbeschriftung verwendet wird.",
       "promptHint": "Verwende den {content}-Platzhalter für den tatsächlichen Verlauf."
-    },
-    "azureSearch": {
-      "title": "Azure AI Search",
-      "description": "Führt eine Suche mit Azure AI Search durch",
-      "apiKeyHint": "API-Key",
-      "indexHint": "Name des Indexes",
-      "vectorColumnHint": "Name der Vektor-Spalte/Feld. Standard: text_vector",
-      "selectHint": "Auszuwählende Felder. Komma-separiert.",
-      "instructionsHint": "Eine Beschreibung des Tools einschließlich Anweisungen für das Modell zur Nutzung.",
-      "endpointHint": "Der Endpunkt. https://<deployment>.search.windows.net"
     },
     "brave": {
       "title": "Brave Web Search",

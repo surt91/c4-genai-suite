@@ -22,7 +22,6 @@ import { AzureTranscribeExtension } from './other/azure-transcribe';
 import { CustomPromptExtension } from './other/custom';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
-import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureGPTImage1Extension } from './tools/azure-gpt-image-1';
 import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
@@ -99,7 +98,6 @@ export class ExtensionLibraryModule {
       imports: [ConfigModule, AuthModule, CqrsModule, TypeOrmModule.forFeature([CacheEntity, BucketEntity, FileEntity])],
       providers: [
         ...dynamicProviders,
-        AzureAISearchExtension,
         AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
         BedrockModelExtension,

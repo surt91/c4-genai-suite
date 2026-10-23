@@ -16,10 +16,6 @@
       "maxOutputTokens": "Max Output Tokens",
       "modelName": "Model Name",
       "endpoint": "Endpoint",
-      "index": "Index",
-      "vectorColumn": "Vector Column",
-      "select": "Select",
-      "instructions": "Instructions",
       "topK": "Top K",
       "topP": "Top P",
       "text": "Text",
@@ -83,16 +79,6 @@
       "title": "Summary Prompt",
       "description": "Defines the summary prompt that is used for conversation label.",
       "promptHint": "Use the {content} placeholder for the actual history."
-    },
-    "azureSearch": {
-      "title": "Azure AI Search",
-      "description": "Performs a search using Azure AI Search",
-      "apiKeyHint": "The API Key",
-      "indexHint": "Name of the index",
-      "vectorColumnHint": "Name of the vector column/field. Defaults to: text_vector",
-      "selectHint": "Fields to select. Comma separated.",
-      "instructionsHint": "A description of the tool including instructions for the model on how to use it.",
-      "endpointHint": "The endpoint. https://<deployment>.search.windows.net"
     },
     "brave": {
       "title": "Brave Web Search",
