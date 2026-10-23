@@ -7,8 +7,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { BucketDto, BucketDtoFileSizeLimits, BucketDtoTypeEnum, UpsertBucketDto, useApi } from 'src/api';
 import { FormAlert, Icon, Modal } from 'src/components';
-import { buildError } from 'src/lib';
-import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import { TestButton } from './TestButton';
 import classes from './UpsertBucketDialog.module.css';
@@ -70,9 +68,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
       onUpdate(response);
       onClose();
     },
-    onError: async (error) => {
-      toast.error(await buildError(texts.theme.updateFailed, error));
-    },
+    // the error is shown in the dialog (like for creating)
   });
 
   const form = useForm<UpsertBucketDto>({
