@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { JsonBodyType } from 'msw';
 import { Route, Routes } from 'react-router-dom';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { BucketDto, FileDto } from 'src/api';
@@ -25,11 +26,11 @@ describe('BucketsPage', () => {
 
   it('does not keep the selection of files when another bucket is shown', async () => {
     new mockedAPI()
-      .withGet('/api/buckets', { items: [bucket(1, 'Bucket A'), bucket(2, 'Bucket B')] })
-      .withGet('/api/buckets/1', bucket(1, 'Bucket A'))
-      .withGet('/api/buckets/2', bucket(2, 'Bucket B'))
-      .withGet('/api/buckets/1/files', { items: [file(11, 'a1.pdf'), file(12, 'a2.pdf')], total: 2 })
-      .withGet('/api/buckets/2/files', { items: [file(21, 'b1.pdf'), file(22, 'b2.pdf')], total: 2 })
+      .withGet<JsonBodyType>('/api/buckets', { items: [bucket(1, 'Bucket A'), bucket(2, 'Bucket B')] })
+      .withGet<JsonBodyType>('/api/buckets/1', bucket(1, 'Bucket A'))
+      .withGet<JsonBodyType>('/api/buckets/2', bucket(2, 'Bucket B'))
+      .withGet<JsonBodyType>('/api/buckets/1/files', { items: [file(11, 'a1.pdf'), file(12, 'a2.pdf')], total: 2 })
+      .withGet<JsonBodyType>('/api/buckets/2/files', { items: [file(21, 'b1.pdf'), file(22, 'b2.pdf')], total: 2 })
       .run();
     window.history.pushState({}, '', '/admin/files/1');
 

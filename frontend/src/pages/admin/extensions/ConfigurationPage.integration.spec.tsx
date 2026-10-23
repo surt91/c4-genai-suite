@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react';
-import { delay, http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse, JsonBodyType } from 'msw';
 import { Route, Routes } from 'react-router-dom';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { ConfigurationDto, ExtensionsDto } from 'src/api';
@@ -24,11 +24,11 @@ describe('ConfigurationPage', () => {
 
   it('does not show the extensions of the previous assistant while the new ones are loaded', async () => {
     new mockedAPI()
-      .withGet('/api/configurations', { items: [configuration(1, 'Assistant A'), configuration(2, 'Assistant B')] })
-      .withGet('/api/configurations/1', configuration(1, 'Assistant A'))
-      .withGet('/api/configurations/2', configuration(2, 'Assistant B'))
-      .withGet('/api/configurations/1/extensions', extensionsOfA)
-      .withGet('/api/buckets', { items: [] })
+      .withGet<JsonBodyType>('/api/configurations', { items: [configuration(1, 'Assistant A'), configuration(2, 'Assistant B')] })
+      .withGet<JsonBodyType>('/api/configurations/1', configuration(1, 'Assistant A'))
+      .withGet<JsonBodyType>('/api/configurations/2', configuration(2, 'Assistant B'))
+      .withGet<JsonBodyType>('/api/configurations/1/extensions', extensionsOfA)
+      .withGet<JsonBodyType>('/api/buckets', { items: [] })
       .run();
     server.use(
       http.get(`${import.meta.env.VITE_SERVER_URL}/api/configurations/2/extensions`, async () => {
