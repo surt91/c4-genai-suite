@@ -119,6 +119,14 @@ export class AuthService implements OnModuleInit {
         clientSecret,
         tenant,
       };
+
+      if (!tenant || ['common', 'organizations', 'consumers'].includes(tenant.toLowerCase())) {
+        // Users are matched by e-mail, and the `mail` attribute can be set freely by the admins of any tenant.
+        this.logger.warn(
+          'AUTH_MICROSOFT_TENANT is not set to a specific tenant: users of any Microsoft tenant can log in, and accounts ' +
+            'are matched by their (unverified) e-mail address. Configure your tenant id.',
+        );
+      }
     }
   }
 

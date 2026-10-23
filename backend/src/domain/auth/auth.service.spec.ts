@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -80,6 +81,21 @@ describe('AuthService', () => {
       configService,
     };
   }
+
+  describe('Microsoft login', () => {
+    afterEach(() => jest.restoreAllMocks());
+
+    it.each([
+      [undefined, true],
+      ['common', true],
+      ['0b5c0e4c-1111-2222-3333-444455556666', false],
+    ])('warns about tenant %p: %p', async (tenant, warns) => {
+      const warn = jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
+      await buildModule({ AUTH_MICROSOFT_CLIENTID: 'id', AUTH_MICROSOFT_CLIENTSECRET: 'secret', AUTH_MICROSOFT_TENANT: tenant });
+
+      expect(warn.mock.calls.some(([message]) => String(message).includes('AUTH_MICROSOFT_TENANT'))).toBe(warns);
+    });
+  });
 
   describe('setupAdmins', () => {
     it('stores the initial API key hashed, like it is looked up by the local strategy', async () => {
