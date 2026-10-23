@@ -561,6 +561,8 @@ export const de: typeof en = {
     },
     noAccessToConversation: 'Du hast keinen Zugriff auf diese Konversation. Du wirst in Kürze weitergeleitet.',
     conversationNotFound: 'Konversation nicht gefunden. Du wirst in Kürze weitergeleitet.',
+    sendFailed: 'Die Nachricht konnte nicht gesendet werden',
+    connectionFailed: 'Die Verbindung zum Server ist fehlgeschlagen. Bitte prüfe dein Netzwerk und versuche es erneut.',
     errorLoadingMessagesOrConversation: 'Fehler beim Laden der Konversation oder ihrer Nachrichten.',
     newChat: 'Neuer Chat',
     welcomeText: 'Wie kann ich dir helfen?',

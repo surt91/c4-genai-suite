@@ -4,6 +4,7 @@ import { Configuration, Middleware } from 'src/api/generated-eval';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
 import { EvalClient } from '../apiEvalClient';
+import { redirectToLogin } from '../redirectToLogin';
 
 type TransientNavigateFn = ReturnType<typeof useTransientNavigate>;
 
@@ -22,10 +23,7 @@ const createEvalClientMiddleware: (navigate: TransientNavigateFn) => Middleware 
   },
   post: async (context) => {
     if (context.response?.status === 401) {
-      const secure = window.location.protocol === 'https:';
-      const sameSite = secure ? 'None' : 'Strict';
-      document.cookie = `post-login-redirect=${encodeURIComponent(window.location.pathname)}; path=/; SameSite=${sameSite}${secure ? '; Secure' : ''}`;
-      navigate('/login');
+      redirectToLogin(navigate);
     }
     return Promise.resolve();
   },

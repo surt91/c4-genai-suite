@@ -568,6 +568,8 @@ export const en = {
     },
     noAccessToConversation: "You don't have access to this conversation. You will be redirected shortly.",
     conversationNotFound: 'Conversation not found. You will be redirected shortly.',
+    sendFailed: 'The message could not be sent',
+    connectionFailed: 'The connection to the server failed. Please check your network and try again.',
     errorLoadingMessagesOrConversation: 'Failed to load the conversation or its messages.',
     newChat: 'New chat',
     welcomeText: 'How may I help you?',

@@ -1,6 +1,7 @@
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FetchError, ResponseError } from 'src/api';
+import { FetchError, ResponseError, StreamObserver } from 'src/api';
+import { SseResponseError } from 'src/api/state/sse';
 import { toast } from 'src/lib/notifications';
 import { renderHook } from 'src/pages/admin/test-utils';
 import { texts } from 'src/texts';
@@ -48,6 +49,49 @@ describe('useChatStream', () => {
         `${texts.chat.errorLoadingMessagesOrConversation} ${texts.common.reloadAndTryAgain}`,
       ),
     );
+  });
+
+  describe('errors of the request', () => {
+    async function sendAndFail(error: unknown) {
+      api.conversations.getConversation.mockResolvedValue({ id: 1, configurationId: 1 });
+      api.conversations.getMessages.mockResolvedValue({ items: [] });
+      api.stream.streamPrompt.mockImplementation((_chatId, _message, _messageId, observer: StreamObserver<unknown>) => {
+        setTimeout(() => observer.error(error));
+        return { unsubscribe: vi.fn(), abort: vi.fn() };
+      });
+
+      const { result } = renderHook(() => useChatStream(1));
+      // the composer is shown once the chat has been loaded
+      await waitFor(() => expect(useChatStore.getState().chatDataMap.get(1)?.hasLoadedFromServer).toBe(true));
+      act(() => (result.current as ReturnType<typeof useChatStream>).sendMessage('Hello'));
+    }
+
+    const answer = () =>
+      useChatStore
+        .getState()
+        .chatDataMap.get(1)
+        ?.messages.find((m) => m.type === 'ai');
+
+    it('shows the message of the server for error responses', async () => {
+      await sendAndFail(new SseResponseError(403, 'Forbidden resource'));
+
+      await waitFor(() => expect(answer()?.error).toBe(`${texts.chat.sendFailed}: Forbidden resource`));
+      expect(useChatStore.getState().chatDataMap.get(1)?.isAiWriting).toBe(false);
+    });
+
+    it('shows a connection error for network errors', async () => {
+      await sendAndFail(new TypeError('Failed to fetch'));
+
+      await waitFor(() => expect(answer()?.error).toBe(texts.chat.connectionFailed));
+    });
+
+    it('goes to the login when the session expired', async () => {
+      window.history.pushState({}, '', '/chat/1');
+      await sendAndFail(new SseResponseError(401, 'Unauthorized'));
+
+      await waitFor(() => expect(window.location.pathname).toBe('/login'));
+      expect(document.cookie).toContain('post-login-redirect=%2Fchat%2F1');
+    });
   });
 
   it.each([404, 400])('reports an unknown chat (%i)', async (status) => {

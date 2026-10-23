@@ -597,6 +597,8 @@ function load() {
       reasoning: translate('chat.reasoning'),
       chunksInformation: translate('chat.chunksInformation'),
       conversationNotFound: translate('chat.conversationNotFound'),
+      sendFailed: translate('chat.sendFailed'),
+      connectionFailed: translate('chat.connectionFailed'),
       noAccessToConversation: translate('chat.noAccessToConversation'),
       errorLoadingMessagesOrConversation: translate('chat.errorLoadingMessagesOrConversation'),
       newChat: translate('chat.newChat'),

@@ -4,6 +4,7 @@ import { Configuration, Middleware } from 'src/api/generated';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
 import { AppClient } from '../apiAppClient';
+import { redirectToLogin } from '../redirectToLogin';
 
 type TransientNavigateFn = ReturnType<typeof useTransientNavigate>;
 
@@ -21,11 +22,8 @@ const createAppClientMiddleware: (navigate: TransientNavigateFn) => Middleware =
     return Promise.resolve();
   },
   post: async (context) => {
-    if (context.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
-      const secure = window.location.protocol === 'https:';
-      const sameSite = secure ? 'None' : 'Strict';
-      document.cookie = `post-login-redirect=${encodeURIComponent(window.location.pathname)}; path=/; SameSite=${sameSite}${secure ? '; Secure' : ''}`;
-      navigate('/login');
+    if (context.response?.status === 401) {
+      redirectToLogin(navigate);
     }
     return Promise.resolve();
   },

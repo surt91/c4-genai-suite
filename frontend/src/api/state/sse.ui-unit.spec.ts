@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createSseParser, fetchEventStream, SseMessage } from './sse';
+import { createSseParser, fetchEventStream, SseMessage, SseResponseError } from './sse';
 
 function parse(...chunks: string[]) {
   const messages: SseMessage[] = [];
@@ -74,12 +74,12 @@ describe('fetchEventStream', () => {
     });
   }
 
-  function mockFetch(body: ReadableStream<Uint8Array> | string, contentType = 'text/event-stream; charset=utf-8') {
+  function mockFetch(body: ReadableStream<Uint8Array> | string, contentType = 'text/event-stream; charset=utf-8', status = 200) {
     const fetchMock = vi.fn(
       (_url: string, init?: RequestInit) =>
         new Promise<Response>((resolve, reject) => {
           init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
-          resolve(new Response(body, { headers: { 'content-type': contentType } }));
+          resolve(new Response(body, { status, headers: { 'content-type': contentType } }));
         }),
     );
     vi.stubGlobal('fetch', fetchMock);
@@ -118,6 +118,24 @@ describe('fetchEventStream', () => {
     await expect(fetchEventStream('/sse', { onMessage: vi.fn() })).rejects.toThrow(
       'Expected content-type to be text/event-stream, Actual: application/json',
     );
+  });
+
+  it('rejects error responses with the status and the message of the server', async () => {
+    mockFetch('{"statusCode":400,"message":["query should not be empty","files must be an array"]}', 'application/json', 400);
+
+    const error = await fetchEventStream('/sse', { onMessage: vi.fn() }).catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(SseResponseError);
+    expect(error).toMatchObject({ status: 400, serverMessage: 'query should not be empty, files must be an array' });
+  });
+
+  it('rejects error responses without a JSON body', async () => {
+    mockFetch('Bad Gateway', 'text/plain', 502);
+
+    await expect(fetchEventStream('/sse', { onMessage: vi.fn() })).rejects.toMatchObject({
+      status: 502,
+      serverMessage: undefined,
+    });
   });
 
   it('rejects with the error thrown by onMessage', async () => {

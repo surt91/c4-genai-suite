@@ -11,6 +11,8 @@ import {
   UpdateConversationDto,
   useApi,
 } from 'src/api';
+import { redirectToLogin } from 'src/api/state/redirectToLogin';
+import { SseResponseError } from 'src/api/state/sse';
 import { toast } from 'src/lib/notifications';
 
 import { texts } from 'src/texts';
@@ -30,6 +32,18 @@ function upsertToolCall(toolCalls: ToolCallState[] | undefined, update: ToolCall
 }
 
 const responseStatus = (error: unknown) => (error instanceof ResponseError ? error.response.status : undefined);
+
+/** The message shown in the answer when the request of the chat failed (before or while streaming). */
+export function streamErrorMessage(error: unknown) {
+  if (error instanceof SseResponseError) {
+    return error.serverMessage ? `${texts.chat.sendFailed}: ${error.serverMessage}` : `${texts.chat.sendFailed}.`;
+  }
+  // fetch and the stream reader reject with a TypeError when the connection fails
+  if (error instanceof TypeError) {
+    return texts.chat.connectionFailed;
+  }
+  return error instanceof Error && error.message ? `${texts.chat.sendFailed}: ${error.message}` : `${texts.chat.sendFailed}.`;
+}
 
 const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEnum) => {
   return messageType === 'ai' ? -1 : 0;
@@ -207,8 +221,11 @@ export const useChatStream = (chatId: number) => {
         }
       },
       error: (error) => {
-        const message = error instanceof Error ? error.message : String(error);
-        chatStore.updateMessage(chatId, actualAiMessageId, { error: message });
+        if (error instanceof SseResponseError && error.status === 401) {
+          // the session expired, like for all other requests
+          redirectToLogin((to) => void navigate(to));
+        }
+        chatStore.updateMessage(chatId, actualAiMessageId, { error: streamErrorMessage(error) });
         chatStore.setIsAiWriting(chatId, false);
         chatStore.setStreamingMessageId(chatId, undefined);
       },
