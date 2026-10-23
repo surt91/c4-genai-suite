@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import shutil
-import subprocess
 import tempfile
 import time
 from uuid import uuid4
@@ -12,6 +11,7 @@ from weasyprint import HTML
 from weasyprint.urls import URLFetcher
 
 from rei_s import logger
+from rei_s.services.formats import subprocess_utils
 from rei_s.types.source_file import SourceFile
 from rei_s.utils import get_new_file_path
 
@@ -72,6 +72,32 @@ def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> Sou
     return SourceFile(id=doc_id, path=path, mime_type="application/pdf", file_name=file_name)
 
 
+# LibreOffice may hang on (malicious) documents, which would block a worker forever
+LIBREOFFICE_TIMEOUT_SECONDS = 600
+
+
+def _run_libreoffice(cmd: list[str], libreoffice_home: Path, file_id: str) -> None:
+    env = {"HOME": str(libreoffice_home), "PATH": os.environ.get("PATH", os.defpath)}
+    # FIXME: this might fail due to a race (?) when starting multiple LibreOffice instances
+    #   we need to fix this properly later
+    retries = 3
+    for retry in range(retries):
+        libreoffice_home.mkdir(parents=True, exist_ok=True)
+        try:
+            # a timeout is not retried, the document would most likely hang again
+            result = subprocess_utils.run(cmd, timeout=LIBREOFFICE_TIMEOUT_SECONDS, env=env)
+        finally:
+            shutil.rmtree(libreoffice_home, ignore_errors=True)
+        if result.returncode == 0:
+            return
+        logger.error(
+            f"Failed to convert {file_id} to pdf, retry {retry + 1}/{retries}, "
+            f"exit code {result.returncode}: {result.stdout!r} {result.stderr!r}"
+        )
+        time.sleep(0.5)
+    raise ValueError(f"Can not convert {file_id} to pdf, giving up")
+
+
 def convert_office_to_pdf(file: SourceFile) -> SourceFile:
     # If we already have a preview PDF, use it
     if file.preview_pdf_cache is not None and file.preview_pdf_cache.exists:
@@ -93,29 +119,17 @@ def convert_office_to_pdf(file: SourceFile) -> SourceFile:
     ]
     logger.info(f"Converting {file.id} with args: {' '.join(cmd)}")
 
-    # FIXME: this might fail due to a race (?) when starting multiple LibreOffice instances
-    #   we need to fix this properly later
-    retries = 3
-    for retry in range(retries):
-        libreoffice_home.mkdir(parents=True, exist_ok=True)
-        try:
-            subprocess.run(cmd, capture_output=True, check=True, env={"HOME": str(libreoffice_home)})
-        except subprocess.CalledProcessError as e:
-            logger.error(
-                f"Failed to convert {file.id} to pdf, retry {retry + 1}/{retries}, "
-                f"exit code {e.returncode}: {e.stdout} {e.stderr} {e!r}"
-            )
-            time.sleep(0.5)
-        else:
-            break
-        finally:
-            shutil.rmtree(libreoffice_home, ignore_errors=True)
-    else:
-        raise ValueError(f"Can not convert {file.id} to pdf, giving up")
-
     base = os.path.basename(file.path)
     pdf_name = os.path.splitext(base)[0] + ".pdf"
     pdf_path = os.path.join(output_dir, pdf_name)
+
+    try:
+        _run_libreoffice(cmd, libreoffice_home, file.id)
+        if not os.path.exists(pdf_path):
+            raise ValueError(f"LibreOffice did not create a pdf for {file.id}")
+    except BaseException:
+        shutil.rmtree(output_dir, ignore_errors=True)
+        raise
 
     pdf = SourceFile(id=file.id, path=pdf_path, mime_type="application/pdf", file_name=file.file_name, delete_dir=True)
     file.preview_pdf_cache = pdf
