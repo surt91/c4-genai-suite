@@ -90,7 +90,8 @@ Fix: a small error state with "reload" when the query fails.
 The X of the thank-you card calls `handleResult('dismiss')`, which calls `onSubmit('dismiss')` → the conversation is
 rated `unrated` right after it was rated `good`/`bad`. The rating mutation does not update the chat in the store
 either, so the card is offered again when the chat is opened again (until the refetch).
-Fix: the X of the thank-you card only hides it; store the rating in the chat on success.
+Fix: the X of the thank-you card only hides it. (Storing the rating in the chat on success would hide the thanks
+right away, the card is hidden by `chat.rating`; the refetch of the chat covers the reopening.)
 
 ### P2-6 Merging the sources mutates the store and duplicates merged metadata – confirmed (trace)
 `pages/chat/conversation/ChatItemSources.tsx:40-66`.
@@ -285,6 +286,53 @@ No tests for the SSE error handling, the chat stream state (`useChatStream`), th
   `conversationId`).
 - de/en translations have the same keys (`de` is typed as `typeof en`).
 
+
 ## Status
 
-To be filled in with the fixes.
+Fixed on the branch of this review, one commit per finding (named after the fix), each with a regression test
+unless noted. "Verified" means the test fails without the fix.
+
+| Finding | Status | Commit / note |
+|---|---|---|
+| P1-1 | fixed | `fix(frontend): load the application again after a password login …` – full page load after the password login, honors `post-login-redirect` (same-origin paths only, cookie removed) |
+| P1-2 | fixed, verified | `fix(frontend): do not crash when a chat cannot be loaded because of a network error` |
+| P1-3 | fixed, verified | `fix(frontend): do not keep the selection of files when another bucket is shown …` – `getRowId`, `RemountOnParam`, files store remembers its bucket |
+| P1-4 | fixed, verified | `fix(frontend): keep the pending changes of a Q&A catalog with the catalog …` (together with P2-17) |
+| P2-1 | fixed | `fix(frontend): show the server's message and go to the login when sending a chat message fails` – `SseResponseError`, shared `redirectToLogin` for both API clients |
+| P2-2 | fixed, verified | `fix(frontend): do not re-render the chat page and the chat list on every streamed chunk` |
+| P2-3 | fixed | `fix(frontend): do not allow to edit a question while an answer is generated` |
+| P2-4 | fixed | `fix(frontend): show an error instead of a white page …` – `components/LoadError.tsx` with "Try again" |
+| P2-5 | fixed, verified | `fix(frontend): closing the thanks for a conversation rating does not reset the rating` (only the dismiss part, see above) |
+| P2-6 | fixed, verified | `fix(frontend): do not change the sources of a message when merging them` (an old test relied on the mutation) |
+| P2-7 | fixed | `fix(frontend): keep tool details and sources in the inspector when the answer gets its ID` (also P3-6) |
+| P2-8 | fixed, verified | `fix(frontend): stop the transcription recording after the maximum duration` |
+| P2-9 | fixed, verified | `fix(frontend): create validation messages in the language of the installation` – schemas and option lists are factories |
+| P2-10 | fixed, verified | `fix(frontend): share the selected assistant between all components` – Mantine `useLocalStorage` (also syncs other tabs) |
+| P2-11 | fixed, verified | `fix(frontend): report failures to save the chat settings` |
+| P2-12 | fixed, verified | `fix(frontend): do not render a 0 for a token count of 0 or empty reasoning` |
+| P2-13 | fixed | `fix(frontend): page through all lists of the evals` – `lib/pagination.ts` (also steps back from an empty page) |
+| P2-14 | fixed | `fix(frontend): update the details of an evaluation while it is pending` – `refetchInterval` instead of `setInterval` |
+| P2-15 | fixed | `fix(frontend): keep eval pages on reload and load the eval status with the generated client` – `AppClient.eval`; no routing test |
+| P2-16 | fixed, verified | `fix(frontend): keep the endpoint of a bucket when its headers are changed` |
+| P2-17 | fixed, verified | with P1-4; the upload clears the pending changes (navigating to a new version after an upload stays open, unconfirmed) |
+| P2-18 | fixed, verified | `fix(frontend): do not show the extensions of the previous assistant in the admin area` |
+| P2-19 | fixed | `fix(frontend): show an error instead of a skeleton when a metric cannot be loaded` |
+| P2-20 | fixed, verified | `fix(frontend): do not stay on a page past the end of the files of a bucket` (eval lists: P2-13) |
+| P2-21 | fixed | `fix(frontend): translate the evals and the remaining texts of the admin area` – also the bucket dialog, list keys and sort label of the results table, error vs. empty state in the wizard |
+| P2-22 | open | Larger refactoring (every admin page and the chat lists); P1-3/P2-18 are fixed locally. Deferred. |
+| P3-1 | fixed, verified | `fix(frontend): show the months of the chat list in the language of the installation` |
+| P3-2 | fixed | `fix(frontend): do not send messages while composing with an input method or without text` (Esc cancels an edit, the edit starts with the question again) |
+| P3-3 | fixed | `fix(frontend): treat invalid chat IDs in the URL like unknown chats` |
+| P3-4 | fixed, verified | `fix(frontend): remove text entries without translation and a dead condition` (test for missing texts), `refactor(frontend): one hook for the bucket availabilities …` |
+| P3-5 | fixed | `fix(frontend): load the in-app docs once per kind of page and label their close button` |
+| P3-6 | fixed | with P2-7 (same code) |
+| P3-7 | fixed, verified | `fix(frontend): detect external links in answers by their origin` – links to the own origin now navigate in the app instead of a new tab |
+| P3-8 | open | deferred: small cost, the settings flow would need the chat query as single source |
+| P3-9 | open | deferred: needs the formats the transcription backend accepts |
+| P3-10 | partly fixed | accessible names (`fix(frontend): label the buttons of the pagination`, `… give the icon buttons of the admin area an accessible name`), fragment key and error states (with P2-21), trimmed names, components rendered as JSX, logo object URLs, logo `accept`, `console.log`, bucket update error. Open: keyboard access of clickable table rows (needs a UI decision), metric search (needs a search parameter in the eval API, `services/eval` is out of scope), the 100-item limit of the wizard, the API key of LLM endpoints (unconfirmed) |
+| P3-11 | partly fixed | tests added with the fixes above; `DashboardPage.unit.spec.tsx` was never run (pattern is `*.ui-unit.spec.*`), renamed and fixed (`test(frontend): run the dashboard test …`) |
+
+Behavior changes: a password login reloads the page (and returns to the page where the session expired); links in
+answers to the own origin open in the same tab; editing a question is disabled while an answer is generated; errors
+of the chat request show a localized message; whitespace-only messages are not sent; the eval lists page; a failed
+bucket update is only shown in the dialog.
