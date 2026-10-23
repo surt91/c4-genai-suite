@@ -39,7 +39,8 @@ export const useExtensionContext = (conversationId: number) => {
     error: query.error,
     isLoading: query.isLoading,
     isUpdating: mutation.isPending,
-    updateContext: mutation.mutate,
+    // resolves when the arguments are stored, rejects on errors
+    updateContext: mutation.mutateAsync,
     updateError: mutation.error,
   };
 };

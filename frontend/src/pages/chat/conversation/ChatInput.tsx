@@ -167,9 +167,7 @@ export function ChatInput({
     }
   });
 
-  const doUpdate = (newContext: ExtensionContext) => {
-    updateContext(newContext);
-  };
+  const doUpdate = (newContext: ExtensionContext) => updateContext(newContext);
 
   const handleUploadFileFromInput = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];

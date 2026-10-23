@@ -79,7 +79,10 @@ function AssistantSelect() {
       renderOption={renderSelectOption}
       onChange={(value) => {
         if (value) {
-          updateChat.mutate({ configurationId: +value });
+          updateChat.mutate(
+            { configurationId: +value },
+            { onError: async (error) => toast.error(await buildError(texts.chat.chatSettings.saveFailed, error)) },
+          );
           setPersistentAssistantId(+value);
         }
       }}
@@ -100,7 +103,7 @@ interface ChatSettingsFormProps {
   extensionsWithFilter: ExtensionUserInfoDto[];
   context?: ExtensionContext;
   defaultValues: ExtensionContext;
-  onUpdateContext: (context: ExtensionContext) => void;
+  onUpdateContext: (context: ExtensionContext) => Promise<unknown>;
   onClose: () => void;
 }
 
@@ -143,7 +146,7 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
         void queryClient.invalidateQueries({ queryKey: valuesQueryKey });
       }
       if (extensionsWithFilter.length > 0) {
-        onUpdateContext(filterForm.getValues());
+        await onUpdateContext(filterForm.getValues());
       }
     },
     onSuccess: () => onClose(),
@@ -241,7 +244,7 @@ interface ChatSettingsProps {
   extensionsWithFilter: ExtensionUserInfoDto[];
   context?: ExtensionContext;
   defaultValues: ExtensionContext;
-  onUpdateContext: (context: ExtensionContext) => void;
+  onUpdateContext: (context: ExtensionContext) => Promise<unknown>;
   // The chips with the current values (e.g. filters), each opens the settings.
   chips: string[];
 }
