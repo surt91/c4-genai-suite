@@ -74,7 +74,6 @@ services:
     environment:
       <<: *s3
       FILE_STORE_S3_BUCKET_NAME: reisbucket
-      VERSION: ${VERSION:-dev}
       WORKERS: ${REIS_WORKERS:-2}
       STORE_TYPE: pgvector
       STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/gaible
