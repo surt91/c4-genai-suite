@@ -7,7 +7,7 @@ import type { QAPair } from 'src/api/generated-eval';
 import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 
-// Module-level schema (Gaible pattern)
+// Created when used, so that the messages are in the language of the installation
 const createScheme = () =>
   z.object({
     question: z.string().min(1, texts.evals.qaCatalog.questionRequired),

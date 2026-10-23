@@ -3,7 +3,7 @@ import type { Language } from 'src/api/generated-eval';
 /**
  * Combined form type that includes all possible fields across endpoint types.
  * Used for form field components that work with any endpoint type.
- * Schema is defined at module level in UpsertLlmEndpointDialog.tsx (Gaible pattern).
+ * The schema is created in UpsertLlmEndpointDialog.tsx.
  */
 export interface EndpointFormValues {
   // Common fields

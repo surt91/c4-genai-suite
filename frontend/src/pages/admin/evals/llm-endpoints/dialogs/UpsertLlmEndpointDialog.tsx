@@ -23,7 +23,7 @@ import {
   useUpdateLlmEndpoint,
 } from '../hooks/useLlmEndpointMutations';
 
-// Module-level schema constant (Gaible pattern)
+// Created when used, so that the messages are in the language of the installation
 const createScheme = () =>
   z
     .object({

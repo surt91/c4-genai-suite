@@ -13,7 +13,7 @@ import { texts } from 'src/texts';
 
 const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
 
-// Module-level schemas (Gaible pattern)
+// Created when used, so that the messages are in the language of the installation
 const createEmptyScheme = () =>
   z.object({
     name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),

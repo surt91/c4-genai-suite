@@ -14,7 +14,7 @@ import { useCreateMetric, useDeleteMetric, useUpdateMetric } from '../hooks/useM
 type MetricConfigurationCreate = Configuration1;
 type MetricConfigurationUpdate = Configuration2;
 
-// Module-level schema constant (Gaible pattern)
+// Created when used, so that the messages are in the language of the installation
 const createScheme = () =>
   z
     .object({

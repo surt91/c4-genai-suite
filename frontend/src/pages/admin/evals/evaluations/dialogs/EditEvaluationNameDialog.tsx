@@ -7,10 +7,10 @@ import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { useUpdateEvaluation } from '../hooks/useEvaluationMutations';
 
-// Module-level schema (Gaible pattern)
+// Created when used, so that the messages are in the language of the installation
 const createScheme = () =>
   z.object({
-    name: z.string().min(1, texts.evals.evaluations.nameRequired),
+    name: z.string().trim().min(1, texts.evals.evaluations.nameRequired),
   });
 
 type FormValues = z.infer<ReturnType<typeof createScheme>>;

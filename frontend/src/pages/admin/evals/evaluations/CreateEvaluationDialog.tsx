@@ -57,7 +57,7 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
 
   const handleCreate = () => {
     const dto = {
-      name,
+      name: name.trim(),
       gaibleAssistantId: gaibleAssistantId!,
       gaibleAssistantName: gaibleAssistantName,
       metrics: metricIds,
