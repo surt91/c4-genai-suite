@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, NotFoundException } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { Observable, ReplaySubject } from 'rxjs';
@@ -16,7 +16,7 @@ import {
   GetConfigurationUserValues,
   GetConfigurationUserValuesResponse,
 } from '../../extensions/use-cases/get-configuration-user-values';
-import { UploadedFile } from '../../files';
+import { GetFiles, GetFilesResponse, UploadedFile } from '../../files';
 import { ChatCacheImpl } from '../cache';
 import {
   CHAT_MIDDLEWARES_TOKEN,
@@ -80,6 +80,8 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
     if (!configuration) {
       throw new NotFoundException(`Configuration with id '${conversation.configurationId}' not found`);
     }
+
+    await this.assertFilesOwnedByUser(user, files);
 
     const { configuration: configurationUserValues }: GetConfigurationUserValuesResponse = await this.queryBus.execute(
       new GetConfigurationUserValues(configuration.id, user.id),
@@ -145,6 +147,21 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
     });
 
     return new SendMessageResponse(observable, abort);
+  }
+
+  private async assertFilesOwnedByUser(user: User, files: SendMessage['files']) {
+    const fileIds = [...new Set(files?.map((x) => x.id) ?? [])];
+    if (!fileIds.length) {
+      return;
+    }
+
+    // The ids come from the client; the file tools must never get access to files of other users.
+    const { files: ownFiles }: GetFilesResponse = await this.queryBus.execute(
+      new GetFiles({ user, bucketIdOrType: 'all', page: 0, files: fileIds }),
+    );
+    if (ownFiles.length !== fileIds.length) {
+      throw new ForbiddenException('Access to the given files is not allowed.');
+    }
   }
 
   private async buildPipeline(

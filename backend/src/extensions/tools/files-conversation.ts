@@ -58,7 +58,7 @@ export class FilesConversationExtension extends FilesExtension<FilesConversation
         }
 
         const files = context.files?.length
-          ? await this.files.findBy({ bucketId: bucket, id: In(context.files.map((x) => x.id)) })
+          ? await this.files.findBy({ bucketId: bucket, userId: context.user.id, id: In(context.files.map((x) => x.id)) })
           : [];
 
         let description =
