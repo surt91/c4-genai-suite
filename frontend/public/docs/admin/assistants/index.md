@@ -23,8 +23,8 @@ Assistants are highly customizable, allowing you to create different assistants 
 	- **Dall-E**
 	  -- allows generating images.
 
-	- **Bing Web Search**
-	  -- to enable the chat to search on the internet (with a Bing API key).
+	- **Brave Web Search**
+	  -- to enable the chat to search on the internet (with a Brave Search API key).
 
 	- **And more extensions...**
 
@@ -120,8 +120,8 @@ Connect to an LLM by Mistral, that will do the talking.
 
 *For the most stable environment via Gaible we recommend using the "Azure-OpenAI" extension instead.*
 
-### Bing Web Search
-Enable the chat to search on the internet (with a Bing API key).
+### Brave Web Search
+Enable the chat to search on the internet (with a Brave Search API key).
 
 ### The Azure Dall-E
 Allows generating images.

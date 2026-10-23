@@ -97,11 +97,6 @@
       "instructionsHint": "A description of the tool including instructions for the model on how to use it.",
       "endpointHint": "The endpoint. https://<deployment>.search.windows.net"
     },
-    "bing": {
-      "title": "Bing Web Search",
-      "description": "Performs a web search using Bing",
-      "apiKeyHint": "The Bing Search Subscription Key"
-    },
     "brave": {
       "title": "Brave Web Search",
       "description": "Performs a web search using Brave",

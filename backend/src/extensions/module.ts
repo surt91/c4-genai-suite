@@ -25,7 +25,6 @@ import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
 import { AzureDallEExtension } from './tools/azure-dall-e';
 import { AzureGPTImage1Extension } from './tools/azure-gpt-image-1';
-import { BingWebSearchExtension } from './tools/bing-web-search';
 import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
 import { DallEExtension } from './tools/dall-e';
@@ -107,7 +106,6 @@ export class ExtensionLibraryModule {
         AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
         BedrockModelExtension,
-        BingWebSearchExtension,
         BraveWebSearchExtension,
         CalculatorExtension,
         ContextExtension,
