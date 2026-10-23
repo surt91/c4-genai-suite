@@ -60,6 +60,11 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         "flac": "audio/flac",
     }
 
+    # Output options for reencoding to vorbis. A fixed bitrate (e.g. 128k) is rejected by libvorbis for many
+    # sample rate / channel combinations (e.g. 16 kHz mono), so we use quality-based VBR instead. Downmixing to
+    # mono is sufficient for speech recognition and keeps the segments small.
+    reencode_output_kwargs: dict[str, Any] = {"acodec": "libvorbis", "q:a": 4, "ac": 1}
+
     parser: AzureOpenAIWhisperParser | None
 
     def __init__(
@@ -132,7 +137,6 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         self,
         input_path: str | Path,
         segment_duration_seconds: int | None = None,
-        output_bitrate: str = "128k",
         force_reencode: bool = False,
     ) -> tuple[list[SourceFile], list[int | float], str]:
         metadata = self.probe_audio_codec(input_path)
@@ -144,10 +148,10 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         if audio_codec in self.supported_audio_codecs and not force_reencode:
             logger.info(f"segment audio of length {duration} s")
-            output_kwargs = {"c": "copy"}
+            output_kwargs: dict[str, Any] = {"c": "copy"}
         else:
             logger.info(f"segment and reencode audio of length {duration} s")
-            output_kwargs = {"audio_bitrate": output_bitrate}
+            output_kwargs = self.reencode_output_kwargs
             audio_codec = "vorbis"
 
         segments_files: list[SourceFile] = []
@@ -172,15 +176,13 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         segment_timestamps.append(duration)
 
         # check that no segment is larger than 25 MB. This could happen for very high bitrates.
-        # In that case we reencode with a lower bitrate
-        if any(x.size >= 25 * 1000 * 1000 for x in segments_files):
+        # In that case we reencode with a lower bitrate (unless we already did)
+        if not force_reencode and any(x.size >= 25 * 1000 * 1000 for x in segments_files):
             # cleanup first
             for i in segments_files:
                 i.delete()
             # split with reencode
-            return self.split_into_compatible_format(
-                input_path, segment_duration_seconds, output_bitrate, force_reencode=True
-            )
+            return self.split_into_compatible_format(input_path, segment_duration_seconds, force_reencode=True)
 
         return segments_files, segment_timestamps, audio_codec
 

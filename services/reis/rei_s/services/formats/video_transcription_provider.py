@@ -41,16 +41,16 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
             f"ffmpeg stderr:\n{e.stderr}"
         )
 
-    def extract_audio_to_file(self, input_video_path: str | Path, output_bitrate: str = "128k") -> SourceFile:
+    def extract_audio_to_file(self, input_video_path: str | Path) -> SourceFile:
         metadata = self.probe_audio_codec(input_video_path)
         audio_codec = metadata.audio_codec
 
         if audio_codec in self.supported_audio_codecs:
             logger.info(f"extract audiotrack ({audio_codec}) from video")
-            output_kwargs = {"acodec": "copy"}
+            output_kwargs: dict[str, Any] = {"acodec": "copy"}
         else:
             logger.info(f"transcode audiotrack ({audio_codec}) to ogg")
-            output_kwargs = {"audio_bitrate": output_bitrate}
+            output_kwargs = self.reencode_output_kwargs
             audio_codec = "vorbis"
 
         audio_only_file = SourceFile.new_temporary_file(extension=self.audio_codecs_to_file_extension[audio_codec])

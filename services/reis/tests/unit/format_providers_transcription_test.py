@@ -41,6 +41,29 @@ def audio_files(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     return files
 
 
+# Inputs that need reencoding (wav/opus are not passed through), with sample rates and channel
+# counts for which a fixed vorbis bitrate of 128k is invalid.
+REENCODE_INPUTS = {
+    "mono_16khz.wav": ["-ar", "16000", "-ac", "1"],
+    "mono_8khz.wav": ["-ar", "8000", "-ac", "1"],
+    "mono_16khz.ogg": ["-ar", "16000", "-ac", "1", "-c:a", "libopus", "-b:a", "24k"],
+    "surround_96khz.wav": ["-ar", "96000", "-ac", "6"],
+}
+
+
+@pytest.fixture(scope="session")
+def reencode_audio_files(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+    directory = tmp_path_factory.mktemp("audio_reencode")
+    files = {}
+    for name, args in REENCODE_INPUTS.items():
+        path = directory / name
+        cmd = ["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "lavfi"]
+        cmd += ["-i", f"sine=frequency=440:sample_rate=44100:duration={AUDIO_DURATION_S}", *args, str(path)]
+        subprocess.run(cmd, check=True, capture_output=True)
+        files[name] = path
+    return files
+
+
 def get_mock_config() -> Config:
     return get_test_config(
         dict(
@@ -79,6 +102,37 @@ def test_audio_transcription_provider_mocked(
     assert len(docs) >= 2
     assert mocked_whisper_answer in docs[0].page_content
     assert mocked_whisper_answer in docs[1].page_content
+
+
+@pytest.mark.parametrize("name", REENCODE_INPUTS)
+def test_audio_transcription_provider_reencode_sample_rates(
+    mocked_whisper_answer: str, reencode_audio_files: dict[str, Path], name: str
+) -> None:
+    source_file = SourceFile(path=str(reencode_audio_files[name]), mime_type="", file_name=name)
+
+    provider = VoiceTranscriptionProvider(
+        config=get_mock_config(), chunk_size=200, chunk_overlap=0, default_segment_duration=7
+    )
+
+    assert provider.supports(source_file)
+    docs = provider.process_file(source_file)
+
+    assert len(docs) >= 2
+    assert mocked_whisper_answer in docs[0].page_content
+
+
+@pytest.mark.parametrize("name", ["mono_16khz.wav", "mono_8khz.wav"])
+def test_video_transcription_provider_reencode_sample_rates(
+    mocked_whisper_answer: str, reencode_audio_files: dict[str, Path], name: str
+) -> None:
+    source_file = SourceFile(path=str(reencode_audio_files[name]), mime_type="video/mp4", file_name="birthdays.mp4")
+
+    provider = VideoTranscriptionProvider(config=get_mock_config(), chunk_size=200, chunk_overlap=0)
+
+    docs = provider.process_file(source_file)
+
+    assert len(docs) > 0
+    assert mocked_whisper_answer in docs[0].page_content
 
 
 def test_audio_transcription_provider_broken_file(mocked_whisper_answer: str) -> None:
