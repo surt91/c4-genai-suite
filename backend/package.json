@@ -41,7 +41,6 @@
     "@ai-sdk/openai": "^3.0.131",
     "@ai-sdk/openai-compatible": "^2.0.87",
     "@modelcontextprotocol/sdk": "^1.32.1",
-    "@n8n/json-schema-to-zod": "^1.18.0",
     "@nestjs/common": "^11.2.8",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.2.8",

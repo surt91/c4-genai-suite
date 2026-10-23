@@ -12,11 +12,9 @@ import {
   ReadResourceRequest,
   ReadResourceResultSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
-import type { JsonSchema } from '@n8n/json-schema-to-zod/dist/types/types';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { jsonSchema, JSONSchema7 } from 'ai';
 import { renderString } from 'nunjucks';
-import { z } from 'zod';
 import {
   ChatContext,
   ChatMiddleware,
@@ -37,8 +35,22 @@ import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
 import { transformMCPToolResponse } from './mcp-types/transformer';
 
-function jsonSchemaToZodInternal(schema: JsonSchema): z.ZodObject<z.ZodRawShape> {
-  return jsonSchemaToZod(schema);
+/**
+ * Input schema of a tool for the LLM: only the attributes that are configured to be defined by the LLM are exposed. The
+ * MCP server validates the arguments of the tool call itself.
+ */
+export function toLlmInputSchema(inputSchema: JSONSchema7, isLlmAttribute: (key: string) => boolean) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { $schema, ...schema } = inputSchema;
+  const properties = Object.fromEntries(Object.entries(schema.properties ?? {}).filter(([key]) => isLlmAttribute(key)));
+  const required = schema.required?.filter((key) => key in properties);
+
+  return jsonSchema<Record<string, any>>({
+    ...schema,
+    type: 'object',
+    properties,
+    ...(required ? { required } : {}),
+  });
 }
 
 enum Transport {
@@ -82,7 +94,7 @@ interface ExtensionState extends Pick<Configuration, 'endpoint'> {
 const passwordKeys = ['apiKey', 'api-key', 'password', 'credentials'];
 
 function toExtensionArgument(
-  schema: JsonSchemaObject & { title?: string; description?: string },
+  schema: JSONSchema7 & { title?: string; description?: string },
   options: { key?: string; required?: boolean; forceRequired?: boolean },
 ): ExtensionArgument | undefined {
   const required = options.forceRequired ?? options.required ?? false;
@@ -121,7 +133,7 @@ function toExtensionArgument(
       properties: Object.entries(schema.properties ?? {}).reduce(
         (prev, [key, type]) => {
           const propertyRequired = options.forceRequired ?? (Array.isArray(schema.required) && schema.required.includes(key));
-          const propertyType = toExtensionArgument(type as JsonSchemaObject, {
+          const propertyType = toExtensionArgument(type as JSONSchema7, {
             key,
             required: propertyRequired,
             forceRequired: options.forceRequired,
@@ -135,7 +147,7 @@ function toExtensionArgument(
       ),
     };
   } else if (schema.type === 'array') {
-    const arrayItemType = toExtensionArgument(schema.items as JsonSchemaObject, {
+    const arrayItemType = toExtensionArgument(schema.items as JSONSchema7, {
       required: true,
       forceRequired: options.forceRequired,
     });
@@ -156,10 +168,10 @@ function toExtensionArgument(
 function toArguments(i18n: I18nService, tools: ListToolsResult['tools']) {
   return tools.reduce(
     (toolObject, tool) => {
-      const methodSchema = tool.inputSchema as JsonSchemaObject;
+      const methodSchema = tool.inputSchema as JSONSchema7;
       toolObject.properties[tool.name] = Object.entries(methodSchema.properties ?? {}).reduce(
         (methodObject, [name, type]) => {
-          const methodType = type as JsonSchemaObject;
+          const methodType = type as JSONSchema7;
           const innerMethodType = toExtensionArgument(methodType, { key: name, forceRequired: false });
           if (!innerMethodType) {
             return methodObject;
@@ -472,11 +484,6 @@ export class MCPToolsExtension implements Extension<Configuration> {
         context.tools.push(
           ...filteredTools.map(({ name, description, inputSchema }) => {
             const params = schemaData[name];
-            const schema = inputSchema as JsonSchemaObject;
-            // only expose attributes that are configured to be defined by the llm
-            schema.properties = Object.fromEntries(
-              Object.entries(schema.properties ?? {}).filter(([key]) => params.attributes?.[key]?.source === 'llm'),
-            );
 
             const userDefinedArgs = userArgs?.[name] ?? {};
             const displayName = `${extension.values.serverName}: ${name}`;
@@ -485,7 +492,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
               displayName,
               name: `${extension.externalId}_${name}`,
               description: params.description || description || name,
-              schema: jsonSchemaToZodInternal(schema),
+              schema: toLlmInputSchema(inputSchema, (key) => params.attributes?.[key]?.source === 'llm'),
               func: async (args: Record<string, any>) => {
                 const attributes = params.attributes ?? {};
                 const adminArgs = this.applyTemplates(context, this.getTemplateArgs(attributes, 'admin'));

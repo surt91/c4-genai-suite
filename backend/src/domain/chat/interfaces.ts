@@ -1,4 +1,4 @@
-import { CallSettings, LanguageModel } from 'ai';
+import { CallSettings, InferSchema, LanguageModel, Schema } from 'ai';
 import { Subject } from 'rxjs';
 import * as z from 'zod';
 import { ConfigurationModel, ExtensionArgument } from '../extensions';
@@ -133,9 +133,12 @@ export interface LanguageModelContext {
   suppressReasoning?: boolean;
 }
 
+// a zod object or a plain JSON schema (`jsonSchema()` of `ai`, e.g. for MCP tools)
+export type ToolSchema = z.ZodObject<z.ZodRawShape> | Schema<Record<string, any>>;
+
 export abstract class NamedStructuredTool<
   T extends z.ZodRawShape = z.ZodRawShape,
-  TSchema extends z.ZodObject<T> = z.ZodObject<T>,
+  TSchema extends ToolSchema = z.ZodObject<T> | Schema<Record<string, any>>,
   TToolOutput = string | Record<string, any> | undefined | void,
 > {
   abstract displayName: string;
@@ -144,32 +147,32 @@ export abstract class NamedStructuredTool<
   abstract name: string;
   abstract description: string;
 
-  protected abstract _call(arg: z.infer<typeof this.schema>): Promise<TToolOutput>;
+  protected abstract _call(arg: InferSchema<TSchema>): Promise<TToolOutput>;
 
-  execute(input: z.infer<TSchema>): Promise<TToolOutput> {
+  execute(input: InferSchema<TSchema>): Promise<TToolOutput> {
     return this._call(input);
   }
 }
 
-export type NamedDynamicStructuredToolInput<TSchema extends z.ZodObject<z.ZodRawShape>, TToolOutput> = {
+export type NamedDynamicStructuredToolInput<TSchema extends ToolSchema, TToolOutput> = {
   name: string;
   description: string;
   displayName: string;
   schema: TSchema;
-  func: (arg: z.infer<TSchema>) => Promise<TToolOutput>;
+  func: (arg: InferSchema<TSchema>) => Promise<TToolOutput>;
   returnDirect?: boolean;
 };
 
 export class NamedDynamicStructuredTool<
   T extends z.ZodRawShape = z.ZodRawShape,
-  TSchema extends z.ZodObject<T> = z.ZodObject<T>,
+  TSchema extends ToolSchema = z.ZodObject<T>,
   TToolOutput = string | Record<string, any> | undefined | void,
 > extends NamedStructuredTool<T, TSchema, TToolOutput> {
   displayName: string;
   name: string;
   schema: TSchema;
   description: string;
-  func: (arg: z.infer<typeof this.schema>) => Promise<TToolOutput>;
+  func: (arg: InferSchema<TSchema>) => Promise<TToolOutput>;
   returnDirect: boolean;
 
   constructor({ displayName, func, schema, ...toolInput }: NamedDynamicStructuredToolInput<TSchema, TToolOutput>) {
@@ -182,7 +185,7 @@ export class NamedDynamicStructuredTool<
     this.returnDirect = toolInput.returnDirect ?? false;
   }
 
-  protected async _call(arg: z.infer<typeof this.schema>): Promise<TToolOutput> {
+  protected async _call(arg: InferSchema<TSchema>): Promise<TToolOutput> {
     return this.func(arg);
   }
 }
