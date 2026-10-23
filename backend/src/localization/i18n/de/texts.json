@@ -291,6 +291,8 @@
     "errorStringAboveMaxLength": "Die Anfrage an das LLM is zu lang. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
     "errorFailedToolUse": "Das LLM hat Probleme das Tool zu benutzen. Möglicherweise sollte ein leistungsfähigeres LLM verwendet werden.",
     "errorInternal": "Interner Fehler",
+    "errorTokenLimitUserGroup": "Das monatliche Token-Limit Ihrer Benutzergruppe ist erreicht.",
+    "errorTokenLimitUser": "Ihr monatliches Token-Limit ist erreicht.",
     "errorMissingLLM": "Kein LLM wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
     "errorMissingPrompt": "Kein Prompt wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
     "noSummary": "Keine Zusammenfassung"

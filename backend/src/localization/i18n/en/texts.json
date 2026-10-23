@@ -291,6 +291,8 @@
     "errorStringAboveMaxLength": "The request to the LLM is too long. Either there is too much text in this chat or you uploaded a too large file with the \"Complete File\" extension.",
     "errorFailedToolUse": "The LLM did not use the tool correctly. This might be solved by using a better LLM.",
     "errorInternal": "Internal error",
+    "errorTokenLimitUserGroup": "The monthly token limit of your user group has been reached.",
+    "errorTokenLimitUser": "Your monthly token limit has been reached.",
     "errorMissingLLM": "No llm has been configured yet. Please configure an extension",
     "errorMissingPrompt": "No prompt has been configured yet. Please configure an extension",
     "noSummary": "No Summary"

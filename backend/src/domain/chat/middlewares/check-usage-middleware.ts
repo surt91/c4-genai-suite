@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addMonths, startOfMonth } from 'date-fns';
 import { And, LessThan, MoreThanOrEqual } from 'typeorm';
@@ -10,10 +10,17 @@ import {
   UserGroupEntity,
   UserGroupRepository,
 } from 'src/domain/database';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
+import { I18nService } from '../../../localization/i18n.service';
+import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
+import { ExceptionMiddleware } from './exception-middleware';
 
+/** Usage rows with this counter are token counts (see StoreUsageMiddleware); other counters are e.g. ratings. */
+const TOKEN_USAGE_COUNTER = 'token_usage';
+
+@Injectable()
 export class CheckUsageMiddleware implements ChatMiddleware {
-  order = -1000;
+  // Must run inside the ExceptionMiddleware, otherwise the limit error becomes a generic internal error.
+  order = ExceptionMiddleware.ORDER + 1;
 
   constructor(
     @InjectRepository(UserGroupEntity)
@@ -21,6 +28,8 @@ export class CheckUsageMiddleware implements ChatMiddleware {
 
     @InjectRepository(UsageEntity)
     private readonly usages: UsageRepository,
+
+    private readonly i18n: I18nService,
   ) {}
 
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
@@ -57,10 +66,11 @@ export class CheckUsageMiddleware implements ChatMiddleware {
         (await this.usages.sum('count', {
           date: And(MoreThanOrEqual(dateFrom), LessThan(dateTo)),
           userGroup: userGroupId,
+          counter: TOKEN_USAGE_COUNTER,
         })) ?? 0;
 
       if (groupUsage >= monthlyTokens) {
-        throw new HttpException('Monthly token limit exceeded for user group.', HttpStatus.TOO_MANY_REQUESTS);
+        throw new ChatError(this.i18n.t('texts.chat.errorTokenLimitUserGroup'));
       }
     }
 
@@ -69,10 +79,11 @@ export class CheckUsageMiddleware implements ChatMiddleware {
         (await this.usages.sum('count', {
           date: And(MoreThanOrEqual(dateFrom), LessThan(dateTo)),
           userId: user.id,
+          counter: TOKEN_USAGE_COUNTER,
         })) ?? 0;
 
       if (groupUsage >= monthlyUserTokens) {
-        throw new HttpException('Monthly token limit exceeded for user.', HttpStatus.TOO_MANY_REQUESTS);
+        throw new ChatError(this.i18n.t('texts.chat.errorTokenLimitUser'));
       }
     }
 
