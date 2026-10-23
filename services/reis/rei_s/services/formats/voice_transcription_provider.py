@@ -78,12 +78,6 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         "vorbis": "ogg",
         "flac": "flac",
     }
-    audio_codecs_to_mime_type = {
-        "aac": "audio/mp4",
-        "mp3": "audio/mp3",
-        "vorbis": "audio/ogg",
-        "flac": "audio/flac",
-    }
 
     # Output options for reencoding to vorbis. A fixed bitrate (e.g. 128k) is rejected by libvorbis for many
     # sample rate / channel combinations (e.g. 16 kHz mono), so we use quality-based VBR instead. Downmixing to
