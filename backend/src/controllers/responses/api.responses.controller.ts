@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiExtension, ApiTags } from '@nestjs/swagger';
+import { ApiExtension, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import * as mime from 'mime-types';
 import { Observable } from 'rxjs';
@@ -273,6 +273,9 @@ export class ApiResponsesController {
   }
 
   @Post('/responses')
+  // like the OpenAI Responses API
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'The response in the format of the OpenAI Responses API.' })
   @ApiExtension('x-external', true)
   async createResponse(
     @Body() request: ResponseCreateDto,
