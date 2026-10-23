@@ -305,7 +305,7 @@ export function ChatInput({
                     type="button"
                     onClick={() => setShowFilter(true)}
                   >
-                    Filters
+                    {texts.chat.filters}
                   </Button>
                 )}
               </div>

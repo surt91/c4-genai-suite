@@ -30,6 +30,9 @@ i18next.on('loaded', () => {
 function load() {
   return {
     common: {
+      logout: translate('common.logout'),
+      collapse: translate('common.collapse'),
+      expand: translate('common.expand'),
       administration: translate('common.administration'),
       apiKey: translate('common.apiKey'),
       appName: translate('common.appName'),
@@ -109,6 +112,19 @@ function load() {
       rowsSelected: (rowCount: number) => translate('common.rowsSelected', { rowCount }),
     },
     accessibility: {
+      openExternalLink: (title: string | number) => translate('accessibility.openExternalLink', { title }),
+      toggleMetadata: (title: string | number) => translate('accessibility.toggleMetadata', { title }),
+      pdf: {
+        toggleViewer: translate('accessibility.pdf.toggleViewer'),
+        firstPage: translate('accessibility.pdf.firstPage'),
+        previousPage: translate('accessibility.pdf.previousPage'),
+        nextPage: translate('accessibility.pdf.nextPage'),
+        lastPage: translate('accessibility.pdf.lastPage'),
+        zoomOut: translate('accessibility.pdf.zoomOut'),
+        zoomIn: translate('accessibility.pdf.zoomIn'),
+        resetZoom: translate('accessibility.pdf.resetZoom'),
+        zoomLevel: translate('accessibility.pdf.zoomLevel'),
+      },
       chatMessageInput: translate('accessibility.chatMessageInput'),
       editMessage: translate('accessibility.editMessage'),
       pageNumber: translate('accessibility.pageNumber'),
@@ -446,6 +462,15 @@ function load() {
       },
     },
     chat: {
+      assistantDeleted: translate('chat.assistantDeleted'),
+      assistantDisabled: translate('chat.assistantDisabled'),
+      filters: translate('chat.filters'),
+      dragAndDrop: {
+        invalidFileType: translate('chat.dragAndDrop.invalidFileType'),
+        acceptedFormats: translate('chat.dragAndDrop.acceptedFormats'),
+        uploadLimitReached: translate('chat.dragAndDrop.uploadLimitReached'),
+        uploadLimitReachedHint: translate('chat.dragAndDrop.uploadLimitReachedHint'),
+      },
       reasoning: translate('chat.reasoning'),
       chunksInformation: translate('chat.chunksInformation'),
       conversationNotFound: translate('chat.conversationNotFound'),
@@ -491,6 +516,7 @@ function load() {
       sourceAI: translate('chat.sourceAI'),
       sourceHuman: translate('chat.sourceHuman'),
       sources: {
+        pdfLoadFailed: translate('chat.sources.pdfLoadFailed'),
         content: translate('chat.sources.content'),
         sources: translate('chat.sources.sources'),
         viewer: translate('chat.sources.viewer'),

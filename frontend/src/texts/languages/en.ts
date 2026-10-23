@@ -1,5 +1,8 @@
 export const en = {
   common: {
+    logout: 'Logout',
+    collapse: 'Collapse',
+    expand: 'Expand',
     administration: 'Admin',
     apiKey: 'API Key',
     appName: 'Gaible',
@@ -79,6 +82,19 @@ export const en = {
     rowsSelected: '{{rowCount}} Row(s) Selected',
   },
   accessibility: {
+    openExternalLink: 'Open {{title}} in a new tab',
+    toggleMetadata: 'Show metadata of {{title}}',
+    pdf: {
+      toggleViewer: 'Show or hide the PDF viewer',
+      firstPage: 'Go to first page',
+      previousPage: 'Go to previous page',
+      nextPage: 'Go to next page',
+      lastPage: 'Go to last page',
+      zoomOut: 'Zoom out',
+      zoomIn: 'Zoom in',
+      resetZoom: 'Reset zoom level',
+      zoomLevel: 'Zoom level',
+    },
     chatMessageInput: 'Chat message input',
     editMessage: 'Edit message',
     pageNumber: 'Page number',
@@ -418,6 +434,15 @@ export const en = {
     },
   },
   chat: {
+    assistantDeleted: 'assistant deleted',
+    assistantDisabled: 'disabled',
+    filters: 'Filters',
+    dragAndDrop: {
+      invalidFileType: 'File type not supported.',
+      acceptedFormats: 'Accepted formats:',
+      uploadLimitReached: 'Upload limit reached',
+      uploadLimitReachedHint: 'You can start a new conversation to upload other files or remove existing files.',
+    },
     noAccessToConversation: "You don't have access to this conversation. You will be redirected shortly.",
     conversationNotFound: 'Conversation not found. You will be redirected shortly.',
     errorLoadingMessagesOrConversation: 'Failed to load the conversation or its messages.',
@@ -462,6 +487,7 @@ export const en = {
     sourceAI: 'Friendly AI',
     sourceHuman: 'You',
     sources: {
+      pdfLoadFailed: 'Something went wrong while loading the PDF source document. Please try again.',
       content: 'Source Content',
       sources: 'Sources',
       viewer: 'Source Viewer',

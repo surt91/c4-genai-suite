@@ -27,7 +27,12 @@ export const ReasoningLoadingIndicator = memo(({ message, inProgress }: Reasonin
         <div className={classes.reasoningBody}>
           <div className={classes.reasoningHeader}>
             <p className={classes.reasoningTitle}>{texts.chat.reasoning}</p>
-            <button onClick={toggleExpanded} className={classes.reasoningToggle} aria-label={isExpanded ? 'Collapse' : 'Expand'}>
+            <button
+              onClick={toggleExpanded}
+              className={classes.reasoningToggle}
+              aria-label={isExpanded ? texts.common.collapse : texts.common.expand}
+              aria-expanded={isExpanded}
+            >
               {isExpanded ? (
                 <IconChevronUp size={16} className={classes.chevron} />
               ) : (

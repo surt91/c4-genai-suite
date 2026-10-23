@@ -61,7 +61,7 @@ export async function sendMessage(page: Page, configuration: { name: string }, c
   const chatItems = page.getByTestId('chat-item');
   const numberOfChatItems = await chatItems.count();
   await page.getByPlaceholder(`Message ${configuration.name}`).fill(content.message);
-  await page.locator('form').getByRole('button').last().click();
+  await page.getByTestId('chat-submit-button').click();
   // wait until the answer is complete: there is a chat item for the question and the answer, and the UI does not show
   // the AI as writing (the loading dot) anymore
   await expect.poll(() => chatItems.count()).toBeGreaterThanOrEqual(numberOfChatItems + 2);

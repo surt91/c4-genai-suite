@@ -2,6 +2,9 @@ import { en } from 'src/texts/languages/en';
 
 export const de: typeof en = {
   common: {
+    logout: 'Abmelden',
+    collapse: 'Einklappen',
+    expand: 'Ausklappen',
     administration: 'Admin',
     apiKey: 'API-Key',
     appName: 'Gaible',
@@ -81,6 +84,19 @@ export const de: typeof en = {
     rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
   accessibility: {
+    openExternalLink: '{{title}} in neuem Tab öffnen',
+    toggleMetadata: 'Metadaten von {{title}} anzeigen',
+    pdf: {
+      toggleViewer: 'PDF-Ansicht ein- oder ausblenden',
+      firstPage: 'Zur ersten Seite',
+      previousPage: 'Zur vorherigen Seite',
+      nextPage: 'Zur nächsten Seite',
+      lastPage: 'Zur letzten Seite',
+      zoomOut: 'Verkleinern',
+      zoomIn: 'Vergrößern',
+      resetZoom: 'Zoom zurücksetzen',
+      zoomLevel: 'Zoomstufe',
+    },
     chatMessageInput: 'Chatnachricht eingeben',
     editMessage: 'Nachricht bearbeiten',
     pageNumber: 'Seitenzahl',
@@ -411,6 +427,15 @@ export const de: typeof en = {
     },
   },
   chat: {
+    assistantDeleted: 'Assistent gelöscht',
+    assistantDisabled: 'deaktiviert',
+    filters: 'Filter',
+    dragAndDrop: {
+      invalidFileType: 'Dateityp wird nicht unterstützt.',
+      acceptedFormats: 'Erlaubte Formate:',
+      uploadLimitReached: 'Upload-Limit erreicht',
+      uploadLimitReachedHint: 'Starte einen neuen Chat, um weitere Dateien hochzuladen, oder entferne vorhandene Dateien.',
+    },
     noAccessToConversation: 'Du hast keinen Zugriff auf diese Konversation. Du wirst in Kürze weitergeleitet.',
     conversationNotFound: 'Konversation nicht gefunden. Du wirst in Kürze weitergeleitet.',
     errorLoadingMessagesOrConversation: 'Fehler beim Laden der Konversation oder ihrer Nachrichten.',
@@ -455,6 +480,7 @@ export const de: typeof en = {
     sourceAI: 'KI',
     sourceHuman: 'Du',
     sources: {
+      pdfLoadFailed: 'Beim Laden des PDF-Dokuments ist ein Fehler aufgetreten. Bitte versuche es erneut.',
       content: 'Quelleninhalt',
       sources: 'Quellen',
       viewer: 'Quell-Viewer',

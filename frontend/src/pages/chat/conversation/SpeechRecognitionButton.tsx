@@ -36,9 +36,8 @@ export function SpeechRecognitionButton({
               variant={listening ? 'filled' : 'outline'}
               size="lg"
               color={listening ? 'red' : 'black'}
-              className={clsx(listening && classes.pulse)}
+              className={clsx(classes.micButton, listening && classes.pulse)}
               onClick={toggleSpeechRecognition}
-              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
               aria-label={toolTipText}
             >
               <IconMicrophone size={16} />
@@ -51,14 +50,7 @@ export function SpeechRecognitionButton({
                 size="xs"
                 disabled={listening}
                 aria-label={texts.accessibility.selectLanguage}
-                style={{
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                  width: '12px',
-                  height: 'auto',
-                }}
+                className={classes.languageButton}
               >
                 <IconChevronDown size={12} />
               </ActionIcon>

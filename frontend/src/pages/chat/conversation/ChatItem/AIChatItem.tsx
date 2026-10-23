@@ -41,7 +41,11 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
 
   const [debouncedIsWriting] = useDebouncedValue(isWriting, 500);
   const newReply = isWriting || debouncedIsWriting;
-  const assistantStatus = !messageAssistant ? ' [assistant deleted]' : !messageAssistant.enabled ? ' [disabled]' : '';
+  const assistantStatus = !messageAssistant
+    ? texts.chat.assistantDeleted
+    : !messageAssistant.enabled
+      ? texts.chat.assistantDisabled
+      : '';
 
   return (
     <div className={classes.aiItem} data-testid="chat-item">
@@ -53,7 +57,7 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
             |<strong>{messageAssistant.name}</strong>
           </>
         )}
-        {assistantStatus && <small className={classes.assistantStatus}>{assistantStatus}</small>}
+        {assistantStatus && <small className={classes.assistantStatus}>[{assistantStatus}]</small>}
       </div>
       {message.error && <Alert text={message.error} className={classes.error} />}
       <ChatItemTools tools={message.toolsInUse || {}} />

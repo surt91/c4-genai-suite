@@ -77,7 +77,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
         )}
 
         <Menu.Item leftSection={<IconLogout size={14} />} component={'a'} href={logoutUrl}>
-          Logout
+          {texts.common.logout}
         </Menu.Item>
       </Menu.Dropdown>
 

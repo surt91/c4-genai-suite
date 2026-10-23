@@ -114,7 +114,7 @@ const PdfControlBar = ({
                   setShowViewer((prevVal) => !prevVal);
                 }
               }}
-              aria-label="Hide PDF Viewer"
+              aria-label={texts.accessibility.pdf.toggleViewer}
               disabled={!numPages}
             >
               {showViewer && <IconEye {...iconConfigurationParams} />}
@@ -124,10 +124,20 @@ const PdfControlBar = ({
           <Divider orientation="vertical" />
           <Group className="doc-navigation" gap="xs">
             <div className="doc-navigation-btns">
-              <ActionIcon onClick={goToFirstPage} aria-label="go to first page" variant="filled" disabled={isFirstPage}>
+              <ActionIcon
+                onClick={goToFirstPage}
+                aria-label={texts.accessibility.pdf.firstPage}
+                variant="filled"
+                disabled={isFirstPage}
+              >
                 <IconArrowBarToLeft {...iconConfigurationParams} />
               </ActionIcon>
-              <ActionIcon onClick={goToPreviousPage} aria-label="go to previous page" variant="filled" disabled={isFirstPage}>
+              <ActionIcon
+                onClick={goToPreviousPage}
+                aria-label={texts.accessibility.pdf.previousPage}
+                variant="filled"
+                disabled={isFirstPage}
+              >
                 <IconArrowLeft {...iconConfigurationParams} />
               </ActionIcon>
             </div>
@@ -144,17 +154,27 @@ const PdfControlBar = ({
             />
             {`/ ${numPages}`}
             <div className="doc-navigation-btns">
-              <ActionIcon onClick={goToNextPage} aria-label="go to next page" variant="filled" disabled={isLastPage}>
+              <ActionIcon
+                onClick={goToNextPage}
+                aria-label={texts.accessibility.pdf.nextPage}
+                variant="filled"
+                disabled={isLastPage}
+              >
                 <IconArrowRight {...iconConfigurationParams} />
               </ActionIcon>
-              <ActionIcon onClick={goToLastPage} aria-label="go to last page" variant="filled" disabled={isLastPage}>
+              <ActionIcon
+                onClick={goToLastPage}
+                aria-label={texts.accessibility.pdf.lastPage}
+                variant="filled"
+                disabled={isLastPage}
+              >
                 <IconArrowBarToRight {...iconConfigurationParams} />
               </ActionIcon>
             </div>
           </Group>
           <Divider orientation="vertical" />
           <Group className={`zoom-level-ctrl ${classes.zoom}`} gap="xs">
-            <ActionIcon onClick={zoomOut} variant="filled" aria-label="zoom out" disabled={isMinZoom}>
+            <ActionIcon onClick={zoomOut} variant="filled" aria-label={texts.accessibility.pdf.zoomOut} disabled={isMinZoom}>
               <IconZoomOut {...iconConfigurationParams} />
             </ActionIcon>
             <NumberInput
@@ -168,12 +188,18 @@ const PdfControlBar = ({
               clampBehavior="strict"
               hideControls
               disabled={!numPages}
+              aria-label={texts.accessibility.pdf.zoomLevel}
             />
-            <ActionIcon onClick={zoomIn} variant="filled" aria-label="zoom in" disabled={isMaxZoom}>
+            <ActionIcon onClick={zoomIn} variant="filled" aria-label={texts.accessibility.pdf.zoomIn} disabled={isMaxZoom}>
               <IconZoomIn {...iconConfigurationParams} />
             </ActionIcon>
             <Divider orientation="vertical" />
-            <ActionIcon onClick={resetZoom} variant="filled" aria-label="rest zoom level" disabled={scale === 1}>
+            <ActionIcon
+              onClick={resetZoom}
+              variant="filled"
+              aria-label={texts.accessibility.pdf.resetZoom}
+              disabled={scale === 1}
+            >
               <IconZoomReset {...iconConfigurationParams} />
             </ActionIcon>
           </Group>

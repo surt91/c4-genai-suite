@@ -13,3 +13,17 @@
   display: flex;
   width: fit-content;
 }
+
+.micButton {
+  width: 36px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.languageButton {
+  width: 12px;
+  height: auto;
+  padding-inline: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
