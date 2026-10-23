@@ -1,6 +1,5 @@
 import { Module, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { LangfuseExporter } from 'langfuse-vercel';
 
@@ -20,7 +19,10 @@ export class OpenTelemetryModule implements OnApplicationBootstrap, OnApplicatio
     if (publicKey && secretKey && baseUrl) {
       this.sdk = new NodeSDK({
         traceExporter: new LangfuseExporter(),
-        instrumentations: [getNodeAutoInstrumentations()],
+        // The only traces are the AI SDK spans (`experimental_telemetry` of `streamText`/`generateText`) and the Langfuse
+        // exporter drops every span that does not come from the `ai` instrumentation scope. Spans of auto
+        // instrumentations (http, express, pg, undici, ...) were never exported, so none are registered.
+        instrumentations: [],
       });
       this.sdk.start();
     }
