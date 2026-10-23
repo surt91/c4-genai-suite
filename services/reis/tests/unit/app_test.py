@@ -2,7 +2,7 @@ import random
 from fastapi import FastAPI
 import pytest
 from fastapi.testclient import TestClient
-from langchain_community.embeddings import FakeEmbeddings
+from rei_s.services.random_embeddings import RandomEmbeddings
 from langchain_core.documents import Document
 
 from pytest_mock import MockerFixture
@@ -210,7 +210,7 @@ def test_add_files_fail(client: TestClient) -> None:
 
 def test_add_files_without_filestore(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to avoid calls to azure
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     # mock store to avoid calls to the db
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
     # mock file store to ensure it is not used
@@ -232,7 +232,7 @@ def test_add_files_without_filestore(mocker: MockerFixture, client: TestClient) 
 
 def test_add_files_with_filestore(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to avoid calls to azure
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     vector_store_mock = mocker.Mock(spec=DevNullVectorStoreAdapter)
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=vector_store_mock)
     file_store_mock = mocker.Mock(spec=DevNullFileStoreAdapter)
@@ -264,7 +264,7 @@ def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
     # mock embeddings to assure that they are not generated
     mocker.patch(
         "rei_s.services.embeddings_provider.get_embeddings",
-        return_value=FakeEmbeddings(size=1352),
+        return_value=RandomEmbeddings(size=1352),
         side_effect=Exception("embeddings generated, but should not"),
     )
     # mock store to assure that nothing is saved
@@ -291,7 +291,7 @@ def test_process_files(mocker: MockerFixture, client: TestClient) -> None:
 
 
 def test_add_damaged_file(mocker: MockerFixture, client: TestClient) -> None:
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with open("tests/data/birthdays.pptx", "rb") as f:
@@ -310,7 +310,7 @@ def test_add_damaged_file(mocker: MockerFixture, client: TestClient) -> None:
 
 
 def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> None:
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     # ~1.5 MB of binary (non UTF-8) data, uploaded as yaml
@@ -330,7 +330,7 @@ def test_add_damaged_large_file(mocker: MockerFixture, client: TestClient) -> No
 
 
 def test_add_unsupported_file(mocker: MockerFixture, client: TestClient) -> None:
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
     with open("tests/data/birthdays.pdf", "rb") as f:

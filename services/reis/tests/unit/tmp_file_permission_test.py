@@ -3,7 +3,7 @@ from fastapi import FastAPI
 import pytest
 
 from fastapi.testclient import TestClient
-from langchain_community.embeddings import FakeEmbeddings
+from rei_s.services.random_embeddings import RandomEmbeddings
 from pytest_mock import MockerFixture
 from rei_s.config import update_tempdir
 from rei_s.services.vectorstores.devnull_store import DevNullVectorStoreAdapter
@@ -25,7 +25,7 @@ def use_tmp_dir() -> Generator[None, None, None]:
 
 def test_add_files_write(mocker: MockerFixture, app: FastAPI, use_tmp_dir: None) -> None:
     # mock embeddings to avoid calls to azure
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     # mock store to avoid calls to the db
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
@@ -46,7 +46,7 @@ def test_add_files_write(mocker: MockerFixture, app: FastAPI, use_tmp_dir: None)
 
 def test_add_files_read_only(mocker: MockerFixture, app: FastAPI, use_unknown_tmp_dir: None) -> None:
     # mock embeddings to avoid calls to azure
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     # mock store to avoid calls to the db
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 

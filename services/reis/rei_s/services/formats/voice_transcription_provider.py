@@ -3,9 +3,7 @@ from pathlib import Path
 from typing import Any
 
 from langchain_core.documents import Document
-from langchain_core.documents.base import Blob
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders.parsers.audio import AzureOpenAIWhisperParser
 import openai
 
 from rei_s import logger
@@ -25,6 +23,32 @@ from rei_s.types.source_file import SourceFile, temp_file
 class MediaMetadata:
     audio_codec: str | None
     duration: float
+
+
+class AzureOpenAIWhisperParser:
+    """Transcribes audio files with a Whisper deployment on Azure OpenAI."""
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        azure_endpoint: str,
+        api_version: str,
+        deployment_name: str,
+        max_retries: int = 3,
+    ) -> None:
+        self.deployment_name = deployment_name
+        self.client = openai.AzureOpenAI(
+            api_key=api_key,
+            azure_endpoint=azure_endpoint,
+            api_version=api_version,
+            max_retries=max_retries,
+        )
+
+    def parse(self, path: str | Path) -> list[Document]:
+        with open(path, "rb") as file_obj:
+            transcript = self.client.audio.transcriptions.create(model=self.deployment_name, file=file_obj)
+        return [Document(page_content=transcript.text, metadata={"source": str(path)})]
 
 
 class VoiceTranscriptionProvider(AbstractFormatProvider):
@@ -86,6 +110,10 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
                 raise ValueError("The env variable `STT_AZURE_OPENAI_WHISPER_API_KEY` is missing.")
             if config.stt_azure_openai_whisper_deployment_name is None:
                 raise ValueError("The env variable `STT_AZURE_OPENAI_WHISPER_DEPLOYMENT_NAME` is missing.")
+            if config.stt_azure_openai_whisper_endpoint is None:
+                raise ValueError("The env variable `STT_AZURE_OPENAI_WHISPER_ENDPOINT` is missing.")
+            if config.stt_azure_openai_whisper_api_version is None:
+                raise ValueError("The env variable `STT_AZURE_OPENAI_WHISPER_API_VERSION` is missing.")
 
             self.parser = AzureOpenAIWhisperParser(
                 api_key=config.stt_azure_openai_whisper_api_key.get_secret_value(),
@@ -198,10 +226,9 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         results = []
         for n, segment in enumerate(segments):
-            blob = Blob.from_path(segment.path)
             logger.info(f"process {n + 1} / {len(segments)}")
             try:
-                docs = self.parser.parse(blob)
+                docs = self.parser.parse(segment.path)
             except openai.APIStatusError as e:  # pragma: no cover
                 if e.status_code == 413:
                     raise ProcessingError("File too large. The limit is 25 MiB.", e.status_code) from e

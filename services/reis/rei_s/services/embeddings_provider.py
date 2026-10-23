@@ -1,10 +1,10 @@
 from langchain_openai import OpenAIEmbeddings, AzureOpenAIEmbeddings
-from langchain_community.embeddings import FakeEmbeddings
 from langchain_ollama import OllamaEmbeddings
 from langchain_core.embeddings import Embeddings
 from langchain_aws.embeddings.bedrock import BedrockEmbeddings
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 from rei_s.config import Config
+from rei_s.services.random_embeddings import RandomEmbeddings
 
 
 def get_embeddings(config: Config) -> Embeddings:
@@ -98,6 +98,6 @@ def get_embeddings(config: Config) -> Embeddings:
     elif config.embeddings_type.lower() == "random-test-embeddings":
         # use text-embedding-3-large size, which is at the time of writing the
         # largest model used in dev or prod
-        return FakeEmbeddings(size=3072)
+        return RandomEmbeddings(size=3072)
     else:
         raise ValueError(f"Unknown embedding type: {config.embeddings_type}")

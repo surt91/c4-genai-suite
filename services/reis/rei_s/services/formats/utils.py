@@ -1,15 +1,11 @@
-from io import BytesIO
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import time
-from typing import Generator
 from uuid import uuid4
 
-from langchain_core.documents.base import Blob
-from langchain_community.document_loaders.blob_loaders import BlobLoader
 import markdown
 from pygments.formatters import HtmlFormatter  # type: ignore[import-untyped]  # ty: ignore[unresolved-import]
 from weasyprint import HTML
@@ -39,14 +35,6 @@ def validate_chunk_overlap(chunk_overlap: int | None, default: int) -> int:
     if chunk_overlap < 0:
         raise ValueError("chunk_overlap needs to be >=0")
     return chunk_overlap
-
-
-class BytesLoader(BlobLoader):
-    def __init__(self, buffer: BytesIO) -> None:
-        self.buffer = buffer
-
-    def yield_blobs(self) -> Generator[Blob, None, None]:
-        yield Blob.from_data(self.buffer.getvalue(), path="stream")
 
 
 class ProcessingError(Exception):

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from langchain_community.embeddings import FakeEmbeddings
+from rei_s.services.random_embeddings import RandomEmbeddings
 
 from pytest_mock import MockerFixture
 from rei_s.config import Config, get_config
@@ -23,7 +23,7 @@ def test_add_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> None
     app.dependency_overrides[get_config] = get_config_override
 
     # mock embeddings to avoid calls to azure
-    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     # mock store to avoid calls to the db
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=DevNullVectorStoreAdapter())
 
@@ -49,7 +49,7 @@ def test_process_files_multiple_workers(mocker: MockerFixture, app: FastAPI) -> 
     # mock embeddings to assure that they are not generated
     mocker.patch(
         "rei_s.services.embeddings_provider.get_embeddings",
-        return_value=FakeEmbeddings(size=1352),
+        return_value=RandomEmbeddings(size=1352),
         side_effect=Exception("embeddings generated, but should not"),
     )
     # mock store to assure that nothing is saved

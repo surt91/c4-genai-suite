@@ -2,7 +2,7 @@ from io import BytesIO
 from faker import Faker
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from langchain_community.embeddings import FakeEmbeddings
+from rei_s.services.random_embeddings import RandomEmbeddings
 import pytest
 
 from pytest_mock import MockerFixture
@@ -37,7 +37,7 @@ def client(mocker: MockerFixture, app: FastAPI) -> TestClient:
     app.dependency_overrides[get_config] = get_config_override
 
     # mock embeddings to avoid calls to azure
-    mocker.patch("rei_s.services.store_service.get_embeddings", return_value=FakeEmbeddings(size=1352))
+    mocker.patch("rei_s.services.store_service.get_embeddings", return_value=RandomEmbeddings(size=1352))
 
     client = TestClient(app)
 

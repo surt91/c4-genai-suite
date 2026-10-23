@@ -80,7 +80,9 @@ def get_mock_config() -> Config:
 def mocked_whisper_answer(mocker: MockerFixture, faker: Faker) -> str:
     content = faker.text()
     docs = [Document(content)]
-    mocker.patch("langchain_community.document_loaders.parsers.audio.AzureOpenAIWhisperParser.parse", return_value=docs)
+    mocker.patch(
+        "rei_s.services.formats.voice_transcription_provider.AzureOpenAIWhisperParser.parse", return_value=docs
+    )
     return content
 
 
