@@ -9,6 +9,7 @@ import {
   duplicateActiveConversation,
   enterAdminArea,
   enterUserArea,
+  expectA11yCompliant,
   globalConversationBucketName,
   login,
   newChat,
@@ -71,17 +72,33 @@ test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
     expect(output).toBeDefined();
 
     await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
-    await page.getByTestId('sources-section').locator('a').getByText('birthdays.pdf').click();
-    await page.waitForSelector(`:has-text("BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2")`);
+    await page.getByTestId('sources-section').getByTestId('source-open').filter({ hasText: 'birthdays.pdf' }).click();
+    const inspector = page.getByTestId('inspector');
+    await expect(inspector.getByTestId('inspector-title')).toHaveText('birthdays.pdf');
+    await expect(
+      inspector.getByText('BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2', { exact: false }).first(),
+    ).toBeVisible();
+  });
 
-    const source_panel = await page.waitForSelector(`:has-text("Source Content")`);
-    expect(source_panel).toBeDefined();
+  await test.step('should put the help on top of the source and go back to it', async () => {
+    const inspector = page.getByTestId('inspector');
+    await page.getByTestId('docs-icon').click();
+    await expect(inspector.getByTestId('inspector-title')).toHaveText('Help');
+    await inspector.getByTestId('inspector-back').click();
+    await expect(inspector.getByTestId('inspector-title')).toHaveText('birthdays.pdf');
+    await expect(inspector.getByTestId('inspector-back')).toHaveCount(0);
+    await expectA11yCompliant(page);
   });
 
   await test.step('should show pdf representation of file referenced in source', async () => {
-    await page.getByText('Source Viewer').click();
+    await page.getByTestId('inspector-source-tabs').getByText('Document').click();
     await expect(page.locator('.pdf-viewport')).toBeVisible();
     await expect(page.locator('.pdf-viewport').getByText('Daisy Duck')).toBeVisible();
+  });
+
+  await test.step('should close the inspector', async () => {
+    await page.getByTestId('inspector-close').click();
+    await expect(page.getByTestId('inspector')).toBeHidden();
   });
 
   await test.step('should duplicate a conversation that includes a file uploaded with files in chat extension', async () => {
@@ -214,10 +231,12 @@ test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
     });
 
     await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
-    await page.getByTestId('sources-section').locator('a').getByText('birthdays.pdf').click();
-    await page.waitForSelector(`:has-text("BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2")`);
-
-    const source_panel = await page.waitForSelector(`:has-text("Source Content")`);
-    expect(source_panel).toBeDefined();
+    await page.getByTestId('sources-section').getByTestId('source-open').filter({ hasText: 'birthdays.pdf' }).click();
+    await expect(
+      page
+        .getByTestId('inspector')
+        .getByText('BirthdaySheet Daniel Düsentrieb Quack 02/07/2714 01/02/3456 Page 2', { exact: false })
+        .first(),
+    ).toBeVisible();
   });
 });

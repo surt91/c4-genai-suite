@@ -8,10 +8,16 @@ test('Documentation on Admin page', async ({ page, adminUser }) => {
     await login(page, adminUser);
   });
 
-  await test.step('should not show documentation on chat page', async () => {
-    // such that docs would have been loaded, if they were shown
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByTestId('docs-icon')).toBeHidden();
+  await test.step('should show the help of the chat in the inspector', async () => {
+    await page.getByTestId('docs-icon').click();
+    const inspector = page.getByTestId('inspector');
+    await expect(inspector.getByTestId('inspector-title')).toHaveText('Help');
+    await expect(inspector.getByRole('heading', { name: 'Using the Chat' })).toBeVisible();
+    // there is only one side panel: the help is not shown as an own panel
+    await expect(page.getByTestId('close-icon')).toBeHidden();
+    await inspector.getByTestId('inspector-close').click();
+    await expect(inspector).toBeHidden();
+    await expect(page.getByTestId('docs-icon')).toBeVisible();
   });
 
   await test.step('should show documentation on button click in admin area', async () => {

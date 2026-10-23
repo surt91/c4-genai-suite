@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { test } from '../utils/fixtures';
 import {
   addMockModelToConfiguration,
@@ -88,4 +88,31 @@ test('Chat workflow with Mock LLM', async ({ page, mockServerUrl, adminUser }) =
     await welcomeText.waitFor();
     await checkSelectedConfiguration(page, assistant);
   });
+
+  await test.step('should restore a deleted chat with undo', async () => {
+    const name = uniqueName('Undo');
+    await duplicateActiveConversationByName(page, name);
+    const item = page.getByTestId('conversation-item').filter({ hasText: name });
+    await expect(item).toHaveCount(1);
+
+    await item.getByRole('button', { name: 'menu' }).click();
+    await page.locator('.mantine-Menu-dropdown').getByText('Delete').click();
+    await expect(item).toHaveCount(0);
+
+    const notification = page.getByRole('alert').filter({ hasText: `Chat "${name}" deleted` });
+    await notification.getByRole('button', { name: 'Undo' }).click();
+    await expect(item).toHaveCount(1);
+    // the restored chat is opened
+    await expect(page.getByTestId('conversation-header')).toContainText(name);
+  });
 });
+
+/** Renames the first chat of the list (which has messages), so that the test can find it. */
+async function duplicateActiveConversationByName(page: Page, name: string) {
+  const first = page.getByTestId('conversation-item').first();
+  await first.getByRole('button').first().click();
+  await first.getByRole('button', { name: 'menu' }).click();
+  await page.locator('.mantine-Menu-dropdown').getByText('Rename').click();
+  await page.getByTestId('conversation-rename-input').fill(name);
+  await page.getByTestId('conversation-rename-input').press('Enter');
+}

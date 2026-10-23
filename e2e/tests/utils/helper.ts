@@ -222,7 +222,7 @@ export async function addUserArgsToConfiguration(page: Page, configuration: { na
 export async function addMCPToConfiguration(
   page: Page,
   configuration: { name: string },
-  mcp: { name: string; endpoint: string },
+  mcp: { name: string; endpoint: string; transport?: 'sse' | 'streamableHttp'; allowedDomains?: string },
 ) {
   await openAssistant(page, configuration.name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
@@ -234,6 +234,12 @@ export async function addMCPToConfiguration(
     .click();
   await page.getByLabel('Server Name').fill(mcp.name);
   await page.getByLabel('Endpoint').fill(mcp.endpoint);
+  if (mcp.transport) {
+    await selectOption(page, 'Transport Protocol', mcp.transport);
+  }
+  if (mcp.allowedDomains) {
+    await page.getByLabel('Allowed domains for pages to open').fill(mcp.allowedDomains);
+  }
 
   const refreshSchemaButton = page.getByRole('button', { name: 'Refresh Schema' });
   await refreshSchemaButton.waitFor({ state: 'visible' });
@@ -333,17 +339,37 @@ export async function deactivateFileInChatExtensionToConfiguration(page: Page, c
   await save(page);
 }
 
+/** Opens the chat settings (assistant, its settings and the options of the extensions) in the composer. */
+export async function openChatSettings(page: Page) {
+  const popover = page.getByTestId('chat-settings-popover');
+  // the state of the button, the popover may still be visible while it closes
+  const button = page.getByTestId('chat-settings-button');
+  if ((await button.getAttribute('aria-expanded')) !== 'true') {
+    await button.click();
+  }
+  await expect(button).toHaveAttribute('aria-expanded', 'true');
+  await expect(popover).toBeVisible();
+  return popover;
+}
+
+/** Applies the chat settings and waits until the popover is closed. */
+export async function applyChatSettings(page: Page) {
+  const popover = page.getByTestId('chat-settings-popover');
+  await popover.getByRole('button', { name: 'Apply', exact: true }).click();
+  await expect(popover).toBeHidden();
+}
+
 export async function resetFilter(page: Page) {
-  await page.getByRole('button', { name: 'Filters' }).click();
+  await openChatSettings(page);
   await page.getByRole('button', { name: 'Reset all' }).click();
-  await page.getByRole('button', { name: 'Apply filter' }).click();
+  await applyChatSettings(page);
 }
 
 export async function setFilter(
   page: Page,
   filter: { date: string; string: string; multiSelect: string[]; singleSelect: string; dateFrom: string; dateUntil: string },
 ) {
-  await page.getByRole('button', { name: 'Filters' }).click();
+  await openChatSettings(page);
   await page.getByRole('textbox', { name: 'Date', exact: true }).fill(filter.date);
   await page.getByRole('textbox', { name: 'String', exact: true }).fill(filter.string);
 
@@ -352,7 +378,7 @@ export async function setFilter(
   await selectOption(page, 'Single Select', filter.singleSelect);
   await page.getByRole('textbox', { name: 'Date (from)', exact: true }).fill(filter.dateFrom);
   await page.getByRole('textbox', { name: 'Date (until)', exact: true }).fill(filter.dateUntil);
-  await page.getByRole('button', { name: 'Apply filter' }).click();
+  await applyChatSettings(page);
 }
 
 export async function wait(timeout: number) {
@@ -378,12 +404,12 @@ export async function addMockModelToConfiguration(
 }
 
 export async function configureAssistantByUser(page: Page, config: { values: { label: string; value: number | string }[] }) {
-  await page.getByTestId('assistant-user-configuration').click();
+  const popover = await openChatSettings(page);
 
   for (const entry of config.values) {
-    await page.getByLabel(entry.label).fill(String(entry.value));
+    await popover.getByLabel(entry.label).fill(String(entry.value));
   }
-  await page.getByRole('button', { name: 'Save' }).click();
+  await applyChatSettings(page);
 }
 
 export async function addSystemPromptToConfiguration(
@@ -431,24 +457,35 @@ export async function addOllamaModelToConfiguration(page: Page, configuration: {
   await save(page);
 }
 
+/** The assistant of the chat is shown as the first chip of the composer. */
 export async function checkSelectedConfiguration(page: Page, configuration: { name: string }) {
-  const selectedAssistant = page.locator(`input[value="${configuration.name}"]`);
-  await selectedAssistant.waitFor();
-  await expect(selectedAssistant.first()).toBeVisible();
+  await expect(page.getByTestId('chat-settings-button')).toHaveText(configuration.name);
 }
 
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
-  const select = page.getByTestId('chat-assistant-select');
-  const element = page.locator('p').getByText(configuration.name, { exact: true });
-  // While a chat is loading, the app focuses the message input, which closes the dropdown again. So reopen it
-  // until the assistant could be clicked.
+  const chip = page.getByTestId('chat-settings-button');
+  const popover = page.getByTestId('chat-settings-popover');
+  const select = popover.getByTestId('chat-assistant-select');
+  const element = popover.locator('p').getByText(configuration.name, { exact: true });
+  // While a chat is loading, the app focuses the message input, which closes the popover or the dropdown again. So
+  // reopen them until the assistant could be clicked.
   await expect(async () => {
+    if ((await chip.textContent()) === configuration.name) {
+      return;
+    }
+    if ((await chip.getAttribute('aria-expanded')) !== 'true') {
+      await chip.click();
+    }
     if (!(await element.isVisible())) {
       await select.click();
     }
     await element.click({ timeout: 2_000 });
   }).toPass();
-  await expect(page.locator(`input[value="${configuration.name}"]`).first()).toBeVisible();
+  await expect(chip).toHaveText(configuration.name);
+  if (await popover.isVisible()) {
+    await page.keyboard.press('Escape');
+    await expect(popover).toBeHidden();
+  }
 }
 
 export async function navigateToUserAdministration(page: Page) {
@@ -503,21 +540,40 @@ export async function searchUser(page: Page, user: { name: string; email: string
   return row;
 }
 
+/** Opens the popover "My files" (personal files) of the composer. */
+export async function openMyFiles(page: Page) {
+  const popover = page.getByTestId('my-files-popover');
+  // the state of the button, the popover may still be visible while it closes
+  const button = page.getByTestId('my-files-button');
+  if ((await button.getAttribute('aria-expanded')) !== 'true') {
+    await button.click();
+  }
+  await expect(button).toHaveAttribute('aria-expanded', 'true');
+  await expect(popover).toBeVisible();
+  return popover;
+}
+
+/** The checkbox of a personal file in the popover "My files". */
+export function myFileCheckbox(page: Page, filename: string) {
+  return page.getByTestId('my-files-popover').getByRole('checkbox', { name: `Select ${filename}`, exact: true });
+}
+
+/** Uploads a personal file in the popover "My files". The popover stays open. */
 export async function uploadFileWhileInChat(page: Page, filename: string, mayFail: boolean = false) {
+  const popover = await openMyFiles(page);
   // Yes, this seems strange at first, but ...
   // - if we ran `page.waitForEvent('filechooser')` after clicking, we
   //   would miss the event caused by the click.
   // - if we would `await` the file chooser event right away, execution
   //   would get stuck before we could click anything to trigger the event.
   const fileChooserPromise = page.waitForEvent('filechooser');
-  await page.getByText('Drag and drop files here, or click to select files.').click();
+  await popover.getByText('Drag and drop files here, or click to select files.').click();
   const fileChooser = await fileChooserPromise;
   await fileChooser.setFiles(path.join(__dirname, `files/${filename}`));
 
   if (!mayFail) {
-    // the filename followed by 2 numbers from the upload date is checked to confirm the upload completed
-    const regex = new RegExp(`${filename}\\d{2}`);
-    await page.getByText(regex).click();
+    // the file is listed with a checkbox once the upload is complete
+    await expect(myFileCheckbox(page, filename)).toBeVisible({ timeout: 60_000 });
   }
 }
 
@@ -649,6 +705,11 @@ export async function expectA11yCompliant(page: Page) {
       { timeout: 5_000 },
     )
     .catch(() => {});
+
+  // Tooltips are transient: move the mouse away so that hover tooltips disappear (they share the portal node of
+  // Mantine with other content).
+  await page.mouse.move(0, 0);
+  await expect(page.locator('.mantine-Tooltip-tooltip')).toHaveCount(0, { timeout: 2_000 }).catch(() => {});
 
   // Exclude open Mantine tooltips from the axe scan: they render into <body> outside any landmark,
   // which violates the "region" rule. Tooltips are transient supplementary content and do not

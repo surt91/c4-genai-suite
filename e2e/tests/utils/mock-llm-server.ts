@@ -152,6 +152,19 @@ const DEFAULT_RESPONSES: MockResponse[] = [
       arguments: { url: 'https://de.wikipedia.org/wiki/Amtsgericht_Ohligs' },
     },
   },
+  // tools of the test MCP server (test-mcp-server.ts)
+  {
+    match: /book the meeting room/i,
+    toolCall: { namePattern: /confirm_booking/i, arguments: {} },
+  },
+  {
+    match: /log me in at the calendar/i,
+    toolCall: { namePattern: /open_login/i, arguments: {} },
+  },
+  {
+    match: /trigger a tool failure/i,
+    toolCall: { namePattern: /failing_tool/i, arguments: {} },
+  },
   {
     match: /user arguments/i,
     toolCall: {

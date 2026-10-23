@@ -12,7 +12,9 @@ import {
   expectElementInYRange,
   globalUserBucketName,
   login,
+  myFileCheckbox,
   newChat,
+  openMyFiles,
   selectConfiguration,
   sendMessage,
   uniqueName,
@@ -100,7 +102,7 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
       message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
     });
     const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
-    await expectElementInYRange(element, -200, 116);
+    await expectElementInYRange(element, -200, 96);
   });
 
   await test.step('should show the shared user bucket', async () => {
@@ -145,7 +147,7 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
   await test.step('should show sources used for the reply', async () => {
     const sourcesSection = page.locator('[data-testid="sources-section"]');
     await expect(sourcesSection).toBeVisible();
-    const sourcesEntry = sourcesSection.locator(`ul > li >> text=keyword_ä_ö_ß.MD`);
+    const sourcesEntry = sourcesSection.getByRole('listitem').filter({ hasText: 'keyword_ä_ö_ß.MD' });
     await expect(sourcesEntry).toHaveCount(1);
     await expectA11yCompliant(page);
   });
@@ -155,37 +157,24 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
     await page.waitForSelector('[data-testid="sources-section"]', { state: 'detached' });
     await page.getByText('How may I help you?').waitFor();
     await selectConfiguration(page, configuration);
-    const keywordFile = page.getByText('keyword_ä_ö_ß.MD');
+    await openMyFiles(page);
+    const checkboxKeywordFile = myFileCheckbox(page, 'keyword_ä_ö_ß.MD');
 
-    await expect(keywordFile).toBeVisible();
-
-    const checkboxKeywordFile = page
-      .locator('div')
-      .filter({ hasText: /^keyword_ä_ö_ß.MD$/ })
-      .getByRole('checkbox');
-
+    await expect(checkboxKeywordFile).toBeVisible();
     await expect(checkboxKeywordFile).not.toBeChecked();
   });
 
   await test.step('should upload a new file and this should be selected', async () => {
     await uploadFileWhileInChat(page, 'e2e-test.txt');
-    const keywordFile = page.getByText('keyword_ä_ö_ß.MD').first();
-    const secondFile = page.getByText('e2e-test.txt').first();
-
-    await expect(keywordFile).toBeVisible();
-    await expect(secondFile).toBeVisible();
-
-    const checkboxKeywordFile = page
-      .locator('div')
-      .filter({ hasText: /^keyword_ä_ö_ß.MD$/ })
-      .getByRole('checkbox');
-    const checkboxNewFile = page
-      .locator('div')
-      .filter({ hasText: /^e2e-test.txt$/ })
-      .getByRole('checkbox');
+    const checkboxKeywordFile = myFileCheckbox(page, 'keyword_ä_ö_ß.MD');
+    const checkboxNewFile = myFileCheckbox(page, 'e2e-test.txt');
 
     await expect(checkboxKeywordFile).not.toBeChecked();
     await expect(checkboxNewFile).toBeChecked();
+    // the selected personal file is shown as a chip in the composer and counted at the button
+    await expect(page.getByTestId('my-files-button')).toHaveText('My files (1)');
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('file-chip').filter({ hasText: 'e2e-test.txt' })).toHaveAttribute('data-origin', 'personal');
   });
 
   await test.step('should answer how many uploaded files exist', async () => {
@@ -205,30 +194,29 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
 
   await test.step('should preview the used sources', async () => {
     // the sources of the last answer (earlier answers may have sources as well)
-    await page.getByTestId('sources-section').last().locator('a', { hasText: 'e2e-test.txt' }).first().click();
-    await page.waitForSelector(`blockquote:has-text("gaible-test")`);
+    await page
+      .getByTestId('sources-section')
+      .last()
+      .getByTestId('source-open')
+      .filter({ hasText: 'e2e-test.txt' })
+      .first()
+      .click();
+    await expect(page.getByTestId('inspector').locator('blockquote', { hasText: 'gaible-test' }).first()).toBeVisible();
     await expectA11yCompliant(page);
   });
 
   await test.step('should close the source preview panel', async () => {
-    await page.locator('#right').getByRole('button', { name: 'close' }).click();
-    await page.waitForSelector(`blockquote:has-text("gaible-test")`, { state: 'detached' });
+    await page.getByTestId('inspector-close').click();
+    await expect(page.getByTestId('inspector')).toBeHidden();
   });
 
   await test.step('should deselect all files', async () => {
+    await openMyFiles(page);
     await page.getByRole('button', { name: 'Deselect all' }).click();
 
-    const checkboxKeywordFile = page
-      .locator('div')
-      .filter({ hasText: /^keyword_ä_ö_ß.MD$/ })
-      .getByRole('checkbox');
-    const checkboxNewFile = page
-      .locator('div')
-      .filter({ hasText: /^e2e-test.txt$/ })
-      .getByRole('checkbox');
-
-    await expect(checkboxKeywordFile).not.toBeChecked();
-    await expect(checkboxNewFile).not.toBeChecked();
+    await expect(myFileCheckbox(page, 'keyword_ä_ö_ß.MD')).not.toBeChecked();
+    await expect(myFileCheckbox(page, 'e2e-test.txt')).not.toBeChecked();
+    await page.keyboard.press('Escape');
   });
 
   await test.step('should reply questions about not selected files', async () => {
@@ -239,19 +227,12 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
   });
 
   await test.step('should select all files', async () => {
+    await openMyFiles(page);
     await page.getByRole('button', { name: 'Select all', exact: true }).click();
 
-    const checkboxKeywordFile = page
-      .locator('div')
-      .filter({ hasText: /^keyword_ä_ö_ß.MD$/ })
-      .getByRole('checkbox');
-    const checkboxNewFile = page
-      .locator('div')
-      .filter({ hasText: /^e2e-test.txt$/ })
-      .getByRole('checkbox');
-
-    await expect(checkboxKeywordFile).toBeChecked();
-    await expect(checkboxNewFile).toBeChecked();
+    await expect(myFileCheckbox(page, 'keyword_ä_ö_ß.MD')).toBeChecked();
+    await expect(myFileCheckbox(page, 'e2e-test.txt')).toBeChecked();
+    await page.keyboard.press('Escape');
   });
 
   await test.step('should reply questions about selected files', async () => {
@@ -261,5 +242,18 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
     });
     await page.waitForSelector(`:has-text("gaibleE2E")`);
     await page.waitForSelector(`:has-text("gaible-test")`);
+  });
+
+  await test.step('should rename a personal file', async () => {
+    const popover = await openMyFiles(page);
+    await popover.getByTestId('my-files-manage').click();
+    const modal = page.getByTestId('manage-files-modal');
+    const row = modal.getByTestId('manage-files-row').filter({ hasText: 'e2e-test.txt' });
+    await row.getByRole('button', { name: 'Rename: e2e-test.txt' }).click();
+    await row.getByRole('textbox').fill('renamed-e2e-test.txt');
+    await row.getByRole('textbox').press('Enter');
+    await expect(modal.getByTestId('manage-files-row').filter({ hasText: 'renamed-e2e-test.txt' })).toHaveCount(1);
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('file-chip').filter({ hasText: 'renamed-e2e-test.txt' })).toBeVisible();
   });
 });

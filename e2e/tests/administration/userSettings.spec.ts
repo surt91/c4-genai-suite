@@ -18,12 +18,10 @@ test('User settings', async ({ page, adminApi }) => {
     await page.getByRole('tab', { name: 'Security' }).click();
     await changePassword(page, '123', 'new-secret');
     await expect(page.getByText('Failed to update password')).toBeVisible({ timeout: 10_000 });
-    await page.getByRole('button', { name: 'close' }).first().click();
   });
   await test.step('new user should change the password', async () => {
     await changePassword(page, 'test-secret', 'new-secret');
     await expect(page.getByText('Password updated successfully')).toBeVisible({ timeout: 10_000 });
-    await page.getByRole('button', { name: 'close' }).last().click();
     await page.getByTestId('user-profile-modal').locator('header').getByRole('button').click();
   });
   await test.step('new user should logout and login with the new password', async () => {

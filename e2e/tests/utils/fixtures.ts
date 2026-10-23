@@ -1,6 +1,7 @@
 import { APIRequestContext, test as base } from '@playwright/test';
 import { createUserViaApi, newAdminApiContext, TestUser } from './api';
 import { startMockLLMServer } from './mock-llm-server';
+import { startTestMcpServer } from './test-mcp-server';
 
 export { expect } from '@playwright/test';
 
@@ -9,6 +10,8 @@ interface WorkerFixtures {
   mockServerUrl: string;
   // API context logged in as the initial admin, used to set up test data.
   adminApi: APIRequestContext;
+  // The test MCP server of this worker (forms, URL requests, failing tools), see test-mcp-server.ts.
+  testMcpServer: { url: string; loginUrl: string };
 }
 
 interface TestFixtures {
@@ -20,6 +23,8 @@ interface TestFixtures {
 
 // Base port for mock LLM servers - each worker gets its own port (basePort + workerIndex)
 const MOCK_LLM_BASE_PORT = 4100;
+// Base port for the test MCP servers, also one per worker
+const TEST_MCP_BASE_PORT = 4300;
 
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   // Worker-scoped fixture - starts once per worker, shared across all tests in that worker
@@ -35,6 +40,16 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
       mockServer.close();
       console.log(`[Fixture] Mock LLM server stopped (worker ${workerInfo.workerIndex})`);
+    },
+    { scope: 'worker' },
+  ],
+
+  testMcpServer: [
+    // eslint-disable-next-line no-empty-pattern
+    async ({}, use, workerInfo) => {
+      const server = await startTestMcpServer(TEST_MCP_BASE_PORT + workerInfo.workerIndex);
+      await use({ url: server.url, loginUrl: server.loginUrl });
+      server.close();
     },
     { scope: 'worker' },
   ],
