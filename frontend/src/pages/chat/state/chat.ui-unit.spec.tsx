@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadStoppedMessages, useStateOfChat, useStateOfIsAiWriting, useStateOfSelectedAssistantId } from './chat';
 import { ChatMessage } from './types';
 import { useChatStore } from './zustand/chatStore';
+import { useInspectorStore } from './zustand/inspectorStore';
 
 describe('chat state selectors', () => {
   beforeEach(() => {
@@ -133,6 +134,18 @@ describe('stopping the generation', () => {
     expect(stoppedQuestion.id).toBeLessThan(-1);
     expect(stoppedAnswer.id).toBeLessThan(-1);
     expect(stoppedAnswer.id).not.toBe(stoppedQuestion.id);
+  });
+
+  it('updates the details in the inspector to the new ID of the stopped answer', () => {
+    startStream();
+    useInspectorStore.getState().open({ type: 'tool', conversationId: 1, messageId: -1, toolId: 'call-1' });
+
+    useChatStore.getState().stopActiveStream(1);
+
+    const stoppedAnswer = useChatStore.getState().chatDataMap.get(1)!.messages[1];
+    expect(useInspectorStore.getState().stack).toEqual([
+      { type: 'tool', conversationId: 1, messageId: stoppedAnswer.id, toolId: 'call-1' },
+    ]);
   });
 
   it('does nothing without an active stream', () => {

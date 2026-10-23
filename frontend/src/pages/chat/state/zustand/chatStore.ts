@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AppClient, ConversationDto, FileDto, MessageDto, StreamEventDto, StreamObserver, StreamSubscription } from 'src/api';
 import { ChatMessage, UIRequestState } from '../types';
+import { useInspectorStore } from './inspectorStore';
 
 type ChatData = {
   messages: ChatMessage[];
@@ -248,6 +249,9 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
 
       const messages = chatData.messages.map((message): ChatMessage => {
         const id = message.id === 0 || message.id === -1 ? --lastStoppedPlaceholderId : message.id;
+        if (id !== message.id) {
+          useInspectorStore.getState().replaceMessageId(chatId, message.id, id);
+        }
         if (message.id !== chatData.streamingMessageId) {
           return { ...message, id };
         }

@@ -19,6 +19,7 @@ import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import { ChatMessage, InteractionStatus, ToolCallState } from './types';
 import { useChatStore } from './zustand/chatStore';
+import { useInspectorStore } from './zustand/inspectorStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
 /** Tool calls without an ID (older servers) are identified by their name. */
@@ -123,11 +124,12 @@ export const useChatStream = (chatId: number) => {
 
     const configurationId = useChatStore.getState().chatDataMap.get(chatId)?.chat.configurationId;
 
+    const humanMessageId = editMessageId ?? getMessagePlaceholderId('human');
     chatStore.addMessage(chatId, {
       type: 'human',
       content: [{ type: 'text', text: input }],
       configurationId: configurationId ?? 0,
-      id: editMessageId ?? getMessagePlaceholderId('human'),
+      id: humanMessageId,
     });
 
     const aiMessageId = getMessagePlaceholderId('ai');
@@ -202,10 +204,14 @@ export const useChatStream = (chatId: number) => {
             return chatStore.updateMessage(chatId, actualAiMessageId, { tokenCount: msg.metadata.tokenCount });
           case 'saved':
             if (msg.messageType === 'ai') {
+              // details opened during the generation (tools, sources) refer to the placeholder
+              useInspectorStore.getState().replaceMessageId(chatId, actualAiMessageId, msg.messageId);
               actualAiMessageId = msg.messageId;
               chatStore.setStreamingMessageId(chatId, msg.messageId);
+              return chatStore.updateMessage(chatId, aiMessageId, { id: msg.messageId });
             }
-            return chatStore.updateMessage(chatId, getMessagePlaceholderId(msg.messageType), { id: msg.messageId });
+            // an edited question is stored as a new message
+            return chatStore.updateMessage(chatId, humanMessageId, { id: msg.messageId });
           case 'ui':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
               requests: [

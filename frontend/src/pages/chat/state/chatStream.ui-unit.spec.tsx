@@ -1,12 +1,14 @@
 import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FetchError, ResponseError, StreamObserver } from 'src/api';
+import { FetchError, ResponseError, StreamEventDto, StreamObserver } from 'src/api';
 import { SseResponseError } from 'src/api/state/sse';
 import { toast } from 'src/lib/notifications';
 import { renderHook } from 'src/pages/admin/test-utils';
 import { texts } from 'src/texts';
 import { useChatStream } from './chat';
+import { ChatMessage } from './types';
 import { useChatStore } from './zustand/chatStore';
+import { useInspectorStore } from './zustand/inspectorStore';
 
 const api = {
   conversations: {
@@ -32,6 +34,7 @@ describe('useChatStream', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useChatStore.setState({ currentChatId: 0, chatDataMap: new Map() });
+    useInspectorStore.setState({ stack: [], hidden: false, trigger: undefined });
   });
 
   it('reports a network error when loading the chat instead of crashing', async () => {
@@ -91,6 +94,55 @@ describe('useChatStream', () => {
 
       await waitFor(() => expect(window.location.pathname).toBe('/login'));
       expect(document.cookie).toContain('post-login-redirect=%2Fchat%2F1');
+    });
+  });
+
+  describe('saved messages', () => {
+    let observer!: StreamObserver<StreamEventDto>;
+
+    async function send(messages: ChatMessage[], editMessageId?: number) {
+      api.conversations.getConversation.mockResolvedValue({ id: 1, configurationId: 1 });
+      api.conversations.getMessages.mockResolvedValue({ items: messages });
+      api.stream.streamPrompt.mockImplementation((_chatId, _message, _messageId, o: StreamObserver<StreamEventDto>) => {
+        observer = o;
+        return { unsubscribe: vi.fn(), abort: vi.fn() };
+      });
+
+      const { result } = renderHook(() => useChatStream(1));
+      await waitFor(() => expect(useChatStore.getState().chatDataMap.get(1)?.hasLoadedFromServer).toBe(true));
+      act(() => (result.current as ReturnType<typeof useChatStream>).sendMessage('Hello', [], editMessageId));
+    }
+
+    const ids = () =>
+      useChatStore
+        .getState()
+        .chatDataMap.get(1)
+        ?.messages.map((m) => m.id);
+
+    it('updates the details in the inspector when the answer gets its ID', async () => {
+      await send([]);
+      act(() => {
+        observer.next({ type: 'tool_error', tool: { name: 'Search', id: 'call-1' }, error: 'Timeout' });
+        useInspectorStore.getState().open({ type: 'tool', conversationId: 1, messageId: -1, toolId: 'call-1' });
+        observer.next({ type: 'saved', messageType: 'human', messageId: 41 });
+        observer.next({ type: 'saved', messageType: 'ai', messageId: 42 });
+      });
+
+      expect(ids()).toEqual([41, 42]);
+      expect(useInspectorStore.getState().stack).toEqual([{ type: 'tool', conversationId: 1, messageId: 42, toolId: 'call-1' }]);
+    });
+
+    it('uses the ID of the stored question after an edit', async () => {
+      await send(
+        [
+          { id: 5, type: 'human', configurationId: 1, content: [{ type: 'text', text: 'Old' }] },
+          { id: 6, type: 'ai', configurationId: 1, content: [{ type: 'text', text: 'Answer' }] },
+        ],
+        5,
+      );
+      act(() => observer.next({ type: 'saved', messageType: 'human', messageId: 7 }));
+
+      expect(ids()).toEqual([7, -1]);
     });
   });
 

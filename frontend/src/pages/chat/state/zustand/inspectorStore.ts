@@ -41,6 +41,8 @@ type InspectorActions = {
   close: () => void;
   // Hides or shows the inspector without closing its views.
   toggleHidden: () => void;
+  // Updates the views of a message that got another ID (e.g. a streamed answer gets its ID when it is stored).
+  replaceMessageId: (conversationId: number, from: number, to: number) => void;
 };
 
 function isSameView(a: InspectorEntry | undefined, b: InspectorEntry) {
@@ -105,6 +107,15 @@ export const useInspectorStore = create<InspectorState & InspectorActions>()((se
   toggleHidden: () => {
     if (get().stack.length > 0) {
       set({ hidden: !get().hidden });
+    }
+  },
+
+  replaceMessageId: (conversationId, from, to) => {
+    const { stack } = get();
+    const matches = (entry: InspectorEntry) =>
+      entry.type !== 'help' && entry.conversationId === conversationId && entry.messageId === from;
+    if (stack.some(matches)) {
+      set({ stack: stack.map((entry) => (matches(entry) ? { ...entry, messageId: to } : entry)) });
     }
   },
 }));
