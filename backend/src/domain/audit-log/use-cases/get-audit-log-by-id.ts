@@ -2,6 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuditLogEntity, AuditLogRepository } from 'src/domain/database';
 import { AuditLog } from '../interfaces';
+import { buildAuditLog } from './utils';
 
 export class GetAuditLogById {
   constructor(public readonly id: number) {}
@@ -12,19 +13,6 @@ export class GetAuditLogByIdResponse {
     public readonly auditLog: AuditLog | null,
     public readonly previousSnapshot: Record<string, unknown> | null,
   ) {}
-}
-
-function buildAuditLog(entity: AuditLogEntity): AuditLog {
-  return {
-    id: entity.id,
-    entityType: entity.entityType,
-    entityId: entity.entityId,
-    action: entity.action,
-    userId: entity.userId,
-    userName: entity.userName,
-    snapshot: entity.snapshot,
-    createdAt: entity.createdAt,
-  };
 }
 
 @QueryHandler(GetAuditLogById)

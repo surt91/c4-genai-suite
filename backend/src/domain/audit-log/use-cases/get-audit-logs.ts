@@ -2,6 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuditEntityType, AuditLogEntity, AuditLogRepository } from 'src/domain/database';
 import { AuditLog } from '../interfaces';
+import { buildAuditLog } from './utils';
 
 export class GetAuditLogs {
   constructor(
@@ -20,19 +21,6 @@ export class GetAuditLogsResponse {
     public readonly auditLogs: AuditLog[],
     public readonly total: number,
   ) {}
-}
-
-function buildAuditLog(entity: AuditLogEntity): AuditLog {
-  return {
-    id: entity.id,
-    entityType: entity.entityType,
-    entityId: entity.entityId,
-    action: entity.action,
-    userId: entity.userId,
-    userName: entity.userName,
-    snapshot: entity.snapshot,
-    createdAt: entity.createdAt,
-  };
 }
 
 @QueryHandler(GetAuditLogs)
