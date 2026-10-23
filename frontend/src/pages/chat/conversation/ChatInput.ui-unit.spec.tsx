@@ -12,6 +12,7 @@ vi.mock('src/api', () => ({
 
 vi.mock('src/hooks/api/extensions', () => ({
   useConversationBucketAvailabilities: vi.fn(),
+  useUserBucket: () => ({ userBucket: undefined }),
 }));
 
 vi.mock('src/hooks/api/files', () => ({

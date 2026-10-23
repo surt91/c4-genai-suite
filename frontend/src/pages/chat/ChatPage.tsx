@@ -10,6 +10,7 @@ import { ProfileButton } from 'src/components';
 import { useDocsContext } from 'src/components/InAppDocsProvider';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
+import { useUserBucket } from 'src/hooks/api/extensions';
 import { useConversationFiles } from 'src/hooks/api/files';
 import { useIsCompact } from 'src/hooks/useIsCompact';
 import { useListOfAllAssistantsInit, useListOfEnabledAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
@@ -29,7 +30,6 @@ import {
   useIsInspectorOpen,
 } from './state/inspector';
 import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
-import { useUserBucket } from './useUserBucket';
 
 const ResizeHandle = () => (
   <Separator className={classes.resizeHandle}>

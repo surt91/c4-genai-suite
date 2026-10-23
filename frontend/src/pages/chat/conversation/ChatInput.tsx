@@ -7,13 +7,13 @@ import { ConfigurationDto, FileDto } from 'src/api';
 import { Markdown } from 'src/components';
 import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
+import { useUserBucket } from 'src/hooks/api/extensions';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useTranscribe } from 'src/hooks/useTranscribe';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { MyFilesButton } from 'src/pages/chat/files/MyFilesButton';
-import { useUserBucket } from 'src/pages/chat/useUserBucket';
 import { texts } from 'src/texts';
 import { closeInspectorIfOpen } from '../state/inspector';
 import { useChatDropzone } from '../useChatDropzone';
@@ -71,7 +71,7 @@ export function ChatInput({
   } = useChatDropzone();
 
   // the personal files of the user (user bucket), selectable via "My files"
-  const { userBucket: personalBucket } = useUserBucket(configuration?.id ?? -1);
+  const { userBucket: personalBucket } = useUserBucket(configuration?.id);
 
   const speechRecognitionLanguages: Language[] = [
     { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },
