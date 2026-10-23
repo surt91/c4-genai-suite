@@ -1,97 +1,98 @@
 @startuml
 class ChatContext {
-    tools: StructuredTool[]
-    llm: ChatContext
-    prompt: ChatPromptTemplate
+    abort: AbortController
+    input: string
+    tools: NamedStructuredTool[]
+    llms: Record<string, LanguageModelContext>
+    llm?: string
+    systemMessages: string[]
+    history?: MessagesHistory
     result: Subject<StreamEvent>
-    callbacks: BaseCallbackHandlerMethods
-    ui: ChatUIImpl
+    cache: ChatCache
+    ui: ChatUI
+    user: User
+    configuration: ConfigurationModel
 }
 
-class Subject<StreamEvent> {
+class "Subject<StreamEvent>" as Subject {
     next(event: StreamEvent)
     error(error: Error)
 }
 
-class StructuredTool<T> {
-    schema: Schema<T>
-    description: string
+abstract class NamedStructuredTool<T> {
     name: string
-    call(t: T)
+    displayName: string
+    description: string
+    schema: ZodObject | Schema
+    execute(input: T)
 }
 
-class BaseChatModel<T> {
-    invoke()
+class LanguageModelContext {
+    model: LanguageModel
+    options: CallSettings
+    modelName: string
+    providerName: string
 }
 
-class ChatPromptTemplate {
-    format()
+abstract class MessagesHistory {
+    getMessages(): BaseMessage[]
+    addMessage(message: BaseMessage)
+    addSources(externalExtensionId: string, sources: Source[])
 }
 
-class BaseCallbackHandlerMethods {
+interface ChatCache {
+    get(key, args, resolver, ttl?)
 }
 
-class BaseListChatMessageHistory {
-    addMessage(message: Message): void
-    addMessages(messages: Message[]): void
-    getMessages(): Message[]
-}
-
-class ChatUIImpl {
+interface ChatUI {
+    form(text: string, schema: ExtensionArgument): ChatUICallbackResult
 }
 
 class CallbackService {
-    confirm(): CallbackResult<boolean>
-    input(): CallbackResult<string>
-    complete(id: string, result: string | boolean)
-}
-
-class CallbackResult<T> {
-    id: string;
-    result: Promise<T>
+    form(owner, timeout?): CallbackResult<ChatUICallbackResult>
+    answer(id: string, owner, result: ChatUICallbackResult): boolean
 }
 
 class ConversationsController {
-    confirm(id: string, result: boolean | string)
-    postMessage(id: string, message: string)
+    postMessage(id: number, body)
+    confirm(id: number, requestId: string, result)
 }
 
 class SendMessageHandler {
-    execute(query: SentMessage)
+    execute(query: SendMessage)
 }
 
-class Middleware {
+interface ChatMiddleware {
+    invoke(context: ChatContext, getContext, next)
+}
+
+class ExecuteMiddleware {
     invoke(context: ChatContext)
 }
 
-class AgentExecutor {
-    execute(llm, tools, prompt)
+package "AI SDK (ai)" {
+    class streamText
+    class generateText
 }
 
-
-Subject "1" - "1"  ChatContext : result
-"StructuredTool" "1" -- "0..*" ChatContext : tools
-"BaseChatModel" "1" --- "1" ChatContext : llm
-"ChatPromptTemplate" "1" -- "1" ChatContext : prompt
-"BaseCallbackHandlerMethods" "1" -- "1..*" ChatContext : callbacks
-"BaseListChatMessageHistory" "1" -- "1" ChatContext : history
-"ChatUIImpl" "1" -- "1" ChatContext : ui
-"ChatUIImpl" --> CallbackService : uses
-ConversationsController --> CallbackService: completes
+Subject "1" - "1" ChatContext : result
+NamedStructuredTool "0..*" -- "1" ChatContext : tools
+LanguageModelContext "1..*" --- "1" ChatContext : llms
+MessagesHistory "1" -- "1" ChatContext : history
+ChatCache "1" -- "1" ChatContext : cache
+ChatUI "1" -- "1" ChatContext : ui
+ChatUI <|.. ChatUIImpl
+ChatUIImpl --> CallbackService : uses
+ConversationsController --> CallbackService : answers
 ConversationsController --> SendMessageHandler : executes
-SendMessageHandler ----> ChatContext: creates
-Middleware --> ChatContext: manipulates
-AgentExecutor ---> ChatContext: uses
-AgentExecutor ---> StructuredTool: calls
-AgentExecutor ---> BaseChatModel: calls
-AgentExecutor ---> ChatPromptTemplate: calls
-AgentExecutor ---> BaseCallbackHandlerMethods: uses
+SendMessageHandler ----> ChatContext : creates
+ChatMiddleware --> ChatContext : manipulates
+ChatMiddleware <|.. ExecuteMiddleware
+ExecuteMiddleware ---> ChatContext : uses
+ExecuteMiddleware ---> streamText : calls
+ExecuteMiddleware ---> generateText : calls (streaming disabled)
+streamText ---> LanguageModelContext : uses model
+streamText ---> NamedStructuredTool : calls
 
-BaseListChatMessageHistory <|-- InternalChatHistory
-BaseCallbackHandlerMethods <|-- CallbackHandler
-BaseChatModel <|-- ChatOpenAI: extends
-BaseChatModel <|-- ChatMistralAI: extends
-BaseChatModel <|-- ChatVertexAI: extends
-
-
+MessagesHistory <|-- InternalChatHistory
 @enduml
