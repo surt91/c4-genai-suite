@@ -22,6 +22,7 @@ export class AuthService implements OnModuleInit {
   private readonly logger = new Logger(AuthService.name);
 
   public readonly config: Readonly<AuthConfig>;
+  private dummyPasswordHash?: Promise<string>;
 
   constructor(
     private readonly configService: ConfigService,
@@ -278,12 +279,13 @@ export class AuthService implements OnModuleInit {
 
   async loginWithPassword(email: string, password: string, req: Request) {
     const user = await this.users.findOne({ where: { email }, relations: ['userGroups'] });
-    // We cannot compare the password in the database due to the salt.
-    if (!user?.passwordHash) {
-      throw new UnauthorizedException('Unknown user.');
-    }
-    if (!(await bcrypt.compare(password, user.passwordHash))) {
-      throw new UnauthorizedException('Wrong password.');
+    // Same error and (roughly) the same time for unknown users and wrong passwords, so that the login cannot be used
+    // to find out which e-mail addresses have an account.
+    this.dummyPasswordHash ??= bcrypt.hash('dummy-password', 10);
+    const passwordHash = user?.passwordHash ?? (await this.dummyPasswordHash);
+    const valid = await bcrypt.compare(password, passwordHash);
+    if (!user?.passwordHash || !valid) {
+      throw new UnauthorizedException('Invalid e-mail or password.');
     }
     this.assertContainsRequiredUserGroup(user.userGroups ?? []);
     await this.setSessionUser(req, user);

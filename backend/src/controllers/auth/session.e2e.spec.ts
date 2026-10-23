@@ -49,7 +49,7 @@ describe('Session handling', () => {
     configureSession(app);
     configureCookies(app);
     await app.init();
-    server = app.getHttpServer() as Server;
+    server = app.getHttpServer();
     dataSource = module.get<DataSource>(getDataSourceToken());
 
     const defaultGroup = await dataSource
@@ -79,6 +79,15 @@ describe('Session handling', () => {
     // The session id known before the (second) login is no longer valid.
     await get('/auth/profile').set('Cookie', first!).expect(HttpStatus.UNAUTHORIZED);
     await get('/auth/profile').set('Cookie', second!).expect(HttpStatus.OK);
+  });
+
+  it('does not reveal whether an e-mail address has an account', async () => {
+    const unknown = await post('/auth/login').send({ email: `unknown-${randomUUID()}@example.com`, password: PASSWORD });
+    const wrong = await post('/auth/login').send({ email, password: 'wrong' });
+
+    expect(unknown.status).toBe(HttpStatus.UNAUTHORIZED);
+    expect(wrong.status).toBe(HttpStatus.UNAUTHORIZED);
+    expect(unknown.body).toEqual(wrong.body);
   });
 
   it('rejects and deletes sessions whose max age has passed (not only enforced by the browser)', async () => {
