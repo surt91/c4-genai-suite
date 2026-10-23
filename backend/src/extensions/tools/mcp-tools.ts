@@ -14,7 +14,6 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { jsonSchema, JSONSchema7 } from 'ai';
-import { renderString } from 'nunjucks';
 import {
   ChatContext,
   ChatMiddleware,
@@ -32,6 +31,7 @@ import {
   ExtensionStringArgument,
 } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
+import { renderTemplate } from 'src/lib';
 import { I18nService } from '../../localization/i18n.service';
 import { transformMCPToolResponse } from './mcp-types/transformer';
 
@@ -418,7 +418,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
       Object.entries(args ?? templateArgs).map(([key, value]) => [
         key,
         typeof value === 'string' && typeof templateArgs[key] === 'string' && templateArgs[key]
-          ? renderString(templateArgs[key], {
+          ? renderTemplate(templateArgs[key], {
               ...context,
               language: this.i18n.language,
               value,

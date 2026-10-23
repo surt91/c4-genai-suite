@@ -51,6 +51,9 @@ There are two types of middleware which are used to process incoming messages
 #### DefaultPromptMiddleware
 - adds a prompt to the context if there is non
 
+#### RenderPromptMiddleware
+- replaces the placeholders of the system prompts, see [Templates](#templates)
+
 #### ExecutorMiddleware
 checks executorEndpoint
 - if defined sends request it to the endpoint
@@ -92,8 +95,24 @@ checks executorEndpoint
 
 ![Context](plantuml/image/context.png)
 
+## Templates
 
+System prompts and the values of MCP tool attributes may contain placeholders that are replaced at runtime
+(`src/lib/template.ts`):
 
+- `{{ name }}` or `{{name}}` is replaced by the value of the variable, dotted paths address nested values
+  (`{{ user.email }}`).
+- Unknown variables, `null` and `undefined` become an empty string, other values are converted with `String()`.
+- Values are inserted as they are, without HTML escaping.
+- There is no further template syntax: tags (`{% if %}`, `{% for %}`), filters (`{{ name | upper }}`), expressions
+  and comments (`{# #}`) are not evaluated but kept as literal text.
 
+Variables of system prompts: `date`, `timestamp`, `llm_name`, `llm_provider`, `user`, `assistant`,
+`assistant_description`.
 
+Variables of MCP tool attribute values: `value` (the value defined by the LLM or the user), `language` and the
+properties of the chat context, e.g. `conversationId`, `user.id`, `user.name`, `user.email`,
+`configuration.name`.
 
+Templates used to be rendered with nunjucks (with HTML escaping of the values); templates that rely on
+tags, filters or expressions need to be rewritten.

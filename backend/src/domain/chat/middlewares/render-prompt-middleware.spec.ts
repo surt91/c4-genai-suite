@@ -22,7 +22,7 @@ describe('RenderPromptMiddleware', () => {
     } as unknown as ChatContext;
 
     const next = (c: ChatContext) => {
-      // assert that there are no unreplaced nunjucks tags
+      // assert that there are no unreplaced placeholders
       for (const msg of c.systemMessages) {
         expect(msg).not.toMatch(/\{\{\s*[^}]+\s*\}\}/);
       }

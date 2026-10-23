@@ -96,7 +96,7 @@
     "customPrompt": {
       "title": "Prompt",
       "description": "Uses a free prompt text as system message.",
-      "templateDescription": "The text may contain certain placeholders that are replaced at runtime. Available placeholders:\n\n* `{{{{date}}}}`: today's date\n* `{{{{timestamp}}}}`: current date and time\n* `{{{{llm_name}}}}`: model name\n* `{{{{llm_provider}}}}`: model provider\n* `{{{{user}}}}`: username or email\n* `{{{{assistant}}}}`: assistant name\n* `{{{{assistant_description}}}}`: assistant description",
+      "templateDescription": "The text may contain certain placeholders (`{{{{name}}}}`, no other template syntax) that are replaced at runtime. Available placeholders:\n\n* `{{{{date}}}}`: today's date\n* `{{{{timestamp}}}}`: current date and time\n* `{{{{llm_name}}}}`: model name\n* `{{{{llm_provider}}}}`: model provider\n* `{{{{user}}}}`: username or email\n* `{{{{assistant}}}}`: assistant name\n* `{{{{assistant_description}}}}`: assistant description",
       "replaceDefaultTitle": "Replace default systemprompt",
       "replaceDefaultDescription": "When enabled, the custom prompt replaces the default systemprompt entirely. When disabled (default), the custom prompt extends the default systemprompt."
     },
@@ -246,7 +246,7 @@
       "source": "Source",
       "sourceHint": "Defines where the value should be defined.",
       "value": "Value (Template)",
-      "valueHint": "Value that is used during tool call",
+      "valueHint": "Value that is used during tool call. Text may contain placeholders like `{{{{value}}}}` (the value defined by the LLM or user), `{{{{language}}}}`, `{{{{conversationId}}}}` or `{{{{user.email}}}}`.",
       "errorToolCall": "An error occurred during the tool call '{tool}'"
     },
     "always42": {

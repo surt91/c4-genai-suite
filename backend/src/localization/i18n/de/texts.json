@@ -96,7 +96,7 @@
     "customPrompt": {
       "title": "Prompt",
       "description": "Verwendet einen freien Text als Systemnachricht.",
-      "templateDescription": "Der Text kann bestimmte Platzhalter enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Username oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten",
+      "templateDescription": "Der Text kann bestimmte Platzhalter (`{{{{name}}}}`, keine weitere Template-Syntax) enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Username oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten",
       "replaceDefaultTitle": "Standard-Systemprompt ersetzen",
       "replaceDefaultDescription": "Wenn aktiviert, ersetzt der benutzerdefinierte Prompt den Standard-Systemprompt vollständig. Wenn deaktiviert (Standard), erweitert der benutzerdefinierte Prompt den Standard-Systemprompt."
     },
@@ -246,7 +246,7 @@
       "source": "Quelle",
       "sourceHint": "An welcher Stelle wird der Wert bestimmt.",
       "value": "Wert (Template)",
-      "valueHint": "Wert, der beim Toolaufruf verwendet wird.",
+      "valueHint": "Wert, der beim Toolaufruf verwendet wird. Text kann Platzhalter wie `{{{{value}}}}` (der vom LLM oder Benutzer definierte Wert), `{{{{language}}}}`, `{{{{conversationId}}}}` oder `{{{{user.email}}}}` enthalten.",
       "errorToolCall": "Es ist ein Fehler aufgetreten beim Aufruf des Tools '{tool}'"
     },
     "always42": {
