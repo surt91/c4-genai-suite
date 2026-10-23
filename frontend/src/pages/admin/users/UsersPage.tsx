@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core';
+import { Button, Card, Group } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,7 +7,9 @@ import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { formatBoolean } from 'src/lib';
 import { texts } from 'src/texts';
+import listClasses from '../list.module.css';
 import { CreateUserDialog, UpdateUserDialog } from './UpsertUserDialog';
+import classes from './Users.module.css';
 import { useUsersStore } from './state';
 
 const EMPTY_USER_GROUPS: UserGroupDto[] = [];
@@ -57,57 +59,55 @@ export function UsersPage() {
   return (
     <>
       <Page>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-3xl">{texts.users.headline}</h2>
+        <div className={listClasses.header}>
+          <h2 className={listClasses.title}>{texts.users.headline}</h2>
 
-          <div className="flex gap-4">
+          <Group gap={16} wrap="nowrap" align="stretch">
             <Search value={query} onSearch={handleSearch} />
 
             <Button onClick={() => setToCreate(true)}>
-              <IconPlus className="mr-2" /> {texts.users.create}
+              <IconPlus className={classes.createIcon} /> {texts.users.create}
             </Button>
-          </div>
+          </Group>
         </div>
 
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <table className="table table-fixed text-base">
-              <thead>
-                <tr>
-                  <th>{texts.common.name}</th>
-                  <th>{texts.common.email}</th>
-                  <th>{texts.common.userGroups}</th>
-                  <th className="w-24">{texts.common.apiKey}</th>
-                  <th className="w-24">{texts.common.password}</th>
+        <Card radius="md" shadow="xs" padding={24}>
+          <table className={listClasses.table}>
+            <thead>
+              <tr>
+                <th>{texts.common.name}</th>
+                <th>{texts.common.email}</th>
+                <th>{texts.common.userGroups}</th>
+                <th className={listClasses.colSmall}>{texts.common.apiKey}</th>
+                <th className={listClasses.colSmall}>{texts.common.password}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr className={listClasses.row} key={user.id} onClick={() => setToUpdate(user)}>
+                  <td className={listClasses.cellStrong}>{user.name}</td>
+                  <td className={listClasses.cellTruncate}>{user.email}</td>
+                  <td className={listClasses.cell}>
+                    {userGroups
+                      .filter((x) => user.userGroupIds.includes(x.id))
+                      .map((group) => group.name)
+                      .join(', ')}
+                  </td>
+                  <td className={listClasses.cell}>{formatBoolean(user.hasApiKey)}</td>
+                  <td className={listClasses.cell}>{formatBoolean(user.hasPassword)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr className="cursor-pointer hover:bg-gray-50" key={user.id} onClick={() => setToUpdate(user)}>
-                    <td className="overflow-hidden font-semibold">{user.name}</td>
-                    <td className="truncate overflow-hidden">{user.email}</td>
-                    <td className="overflow-hidden">
-                      {userGroups
-                        .filter((x) => user.userGroupIds.includes(x.id))
-                        .map((group) => group.name)
-                        .join(', ')}
-                    </td>
-                    <td className="overflow-hidden">{formatBoolean(user.hasApiKey)}</td>
-                    <td className="overflow-hidden">{formatBoolean(user.hasPassword)}</td>
-                  </tr>
-                ))}
+              ))}
 
-                {users.length === 0 && isFetched && (
-                  <tr>
-                    <td colSpan={4}>{texts.users.empty}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+              {users.length === 0 && isFetched && (
+                <tr>
+                  <td colSpan={4}>{texts.users.empty}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
 
-            <Pagination page={page} pageSize={20} total={loadedUsers?.total || 0} onPage={doChangePage} />
-          </div>
-        </div>
+          <Pagination page={page} pageSize={20} total={loadedUsers?.total || 0} onPage={doChangePage} />
+        </Card>
       </Page>
       {toCreate && <CreateUserDialog userGroups={userGroups} onClose={doClose} onCreate={setUser} />}
       {toUpdate && (

@@ -1,4 +1,4 @@
-import { Button, MultiSelect, PasswordInput, Portal, TextInput } from '@mantine/core';
+import { ActionIcon, Box, Button, Divider, Group, MultiSelect, PasswordInput, Portal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard } from '@tabler/icons-react';
@@ -11,7 +11,9 @@ import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { useDeleteUser } from 'src/pages/admin/users/hooks/useDeleteUser';
 import { useUpsertUser } from 'src/pages/admin/users/hooks/useUpsertUser';
 import { texts } from 'src/texts';
+import formClasses from '../forms.module.css';
 import { GenerateApiKeyButton } from './GenerateApiKeyButton';
+import classes from './Users.module.css';
 
 const SCHEME = z
   .object({
@@ -113,10 +115,10 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
       <form noValidate onSubmit={form.onSubmit((newUserInformation) => userUpsert.mutate(newUserInformation))}>
         <Modal
           onClose={onClose}
-          header={<div className="flex items-center gap-4">{isCreating ? texts.users.create : texts.users.update}</div>}
+          header={<div className={classes.dialogHeader}>{isCreating ? texts.users.create : texts.users.update}</div>}
           footer={
             <fieldset disabled={isPending}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap={16} wrap="nowrap" align="stretch">
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
@@ -132,15 +134,15 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                     }}
                   >
                     {({ onClick }) => (
-                      <button type="button" className="btn" onClick={onClick}>
+                      <Button type="button" variant="default" onClick={onClick}>
                         {texts.common.save}
-                      </button>
+                      </Button>
                     )}
                   </ConfirmDialog>
                 ) : (
                   <Button type="submit">{texts.common.save}</Button>
                 )}
-              </div>
+              </Group>
             </fieldset>
           }
         >
@@ -151,7 +153,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
               id="name"
               withAsterisk
               label={texts.common.name}
-              className="mb-4"
+              mb="md"
               key={form.key('name')}
               {...form.getInputProps('name')}
             />
@@ -160,7 +162,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
               id="email"
               withAsterisk
               label={texts.common.email}
-              className="mb-4"
+              mb="md"
               key={form.key('email')}
               {...form.getInputProps('email')}
             />
@@ -170,7 +172,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
               withAsterisk
               label={texts.common.userGroups}
               data={userGroupsOptions ?? []}
-              className="mb-4"
+              mb="md"
               key={form.key('userGroupIds')}
               {...form.getInputProps('userGroupIds')}
             />
@@ -178,7 +180,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             <PasswordInput
               id="password"
               label={texts.common.password}
-              className="mb-4"
+              mb="md"
               key={form.key('password')}
               {...form.getInputProps('password')}
             />
@@ -186,15 +188,15 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
             <PasswordInput
               id="passwordConfirm"
               label={texts.common.passwordConfirm}
-              className="mb-4"
+              mb="md"
               key={form.key('passwordConfirm')}
               {...form.getInputProps('passwordConfirm')}
             />
 
-            <div className="mb-4">
-              {!userIsAdmin && <div className="text-sm text-slate-500">{texts.users.apiKeyHint}</div>}
-              <div className="flex items-end gap-2">
-                <div className="grow">
+            <Box mb="md">
+              {!userIsAdmin && <div className={classes.hint}>{texts.users.apiKeyHint}</div>}
+              <Group gap={8} align="flex-end" wrap="nowrap">
+                <Box flex={1}>
                   <TextInput
                     id="apiKey"
                     label={texts.common.apiKey}
@@ -202,10 +204,12 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                     key={form.key('apiKey')}
                     {...form.getInputProps('apiKey')}
                   />
-                </div>
+                </Box>
                 {form.getValues().apiKey && (
-                  <div
-                    className="btn btn-square"
+                  <ActionIcon
+                    component="div"
+                    variant="default"
+                    size="input-sm"
                     onClick={() => {
                       const value = form.getValues().apiKey;
                       if (!value) return;
@@ -214,27 +218,27 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
                     }}
                   >
                     <IconClipboard />
-                  </div>
+                  </ActionIcon>
                 )}
                 <GenerateApiKeyButton disabled={!userIsAdmin} form={form} />
-              </div>
-            </div>
+              </Group>
+            </Box>
 
             {!isCreating && userDelete && (
               <>
-                <hr className="my-6" />
+                <Divider my={24} />
 
-                <div className="flex flex-row">
-                  <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{texts.common.dangerZone}</label>
+                <div className={classes.dangerZone}>
+                  <label className={formClasses.labelInput}>{texts.common.dangerZone}</label>
                   <ConfirmDialog
                     title={texts.users.removeConfirmTitle}
                     text={texts.users.removeConfirmText}
                     onPerform={() => userDelete.mutate(props.target.id)}
                   >
                     {({ onClick }) => (
-                      <button type="button" className="btn btn-error" onClick={onClick}>
+                      <Button type="button" color="red" onClick={onClick}>
                         {texts.common.remove}
-                      </button>
+                      </Button>
                     )}
                   </ConfirmDialog>
                 </div>

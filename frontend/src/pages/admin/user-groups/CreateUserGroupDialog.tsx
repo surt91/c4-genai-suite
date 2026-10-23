@@ -1,4 +1,4 @@
-import { Button, NumberInput, Portal, TextInput } from '@mantine/core';
+import { Button, Group, NumberInput, Portal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { UpsertUserGroupDto, useApi, UserGroupDto } from 'src/api';
 import { FormAlert, Modal } from 'src/components';
 import { texts } from 'src/texts';
+import classes from './UserGroups.module.css';
 
 const SCHEME = z.object({
   name: z.string().min(1, texts.common.name),
@@ -60,16 +61,16 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
       >
         <Modal
           onClose={onClose}
-          header={<div className="flex items-center gap-4">{texts.userGroups.create}</div>}
+          header={<div className={classes.dialogHeader}>{texts.userGroups.create}</div>}
           footer={
             <fieldset disabled={updating.isPending}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap={16} wrap="nowrap" align="stretch">
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
 
                 <Button type="submit">{texts.common.save}</Button>
-              </div>
+              </Group>
             </fieldset>
           }
         >
@@ -80,7 +81,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
               id="name"
               withAsterisk
               label={texts.common.groupName}
-              className="mb-4"
+              mb="md"
               key={form.key('name')}
               {...form.getInputProps('name')}
             />
@@ -88,7 +89,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
             <NumberInput
               id="monthlyTokens"
               label={texts.common.monthlyTokens}
-              className="mb-4"
+              mb="md"
               key={form.key('monthlyTokens')}
               {...form.getInputProps('monthlyTokens')}
             />
@@ -96,7 +97,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
             <NumberInput
               id="monthlyUserTokens"
               label={texts.common.monthlyUserTokens}
-              className="mb-4"
+              mb="md"
               key={form.key('monthlyUserTokens')}
               {...form.getInputProps('monthlyUserTokens')}
             />

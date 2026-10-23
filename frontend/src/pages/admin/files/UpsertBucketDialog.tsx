@@ -1,15 +1,17 @@
-import { Button, MultiSelect, NumberInput, Portal, Select, Textarea, TextInput } from '@mantine/core';
+import { Button, Group, MultiSelect, NumberInput, Portal, Select, Textarea, TextInput } from '@mantine/core';
 import { useForm, UseFormReturnType } from '@mantine/form';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { clsx } from 'clsx';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { BucketDto, BucketDtoFileSizeLimits, BucketDtoTypeEnum, UpsertBucketDto, useApi } from 'src/api';
 import { FormAlert, Icon, Modal } from 'src/components';
-import { buildError, cn } from 'src/lib';
+import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { TestButton } from './TestButton';
+import classes from './UpsertBucketDialog.module.css';
 
 function debounce<F extends (...args: never[]) => void>(func: F, wait: number): (...args: Parameters<F>) => void {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -141,20 +143,20 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
       <form onSubmit={form.onSubmit((v) => (target ? updating.mutate(v) : creating.mutate(v)))}>
         <Modal
           onClose={onClose}
-          header={<div className="flex items-center gap-4">{target ? texts.files.updateBucket : texts.files.createBucket}</div>}
+          header={<div className={classes.header}>{target ? texts.files.updateBucket : texts.files.createBucket}</div>}
           footer={
             <fieldset disabled={updating.isPending || creating.isPending}>
-              <div className="flex flex-row justify-between">
+              <Group justify="space-between" wrap="nowrap" align="stretch">
                 <TestButton form={form} />
-                <div className="flex flex-row gap-2">
+                <Group gap={8} wrap="nowrap" align="stretch">
                   <Button type="button" variant={'subtle'} onClick={onClose}>
                     {texts.common.cancel}
                   </Button>
                   <Button type="submit" disabled={isDisabled}>
                     {texts.common.save}
                   </Button>
-                </div>
-              </div>
+                </Group>
+              </Group>
             </fieldset>
           }
         >
@@ -327,45 +329,37 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
 
   return (
     <div className={className}>
-      <label className="text-sm font-medium">{label}</label>
-      <div className="mt-1 space-y-2">
-        <div className={cn('form-row flex flex-row items-center space-x-2', className)}>
-          <button type="button" className="cursor-pointer" data-testid="fileSizeLimitsDynamic.add" onClick={handleAddField}>
+      <label className={classes.label}>{label}</label>
+      <div className={classes.rows}>
+        <div className={clsx(classes.row, className)}>
+          <button type="button" className={classes.iconButton} data-testid="fileSizeLimitsDynamic.add" onClick={handleAddField}>
             <Icon icon="plus" />
           </button>
           <input
             placeholder="general"
             disabled
-            className={cn('input input-bordered w-full', className)}
+            className={clsx(classes.input, className)}
             aria-label={texts.accessibility.fileTypeGeneral}
           />
-          <div className="relative w-full">
+          <div className={classes.suffixWrapper}>
             <input
               type="number"
               placeholder="10"
               step="0.1"
               value={generalValue}
               onChange={(e) => handleGeneralChange(parseFloat(e.target.value) || 0)}
-              className={cn('input input-bordered w-full pr-10', className)}
+              className={clsx(classes.input, classes.inputWithSuffix, className)}
               data-testid="fileSizeLimitsGeneral.value"
               aria-label={texts.accessibility.generalFileSizeLimit}
             />
-            {suffix && (
-              <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
-                {suffix}
-              </span>
-            )}
+            {suffix && <span className={classes.suffix}>{suffix}</span>}
           </div>
         </div>
         {dynamicFields.map((field, index) => (
-          <div
-            key={index}
-            className={cn('form-row flex flex-row items-center space-x-2', className)}
-            data-testid={`fileSizeLimitsDynamic.${index}.row`}
-          >
+          <div key={index} className={clsx(classes.row, className)} data-testid={`fileSizeLimitsDynamic.${index}.row`}>
             <button
               type="button"
-              className="cursor-pointer"
+              className={classes.iconButton}
               data-testid={`fileSizeLimitsDynamic.${index}.remove`}
               onClick={() => handleRemoveField(index)}
             >
@@ -375,11 +369,11 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
               placeholder="pdf"
               value={field.key}
               onChange={(e) => handleFieldKeyChange(index, e.target.value)}
-              className={cn('input input-bordered w-full', className)}
+              className={clsx(classes.input, className)}
               data-testid={`fileSizeLimitsDynamic.${index}.key`}
               aria-label={texts.accessibility.fileType(index + 1)}
             />
-            <div className="relative w-full">
+            <div className={classes.suffixWrapper}>
               <input
                 type="number"
                 placeholder="10"
@@ -387,15 +381,11 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
                 required
                 value={field.value}
                 onChange={(e) => handleFieldValueChange(index, parseFloat(e.target.value) || 0)}
-                className={cn('input input-bordered w-full pr-10', className)}
+                className={clsx(classes.input, classes.inputWithSuffix, className)}
                 data-testid={`fileSizeLimitsDynamic.${index}.value`}
                 aria-label={texts.accessibility.fileSizeLimit(index + 1)}
               />
-              {suffix && (
-                <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
-                  {suffix}
-                </span>
-              )}
+              {suffix && <span className={classes.suffix}>{suffix}</span>}
             </div>
           </div>
         ))}

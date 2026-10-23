@@ -1,5 +1,7 @@
 import {
+  Anchor,
   Autocomplete,
+  Box,
   Checkbox,
   Fieldset,
   MultiSelect,
@@ -7,6 +9,7 @@ import {
   PasswordInput,
   Select,
   Slider,
+  Stack,
   TagsInput,
   Textarea,
   TextInput,
@@ -16,6 +19,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { BucketDto, CreateExtensionDto, ExtensionArgumentObjectSpecDtoPropertiesValue, ExtensionSpecDto } from 'src/api';
 import { Icon, Markdown } from 'src/components';
 import { texts } from 'src/texts';
+import formClasses from '../forms.module.css';
 
 type ExtensionUserInfoDtoUserArgumentsValue = ExtensionArgumentObjectSpecDtoPropertiesValue;
 
@@ -71,17 +75,17 @@ export function ExtensionForm(props: ExtensionFormProps) {
   }));
 
   return (
-    <div className="flex flex-col">
+    <Stack gap={0}>
       {Object.keys(spec.arguments).length > 0 && (
         <>
           <Fieldset
             legend={
-              <div className="flex items-center">
-                <h4 className="mr-2.5 font-bold">{spec.title}</h4>
-                <p className="text-xs">{spec.description}</p>
+              <div className={formClasses.legend}>
+                <h4 className={formClasses.legendTitle}>{spec.title}</h4>
+                <p className={formClasses.legendDescription}>{spec.description}</p>
               </div>
             }
-            className="mb-4"
+            mb="md"
           >
             {Object.entries(spec.arguments).map(([name, argumentSpec]) => (
               <Argument namePrefix={'values.'} key={name} buckets={buckets} name={name} argument={argumentSpec} form={form} />
@@ -115,7 +119,7 @@ export function ExtensionForm(props: ExtensionFormProps) {
           }}
         />
       </FormRow>
-    </div>
+    </Stack>
   );
 }
 
@@ -149,13 +153,13 @@ export function Argument({
         <Markdown>{description}</Markdown>
 
         {documentationUrl && (
-          <div className="mt-1">
+          <Box mt={4}>
             <span>{texts.common.documentationLabel}&nbsp;</span>
 
-            <a className="text-primary hover:underline" href={documentationUrl} rel="noopener noreferrer" target="_blank">
-              <Icon icon="external-link" className="inline-block align-baseline" size={12} /> {texts.common.documentation}
-            </a>
-          </div>
+            <Anchor c="var(--color-primary)" href={documentationUrl} rel="noopener noreferrer" target="_blank">
+              <Icon icon="external-link" className={formClasses.inlineIcon} size={12} /> {texts.common.documentation}
+            </Anchor>
+          </Box>
         )}
       </>
     );
@@ -181,9 +185,9 @@ export function Argument({
     return (
       <Fieldset
         legend={
-          <div className="flex items-center">
-            <h4 className="mr-2.5 font-bold">{title}</h4>
-            <p className="text-xs">{description}</p>
+          <div className={formClasses.legend}>
+            <h4 className={formClasses.legendTitle}>{title}</h4>
+            <p className={formClasses.legendDescription}>{description}</p>
           </div>
         }
       >
@@ -357,15 +361,15 @@ function FormRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="form-row mb-4 flex flex-row" data-testid={name}>
+    <div className={formClasses.row} data-testid={name}>
       {label && (
-        <label htmlFor={name} className="w-48 shrink-0 pt-1 text-sm font-semibold">
+        <label htmlFor={name} className={formClasses.label}>
           {label}
         </label>
       )}
-      <div className="min-w-0 grow">
+      <div className={formClasses.control}>
         {children}
-        {hints && <div className="text-sm leading-6 text-slate-500">{hints}</div>}
+        {hints && <div className={formClasses.hints}>{hints}</div>}
       </div>
     </div>
   );

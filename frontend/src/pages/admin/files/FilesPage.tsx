@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Checkbox, NativeSelect } from '@mantine/core';
+import { ActionIcon, Box, Button, Checkbox, Group, NativeSelect } from '@mantine/core';
 import { IconEdit, IconLoader, IconTrash, IconUpload } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -9,6 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { clsx } from 'clsx';
 import { formatDate } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -19,6 +20,7 @@ import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
+import classes from './Files.module.css';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useDeletingBucket, useDeletingFile, useUploadingFile } from './hooks';
 import { useBucketstore, useFilesStore } from './state';
@@ -120,7 +122,7 @@ export function FilesPage() {
           />
         ),
         cell: ({ row }) => (
-          <div className="px-0">
+          <div>
             <Checkbox
               radius="sm"
               color="blue"
@@ -141,7 +143,7 @@ export function FilesPage() {
       },
       {
         accessorKey: 'mimeType',
-        cell: (info) => <span className="badge self-center bg-gray-100">{extractType(info.row.original)}</span>,
+        cell: (info) => <span className={clsx(classes.badge, classes.badgeType)}>{extractType(info.row.original)}</span>,
         header: () => <span>{texts.files.properties.fileType}</span>,
       },
       {
@@ -190,11 +192,11 @@ export function FilesPage() {
   return (
     <>
       {thisBucket && (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-8">
-            <div className="flex items-end justify-between">
-              <h2 className="text-3xl">{thisBucket.name}</h2>
-              <div className="flex gap-2">
+        <div className={classes.page}>
+          <div className={classes.header}>
+            <div className={classes.titleRow}>
+              <h2 className={classes.title}>{thisBucket.name}</h2>
+              <Group gap={8} wrap="nowrap" align="stretch">
                 <Button leftSection={<IconEdit size={20} />} onClick={() => setToUpdate(true)}>
                   {texts.common.edit}
                 </Button>
@@ -209,9 +211,9 @@ export function FilesPage() {
                     </Button>
                   )}
                 </ConfirmDialog>
-              </div>
+              </Group>
             </div>
-            <div className="flex min-h-full grow flex-wrap items-center gap-x-10 gap-y-2">
+            <div className={classes.infos}>
               {thisBucket.type === BucketDtoTypeEnum.General && <InfoByte title={texts.files.bucketType} value={'General'} />}
               {thisBucket.type === BucketDtoTypeEnum.Conversation && <InfoByte title={texts.files.bucketType} value={'Chat'} />}
               {thisBucket.type === BucketDtoTypeEnum.User && (
@@ -220,18 +222,18 @@ export function FilesPage() {
               <InfoByte title={texts.common.endpoint} value={thisBucket.endpoint} />
               {thisBucket.indexName && <InfoByte title={texts.common.indexName} value={thisBucket.indexName} />}
             </div>
-            <div className="my-4 flex">
-              <h2 className="grow text-2xl">{texts.files.headlineSearchable}</h2>
+            <div className={classes.sectionHeader}>
+              <h2 className={classes.sectionTitle}>{texts.files.headlineSearchable}</h2>
               {thisBucket.type !== BucketDtoTypeEnum.User && thisBucket.type !== BucketDtoTypeEnum.Conversation && (
                 <ActionIcon onClick={open} disabled={isDragActive || uploading.length > 0} color="black" size="input-sm">
-                  {uploading.length > 0 ? <IconLoader size={20} className="animate-spin" /> : <IconUpload size={20} />}
+                  {uploading.length > 0 ? <IconLoader size={20} className={classes.spin} /> : <IconUpload size={20} />}
                 </ActionIcon>
               )}
             </div>
           </div>
 
-          <div className="relative flex w-full flex-col gap-y-4 overflow-x-hidden rounded-xl bg-white bg-clip-border p-4 pt-6 shadow-sm">
-            <div className="flex items-center justify-between">
+          <div className={classes.tableCard}>
+            <Group justify="space-between" wrap="nowrap" gap={0}>
               <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
               <NativeSelect
                 size="sm"
@@ -239,19 +241,19 @@ export function FilesPage() {
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
                 value={String(table.getState().pagination.pageSize)}
               />
-            </div>
+            </Group>
 
             {thisBucket?.type !== BucketDtoTypeEnum.User && thisBucket?.type !== BucketDtoTypeEnum.Conversation ? (
-              <div className={isDragActive ? 'rounded-sm bg-gray-50' : ''} {...getRootProps()}>
+              <div className={isDragActive ? classes.dropActive : undefined} {...getRootProps()}>
                 <input {...getInputProps()} />
                 <FilterableTable table={table} />
               </div>
             ) : (
               <FilterableTable table={table} />
             )}
-            <div className="flex flex-row items-center justify-between gap-x-2">
-              <div className="flex flex-row items-center gap-x-2 p-2 text-sm">
-                <div className="text-gray-500">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</div>
+            <Group justify="space-between" gap={8} wrap="nowrap">
+              <div className={classes.selection}>
+                <Box c="dark.3">{texts.common.rowsSelected(table.getSelectedRowModel().rows.length)}</Box>
                 <ConfirmDialog
                   title={texts.files.removeFilesConfirmTitle}
                   text={texts.files.removeFilesConfirmText(table.getSelectedRowModel().rows.length)}
@@ -271,7 +273,7 @@ export function FilesPage() {
                 </ConfirmDialog>
               </div>
               <TablePagination table={table} />
-            </div>
+            </Group>
           </div>
         </div>
       )}

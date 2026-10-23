@@ -1,9 +1,11 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { memo } from 'react';
 import { BucketDto, BucketDtoTypeEnum } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
 import { texts } from 'src/texts';
+import classes from './Files.module.css';
 
 interface BucketProps {
   bucket: BucketDto;
@@ -13,23 +15,19 @@ interface BucketProps {
 
 export const Bucket = memo(({ bucket, onDelete, onUpdate }: BucketProps) => {
   return (
-    <li className="group flex items-center rounded-lg px-2 py-1 hover:bg-gray-100 focus:font-semibold">
-      <TransientNavLink to={`/admin/files/${bucket.id}`} className="text-normal block min-w-0 grow truncate text-ellipsis">
-        {/*{bucket.isDefault && <div className="badge badge-primary mr-2 truncate font-normal">{texts.common.userBucketBadge}</div>}*/}
-
+    <li className={classes.menuItem}>
+      <TransientNavLink to={`/admin/files/${bucket.id}`} className={classes.menuLink}>
         {bucket.type === BucketDtoTypeEnum.User && (
-          <div className="badge badge-primary mr-2 truncate font-normal">{texts.common.userBucketBadge}</div>
+          <div className={clsx(classes.badge, classes.badgePrimary)}>{texts.common.userBucketBadge}</div>
         )}
-        {bucket.type === BucketDtoTypeEnum.Conversation && (
-          <div className="badge badge-primary mr-2 truncate font-normal">Chat</div>
-        )}
+        {bucket.type === BucketDtoTypeEnum.Conversation && <div className={clsx(classes.badge, classes.badgePrimary)}>Chat</div>}
         {bucket.name}
       </TransientNavLink>
 
       <Menu withInitialFocusPlaceholder={false}>
         <Menu.Target>
           <ActionIcon
-            className="opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+            className={classes.menuActions}
             variant="subtle"
             data-testid={'more-actions'}
             aria-label={texts.common.menu}

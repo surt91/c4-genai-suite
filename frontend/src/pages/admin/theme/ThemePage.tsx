@@ -1,43 +1,37 @@
+import { Card } from '@mantine/core';
 import { Page } from 'src/components';
 import { texts } from 'src/texts';
 import { LogoUpload } from './LogoUpload';
+import classes from './Theme.module.css';
 import { ThemeForm } from './ThemeForm';
 
 export function ThemePage() {
   return (
     <Page>
-      <h1 className="mb-4 text-3xl">{texts.theme.headline}</h1>
+      <h1 className={classes.headline}>{texts.theme.headline}</h1>
 
-      <h2 className="mt-8 mb-2 text-xl">{texts.theme.logo}</h2>
+      <h2 className={classes.sectionTitle}>{texts.theme.logo}</h2>
 
-      <div className="card bg-base-100 shadow">
-        <div className="card-body">
-          <LogoUpload imageType="logo" />
-        </div>
-      </div>
-      <h2 className="mt-8 mb-2 text-xl">{texts.theme.avatarLogo}</h2>
+      <Card radius="md" shadow="xs" padding={24}>
+        <LogoUpload imageType="logo" />
+      </Card>
+      <h2 className={classes.sectionTitle}>{texts.theme.avatarLogo}</h2>
 
-      <div className="card bg-base-100 shadow">
-        <div className="card-body">
-          <LogoUpload imageType="avatarLogo" />
-        </div>
-      </div>
+      <Card radius="md" shadow="xs" padding={24}>
+        <LogoUpload imageType="avatarLogo" />
+      </Card>
 
-      <h2 className="mt-8 mb-2 text-xl">{texts.theme.backgroundLogo}</h2>
+      <h2 className={classes.sectionTitle}>{texts.theme.backgroundLogo}</h2>
 
-      <div className="card bg-base-100 mb-2 shadow">
-        <div className="card-body">
-          <LogoUpload imageType="backgroundLogo" />
-        </div>
-      </div>
+      <Card radius="md" shadow="xs" padding={24} mb={8}>
+        <LogoUpload imageType="backgroundLogo" />
+      </Card>
 
-      <h2 className="mb-2 pt-4 text-xl">{texts.theme.settings}</h2>
+      <h2 className={classes.settingsTitle}>{texts.theme.settings}</h2>
 
-      <div className="card bg-base-100 mt-4 shadow">
-        <div className="card-body">
-          <ThemeForm />
-        </div>
-      </div>
+      <Card radius="md" shadow="xs" padding={24} mt={16}>
+        <ThemeForm />
+      </Card>
     </Page>
   );
 }

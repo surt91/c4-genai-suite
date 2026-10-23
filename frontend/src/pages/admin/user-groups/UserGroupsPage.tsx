@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core';
+import { Button, Card, Group } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import { Page } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { formatBoolean } from 'src/lib';
 import { texts } from 'src/texts';
+import listClasses from '../list.module.css';
 import { CreateUserGroupDialog } from './CreateUserGroupDialog';
 import { UpdateUserGroupDialog } from './UpdateUserGroupDialog';
 import { useUserGroupsStore } from './state';
@@ -37,44 +38,42 @@ export function UserGroupsPage() {
 
   return (
     <Page>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-3xl">{texts.userGroups.headline}</h2>
+      <div className={listClasses.header}>
+        <h2 className={listClasses.title}>{texts.userGroups.headline}</h2>
 
-        <div className="flex gap-4">
+        <Group gap={16} wrap="nowrap" align="stretch">
           <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
             {texts.userGroups.create}
           </Button>
-        </div>
+        </Group>
       </div>
 
-      <div className="card bg-base-100 shadow">
-        <div className="card-body">
-          <table className="table table-fixed text-base">
-            <thead>
-              <tr>
-                <th>{texts.common.groupName}</th>
-                <th className="w-40">{texts.common.administration}</th>
-                <th className="w-40">{texts.common.builtIn}</th>
+      <Card radius="md" shadow="xs" padding={24}>
+        <table className={listClasses.table}>
+          <thead>
+            <tr>
+              <th>{texts.common.groupName}</th>
+              <th className={listClasses.colMedium}>{texts.common.administration}</th>
+              <th className={listClasses.colMedium}>{texts.common.builtIn}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {userGroups.map((userGroup) => (
+              <tr className={listClasses.row} key={userGroup.id} onClick={() => setToUpdate(userGroup)}>
+                <td className={listClasses.cellStrong}>{userGroup.name}</td>
+                <td className={listClasses.cell}>{formatBoolean(userGroup.isAdmin)}</td>
+                <td className={listClasses.cell}>{formatBoolean(userGroup.isBuiltIn)}</td>
               </tr>
-            </thead>
-            <tbody>
-              {userGroups.map((userGroup) => (
-                <tr className="cursor-pointer hover:bg-gray-50" key={userGroup.id} onClick={() => setToUpdate(userGroup)}>
-                  <td className="overflow-hidden font-semibold">{userGroup.name}</td>
-                  <td className="overflow-hidden">{formatBoolean(userGroup.isAdmin)}</td>
-                  <td className="overflow-hidden">{formatBoolean(userGroup.isBuiltIn)}</td>
-                </tr>
-              ))}
+            ))}
 
-              {userGroups.length === 0 && isFetched && (
-                <tr>
-                  <td colSpan={3}>{texts.userGroups.empty}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            {userGroups.length === 0 && isFetched && (
+              <tr>
+                <td colSpan={3}>{texts.userGroups.empty}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </Card>
 
       {toCreate && <CreateUserGroupDialog onClose={doClose} onCreate={setUserGroup} />}
       {toUpdate && (

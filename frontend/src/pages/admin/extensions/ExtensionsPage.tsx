@@ -1,4 +1,4 @@
-import { Button, Fieldset, Tabs } from '@mantine/core';
+import { Box, Button, Fieldset, Group, Alert as MantineAlert, Stack, Tabs } from '@mantine/core';
 import { IconBlocks, IconBrain, IconCopy, IconEdit, IconPlus, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -10,7 +10,9 @@ import { Alert, ConfirmDialog, Icon } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
+import formClasses from '../forms.module.css';
 import { ExtensionCard } from './ExtensionCard';
+import classes from './Extensions.module.css';
 import { UpsertConfigurationDialog } from './UpsertConfigurationDialog';
 import { UpsertExtensionDialog } from './UpsertExtensionDialog';
 import { useConfigurationStore, useExtensionsStore } from './state';
@@ -162,17 +164,17 @@ export function ExtensionsPage() {
     <>
       {thisConfiguration && (
         <>
-          <div className="flex flex-col gap-8">
-            <div className="flex items-start justify-between">
-              <div className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-4">
-                  <h2 className="text-3xl">{thisConfiguration.name}</h2>
-                </div>
-                <div className="text-gray-600">{thisConfiguration.description}</div>
-                <div className="text-gray-400">id: {thisConfiguration.id}</div>
-              </div>
+          <div className={classes.page}>
+            <div className={classes.pageHeader}>
+              <Stack gap={8}>
+                <Group gap={16}>
+                  <h2 className={classes.pageTitle}>{thisConfiguration.name}</h2>
+                </Group>
+                <Box c="gray.7">{thisConfiguration.description}</Box>
+                <Box c="gray.6">id: {thisConfiguration.id}</Box>
+              </Stack>
 
-              <div className="flex gap-2">
+              <Group gap={8} wrap="nowrap" align="stretch">
                 <Button leftSection={<IconEdit size={20} />} onClick={() => setToUpdateConfiguration(true)}>
                   {texts.common.edit}
                 </Button>
@@ -190,10 +192,10 @@ export function ExtensionsPage() {
                     </Button>
                   )}
                 </ConfirmDialog>
-              </div>
+              </Group>
             </div>
-            <div className="mt-4 flex">
-              <h2 className="grow text-2xl">{texts.extensions.headline}</h2>
+            <div className={classes.sectionHeader}>
+              <h2 className={classes.sectionTitle}>{texts.extensions.headline}</h2>
               <Button leftSection={<IconPlus />} onClick={() => setToCreate(true)}>
                 {texts.extensions.add}
               </Button>
@@ -205,7 +207,7 @@ export function ExtensionsPage() {
                 radius="lg"
                 onChange={setActiveTab}
                 value={activeTab}
-                classNames={{ tab: 'custom-tab', tabLabel: 'custom-tabLabel', panel: 'custom-tab-panel' }}
+                classNames={{ tab: classes.tab, tabLabel: classes.tabLabel, panel: classes.tabPanel }}
               >
                 <Tabs.List grow>
                   <Tabs.Tab value="models" leftSection={<IconBrain size={18} />}>
@@ -223,7 +225,7 @@ export function ExtensionsPage() {
 
                   {numModels > 1 && isFetched && <Alert text={texts.extensions.warningTooManyModels} />}
 
-                  <ul aria-label={'extensionList'} className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  <ul aria-label={'extensionList'} className={classes.cards}>
                     {asModels.map((extension) => (
                       <ExtensionCard
                         key={extension.id}
@@ -237,22 +239,22 @@ export function ExtensionsPage() {
                   </ul>
                 </Tabs.Panel>
                 <Tabs.Panel value="tools">
-                  {asTools.length == 0 && isFetched && <div className="p-2 text-sm">{texts.extensions.noTools}</div>}
+                  {asTools.length == 0 && isFetched && <div className={classes.empty}>{texts.extensions.noTools}</div>}
 
                   {incompatibleToolPairsNames.map(([title, other]) => (
-                    <div
+                    <MantineAlert
                       key={title + other}
-                      role="alert"
-                      className="alert alert-warning"
+                      variant="filled"
+                      color="yellow"
+                      icon={<Icon icon="alert" />}
                       aria-label={'warning'}
                       data-testid="incompatibleToolAlert"
                     >
-                      <Icon icon="alert" />
                       <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
-                    </div>
+                    </MantineAlert>
                   ))}
 
-                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  <div className={classes.cards}>
                     {asTools.map((extension) => (
                       <ExtensionCard
                         key={extension.id}
@@ -266,22 +268,22 @@ export function ExtensionsPage() {
                   </div>
                 </Tabs.Panel>
                 <Tabs.Panel value="others">
-                  {asOthers.length == 0 && isFetched && <div className="p-2 text-sm">{texts.extensions.noOthers}</div>}
+                  {asOthers.length == 0 && isFetched && <div className={classes.empty}>{texts.extensions.noOthers}</div>}
 
                   {incompatibleToolsOtherPairsNames.map(([title, other]) => (
-                    <div
+                    <MantineAlert
                       key={title + other}
-                      role="alert"
-                      className="alert alert-warning"
+                      variant="filled"
+                      color="yellow"
+                      icon={<Icon icon="alert" />}
                       aria-label={'warning'}
                       data-testid="incompatibleOtherAlert"
                     >
-                      <Icon icon="alert" />
                       <span>{texts.extensions.warningIncompatibleFilesTools(title, other)}</span>
-                    </div>
+                    </MantineAlert>
                   ))}
 
-                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  <div className={classes.cards}>
                     {asOthers.map((extension) => (
                       <ExtensionCard
                         key={extension.id}
@@ -298,8 +300,8 @@ export function ExtensionsPage() {
             </div>
 
             {extensions.some((x) => x.configurableArguments) && (
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl">{texts.common.configurableArguments}</h3>
+              <div className={classes.arguments}>
+                <h3 className={classes.subTitle}>{texts.common.configurableArguments}</h3>
 
                 {extensions
                   .filter((x) => x.configurableArguments)
@@ -307,21 +309,21 @@ export function ExtensionsPage() {
                     <Fieldset
                       key={x.id}
                       legend={
-                        <div className="flex items-center">
-                          <h4 className="mr-2.5 font-bold">{x.configurableArguments?.title}</h4>
-                          <p className="text-xs">{x.configurableArguments?.description}</p>
+                        <div className={formClasses.legend}>
+                          <h4 className={formClasses.legendTitle}>{x.configurableArguments?.title}</h4>
+                          <p className={formClasses.legendDescription}>{x.configurableArguments?.description}</p>
                         </div>
                       }
                     >
-                      <ul className="list-none space-y-2 text-sm">
+                      <ul className={classes.argumentList}>
                         {Object.entries(x.configurableArguments!.properties).map(([name, spec]) => (
-                          <li key={`${x.id}-${name}`} className="flex flex-col gap-0.5 border-l-2 border-slate-300 pl-3">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-slate-700">{spec.title}</span>
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">{spec.type}</span>
-                              {spec.required && <span className="text-xs text-red-500">*</span>}
+                          <li key={`${x.id}-${name}`} className={classes.argument}>
+                            <div className={classes.argumentHeader}>
+                              <span className={classes.argumentTitle}>{spec.title}</span>
+                              <span className={classes.argumentType}>{spec.type}</span>
+                              {spec.required && <span className={classes.argumentRequired}>*</span>}
                             </div>
-                            {spec.description && <p className="text-slate-500">{spec.description}</p>}
+                            {spec.description && <p className={classes.argumentDescription}>{spec.description}</p>}
                           </li>
                         ))}
                       </ul>

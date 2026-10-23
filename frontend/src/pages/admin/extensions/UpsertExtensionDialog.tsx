@@ -1,4 +1,4 @@
-import { Alert, Button, Divider, Portal, Tabs } from '@mantine/core';
+import { Alert, Button, Divider, Group, Portal, Stack, Tabs } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconBlocks, IconBrain, IconInfoCircle, IconRefresh, IconTool, IconTrash } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
@@ -15,8 +15,10 @@ import {
 import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { texts } from 'src/texts';
+import formClasses from '../forms.module.css';
 import { ExtensionCard } from './ExtensionCard';
 import { ExtensionForm } from './ExtensionForm';
+import classes from './Extensions.module.css';
 import { TestButton } from './TestButton';
 import { useSpecResolver } from './hooks';
 
@@ -172,9 +174,14 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
         <Modal
           onClose={onClose}
           header={
-            <div className="flex items-center gap-4">
+            <div className={classes.dialogHeader}>
               {spec?.logo && (
-                <img className="h-6" src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`} alt="" aria-hidden="true" />
+                <img
+                  className={classes.dialogLogo}
+                  src={`data:image/svg+xml;utf8,${encodeURIComponent(spec.logo)}`}
+                  alt=""
+                  aria-hidden="true"
+                />
               )}
               {selected && texts.extensions.updateExtension}
               {!selected && texts.extensions.createExtension}
@@ -183,11 +190,11 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
           footer={
             spec ? (
               <fieldset disabled={creating.isPending || updating.isPending || rebuild.isPending}>
-                <div className="flex flex-row justify-between">
-                  <div className="flex flex-row gap-4">
+                <Group justify="space-between" wrap="nowrap" align="stretch">
+                  <Group gap={16} wrap="nowrap" align="stretch">
                     {spec.testable ? <TestButton extensionId={selected?.id} form={form} /> : <div />}
-                  </div>
-                  <div className="flex flex-row gap-4">
+                  </Group>
+                  <Group gap={16} wrap="nowrap" align="stretch">
                     <Button type="button" variant="subtle" onClick={onClose}>
                       {texts.common.cancel}
                     </Button>
@@ -206,8 +213,8 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                       </DisabledAwareTooltip>
                     )}
                     {!modified && <Button type="submit">{texts.common.save}</Button>}
-                  </div>
-                </div>
+                  </Group>
+                </Group>
               </fieldset>
             ) : undefined
           }
@@ -229,9 +236,9 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                 {selected && <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />}
 
                 {selected && (
-                  <div className="form-row mb-4 flex flex-row">
-                    <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{texts.common.remove}</label>
-                    <div className="min-w-0 grow">
+                  <div className={formClasses.row}>
+                    <label className={formClasses.labelInput}>{texts.common.remove}</label>
+                    <div className={formClasses.control}>
                       <ConfirmDialog
                         title={texts.extensions.removeExtensionConfirmText}
                         text={texts.extensions.removeExtensionConfirmText}
@@ -242,7 +249,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                             type="button"
                             variant="light"
                             color="red"
-                            leftSection={<IconTrash className="w-4" />}
+                            leftSection={<IconTrash size={16} />}
                             onClick={onClick}
                           >
                             {texts.common.remove}
@@ -254,10 +261,10 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                 )}
               </>
             ) : (
-              <div className="flex flex-col gap-6">
+              <Stack gap={24}>
                 <Tabs
                   color={'blue'}
-                  classNames={{ tabLabel: 'custom-tabLabel', panel: 'dialogue-tab-panel' }}
+                  classNames={{ tabLabel: classes.tabLabel, panel: classes.dialogTabPanel }}
                   defaultValue={'models'}
                 >
                   <Tabs.List grow>
@@ -272,28 +279,28 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                     </Tabs.Tab>
                   </Tabs.List>
                   <Tabs.Panel value="models">
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    <div className={classes.cards}>
                       {asModels.map((spec) => (
                         <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
                       ))}
                     </div>
                   </Tabs.Panel>
                   <Tabs.Panel value="tools">
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    <div className={classes.cards}>
                       {asTools.map((spec) => (
                         <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
                       ))}
                     </div>
                   </Tabs.Panel>
                   <Tabs.Panel value="others">
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    <div className={classes.cards}>
                       {asOthers.map((spec) => (
                         <ExtensionCard key={spec.name} buckets={buckets} spec={spec} onClick={setSpec} />
                       ))}
                     </div>
                   </Tabs.Panel>
                 </Tabs>
-              </div>
+              </Stack>
             )}
           </fieldset>
         </Modal>

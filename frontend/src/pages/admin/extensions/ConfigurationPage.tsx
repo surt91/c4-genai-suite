@@ -1,4 +1,6 @@
+import { ActionIcon } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { clsx } from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Route, Routes } from 'react-router-dom';
@@ -10,6 +12,7 @@ import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { Configuration } from './Configuration.tsx';
 import { EmptyPage } from './EmptyPage';
+import classes from './Extensions.module.css';
 import { ExtensionsPage } from './ExtensionsPage';
 import { UpsertConfigurationDialog } from './UpsertConfigurationDialog.tsx';
 import { useConfigurationStore } from './state';
@@ -123,28 +126,30 @@ export function ConfigurationPage() {
   return (
     <Page
       menu={
-        <div className="flex flex-col overflow-y-hidden">
-          <div className="flex gap-x-2 p-8 pb-4">
-            <h3 id={texts.extensions.configurations} className="grow text-xl">
+        <div className={classes.menu}>
+          <div className={classes.menuHeader}>
+            <h3 id={texts.extensions.configurations} className={classes.menuTitle}>
               {texts.extensions.configurations}
             </h3>
 
-            <button
-              className="btn btn-square btn-sm text-sm"
+            <ActionIcon
+              variant="default"
+              size={32}
               onClick={handleImportClick}
               title={texts.extensions.importConfiguration}
               aria-label={texts.extensions.importConfiguration}
             >
               <Icon icon="arrow-up" size={16} />
-            </button>
+            </ActionIcon>
 
-            <button
-              className="btn btn-square btn-sm text-sm"
+            <ActionIcon
+              variant="default"
+              size={32}
               onClick={() => setToCreate(true)}
               aria-label={texts.extensions.createConfiguration}
             >
               <Icon icon="plus" size={16} />
-            </button>
+            </ActionIcon>
 
             <input
               ref={fileInputRef}
@@ -155,8 +160,8 @@ export function ConfigurationPage() {
             />
           </div>
 
-          <div className="grow overflow-y-auto p-4 pt-4">
-            <div aria-labelledby={texts.extensions.configurations} className="nav-menu flex flex-col">
+          <div className={classes.menuList}>
+            <div aria-labelledby={texts.extensions.configurations} className={clsx('nav-menu', classes.menuEntries)}>
               {configurations.map((configuration) => (
                 <Configuration
                   key={configuration.id}
@@ -169,7 +174,7 @@ export function ConfigurationPage() {
             </div>
 
             {configurations.length === 0 && isFetched && (
-              <div className="pt-4 text-sm text-gray-400">{texts.extensions.configurationsEmpty}</div>
+              <div className={classes.menuEmpty}>{texts.extensions.configurationsEmpty}</div>
             )}
           </div>
         </div>

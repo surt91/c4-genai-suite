@@ -1,11 +1,13 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { IconCopy, IconDots, IconDownload, IconEdit, IconTrash } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { memo } from 'react';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, useApi } from 'src/api';
 import { ConfirmDialog, TransientNavLink } from 'src/components';
-import { buildError, cn, downloadJson, sanitizeFilename } from 'src/lib';
+import { buildError, downloadJson, sanitizeFilename } from 'src/lib';
 import { texts } from 'src/texts';
+import classes from './Extensions.module.css';
 
 interface ConfigurationProps {
   // The configuration to render.
@@ -35,10 +37,10 @@ export const Configuration = memo((props: ConfigurationProps) => {
   };
 
   return (
-    <li className="group flex items-center !px-0">
+    <li className={classes.menuItem}>
       <TransientNavLink
         data-text={configuration.name}
-        className={cn('text-normal block min-w-0 grow truncate text-ellipsis', { 'opacity-25': !configuration.enabled })}
+        className={clsx(classes.menuLink, { [classes.menuLinkDisabled]: !configuration.enabled })}
         to={`/admin/assistants/${configuration.id}`}
       >
         {configuration.name}
@@ -46,7 +48,7 @@ export const Configuration = memo((props: ConfigurationProps) => {
       <Menu>
         <Menu.Target>
           <ActionIcon
-            className="opacity-0 group-hover:opacity-100"
+            className={classes.menuActions}
             variant="subtle"
             data-testid={'more-actions'}
             aria-label={texts.common.menu}

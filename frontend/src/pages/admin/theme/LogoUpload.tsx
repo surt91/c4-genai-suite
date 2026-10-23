@@ -1,3 +1,4 @@
+import { Button, Divider } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -6,6 +7,7 @@ import { Alert, Logo, Markdown } from 'src/components';
 import { useTheme } from 'src/hooks';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
+import classes from './Theme.module.css';
 
 type LogoUploadProps = {
   imageType: 'logo' | 'backgroundLogo' | 'avatarLogo';
@@ -60,20 +62,20 @@ export function LogoUpload({ imageType }: LogoUploadProps) {
       <MutationAlert error={updating.isError || deleting.isError} />
 
       <div>
-        <div className="flex flex-row items-center gap-8">
-          <div className="relative">
+        <div className={classes.logoRow}>
+          <div className={classes.logo}>
             <Logo size="6rem" key={theme.key} url={theme[`${imageType}Url`]} previewLogo={previewLogo} />
           </div>
 
-          <div className="divider divider-horizontal"></div>
+          <Divider orientation="vertical" mx={24} />
 
           <div>
-            <div className="flex flex-row gap-2">
+            <div className={classes.controls}>
               <LogoInput onChange={setPreviewLogo} previewLogo={previewLogo} />
               <SaveButton onClick={upload} disabled={updating.isPending || !previewLogo} />
               <DeleteButton onClick={deleteLogo} disabled={!theme[`${imageType}Url`] || deleting.isPending} />
             </div>
-            <div className="mt-2 text-sm leading-6 text-slate-500">
+            <div className={classes.hint}>
               <Markdown>{texts.theme[`${imageType}Hint`]}</Markdown>
             </div>
           </div>
@@ -84,22 +86,22 @@ export function LogoUpload({ imageType }: LogoUploadProps) {
 }
 
 function MutationAlert({ error }: { error: boolean }) {
-  if (error) return <Alert text={texts.common.error} className="mb-4" />;
+  if (error) return <Alert text={texts.common.error} className={classes.alert} />;
 }
 
 function SaveButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   return (
-    <button type="button" className="btn w-auto" disabled={disabled} onClick={onClick}>
+    <Button type="button" variant="default" disabled={disabled} onClick={onClick}>
       {texts.common.save}
-    </button>
+    </Button>
   );
 }
 
 function DeleteButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   return (
-    <button type="button" className="btn w-auto" disabled={disabled} onClick={onClick}>
+    <Button type="button" variant="default" disabled={disabled} onClick={onClick}>
       {texts.common.remove}
-    </button>
+    </Button>
   );
 }
 
@@ -115,7 +117,7 @@ function LogoInput({
       type="file"
       value={!previewLogo ? '' : undefined}
       data-testid="logo-upload-input"
-      className="file-input file-input-bordered w-full max-w-xs"
+      className={classes.fileInput}
       onChange={(event) => onChange(event.target.files?.[0])}
       aria-label={texts.accessibility.uploadLogoFile}
     />

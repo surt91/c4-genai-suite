@@ -1,4 +1,4 @@
-import { Button, ColorInput, Select, Textarea, TextInput } from '@mantine/core';
+import { Button, ColorInput, Select, Space, Textarea, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -11,6 +11,7 @@ import { Markdown } from 'src/components/Markdown';
 import { useTheme } from 'src/hooks';
 import { texts } from 'src/texts';
 import { i18next } from 'src/texts/i18n';
+import formClasses from '../forms.module.css';
 
 const SCHEME = z.object({
   // Optional array of chat suggestions.
@@ -96,7 +97,7 @@ export function ThemeForm() {
           <Textarea id="welcomeText" autosize minRows={3} key={form.key('welcomeText')} {...form.getInputProps('welcomeText')} />
         </FormRow>
 
-        <div className="h-4" />
+        <Space h={16} />
 
         <FormRow name="primaryColor" label={texts.theme.primaryColor}>
           <ColorInput id="primaryColor" key={form.key('primaryColor')} {...form.getInputProps('primaryColor')} />
@@ -114,7 +115,7 @@ export function ThemeForm() {
           <Textarea id="customCss" autosize minRows={3} key={form.key('customCss')} {...form.getInputProps('customCss')} />
         </FormRow>
 
-        <div className="h-4" />
+        <Space h={16} />
 
         <FormRow name="agentName" label={texts.theme.agentName} hints={texts.theme.agentNameHints}>
           <TextInput id="agentName" key={form.key('agentName')} {...form.getInputProps('agentName')} />
@@ -144,14 +145,14 @@ export function ThemeForm() {
 
 function FormRow({ name, label, hints, children }: { name?: string; label?: string; hints?: string; children: React.ReactNode }) {
   return (
-    <div className="form-row mb-4 flex flex-row">
-      <label htmlFor={name} className="mt-3 w-48 shrink-0 text-sm font-semibold">
+    <div className={formClasses.row}>
+      <label htmlFor={name} className={formClasses.labelInput}>
         {label}
       </label>
-      <div className="min-w-0 grow">
+      <div className={formClasses.control}>
         {children}
         {hints && (
-          <div className="text-sm leading-6 text-slate-500">
+          <div className={formClasses.hints}>
             <Markdown>{hints}</Markdown>
           </div>
         )}

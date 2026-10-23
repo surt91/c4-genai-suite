@@ -8,6 +8,7 @@ import { ChatSuggestionsInput } from 'src/components/ChatSuggestionsInput';
 import { UserGroupTagsInput } from 'src/components/UserGroupTagsInput';
 import { typedZodResolver } from 'src/lib';
 import { texts } from 'src/texts';
+import classes from './UpsertConfigurationDialog.module.css';
 
 const chatSuggestionScheme = z.object({
   title: z.string().min(1),
@@ -73,7 +74,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
     <Portal>
       <Modal onClose={onClose} title={target ? texts.extensions.updateConfiguration : texts.extensions.createConfiguration}>
         <form onSubmit={form.onSubmit((v) => (target ? updating.mutate(v) : creating.mutate(v)))}>
-          <fieldset disabled={creating.isPending || updating.isPending} className="flex flex-col gap-4">
+          <fieldset disabled={creating.isPending || updating.isPending} className={classes.fieldset}>
             {target ? (
               <FormAlert common={texts.extensions.updateConfigurationFailed} error={updating.error} />
             ) : (
@@ -93,14 +94,14 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
             />
             <UserGroupTagsInput form={form} />
             <TextInput
-              classNames={{ input: 'font-mono' }}
+              classNames={{ input: classes.mono }}
               label={texts.extensions.executorEndpoint}
               description={texts.extensions.executorEndpointHints}
               key={form.key('executorEndpoint')}
               {...form.getInputProps('executorEndpoint')}
             />
             <Textarea
-              classNames={{ input: 'font-mono' }}
+              classNames={{ input: classes.mono }}
               label={texts.extensions.executorHeaders}
               key={form.key('executorHeaders')}
               {...form.getInputProps('executorHeaders')}

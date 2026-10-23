@@ -1,0 +1,73 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.rows {
+  margin-top: 0.25rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.iconButton {
+  cursor: pointer;
+}
+
+.input {
+  width: 100%;
+  height: 2.5rem;
+  border: 1px solid var(--mantine-color-gray-4);
+  border-radius: 0.25rem;
+  background-color: var(--mantine-color-white);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+
+  &:focus {
+    outline: 2px solid var(--mantine-color-gray-4);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    border-color: var(--mantine-color-gray-2);
+    background-color: var(--mantine-color-gray-1);
+    color: var(--mantine-color-gray-6);
+  }
+}
+
+.inputWithSuffix {
+  padding-right: 2.5rem;
+}
+
+.suffixWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.suffix {
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--mantine-color-dark-3);
+}

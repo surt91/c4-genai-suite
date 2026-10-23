@@ -1,4 +1,4 @@
-import { Button, Divider, NumberInput, Portal, TextInput } from '@mantine/core';
+import { Button, Divider, Group, NumberInput, Portal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconTrash } from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -8,6 +8,8 @@ import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { useDeleteUserGroup } from 'src/pages/admin/user-groups/hooks/useDeleteUserGroup';
 import { useUpdateUserGroup } from 'src/pages/admin/user-groups/hooks/useUpdateUserGroup';
 import { texts } from 'src/texts';
+import formClasses from '../forms.module.css';
+import classes from './UserGroups.module.css';
 
 const SCHEME = z.object({
   name: z.string().min(1, texts.common.name),
@@ -61,16 +63,16 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
         <Modal
           size="lg"
           onClose={onClose}
-          header={<div className="flex items-center gap-4">{texts.userGroups.update}</div>}
+          header={<div className={classes.dialogHeader}>{texts.userGroups.update}</div>}
           footer={
             <fieldset disabled={userGroupUpdate.isPending || userGroupDelete.isPending || target.isBuiltIn}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap={16} wrap="nowrap" align="stretch">
                 <Button variant="subtle" type="button" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
 
                 <Button type="submit">{texts.common.save}</Button>
-              </div>
+              </Group>
             </fieldset>
           }
         >
@@ -81,7 +83,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
               id="name"
               withAsterisk
               label={texts.common.groupName}
-              className="mb-4"
+              mb="md"
               key={form.key('name')}
               {...form.getInputProps('name')}
             />
@@ -89,7 +91,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
             <NumberInput
               id="monthlyTokens"
               label={texts.common.monthlyTokens}
-              className="mb-4"
+              mb="md"
               key={form.key('monthlyTokens')}
               {...form.getInputProps('monthlyTokens')}
             />
@@ -97,22 +99,22 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
             <NumberInput
               id="monthlyUserTokens"
               label={texts.common.monthlyUserTokens}
-              className="mb-4"
+              mb="md"
               key={form.key('monthlyUserTokens')}
               {...form.getInputProps('monthlyUserTokens')}
             />
 
             <Divider my="xs" label={texts.common.dangerZone} labelPosition="left" />
 
-            <div className="flex flex-row">
-              <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{texts.common.remove}</label>
+            <div className={classes.dangerZone}>
+              <label className={formClasses.labelInput}>{texts.common.remove}</label>
               <ConfirmDialog
                 title={texts.userGroups.removeConfirmTitle}
                 text={texts.userGroups.removeConfirmText}
                 onPerform={userGroupDelete.mutate}
               >
                 {({ onClick }) => (
-                  <Button type="button" variant="light" color="red" leftSection={<IconTrash className="w-4" />} onClick={onClick}>
+                  <Button type="button" variant="light" color="red" leftSection={<IconTrash size={16} />} onClick={onClick}>
                     {texts.common.remove}
                   </Button>
                 )}

@@ -1,5 +1,7 @@
+import { ActionIcon } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
+import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { BucketDto, useApi } from 'src/api';
@@ -8,6 +10,7 @@ import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { texts } from 'src/texts';
 import { Bucket } from './Bucket';
 import { EmptyPage } from './EmptyPage';
+import classes from './Files.module.css';
 import { FilesPage } from './FilesPage';
 import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useDeletingBucket } from './hooks';
@@ -50,23 +53,23 @@ export function BucketsPage() {
   return (
     <Page
       menu={
-        <div className="flex flex-col overflow-y-hidden">
-          <div className="flex p-8 pb-4">
-            <h3 className="grow text-xl">{texts.files.buckets}</h3>
+        <div className={classes.menu}>
+          <div className={classes.menuHeader}>
+            <h3 className={classes.menuTitle}>{texts.files.buckets}</h3>
 
-            <button className="btn btn-square btn-sm text-sm" onClick={() => setToCreate(true)}>
+            <ActionIcon variant="default" size={32} onClick={() => setToCreate(true)}>
               <IconPlus size={16} />
-            </button>
+            </ActionIcon>
           </div>
 
-          <div className="grow overflow-y-auto p-4 pt-4">
-            <div aria-labelledby={texts.files.buckets} className="nav-menu flex flex-col">
+          <div className={classes.menuList}>
+            <div aria-labelledby={texts.files.buckets} className={clsx('nav-menu', classes.menuEntries)}>
               {buckets.map((bucket) => (
                 <Bucket key={bucket.id} bucket={bucket} onDelete={deleting.mutate} onUpdate={setToUpdate} />
               ))}
             </div>
 
-            {buckets.length === 0 && isFetched && <div className="pt-4 text-sm text-gray-400">{texts.files.bucketsEmpty}</div>}
+            {buckets.length === 0 && isFetched && <div className={classes.menuEmpty}>{texts.files.bucketsEmpty}</div>}
           </div>
         </div>
       }
