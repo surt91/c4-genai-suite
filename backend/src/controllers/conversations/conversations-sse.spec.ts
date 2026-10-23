@@ -2,7 +2,7 @@ import * as http from 'http';
 import { AddressInfo } from 'net';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
-import { Subject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { SendMessageResponse } from 'src/domain/chat';
 import { StreamEvent } from 'src/domain/chat/interfaces';
 import { CallbackService } from 'src/domain/chat/services/callback-service';
@@ -10,12 +10,12 @@ import { ConversationsController } from './conversations.controller';
 
 describe('ConversationsController SSE', () => {
   let server: http.Server;
-  let stream: Subject<StreamEvent>;
+  let stream: ReplaySubject<StreamEvent>;
   let abort: AbortController;
   let getStreamDelay: number;
 
   beforeEach(async () => {
-    stream = new Subject<StreamEvent>();
+    stream = new ReplaySubject<StreamEvent>();
     abort = new AbortController();
     getStreamDelay = 0;
     const queryBus = {
