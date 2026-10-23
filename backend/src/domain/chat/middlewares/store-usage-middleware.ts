@@ -13,8 +13,15 @@ export class StorageUsageMiddleware implements ChatMiddleware {
   ) {}
 
   async invoke(context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> {
-    await next(context);
+    try {
+      await next(context);
+    } finally {
+      // Also count the tokens of failed or aborted requests.
+      await this.storeUsage(context);
+    }
+  }
 
+  private async storeUsage(context: ChatContext) {
     const usage = context.tokenUsage;
 
     if (!usage) {

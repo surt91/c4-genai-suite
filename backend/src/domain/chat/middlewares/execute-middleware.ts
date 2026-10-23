@@ -70,11 +70,16 @@ export class ExecuteMiddleware implements ChatMiddleware {
       ...llm.options,
       abortSignal: abort.signal,
       stopWhen: stepCountIs(1000),
-      onFinish: ({ totalUsage }) => {
-        const totalTokens = totalUsage.totalTokens ?? 0;
-        context.tokenUsage ??= { tokenCount: 0, model: llm.modelName, llm: llm.providerName };
-        context.tokenUsage.tokenCount += totalTokens;
-      },
+      onFinish: ({ totalUsage }) => addTokenUsage(context, llm, totalUsage.totalTokens),
+      // `onFinish` is not called when the user stops the answer; count at least the finished steps (e.g. tool calls),
+      // otherwise stopping each answer just before its end would bypass the token limits. The usage of the step
+      // that was interrupted is not reported by the providers.
+      onAbort: ({ steps }) =>
+        addTokenUsage(
+          context,
+          llm,
+          steps.reduce((sum, step) => sum + (step.usage.totalTokens ?? 0), 0),
+        ),
       experimental_telemetry: {
         isEnabled: context.telemetry ?? false,
         metadata: {
@@ -163,9 +168,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
       },
     });
 
-    const totalTokens = response.usage?.totalTokens ?? 0;
-    context.tokenUsage ??= { tokenCount: 0, model: llm.modelName, llm: llm.providerName };
-    context.tokenUsage.tokenCount += totalTokens;
+    addTokenUsage(context, llm, response.totalUsage?.totalTokens);
 
     if (response.finishReason === 'content-filter') {
       throw { code: 'content_filter' } as unknown;
@@ -209,4 +212,9 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     return this.handleAiSdkChainExecution(llm, context);
   }
+}
+
+function addTokenUsage(context: ChatContext, llm: LanguageModelContext, totalTokens: number | undefined) {
+  context.tokenUsage ??= { tokenCount: 0, model: llm.modelName, llm: llm.providerName };
+  context.tokenUsage.tokenCount += totalTokens ?? 0;
 }
