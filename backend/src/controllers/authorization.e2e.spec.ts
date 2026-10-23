@@ -131,4 +131,21 @@ describe('Authorization', () => {
       await asAdmin(http().get(`/configurations/${configuration.id}/extensions`)).expect(200);
     });
   });
+
+  describe('configuration list', () => {
+    type Items = { items: { id: number; executorHeaders?: string; executorEndpoint?: string }[] };
+    const find = (body: unknown) => (body as Items).items.find((x) => x.id === configuration.id)!;
+
+    it('does not contain the executor credentials for regular users', async () => {
+      const response = await asUser(http().get('/configurations')).expect(200);
+      expect(find(response.body)).toBeDefined();
+      expect(find(response.body).executorHeaders).toBeUndefined();
+      expect(find(response.body).executorEndpoint).toBeUndefined();
+    });
+
+    it('contains the executor settings for admins', async () => {
+      const response = await asAdmin(http().get('/configurations')).expect(200);
+      expect(find(response.body).executorHeaders).toBe('Authorization=Bearer executor-secret');
+    });
+  });
 });
