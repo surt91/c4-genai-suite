@@ -81,7 +81,7 @@ export const AIChatItemActions = ({
           </Tooltip>
         )}
 
-        {user.isAdmin && tokenCount && tokenCount > 0 && (
+        {user.isAdmin && !!tokenCount && tokenCount > 0 && (
           <div className={classes.tokenCount}>
             {tokenCount} {texts.common.tokens}
           </div>

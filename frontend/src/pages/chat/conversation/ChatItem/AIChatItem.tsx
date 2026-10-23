@@ -67,9 +67,7 @@ export const AIChatItem = ({ agentName, message, isLast }: ChatItemProps) => {
         tools={message.toolCalls ?? storedToolCalls(message.tools, message.interactions)}
       />
       <ChatItemInteractions message={message} />
-      {message.reasoning?.length && (
-        <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />
-      )}
+      {!!message.reasoning && <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />}
       <Markdown animateText={isLast && newReply} className={classes.markdown}>
         {textContent}
       </Markdown>
