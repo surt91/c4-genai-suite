@@ -91,7 +91,7 @@ Now you can return to the [chat page](http://localhost:3333/chat) (click on `Gai
 
 ### Model Context Protocol (MCP) [optional]
 
-Use any MCP server offering an `sse` interface with the `MCP Tools` Extension (or use our `mcp-tool-as-server` as a proxy in front of an `stdio` MCP server).
+Use any MCP server offering a Streamable HTTP or `sse` interface with the `MCP Tools` Extension (or use our `mcp-tool-as-server` as a proxy in front of an `stdio` MCP server).
 Each MCP server can be configured in detail as an extension.
 
 ### Retrieval Augmented Generation (RAG) / File Search [optional]
