@@ -43,6 +43,21 @@ INDEX_FIELD_NAMES = [FIELD_ID, FIELD_CONTENT, FIELD_CONTENT_VECTOR, FIELD_METADA
 
 MAX_UPLOAD_BATCH_SIZE = 1000
 
+# delimiter for `search.in`; the default delimiters (space and comma) may occur in ids
+SEARCH_IN_DELIMITER = "|"
+
+
+def odata_string(value: str) -> str:
+    """Quotes a value as OData string literal."""
+    return "'" + value.replace("'", "''") + "'"
+
+
+def odata_search_in(field: str, values: list[str]) -> str:
+    if any(SEARCH_IN_DELIMITER in value for value in values):
+        raise ValueError(f"Values must not contain `{SEARCH_IN_DELIMITER}`")
+    joined = SEARCH_IN_DELIMITER.join(values)
+    return f"search.in({field}, {odata_string(joined)}, {odata_string(SEARCH_IN_DELIMITER)})"
+
 
 def get_index_fields(vector_dimensions: int) -> list[SearchField]:
     # We can not filter on the json metadata, so we have to configure new fields in the azure index,
@@ -203,7 +218,7 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
     def delete(self, doc_id: str) -> None:
         # Documents can only be deleted by the "key", which is unique, i.e., the chunk id.
         # To delete by our doc_id, we first need to fetch all chunk_ids of the doc_id.
-        response = self.client.search(search_text="*", filter=f"doc_id eq '{doc_id}'", select=["id"])
+        response = self.client.search(search_text="*", filter=f"doc_id eq {odata_string(doc_id)}", select=["id"])
         # assure ty that we get the sync type
         if isinstance(response, Awaitable):
             raise TypeError("Got awaitable response from client. Expected sync Azure AI Search client")
@@ -219,11 +234,11 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
         else:
             filter_expressions = []
             if search_filter.bucket is not None:
-                filter_expressions.append(f"bucket eq '{search_filter.bucket}'")
+                filter_expressions.append(f"bucket eq {odata_string(search_filter.bucket)}")
             if search_filter.doc_ids is not None:
                 if len(search_filter.doc_ids) == 0:
                     raise ValueError("The result would not match any entry")
-                filter_expressions.append(f"search.in(doc_id, '{', '.join(search_filter.doc_ids)}')")
+                filter_expressions.append(odata_search_in("doc_id", search_filter.doc_ids))
             filter_expression = " and ".join(filter_expressions)
 
         return filter_expression
@@ -258,5 +273,8 @@ class AzureAISearchStoreAdapter(VectorStoreAdapter):
         return self._hybrid_search(query, k, filter_expression)
 
     def get_documents(self, ids: List[str]) -> List[Document]:
-        filter_query = f"search.in(id, '{', '.join(ids)}')"
-        return self._hybrid_search("", len(ids), filter_query)
+        if not ids:
+            return []
+        # a plain filter query, there is nothing to rank (and no need to embed a query)
+        results = self.client.search(search_text="*", filter=odata_search_in(FIELD_ID, ids), top=len(ids))
+        return [result_to_document(result) for result in results]

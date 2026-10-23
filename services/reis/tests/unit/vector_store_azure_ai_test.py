@@ -1,3 +1,4 @@
+import json
 from io import BytesIO
 from faker import Faker
 from fastapi import FastAPI
@@ -161,15 +162,39 @@ def test_get_files_deleted(client: TestClient, responses: RequestsMock) -> None:
     [
         (None, None),
         (VectorStoreFilter(bucket="1"), "bucket eq '1'"),
-        (VectorStoreFilter(bucket="42", doc_ids=["3", "2"]), "bucket eq '42' and search.in(doc_id, '3, 2')"),
-        (VectorStoreFilter(doc_ids=["3", "2"]), "search.in(doc_id, '3, 2')"),
+        (VectorStoreFilter(bucket="42", doc_ids=["3", "2"]), "bucket eq '42' and search.in(doc_id, '3|2', '|')"),
+        (VectorStoreFilter(doc_ids=["3", "2"]), "search.in(doc_id, '3|2', '|')"),
+        # quotes are escaped, such that the filter can not be extended
+        (VectorStoreFilter(bucket="1' or bucket ne '1"), "bucket eq '1'' or bucket ne ''1'"),
+        (VectorStoreFilter(doc_ids=["a b", "c,d", "it's"]), "search.in(doc_id, 'a b|c,d|it''s', '|')"),
     ],
 )
 def test_filter_conversion(test_input: VectorStoreFilter, expected: str) -> None:
     assert AzureAISearchStoreAdapter.convert_filter(test_input) == expected
 
 
+def test_filter_conversion_rejects_delimiter() -> None:
+    with pytest.raises(ValueError):
+        AzureAISearchStoreAdapter.convert_filter(VectorStoreFilter(doc_ids=["1|2"]))
+
+
 def test_filter_conversion_raises() -> None:
     with pytest.raises(Exception) as exc_info:
         AzureAISearchStoreAdapter.convert_filter(VectorStoreFilter(bucket="42", doc_ids=[]))
     assert exc_info.value.args[0] == "The result would not match any entry"
+
+
+def test_delete_escapes_doc_id(client: TestClient, responses: RequestsMock) -> None:
+    responses.add(index_get(endpoint, index_name, api_version))
+    search = responses.add(
+        responses.POST,
+        f"{endpoint}/indexes('{index_name}')/docs/search.post.search?api-version={api_version}",
+        json={"value": []},
+    )
+
+    response = client.delete("/files/x' or id ne 'x")
+
+    assert response.status_code == 200
+    body = search.calls[0].request.body
+    assert isinstance(body, (str, bytes))
+    assert json.loads(body)["filter"] == "doc_id eq 'x'' or id ne ''x'"
