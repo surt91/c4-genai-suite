@@ -31,7 +31,6 @@ function load() {
   return {
     common: {
       administration: translate('common.administration'),
-      administrator: translate('common.administrator'),
       apiKey: translate('common.apiKey'),
       appName: translate('common.appName'),
       builtIn: translate('common.builtIn'),
@@ -40,7 +39,6 @@ function load() {
       reject: translate('common.reject'),
       chat: translate('common.chat'),
       next: translate('common.next'),
-      chatUser: translate('common.chatUser'),
       confirm: translate('common.confirm'),
       copied: translate('common.copied'),
       copy: translate('common.copy'),
@@ -56,7 +54,6 @@ function load() {
       edit: translate('common.edit'),
       duplicate: translate('common.duplicate'),
       export: translate('common.export'),
-      import: translate('common.import'),
       email: translate('common.email'),
       enabled: translate('common.enabled'),
       endpoint: translate('common.endpoint'),
@@ -70,8 +67,6 @@ function load() {
       loginButton: translate('common.loginButton'),
       loginFailed: translate('common.loginFailed'),
       loginForbidden: translate('common.loginForbidden'),
-      loginText: translate('common.loginText'),
-      logout: translate('common.logout'),
       clearConversations: translate('common.clearConversations'),
       monthlyTokens: translate('common.monthlyTokens'),
       monthlyUserTokens: translate('common.monthlyUserTokens'),
@@ -86,9 +81,6 @@ function load() {
       remove: translate('common.remove'),
       rename: translate('common.rename'),
       required: translate('common.required'),
-      reset: translate('common.reset'),
-      roles: translate('common.roles'),
-      rolesPlaceholder: translate('common.rolesPlaceholder'),
       attachFile: translate('common.attachFile'),
       save: translate('common.save'),
       saved: translate('common.saved'),
@@ -111,12 +103,8 @@ function load() {
       link: translate('common.link'),
       tokens: translate('common.tokens'),
       uploadLimit: (limit: number, extensionName: string) => translate('common.uploadLimit', { limit, extensionName }),
-      userGroup: translate('common.userGroup'),
       userGroups: translate('common.userGroups'),
       yes: translate('common.yes'),
-      selectOption: translate('common.selectOption'),
-      selectOptions: translate('common.selectOptions'),
-      addItem: translate('common.addItem'),
       configurableArguments: translate('common.configurableArguments'),
       rowsSelected: (rowCount: number) => translate('common.rowsSelected', { rowCount }),
     },
@@ -160,7 +148,6 @@ function load() {
         status: translate('evals.evaluations.status'),
         progress: translate('evals.evaluations.progress'),
         createdAt: translate('evals.evaluations.createdAt'),
-        actions: translate('evals.evaluations.actions'),
         manualTestCases: translate('evals.evaluations.manualTestCases'),
         // Status
         statusPending: translate('evals.evaluations.statusPending'),
@@ -172,12 +159,10 @@ function load() {
         statusSuccessTooltip: translate('evals.evaluations.statusSuccessTooltip'),
         statusFailureTooltip: translate('evals.evaluations.statusFailureTooltip'),
         // Actions
-        viewResults: translate('evals.evaluations.viewResults'),
         exportCsv: translate('evals.evaluations.exportCsv'),
         editName: translate('evals.evaluations.editName'),
         deleteEvaluation: translate('evals.evaluations.deleteEvaluation'),
         cloneEvaluation: translate('evals.evaluations.cloneEvaluation'),
-        compare: translate('evals.evaluations.compare'),
         // Messages
         createSuccess: translate('evals.evaluations.createSuccess'),
         createFailed: translate('evals.evaluations.createFailed'),
@@ -197,25 +182,11 @@ function load() {
         namePlaceholder: translate('evals.evaluations.namePlaceholder'),
         nameRequired: translate('evals.evaluations.nameRequired'),
         // Results Tab
-        resultsTab: translate('evals.evaluations.resultsTab'),
-        overviewTab: translate('evals.evaluations.overviewTab'),
-        testCaseResults: translate('evals.evaluations.testCaseResults'),
-        question: translate('evals.evaluations.question'),
-        expectedOutputLabel: translate('evals.evaluations.expectedOutputLabel'),
-        actualOutputLabel: translate('evals.evaluations.actualOutputLabel'),
-        metricScoresLabel: translate('evals.evaluations.metricScoresLabel'),
-        statusLabel: translate('evals.evaluations.statusLabel'),
-        noResults: translate('evals.evaluations.noResults'),
-        noResultsHint: translate('evals.evaluations.noResultsHint'),
-        testCaseRuns: translate('evals.evaluations.testCaseRuns'),
-        run: translate('evals.evaluations.run'),
         // Errors
         errorLoading: translate('evals.evaluations.errorLoading'),
-        errorLoadingEvaluations: translate('evals.evaluations.errorLoadingEvaluations'),
         errorNotFound: translate('evals.evaluations.errorNotFound'),
         // Create Wizard
         createEvaluation: translate('evals.evaluations.createEvaluation'),
-        createEvaluationDescription: translate('evals.evaluations.createEvaluationDescription'),
         wizard: {
           modeStep: translate('evals.evaluations.wizard.modeStep'),
           modeStepDescription: translate('evals.evaluations.wizard.modeStepDescription'),
@@ -227,18 +198,13 @@ function load() {
           assistantStepDescription: translate('evals.evaluations.wizard.assistantStepDescription'),
           reviewStep: translate('evals.evaluations.wizard.reviewStep'),
           reviewStepDescription: translate('evals.evaluations.wizard.reviewStepDescription'),
-          cancelConfirmTitle: translate('evals.evaluations.wizard.cancelConfirmTitle'),
-          cancelConfirmMessage: translate('evals.evaluations.wizard.cancelConfirmMessage'),
         },
       },
       qaCatalog: {
         // List page
         create: translate('evals.qaCatalog.create'),
-        createCatalog: translate('evals.qaCatalog.createCatalog'),
         empty: translate('evals.qaCatalog.empty'),
         emptyHint: translate('evals.qaCatalog.emptyHint'),
-        searchPlaceholder: translate('evals.qaCatalog.searchPlaceholder'),
-        noSearchResults: translate('evals.qaCatalog.noSearchResults'),
         // Table columns
         name: translate('evals.qaCatalog.name'),
         length: translate('evals.qaCatalog.length'),
@@ -258,7 +224,6 @@ function load() {
         createTitle: translate('evals.qaCatalog.createTitle'),
         createTabEmpty: translate('evals.qaCatalog.createTabEmpty'),
         createTabUpload: translate('evals.qaCatalog.createTabUpload'),
-        createTabGenerate: translate('evals.qaCatalog.createTabGenerate'),
         createEmptyDescription: translate('evals.qaCatalog.createEmptyDescription'),
         uploadFile: translate('evals.qaCatalog.uploadFile'),
         uploadFileHint: translate('evals.qaCatalog.uploadFileHint'),
@@ -270,10 +235,7 @@ function load() {
         createSuccess: translate('evals.qaCatalog.createSuccess'),
         createFailed: translate('evals.qaCatalog.createFailed'),
         // Detail page
-        catalogDetails: translate('evals.qaCatalog.catalogDetails'),
-        version: translate('evals.qaCatalog.version'),
         versionSelect: translate('evals.qaCatalog.versionSelect'),
-        versionSelectHint: translate('evals.qaCatalog.versionSelectHint'),
         downloadCatalog: translate('evals.qaCatalog.downloadCatalog'),
         deleteCatalog: translate('evals.qaCatalog.deleteCatalog'),
         addQaPair: translate('evals.qaCatalog.addQaPair'),
@@ -282,7 +244,6 @@ function load() {
         expectedOutput: translate('evals.qaCatalog.expectedOutput'),
         contexts: translate('evals.qaCatalog.contexts'),
         contextsHint: translate('evals.qaCatalog.contextsHint'),
-        metadata: translate('evals.qaCatalog.metadata'),
         noQaPairs: translate('evals.qaCatalog.noQaPairs'),
         // Edit Q&A pair
         editQaPair: translate('evals.qaCatalog.editQaPair'),
@@ -332,31 +293,15 @@ function load() {
         deleteConfirmText: (name: string) => translate('evals.qaCatalog.deleteConfirmText', { name }),
         deleteSuccess: translate('evals.qaCatalog.deleteSuccess'),
         deleteFailed: translate('evals.qaCatalog.deleteFailed'),
-        deleteQaPairConfirm: translate('evals.qaCatalog.deleteQaPairConfirm'),
         // Errors
-        errorLoading: translate('evals.qaCatalog.errorLoading'),
-        errorLoadingCatalogs: translate('evals.qaCatalog.errorLoadingCatalogs'),
         errorNotFound: translate('evals.qaCatalog.errorNotFound'),
-        errorInvalidFile: translate('evals.qaCatalog.errorInvalidFile'),
-        errorFileTooLarge: (maxSize: string) => translate('evals.qaCatalog.errorFileTooLarge', { maxSize }),
-        errorMissingFields: (fields: string) => translate('evals.qaCatalog.errorMissingFields', { fields }),
         // Generation
-        generateTitle: translate('evals.qaCatalog.generateTitle'),
-        generatorType: translate('evals.qaCatalog.generatorType'),
-        generatorRagas: translate('evals.qaCatalog.generatorRagas'),
-        generatorConfig: translate('evals.qaCatalog.generatorConfig'),
-        generateSampleCount: translate('evals.qaCatalog.generateSampleCount'),
-        generatePersonas: translate('evals.qaCatalog.generatePersonas'),
-        generateFiles: translate('evals.qaCatalog.generateFiles'),
-        generateStart: translate('evals.qaCatalog.generateStart'),
-        generateInProgress: translate('evals.qaCatalog.generateInProgress'),
       },
       llmEndpoint: {
         // List page
         create: translate('evals.llmEndpoint.create'),
         empty: translate('evals.llmEndpoint.empty'),
         emptyHint: translate('evals.llmEndpoint.emptyHint'),
-        searchPlaceholder: translate('evals.llmEndpoint.searchPlaceholder'),
         // Table columns
         name: translate('evals.llmEndpoint.name'),
         type: translate('evals.llmEndpoint.type'),
@@ -365,7 +310,6 @@ function load() {
         updatedAt: translate('evals.llmEndpoint.updatedAt'),
         actions: translate('evals.llmEndpoint.actions'),
         // Types
-        typeGaible: translate('evals.llmEndpoint.typeGaible'),
         typeOpenAI: translate('evals.llmEndpoint.typeOpenAI'),
         typeAzureOpenAI: translate('evals.llmEndpoint.typeAzureOpenAI'),
         // Features
@@ -377,8 +321,6 @@ function load() {
         deleteConfirmTitle: translate('evals.llmEndpoint.deleteConfirmTitle'),
         deleteConfirmText: (name: string) => translate('evals.llmEndpoint.deleteConfirmText', { name }),
         // Steps
-        stepSelectType: translate('evals.llmEndpoint.stepSelectType'),
-        stepConfigure: translate('evals.llmEndpoint.stepConfigure'),
         selectEndpointType: translate('evals.llmEndpoint.selectEndpointType'),
         selectEndpointTypeHint: translate('evals.llmEndpoint.selectEndpointTypeHint'),
         // Fields - Common
@@ -394,15 +336,8 @@ function load() {
         // Fields - API Key
         apiKeyLabel: translate('evals.llmEndpoint.apiKeyLabel'),
         apiKeyPlaceholder: translate('evals.llmEndpoint.apiKeyPlaceholder'),
-        apiKeyRequired: translate('evals.llmEndpoint.apiKeyRequired'),
         apiKeyUnchanged: translate('evals.llmEndpoint.apiKeyUnchanged'),
         // Fields - Gaible
-        gaibleEndpointLabel: translate('evals.llmEndpoint.gaibleEndpointLabel'),
-        gaibleEndpointPlaceholder: translate('evals.llmEndpoint.gaibleEndpointPlaceholder'),
-        gaibleEndpointRequired: translate('evals.llmEndpoint.gaibleEndpointRequired'),
-        configurationIdLabel: translate('evals.llmEndpoint.configurationIdLabel'),
-        configurationIdPlaceholder: translate('evals.llmEndpoint.configurationIdPlaceholder'),
-        configurationIdRequired: translate('evals.llmEndpoint.configurationIdRequired'),
         // Fields - OpenAI
         baseUrlLabel: translate('evals.llmEndpoint.baseUrlLabel'),
         baseUrlPlaceholder: translate('evals.llmEndpoint.baseUrlPlaceholder'),
@@ -425,9 +360,6 @@ function load() {
         azureEndpointPlaceholder: translate('evals.llmEndpoint.azureEndpointPlaceholder'),
         azureEndpointRequired: translate('evals.llmEndpoint.azureEndpointRequired'),
         // Type descriptions
-        gaibleDescription: translate('evals.llmEndpoint.gaibleDescription'),
-        openAiDescription: translate('evals.llmEndpoint.openAiDescription'),
-        azureOpenAiDescription: translate('evals.llmEndpoint.azureOpenAiDescription'),
         // Messages
         createSuccess: translate('evals.llmEndpoint.createSuccess'),
         createFailed: translate('evals.llmEndpoint.createFailed'),
@@ -437,16 +369,12 @@ function load() {
         deleteFailed: translate('evals.llmEndpoint.deleteFailed'),
         versionConflict: translate('evals.llmEndpoint.versionConflict'),
         // Errors
-        errorLoading: translate('evals.llmEndpoint.errorLoading'),
-        errorLoadingEndpoints: translate('evals.llmEndpoint.errorLoadingEndpoints'),
-        errorNotFound: translate('evals.llmEndpoint.errorNotFound'),
       },
       metric: {
         // List page
         create: translate('evals.metric.create'),
         empty: translate('evals.metric.empty'),
         emptyHint: translate('evals.metric.emptyHint'),
-        searchPlaceholder: translate('evals.metric.searchPlaceholder'),
         // Table columns
         name: translate('evals.metric.name'),
         type: translate('evals.metric.type'),
@@ -461,18 +389,12 @@ function load() {
         typeHallucination: translate('evals.metric.typeHallucination'),
         typeGEval: translate('evals.metric.typeGEval'),
         // Type Descriptions
-        answerRelevancyDescription: translate('evals.metric.answerRelevancyDescription'),
-        faithfulnessDescription: translate('evals.metric.faithfulnessDescription'),
-        hallucinationDescription: translate('evals.metric.hallucinationDescription'),
-        gEvalDescription: translate('evals.metric.gEvalDescription'),
         // Dialogs
         createTitle: translate('evals.metric.createTitle'),
         editTitle: translate('evals.metric.editTitle'),
         deleteConfirmTitle: translate('evals.metric.deleteConfirmTitle'),
         deleteConfirmText: (name: string) => translate('evals.metric.deleteConfirmText', { name }),
         // Steps
-        stepSelectType: translate('evals.metric.stepSelectType'),
-        stepConfigure: translate('evals.metric.stepConfigure'),
         selectMetricType: translate('evals.metric.selectMetricType'),
         selectMetricTypeHint: translate('evals.metric.selectMetricTypeHint'),
         // Fields - Common (Base)
@@ -495,7 +417,6 @@ function load() {
         evaluationStepsHint: translate('evals.metric.evaluationStepsHint'),
         evaluationStepPlaceholder: translate('evals.metric.evaluationStepPlaceholder'),
         addEvaluationStep: translate('evals.metric.addEvaluationStep'),
-        removeEvaluationStep: translate('evals.metric.removeEvaluationStep'),
         evaluationStepsRequired: translate('evals.metric.evaluationStepsRequired'),
         evaluationParamsLabel: translate('evals.metric.evaluationParamsLabel'),
         evaluationParamsHint: translate('evals.metric.evaluationParamsHint'),
@@ -512,7 +433,6 @@ function load() {
         overview: translate('evals.metric.overview'),
         configuration: translate('evals.metric.configuration'),
         usage: translate('evals.metric.usage'),
-        usedInEvaluations: translate('evals.metric.usedInEvaluations'),
         noEvaluationsUsing: translate('evals.metric.noEvaluationsUsing'),
         // Messages
         createSuccess: translate('evals.metric.createSuccess'),
@@ -523,10 +443,6 @@ function load() {
         deleteFailed: translate('evals.metric.deleteFailed'),
         versionConflict: translate('evals.metric.versionConflict'),
         // Errors
-        errorLoading: translate('evals.metric.errorLoading'),
-        errorLoadingMetrics: translate('evals.metric.errorLoadingMetrics'),
-        errorNotFound: translate('evals.metric.errorNotFound'),
-        errorLoadingChatModels: translate('evals.metric.errorLoadingChatModels'),
       },
     },
     chat: {
@@ -654,8 +570,6 @@ function load() {
     },
     extensions: {
       add: translate('extensions.add'),
-      all: translate('extensions.all'),
-      configured: translate('extensions.configured'),
       createConfiguration: translate('extensions.createConfiguration'),
       createConfigurationFailed: translate('extensions.createConfigurationFailed'),
       createExtension: translate('extensions.createExtension'),
@@ -677,7 +591,6 @@ function load() {
       removeConfigurationConfirmTitle: translate('extensions.removeConfigurationConfirmTitle'),
       removeConfigurationFailed: translate('extensions.removeConfigurationFailed'),
       removeExtensionConfirmText: translate('extensions.removeExtensionConfirmText'),
-      removeExtensionConfirmTitle: translate('extensions.removeExtensionConfirmTitle'),
       removeExtensionFailed: translate('extensions.removeExtensionFailed'),
       test: translate('extensions.test'),
       testFailed: translate('extensions.testFailed'),
@@ -706,13 +619,11 @@ function load() {
       createBucket: translate('files.createBucket'),
       bucketType: translate('files.bucketType'),
       createBucketFailed: translate('files.createBucketFailed'),
-      deleted: translate('files.deleted'),
       deleting: translate('files.deleting'),
       deselectAll: translate('files.deselectAll'),
       fileSizeLimits: translate('files.fileSizeLimits'),
       headline: translate('files.headline'),
       headlineSearchable: translate('files.headlineSearchable'),
-      isDefault: translate('files.isDefault'),
       perUserQuota: translate('files.perUserQuota'),
       allowedFileTypes: translate('files.allowedFileTypes'),
       invalidEndpointError: translate('files.invalidEndpointError'),
@@ -727,7 +638,6 @@ function load() {
       removeBucketFailed: translate('files.removeBucketFailed'),
       removeFileConfirmText: translate('files.removeFileConfirmText'),
       removeFilesConfirmText: (fileCount: number) => translate('files.removeFilesConfirmText', { fileCount }),
-      removeFileConfirmTitle: translate('files.removeFileConfirmTitle'),
       removeFilesConfirmTitle: translate('files.removeFilesConfirmTitle'),
       removeFileFailed: translate('files.removeFileFailed'),
       selectAll: translate('files.selectAll'),
@@ -742,12 +652,9 @@ function load() {
       uploadImageFailedNotYetSupported: (fileName: string) => translate('files.uploadImageFailedNotYetSupported', { fileName }),
       uploadImageFailedUseThePaperclip: (fileName: string) => translate('files.uploadImageFailedUseThePaperclip', { fileName }),
       uploading: translate('files.uploading'),
-      uploadMultiple: (fileCount: number) => translate('files.uploadMultiple', { fileCount }),
-      wholeFileTooLarge: translate('files.wholeFileTooLarge'),
     },
     login: {
       loginButton: (provider: string) => translate('login.loginButton', { provider }),
-      loginHint: translate('login.loginHint'),
       welcome: translate('login.welcome'),
       authError: translate('login.authError'),
       emptyAuthSettings: translate('login.emptyAuthSettings'),
@@ -819,7 +726,6 @@ function load() {
       avatarLogoHint: translate('theme.avatarLogoHint'),
       backgroundLogo: translate('theme.backgroundLogo'),
       backgroundLogoHint: translate('theme.backgroundLogoHint'),
-      logoCurrent: translate('theme.logoCurrent'),
       logoHint: translate('theme.logoHint'),
       logoUpdateFailed: translate('theme.logoUpdateFailed'),
       logoDeleteFailed: translate('theme.logoDeleteFailed'),

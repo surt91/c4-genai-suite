@@ -1,7 +1,6 @@
 export const en = {
   common: {
     administration: 'Admin',
-    administrator: 'Admin',
     apiKey: 'API Key',
     appName: 'Gaible',
     builtIn: 'System Default',
@@ -9,7 +8,6 @@ export const en = {
     cancel: 'Cancel',
     chat: 'Chat',
     next: 'Next',
-    chatUser: 'Chat User',
     confirm: 'Confirm',
     copied: 'Text added to clipboard',
     copy: 'Copy to clipboard',
@@ -25,7 +23,6 @@ export const en = {
     edit: 'Edit',
     duplicate: 'Duplicate',
     export: 'Export',
-    import: 'Import',
     email: 'Email',
     enabled: 'Enabled',
     endpoint: 'Endpoint',
@@ -39,8 +36,6 @@ export const en = {
     loginButton: 'Login',
     loginFailed: 'Username or password not correct.',
     loginForbidden: 'Your account is not allowed to log in. Please contact an administrator.',
-    loginText: 'Login with username and password',
-    logout: 'Logout',
     clearConversations: 'Clear conversations',
     monthlyTokens: 'Monthly tokens',
     monthlyUserTokens: 'Monthly tokens / User',
@@ -56,9 +51,6 @@ export const en = {
     remove: 'Delete',
     rename: 'Rename',
     required: 'Required field',
-    reset: 'reset',
-    roles: 'Roles',
-    rolesPlaceholder: 'Optional roles',
     attachFile: 'Attach file',
     save: 'Save',
     saved: 'Saved successfully.',
@@ -81,12 +73,8 @@ export const en = {
     link: 'Link',
     tokens: 'Tokens',
     uploadLimit: 'You have reached the maximum upload limit of {{limit}} files for the {{extensionName}} extension.',
-    userGroup: 'User Group',
     userGroups: 'User Groups',
     yes: 'Yes',
-    selectOption: 'Select an option',
-    selectOptions: 'Select options',
-    addItem: 'Add an item',
     configurableArguments: 'Configurable',
     rowsSelected: '{{rowCount}} Row(s) Selected',
   },
@@ -118,11 +106,8 @@ export const en = {
     qaCatalog: {
       // List page
       create: 'Create QA Catalog',
-      createCatalog: 'Create QA Catalog',
       empty: 'No QA catalogs found.',
       emptyHint: 'Create your first catalog by uploading a file or generating one.',
-      searchPlaceholder: 'Search catalogs...',
-      noSearchResults: 'No catalogs match your search.',
       // Table columns
       name: 'Name',
       length: 'Q&A Pairs',
@@ -142,7 +127,6 @@ export const en = {
       createTitle: 'Create QA Catalog',
       createTabEmpty: 'Empty Catalog',
       createTabUpload: 'Upload File',
-      createTabGenerate: 'Generate',
       createEmptyDescription: 'Start with an empty catalog and add Q&A pairs manually.',
       uploadFile: 'Upload File',
       uploadFileHint: 'Upload a CSV, JSON, or XLSX file with Q&A pairs',
@@ -154,10 +138,7 @@ export const en = {
       createSuccess: 'QA catalog created successfully',
       createFailed: 'Failed to create QA catalog',
       // Detail page
-      catalogDetails: 'Catalog Details',
-      version: 'Version',
       versionSelect: 'Select version',
-      versionSelectHint: 'View previous revisions',
       downloadCatalog: 'Download',
       deleteCatalog: 'Delete Catalog',
       addQaPair: 'Add Q&A Pair',
@@ -166,7 +147,6 @@ export const en = {
       expectedOutput: 'Expected Output',
       contexts: 'Contexts',
       contextsHint: 'Background information for answering the question',
-      metadata: 'Metadata',
       noQaPairs: 'This catalog has no Q&A pairs.',
       // Edit Q&A pair
       editQaPair: 'Edit Q&A Pair',
@@ -216,31 +196,15 @@ export const en = {
       deleteConfirmText: 'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
       deleteSuccess: 'QA catalog deleted successfully',
       deleteFailed: 'Failed to delete QA catalog',
-      deleteQaPairConfirm: 'Remove this Q&A pair?',
       // Errors
-      errorLoading: 'Failed to load QA catalog',
-      errorLoadingCatalogs: 'Failed to load QA catalogs',
       errorNotFound: 'QA catalog not found',
-      errorInvalidFile: 'Invalid file format. Please upload a CSV, JSON, or XLSX file.',
-      errorFileTooLarge: 'File is too large. Maximum size is {{maxSize}}.',
-      errorMissingFields: 'File is missing required fields: {{fields}}',
       // Generation (deferred but adding keys for future)
-      generateTitle: 'Generate QA Catalog',
-      generatorType: 'Generator Type',
-      generatorRagas: 'RAGAS',
-      generatorConfig: 'Configuration',
-      generateSampleCount: 'Sample Count',
-      generatePersonas: 'Personas',
-      generateFiles: 'Source Files',
-      generateStart: 'Start Generation',
-      generateInProgress: 'Generation in progress...',
     },
     llmEndpoint: {
       // List page
       create: 'Create LLM Endpoint',
       empty: 'No LLM endpoints found.',
       emptyHint: 'Create your first endpoint to start running evaluations.',
-      searchPlaceholder: 'Search endpoints...',
       // Table columns
       name: 'Name',
       type: 'Type',
@@ -249,7 +213,6 @@ export const en = {
       updatedAt: 'Updated',
       actions: 'Actions',
       // Types
-      typeGaible: 'Gaible',
       typeOpenAI: 'OpenAI',
       typeAzureOpenAI: 'Azure OpenAI',
       // Features
@@ -261,8 +224,6 @@ export const en = {
       deleteConfirmTitle: 'Delete LLM Endpoint',
       deleteConfirmText: 'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
       // Steps
-      stepSelectType: 'Select Type',
-      stepConfigure: 'Configure',
       selectEndpointType: 'Select Endpoint Type',
       selectEndpointTypeHint: 'Choose the type of LLM endpoint to configure',
       // Fields - Common
@@ -278,15 +239,8 @@ export const en = {
       // Fields - API Key
       apiKeyLabel: 'API Key',
       apiKeyPlaceholder: 'Enter API key',
-      apiKeyRequired: 'API key is required',
       apiKeyUnchanged: 'Leave unchanged to keep existing key',
       // Fields - Gaible
-      gaibleEndpointLabel: 'Endpoint URL',
-      gaibleEndpointPlaceholder: 'https://api.example.com',
-      gaibleEndpointRequired: 'Endpoint URL is required',
-      configurationIdLabel: 'Configuration ID',
-      configurationIdPlaceholder: 'Enter configuration ID',
-      configurationIdRequired: 'Configuration ID is required',
       // Fields - OpenAI
       baseUrlLabel: 'Base URL',
       baseUrlPlaceholder: 'https://api.openai.com (optional)',
@@ -309,9 +263,6 @@ export const en = {
       azureEndpointPlaceholder: 'https://my-resource.openai.azure.com',
       azureEndpointRequired: 'Azure endpoint URL is required',
       // Type descriptions
-      gaibleDescription: 'Connect to Gaible for managed LLM access',
-      openAiDescription: 'Use OpenAI API or compatible services',
-      azureOpenAiDescription: 'Connect to Azure OpenAI Service',
       // Messages
       createSuccess: 'Endpoint created successfully',
       createFailed: 'Failed to create endpoint',
@@ -321,16 +272,12 @@ export const en = {
       deleteFailed: 'Failed to delete endpoint',
       versionConflict: 'Endpoint was modified by another user. Please refresh and try again.',
       // Errors
-      errorLoading: 'Failed to load LLM endpoint',
-      errorLoadingEndpoints: 'Failed to load LLM endpoints',
-      errorNotFound: 'LLM endpoint not found',
     },
     metric: {
       // List page
       create: 'Create Metric',
       empty: 'No metrics found.',
       emptyHint: 'Create your first metric to start defining evaluation criteria.',
-      searchPlaceholder: 'Search metrics...',
       // Table columns
       name: 'Name',
       type: 'Type',
@@ -345,18 +292,12 @@ export const en = {
       typeHallucination: 'Hallucination',
       typeGEval: 'G-Eval',
       // Type Descriptions
-      answerRelevancyDescription: 'Measures if answers are relevant to the questions asked',
-      faithfulnessDescription: 'Measures if answers are faithful to the provided context',
-      hallucinationDescription: 'Detects hallucinated or fabricated content in responses',
-      gEvalDescription: 'Custom evaluation with configurable steps and parameters',
       // Dialogs
       createTitle: 'Create Metric',
       editTitle: 'Edit Metric',
       deleteConfirmTitle: 'Delete Metric',
       deleteConfirmText: 'Are you sure you want to delete "{{name}}"? Evaluations using this metric may be affected.',
       // Steps
-      stepSelectType: 'Select Metric Type',
-      stepConfigure: 'Configure Metric',
       selectMetricType: 'Select Metric Type',
       selectMetricTypeHint: 'Choose the type of evaluation metric to create',
       // Fields - Common (Base)
@@ -379,7 +320,6 @@ export const en = {
       evaluationStepsHint: 'Define the steps the model should follow to evaluate',
       evaluationStepPlaceholder: 'Enter evaluation step',
       addEvaluationStep: 'Add Step',
-      removeEvaluationStep: 'Remove Step',
       evaluationStepsRequired: 'At least one evaluation step is required',
       evaluationParamsLabel: 'Evaluation Parameters',
       evaluationParamsHint: 'Select which test case parameters are required for this metric',
@@ -396,7 +336,6 @@ export const en = {
       overview: 'Overview',
       configuration: 'Configuration',
       usage: 'Usage',
-      usedInEvaluations: 'Used in Evaluations',
       noEvaluationsUsing: 'No evaluations are currently using this metric',
       // Messages
       createSuccess: 'Metric created successfully',
@@ -407,10 +346,6 @@ export const en = {
       deleteFailed: 'Failed to delete metric',
       versionConflict: 'Metric was modified by another user. Please refresh and try again.',
       // Errors
-      errorLoading: 'Failed to load metric',
-      errorLoadingMetrics: 'Failed to load metrics',
-      errorNotFound: 'Metric not found',
-      errorLoadingChatModels: 'Failed to load available chat models',
     },
     evaluations: {
       // Page titles
@@ -427,7 +362,6 @@ export const en = {
       status: 'Status',
       progress: 'Progress',
       createdAt: 'Created',
-      actions: 'Actions',
       manualTestCases: 'Manual Test Cases',
       // Status
       statusPending: 'Pending',
@@ -439,12 +373,10 @@ export const en = {
       statusSuccessTooltip: 'Evaluation completed successfully',
       statusFailureTooltip: 'Evaluation failed to complete',
       // Actions
-      viewResults: 'View Results',
       exportCsv: 'Export CSV',
       editName: 'Edit Name',
       deleteEvaluation: 'Delete',
       cloneEvaluation: 'Clone',
-      compare: 'Compare',
       // Messages
       createSuccess: 'Evaluation created successfully',
       createFailed: 'Failed to create evaluation',
@@ -464,25 +396,11 @@ export const en = {
       namePlaceholder: 'Enter evaluation name',
       nameRequired: 'Name is required',
       // Results Tab
-      resultsTab: 'Results',
-      overviewTab: 'Overview',
-      testCaseResults: 'Test Case Results',
-      question: 'Question',
-      expectedOutputLabel: 'Expected Output',
-      actualOutputLabel: 'Actual Output',
-      metricScoresLabel: 'Metric Scores',
-      statusLabel: 'Status',
-      noResults: 'No results found for this evaluation.',
-      noResultsHint: 'Results will appear here once the evaluation completes.',
-      testCaseRuns: 'Test Case Runs',
-      run: 'Run',
       // Errors
       errorLoading: 'Failed to load evaluation',
-      errorLoadingEvaluations: 'Failed to load evaluations',
       errorNotFound: 'Evaluation not found',
       // Create Wizard
       createEvaluation: 'Create Evaluation',
-      createEvaluationDescription: 'Follow the steps to configure and run a new evaluation',
       wizard: {
         // Step labels
         modeStep: 'Source Mode',
@@ -496,8 +414,6 @@ export const en = {
         reviewStep: 'Review',
         reviewStepDescription: 'Finalize details',
         // Cancel dialog
-        cancelConfirmTitle: 'Cancel Evaluation Creation',
-        cancelConfirmMessage: 'Are you sure you want to cancel? All your progress will be lost.',
       },
     },
   },
@@ -626,8 +542,6 @@ export const en = {
   },
   extensions: {
     add: 'Add Extension',
-    all: 'All Extensions',
-    configured: 'Configured Extensions',
     createConfiguration: 'Create assistant',
     createConfigurationFailed: 'Failed to create assistant.',
     createExtension: 'Create Extension',
@@ -653,7 +567,6 @@ export const en = {
     removeConfigurationConfirmTitle: 'Remove assistant',
     removeConfigurationFailed: 'Failed to remove assistant',
     removeExtensionConfirmText: 'Do you really want to remove the extension?',
-    removeExtensionConfirmTitle: 'Remove extension',
     removeExtensionFailed: 'Failed to remove extension',
     schemaChanged: 'The schema changed',
     test: 'Test',
@@ -680,13 +593,11 @@ export const en = {
     createBucket: 'Create Bucket',
     createBucketFailed: 'Failed to create bucket.',
     bucketType: 'Bucket Type',
-    deleted: 'Deleted File',
     deleting: 'Deleting File',
     deselectAll: 'Deselect all',
     fileSizeLimits: 'File Size Limits',
     headline: 'Files',
     headlineSearchable: 'Searchable Files',
-    isDefault: 'Use bucket for user uploaded files',
     perUserQuota: 'The maximum number of files each user may upload to this bucket.',
     allowedFileTypes: 'The allowed file types',
     invalidEndpointError: 'Cannot connect to endpoint',
@@ -701,7 +612,6 @@ export const en = {
     removeBucketFailed: 'Failed to remove bucket',
     removeFilesConfirmText: 'Do you really want to remove {{fileCount}} file(s)?',
     removeFileConfirmText: 'Do you really want to remove the file?',
-    removeFileConfirmTitle: 'Remove file',
     removeFilesConfirmTitle: 'Remove file(s)',
     removeFileFailed: 'Failed to delete file.',
     selectAll: 'Select all',
@@ -718,12 +628,9 @@ export const en = {
     uploadImageFailedUseThePaperclip:
       'Failed to upload file {{fileName}}. Images can be uploaded via the 📎 symbol in the message window.',
     uploading: 'Uploading File',
-    uploadMultiple: 'Uploading {{fileCount}} files...',
-    wholeFileTooLarge: 'The file is larger than the defined file size limit',
   },
   login: {
     loginButton: 'Login with {{provider}}',
-    loginHint: 'Login to your account',
     welcome: 'Welcome to Gaible 👋',
     authError: 'An error occurred while trying to authenticate. Please try again later.',
     emptyAuthSettings: 'No authentication settings found',
@@ -796,7 +703,6 @@ export const en = {
     avatarLogoHint: 'The logo is shown on the chat screen.',
     backgroundLogo: 'Background Logo',
     backgroundLogoHint: 'The logo is shown as background on the login screen.',
-    logoCurrent: 'Current logo',
     logoHint: 'The logo used in the upper left side on all pages.',
     logoUpdateFailed: 'Failed to update logo.',
     logoDeleteFailed: 'Failed to delete logo.',

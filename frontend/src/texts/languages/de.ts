@@ -3,7 +3,6 @@ import { en } from 'src/texts/languages/en';
 export const de: typeof en = {
   common: {
     administration: 'Admin',
-    administrator: 'Admin',
     apiKey: 'API-Key',
     appName: 'Gaible',
     builtIn: 'System Default',
@@ -11,7 +10,6 @@ export const de: typeof en = {
     cancel: 'Abbrechen',
     chat: 'Chat',
     next: 'Weiter',
-    chatUser: 'Chat-Benutzer',
     confirm: 'Bestätigen',
     copied: 'Text in die Zwischenablage kopiert',
     copy: 'In die Zwischenablage kopieren',
@@ -26,7 +24,6 @@ export const de: typeof en = {
     dropZoneDrop: 'Dateien ablegen.',
     duplicate: 'Duplizieren',
     export: 'Exportieren',
-    import: 'Importieren',
     edit: 'Bearbeiten',
     email: 'E-Mail',
     enabled: 'Aktiviert',
@@ -39,8 +36,6 @@ export const de: typeof en = {
     loginButton: 'Anmelden',
     loginFailed: 'Benutzername oder Passwort ist nicht korrekt. Bitte versuch es erneut.',
     loginForbidden: 'Dein Konto ist nicht für die Anmeldung berechtigt. Bitte wende dich an einen Administrator.',
-    loginText: 'Mit Benutzername und Passwort anmelden',
-    logout: 'Abmelden',
     clearConversations: 'Chatverlauf löschen',
     monthlyTokens: 'Monatliche Tokens',
     monthlyUserTokens: 'Monatliche Tokens pro Benutzer',
@@ -56,9 +51,6 @@ export const de: typeof en = {
     remove: 'Löschen',
     rename: 'Umbenennen',
     required: 'Pflichtfeld',
-    reset: 'reset',
-    roles: 'Rollen',
-    rolesPlaceholder: 'Optionale Rollen',
     attachFile: 'Datei anhängen',
     save: 'Speichern',
     saved: 'Erfolgreich gespeichert.',
@@ -80,15 +72,11 @@ export const de: typeof en = {
     link: 'Link',
     tokens: 'Tokens',
     uploadLimit: "Du hast das maximale Upload-Limit von {{limit}} Dateien bei der '{{extensionName}}' Erweiterung erreicht.",
-    userGroup: 'Benutzergruppe',
     userGroups: 'Benutzergruppen',
     yes: 'Ja',
     errorLoading: 'Fehler beim Laden.',
     errorSourcePdfViewer: 'Das Dokument wurde in der Zwischenzeit gelöscht und kann daher nicht mehr angezeigt werden.',
     tryAgain: 'Neu versuchen',
-    selectOption: 'Option auswählen',
-    selectOptions: 'Optionen auswählen',
-    addItem: 'Item hinzufügen',
     configurableArguments: 'Konfigurierbar',
     rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
@@ -119,11 +107,8 @@ export const de: typeof en = {
     llmEndpoints: 'LLM-Endpunkte',
     qaCatalog: {
       create: 'QA-Katalog erstellen',
-      createCatalog: 'QA-Katalog erstellen',
       empty: 'Keine QA-Kataloge gefunden.',
       emptyHint: 'Erstellen Sie Ihren ersten Katalog durch Hochladen einer Datei oder Generieren.',
-      searchPlaceholder: 'Kataloge suchen...',
-      noSearchResults: 'Keine Kataloge gefunden.',
       name: 'Name',
       length: 'Q&A-Paare',
       status: 'Status',
@@ -140,7 +125,6 @@ export const de: typeof en = {
       createTitle: 'QA-Katalog erstellen',
       createTabEmpty: 'Leerer Katalog',
       createTabUpload: 'Datei hochladen',
-      createTabGenerate: 'Generieren',
       createEmptyDescription: 'Beginnen Sie mit einem leeren Katalog und fügen Sie Q&A-Paare manuell hinzu.',
       uploadFile: 'Datei hochladen',
       uploadFileHint: 'CSV-, JSON- oder XLSX-Datei mit Q&A-Paaren hochladen',
@@ -151,10 +135,7 @@ export const de: typeof en = {
       fileRequired: 'Bitte wählen Sie eine Datei zum Hochladen',
       createSuccess: 'QA-Katalog erfolgreich erstellt',
       createFailed: 'QA-Katalog konnte nicht erstellt werden',
-      catalogDetails: 'Katalogdetails',
-      version: 'Version',
       versionSelect: 'Version auswählen',
-      versionSelectHint: 'Frühere Revisionen anzeigen',
       downloadCatalog: 'Herunterladen',
       deleteCatalog: 'Katalog löschen',
       addQaPair: 'Q&A-Paar hinzufügen',
@@ -162,7 +143,6 @@ export const de: typeof en = {
       expectedOutput: 'Erwartete Ausgabe',
       contexts: 'Kontexte',
       contextsHint: 'Hintergrundinformationen zur Beantwortung der Frage',
-      metadata: 'Metadaten',
       noQaPairs: 'Dieser Katalog hat keine Q&A-Paare.',
       editQaPair: 'Q&A-Paar bearbeiten',
       addNewQaPair: 'Neues Q&A-Paar hinzufügen',
@@ -207,29 +187,13 @@ export const de: typeof en = {
       deleteConfirmText: 'Möchten Sie "{{name}}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
       deleteSuccess: 'QA-Katalog erfolgreich gelöscht',
       deleteFailed: 'QA-Katalog konnte nicht gelöscht werden',
-      deleteQaPairConfirm: 'Dieses Q&A-Paar entfernen?',
-      errorLoading: 'QA-Katalog konnte nicht geladen werden',
-      errorLoadingCatalogs: 'QA-Kataloge konnten nicht geladen werden',
       errorNotFound: 'QA-Katalog nicht gefunden',
-      errorInvalidFile: 'Ungültiges Dateiformat. Bitte laden Sie eine CSV-, JSON- oder XLSX-Datei hoch.',
-      errorFileTooLarge: 'Datei ist zu groß. Maximale Größe ist {{maxSize}}.',
-      errorMissingFields: 'Datei fehlen erforderliche Felder: {{fields}}',
-      generateTitle: 'QA-Katalog generieren',
-      generatorType: 'Generatortyp',
-      generatorRagas: 'RAGAS',
-      generatorConfig: 'Konfiguration',
-      generateSampleCount: 'Anzahl der Beispiele',
-      generatePersonas: 'Personas',
-      generateFiles: 'Quelldateien',
-      generateStart: 'Generierung starten',
-      generateInProgress: 'Generierung läuft...',
     },
     llmEndpoint: {
       // List page
       create: 'LLM-Endpunkt erstellen',
       empty: 'Keine LLM-Endpunkte gefunden.',
       emptyHint: 'Erstellen Sie Ihren ersten Endpunkt, um mit Evaluierungen zu beginnen.',
-      searchPlaceholder: 'Endpunkte durchsuchen...',
       // Table columns
       name: 'Name',
       type: 'Typ',
@@ -238,7 +202,6 @@ export const de: typeof en = {
       updatedAt: 'Aktualisiert',
       actions: 'Aktionen',
       // Types
-      typeGaible: 'Gaible',
       typeOpenAI: 'OpenAI',
       typeAzureOpenAI: 'Azure OpenAI',
       // Features
@@ -250,8 +213,6 @@ export const de: typeof en = {
       deleteConfirmTitle: 'LLM-Endpunkt löschen',
       deleteConfirmText: 'Möchten Sie "{{name}}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
       // Steps
-      stepSelectType: 'Typ auswählen',
-      stepConfigure: 'Konfigurieren',
       selectEndpointType: 'Endpunkt-Typ auswählen',
       selectEndpointTypeHint: 'Wählen Sie den Typ des zu konfigurierenden LLM-Endpunkts',
       // Fields - Common
@@ -267,15 +228,8 @@ export const de: typeof en = {
       // Fields - API Key
       apiKeyLabel: 'API-Schlüssel',
       apiKeyPlaceholder: 'API-Schlüssel eingeben',
-      apiKeyRequired: 'API-Schlüssel ist erforderlich',
       apiKeyUnchanged: 'Leer lassen, um den vorhandenen Schlüssel zu behalten',
       // Fields - Gaible
-      gaibleEndpointLabel: 'Endpunkt-URL',
-      gaibleEndpointPlaceholder: 'https://api.example.com',
-      gaibleEndpointRequired: 'Endpunkt-URL ist erforderlich',
-      configurationIdLabel: 'Konfigurations-ID',
-      configurationIdPlaceholder: 'Konfigurations-ID eingeben',
-      configurationIdRequired: 'Konfigurations-ID ist erforderlich',
       // Fields - OpenAI
       baseUrlLabel: 'Basis-URL',
       baseUrlPlaceholder: 'https://api.openai.com (optional)',
@@ -298,9 +252,6 @@ export const de: typeof en = {
       azureEndpointPlaceholder: 'https://my-resource.openai.azure.com',
       azureEndpointRequired: 'Azure-Endpunkt-URL ist erforderlich',
       // Type descriptions
-      gaibleDescription: 'Mit Gaible für verwalteten LLM-Zugriff verbinden',
-      openAiDescription: 'OpenAI API oder kompatible Dienste verwenden',
-      azureOpenAiDescription: 'Mit Azure OpenAI Service verbinden',
       // Messages
       createSuccess: 'Endpunkt erfolgreich erstellt',
       createFailed: 'Fehler beim Erstellen des Endpunkts',
@@ -311,16 +262,12 @@ export const de: typeof en = {
       versionConflict:
         'Der Endpunkt wurde von einem anderen Benutzer geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.',
       // Errors
-      errorLoading: 'Fehler beim Laden des LLM-Endpunkts',
-      errorLoadingEndpoints: 'Fehler beim Laden der LLM-Endpunkte',
-      errorNotFound: 'LLM-Endpunkt nicht gefunden',
     },
     metric: {
       // List page
       create: 'Metrik erstellen',
       empty: 'Keine Metriken gefunden.',
       emptyHint: 'Erstellen Sie Ihre erste Metrik, um Bewertungskriterien zu definieren.',
-      searchPlaceholder: 'Metriken durchsuchen...',
       // Table columns
       name: 'Name',
       type: 'Typ',
@@ -335,10 +282,6 @@ export const de: typeof en = {
       typeHallucination: 'Halluzination',
       typeGEval: 'G-Eval',
       // Type Descriptions
-      answerRelevancyDescription: 'Misst, ob Antworten relevant zu den gestellten Fragen sind',
-      faithfulnessDescription: 'Misst, ob Antworten dem bereitgestellten Kontext treu sind',
-      hallucinationDescription: 'Erkennt halluzinierte oder erfundene Inhalte in Antworten',
-      gEvalDescription: 'Benutzerdefinierte Bewertung mit konfigurierbaren Schritten und Parametern',
       // Dialogs
       createTitle: 'Metrik erstellen',
       editTitle: 'Metrik bearbeiten',
@@ -346,8 +289,6 @@ export const de: typeof en = {
       deleteConfirmText:
         'Möchten Sie "{{name}}" wirklich löschen? Evaluierungen, die diese Metrik verwenden, könnten betroffen sein.',
       // Steps
-      stepSelectType: 'Metrik-Typ auswählen',
-      stepConfigure: 'Metrik konfigurieren',
       selectMetricType: 'Metrik-Typ auswählen',
       selectMetricTypeHint: 'Wählen Sie den Typ der zu erstellenden Bewertungsmetrik',
       // Fields - Common (Base)
@@ -370,7 +311,6 @@ export const de: typeof en = {
       evaluationStepsHint: 'Definieren Sie die Schritte, die das Modell zur Bewertung befolgen soll',
       evaluationStepPlaceholder: 'Bewertungsschritt eingeben',
       addEvaluationStep: 'Schritt hinzufügen',
-      removeEvaluationStep: 'Schritt entfernen',
       evaluationStepsRequired: 'Mindestens ein Bewertungsschritt ist erforderlich',
       evaluationParamsLabel: 'Bewertungsparameter',
       evaluationParamsHint: 'Wählen Sie aus, welche Testfallparameter für diese Metrik erforderlich sind',
@@ -387,7 +327,6 @@ export const de: typeof en = {
       overview: 'Übersicht',
       configuration: 'Konfiguration',
       usage: 'Verwendung',
-      usedInEvaluations: 'Verwendet in Evaluierungen',
       noEvaluationsUsing: 'Keine Evaluierungen verwenden derzeit diese Metrik',
       // Messages
       createSuccess: 'Metrik erfolgreich erstellt',
@@ -399,10 +338,6 @@ export const de: typeof en = {
       versionConflict:
         'Die Metrik wurde von einem anderen Benutzer geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.',
       // Errors
-      errorLoading: 'Fehler beim Laden der Metrik',
-      errorLoadingMetrics: 'Fehler beim Laden der Metriken',
-      errorNotFound: 'Metrik nicht gefunden',
-      errorLoadingChatModels: 'Fehler beim Laden der verfügbaren Chat-Modelle',
     },
     evaluations: {
       // Page titles
@@ -419,7 +354,6 @@ export const de: typeof en = {
       status: 'Status',
       progress: 'Fortschritt',
       createdAt: 'Erstellt',
-      actions: 'Aktionen',
       manualTestCases: 'Manuelle Testfälle',
       // Status
       statusPending: 'Ausstehend',
@@ -431,12 +365,10 @@ export const de: typeof en = {
       statusSuccessTooltip: 'Evaluierung erfolgreich abgeschlossen',
       statusFailureTooltip: 'Evaluierung fehlgeschlagen',
       // Actions
-      viewResults: 'Ergebnisse anzeigen',
       exportCsv: 'CSV exportieren',
       editName: 'Name bearbeiten',
       deleteEvaluation: 'Löschen',
       cloneEvaluation: 'Klonen',
-      compare: 'Vergleichen',
       // Messages
       createSuccess: 'Evaluierung erfolgreich erstellt',
       createFailed: 'Evaluierung konnte nicht erstellt werden',
@@ -457,25 +389,11 @@ export const de: typeof en = {
       namePlaceholder: 'Evaluierungsname eingeben',
       nameRequired: 'Name ist erforderlich',
       // Results Tab
-      resultsTab: 'Ergebnisse',
-      overviewTab: 'Übersicht',
-      testCaseResults: 'Testfall-Ergebnisse',
-      question: 'Frage',
-      expectedOutputLabel: 'Erwartete Ausgabe',
-      actualOutputLabel: 'Tatsächliche Ausgabe',
-      metricScoresLabel: 'Metrik-Scores',
-      statusLabel: 'Status',
-      noResults: 'Keine Ergebnisse für diese Evaluierung gefunden.',
-      noResultsHint: 'Ergebnisse werden hier angezeigt, sobald die Evaluierung abgeschlossen ist.',
-      testCaseRuns: 'Testfall-Durchläufe',
-      run: 'Durchlauf',
       // Errors
       errorLoading: 'Evaluierung konnte nicht geladen werden',
-      errorLoadingEvaluations: 'Evaluierungen konnten nicht geladen werden',
       errorNotFound: 'Evaluierung nicht gefunden',
       // Create Wizard
       createEvaluation: 'Evaluierung erstellen',
-      createEvaluationDescription: 'Folgen Sie den Schritten, um eine neue Evaluierung zu konfigurieren und auszuführen',
       wizard: {
         // Step labels
         modeStep: 'Quellmodus',
@@ -489,8 +407,6 @@ export const de: typeof en = {
         reviewStep: 'Überprüfung',
         reviewStepDescription: 'Details abschließen',
         // Cancel dialog
-        cancelConfirmTitle: 'Evaluierungserstellung abbrechen',
-        cancelConfirmMessage: 'Möchten Sie wirklich abbrechen? Alle Ihre Fortschritte gehen verloren.',
       },
     },
   },
@@ -621,8 +537,6 @@ export const de: typeof en = {
   },
   extensions: {
     add: 'Erweiterung hinzufügen',
-    all: 'Alle Erweiterungen',
-    configured: 'Konfigurierte Erweiterungen',
     createConfiguration: 'Assistent erstellen',
     createConfigurationFailed: 'Erstellen des Assistenten fehlgeschlagen.',
     createExtension: 'Erweiterung erstellen',
@@ -646,7 +560,6 @@ export const de: typeof en = {
     removeConfigurationConfirmTitle: 'Assistent löschen',
     removeConfigurationFailed: 'Löschen des Assistenten fehlgeschlagen',
     removeExtensionConfirmText: 'Möchtest du diese Erweiterung wirklich löschen?',
-    removeExtensionConfirmTitle: 'Erweiterung löschen',
     removeExtensionFailed: 'Löschen der Erweiterung fehlgeschlagen',
     rebuildSchemaFailed: 'Aktualisierung des Schemas fehlgeschlagen',
     rebuildSchema: 'Schema aktualisieren',
@@ -676,13 +589,11 @@ export const de: typeof en = {
     createBucket: 'Bucket erstellen',
     bucketType: 'Bucket-Typ',
     createBucketFailed: 'Erstellen des Buckets fehlgeschlagen.',
-    deleted: 'Datei gelöscht',
     deleting: 'Datei wird gelöscht',
     deselectAll: 'Alles abwählen',
     fileSizeLimits: 'Maximale Dateigröße',
     headline: 'Dateien',
     headlineSearchable: 'Durchsuchbare Dateien',
-    isDefault: 'Bucket für vom Benutzer hochgeladene Dateien verwenden',
     perUserQuota: 'Die maximale Anzahl an Dateien, die jeder Benutzer in diesen Bucket hochladen darf.',
     allowedFileTypes: 'Erlaubte Dateitypen',
     invalidEndpointError: 'Verbindung zum Endpunkt fehlgeschlagen',
@@ -697,7 +608,6 @@ export const de: typeof en = {
     removeBucketFailed: 'Löschen des Buckets fehlgeschlagen',
     removeFileConfirmText: 'Möchtest du die Datei wirklich löschen?',
     removeFilesConfirmText: 'Möchtest du wirklich {{fileCount}} Datei(en) löschen?',
-    removeFileConfirmTitle: 'Datei löschen',
     removeFilesConfirmTitle: 'Datei(en) löschen',
     removeFileFailed: 'Löschen der Datei fehlgeschlagen.',
     selectAll: 'Alles auswählen',
@@ -715,12 +625,9 @@ export const de: typeof en = {
     uploadImageFailedUseThePaperclip:
       'Datei {{fileName}} konnte nicht hochgeladen werden. Bilder können über das 📎-Symbol im Nachrichtenfenster hochgeladen werden.',
     uploading: 'Datei wird hochgeladen',
-    uploadMultiple: '{{fileCount}} Dateien werden hochgeladen...',
-    wholeFileTooLarge: 'Die Datei ist größer als die definierte maximale Dateigröße',
   },
   login: {
     loginButton: 'Anmelden mit {{provider}}',
-    loginHint: 'Melde dich mit deinem Konto an',
     welcome: 'Willkommen bei Gaible 👋',
     authError: 'Es ist ein Fehler beim Anmelden aufgetreten. Bitte versuche es später noch einmal.',
     emptyAuthSettings: 'Keine Authentifizierungseinstellungen gefunden',
@@ -793,7 +700,6 @@ export const de: typeof en = {
     avatarLogoHint: 'Das Logo wird im Chat angezeigt.',
     backgroundLogo: 'Hintergrund Logo',
     backgroundLogoHint: 'Das Logo wird auf dem Anmeldebildschirm als Hintergrund angezeigt.',
-    logoCurrent: 'Aktuelles Logo',
     logoHint: 'Das Logo in der Ecke oben links auf allen Seiten der App.',
     logoUpdateFailed: 'Aktualisierung fehlgeschlagen.',
     logoDeleteFailed: 'Löschen fehlgeschlagen.',
