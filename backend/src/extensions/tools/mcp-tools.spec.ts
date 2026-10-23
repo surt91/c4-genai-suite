@@ -85,6 +85,18 @@ describe('MCPToolsExtension client lifecycle', () => {
     expect(Client.prototype.close).toHaveBeenCalledTimes(2);
   });
 
+  it('continues the chat without the tools when the server is not reachable', async () => {
+    jest.spyOn(Client.prototype, 'connect').mockRejectedValue(new Error('ECONNREFUSED'));
+    const [middleware] = await sut.getMiddlewares({} as User, { externalId: 'mcp_1', values } as never);
+    const next = jest.fn().mockResolvedValue(true);
+
+    const ctx = context();
+    await middleware.invoke(ctx, () => ctx, next);
+
+    expect(next).toHaveBeenCalledWith(ctx);
+    expect(ctx.tools).toHaveLength(0);
+  });
+
   it('closes the client after testing the connection', async () => {
     await sut.test(values as never);
     expect(Client.prototype.close).toHaveBeenCalledTimes(1);

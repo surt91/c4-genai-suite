@@ -495,7 +495,18 @@ export class MCPToolsExtension implements Extension<Configuration> {
   ): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { tools, client } = await this.getTools(extension.values);
+        let connection: Awaited<ReturnType<typeof this.getTools>>;
+        try {
+          connection = await this.getTools(extension.values);
+        } catch (err) {
+          // An unreachable MCP server must not break the whole chat; continue without its tools.
+          this.logger.error(
+            `Cannot connect to mcp tool ${extension.values.serverName} (extension id: ${extension.externalId})`,
+            err,
+          );
+          return next(context);
+        }
+        const { tools, client } = connection;
         this.enableElicitRequests(client, context);
         const schemaData = extension.values.schema ?? {};
 
