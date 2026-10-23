@@ -6,13 +6,8 @@ from sqlalchemy import pool, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-# IMPORTANT: Load environment variables FIRST before importing settings
-from llm_eval.utils.env import load_env
-
-load_env()
-
-from llm_eval.database.model import Base, SCHEMA_NAME  # noqa: E402
-from llm_eval.settings import SETTINGS  # noqa: E402
+from llm_eval.database.model import Base, SCHEMA_NAME
+from llm_eval.settings import SETTINGS
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,6 +1,6 @@
 from logging import LogRecord, Formatter
 from types import TracebackType
-import orjson
+import json
 from datetime import datetime, timezone
 import traceback
 
@@ -19,7 +19,7 @@ class JsonFormatter(Formatter):
         if record.exc_info:
             log_obj["stack"] = self.format_exception(record.exc_info)
 
-        return orjson.dumps(log_obj).decode()
+        return json.dumps(log_obj, ensure_ascii=False, separators=(",", ":"))
 
     def format_exception(
         self, exc_info: tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None]

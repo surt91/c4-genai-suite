@@ -4,13 +4,6 @@ from contextlib import asynccontextmanager
 from os import environ
 from typing import AsyncGenerator
 
-# IMPORTANT: Load environment variables FIRST before any other imports
-# This ensures .env is loaded before SETTINGS object is created
-from llm_eval.utils.env import load_env
-
-load_env()
-
-# flake8: noqa: E402
 import time
 from fastapi import FastAPI, Request, Response, status
 from fastapi.routing import APIRoute

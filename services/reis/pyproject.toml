@@ -19,7 +19,8 @@ dependencies = [
     "langchain-aws>=1.9.0",
     "langchain-nvidia-ai-endpoints>=1.5.0",
     "psycopg[binary]>=3.3.6",
-    "fastapi[standard]==0.161.1",
+    "fastapi==0.161.1",
+    "uvicorn[standard]>=0.54.0",
     "azure-search-documents==11.6.0",
     "azure-identity==1.26.0",
     "pdfminer-six>=20260107",
@@ -31,7 +32,6 @@ dependencies = [
     "weasyprint>=70.0",
     "markdown>=3.11.2",
     "pygments>=2.21.0",
-    "orjson>=3.13.0",
     "pyyaml>=6.0.3",
     "tenacity>=9.2.1",
     "anyio>=4.15.1",
@@ -39,6 +39,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "fastapi-cli>=0.0.32",
     "ruff==0.17.2",
     "ty==0.0.57",
     "pre-commit==4.7.0",

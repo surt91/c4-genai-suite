@@ -39,7 +39,6 @@ const config: Config = {
       moduleFileExtensions: ['js', 'json', 'ts'],
       globalSetup: '../jest.setup.e2e.ts',
       setupFiles: ['../jest.setup-db.e2e.ts'],
-      globalTeardown: '../jest.teardown.e2e.ts',
       rootDir: 'src',
     },
   ],

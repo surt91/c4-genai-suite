@@ -1,10 +1,10 @@
 import uuid
 from collections.abc import AsyncGenerator
 
+import asyncpg
 import pytest_asyncio
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy_utils import create_database, drop_database
 
 from llm_eval.database.migration import run_migrations_async
 from llm_eval.settings import SETTINGS
@@ -13,9 +13,9 @@ from llm_eval.settings import SETTINGS
 @pytest_asyncio.fixture(scope="function")
 async def test_session() -> AsyncGenerator[AsyncSession]:
     hash = str(uuid.uuid4())[:8]
-    connection_string_sync = build_test_url(SETTINGS.connection_string_sync, hash)
+    database = f"test_db_{hash}"
 
-    create_database(connection_string_sync)
+    await _admin_query(f'CREATE DATABASE "{database}"')
 
     session = None
 
@@ -31,7 +31,21 @@ async def test_session() -> AsyncGenerator[AsyncSession]:
     finally:
         if session:
             await session.close()
-        drop_database(connection_string_sync)
+        await _admin_query(f'DROP DATABASE IF EXISTS "{database}" WITH (FORCE)')
+
+
+async def _admin_query(query: str) -> None:
+    connection = await asyncpg.connect(
+        user=SETTINGS.pg_user,
+        password=SETTINGS.pg_password,
+        host=SETTINGS.pg_host,
+        port=SETTINGS.pg_port,
+        database=SETTINGS.pg_db,
+    )
+    try:
+        await connection.execute(query)
+    finally:
+        await connection.close()
 
 
 def build_test_url(url: str, hash: str) -> str:

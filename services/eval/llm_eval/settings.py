@@ -6,7 +6,7 @@ from pydantic import Field, PostgresDsn, SecretBytes
 from pydantic_settings import BaseSettings as PydanticBaseSettings
 from pydantic_settings import SettingsConfigDict
 
-from llm_eval.config.paths import DATA_DIR, PROJECT_ROOT_DIR
+from llm_eval.config.paths import BACKEND_DIR, DATA_DIR
 
 
 class BaseSettings(PydanticBaseSettings):
@@ -14,9 +14,11 @@ class BaseSettings(PydanticBaseSettings):
         super().__init_subclass__(**kwargs)
 
         config = SettingsConfigDict(
+            # environment variables override the files,
+            # `.env` overrides `.env.services` (later files win)
             env_file=(
-                PROJECT_ROOT_DIR / ".env",
-                PROJECT_ROOT_DIR / ".env.services",
+                BACKEND_DIR / ".env.services",
+                BACKEND_DIR / ".env",
             ),
             env_file_encoding="utf-8",
             extra="allow",
@@ -95,6 +97,8 @@ class Settings(BaseSettings):
     file_store: FileStoreSettings = FileStoreSettings()
     gaible_backend: GaibleBackendSettings = GaibleBackendSettings()
 
+    custom_ssl_cert_file: str | None = Field(default=None, alias="CUSTOM_SSL_CERT_FILE")
+
     file_upload_temp_location: Path = Field(default=DATA_DIR / "uploaded_files")
 
     pg_user: str = Field(default="postgres")
@@ -104,23 +108,16 @@ class Settings(BaseSettings):
     pg_port: int = Field(default=5432)
     pg_schema: str = Field(default="llm_eval")
 
-    def __postgres_string(self, sync: bool = False) -> PostgresDsn:
+    @property
+    def connection_string(self) -> str:
         return PostgresDsn.build(
-            scheme="postgresql+asyncpg" if not sync else "postgresql+psycopg2",
+            scheme="postgresql+asyncpg",
             username=self.pg_user,
             password=self.pg_password,
             port=self.pg_port,
             host=self.pg_host,
             path=self.pg_db,
-        )
-
-    @property
-    def connection_string(self) -> str:
-        return self.__postgres_string().encoded_string()
-
-    @property
-    def connection_string_sync(self) -> str:
-        return self.__postgres_string(sync=True).encoded_string()
+        ).encoded_string()
 
 
 SETTINGS = Settings()  # type: ignore

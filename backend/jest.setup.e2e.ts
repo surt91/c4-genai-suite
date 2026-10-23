@@ -1,37 +1,38 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as process from 'node:process';
+import { parseEnv } from 'node:util';
 import { Logger } from '@nestjs/common';
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { Client } from 'pg';
-import { Wait } from 'testcontainers';
 
 const logger = new Logger();
 
 /**
  * Provides a PostgreSQL server for the DB-backed `*.e2e.spec.ts` tests.
  *
- * - If `DB_URL` is set (e.g. a postgres service container in CI), that server is used.
- * - Otherwise a throwaway postgres is started via testcontainers (requires a docker daemon).
+ * The server is taken from `DB_URL` (environment, or else `backend/.env`), e.g. the compose postgres
+ * (`docker compose up -d postgres`) or a postgres service container in CI.
  *
  * Every jest worker gets its own freshly (re)created database `<db>_test_<workerId>` (see
  * jest.setup-db.e2e.ts), so the suites can run in parallel and never see data of a previous run.
  * The role in `DB_URL` therefore needs the CREATEDB privilege.
  */
+const readDbUrlFromEnvFile = (): string | undefined => {
+  const envFile = join(__dirname, '.env');
+  return existsSync(envFile) ? parseEnv(readFileSync(envFile, 'utf8')).DB_URL : undefined;
+};
+
 const init = async (globalConfig: { maxWorkers: number }) => {
   process.env.TZ = 'UTC';
 
-  if (process.env.DB_URL) {
-    logger.log('using database server from DB_URL');
-  } else {
-    logger.log('DB_URL not set, spinning up postgres test container');
-    const container: StartedPostgreSqlContainer = await new PostgreSqlContainer('postgres:17.5-alpine')
-      .withWaitStrategy(Wait.forListeningPorts())
-      .start();
-    process.env.DB_URL = container.getConnectionUri();
-    // @ts-expect-error setting global to use it in the teardown function
-    globalThis.dbContainer = container;
+  const baseUrl = process.env.DB_URL || readDbUrlFromEnvFile();
+  if (!baseUrl) {
+    throw new Error(
+      'DB_URL is not set. The DB tests need a running postgres: start it with `docker compose up -d postgres` ' +
+        'and set DB_URL (e.g. `cp .env.example .env`, default postgres://admin:secret@localhost:5432/gaible).',
+    );
   }
-
-  const baseUrl = process.env.DB_URL;
+  logger.log('using database server from DB_URL');
   process.env.GAIBLE_TEST_DB_BASE_URL = baseUrl;
   const baseName = new URL(baseUrl).pathname.slice(1) || 'postgres';
 

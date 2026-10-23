@@ -5,14 +5,9 @@ from celery import Celery
 from celery.bootsteps import StartStopStep
 from celery.signals import worker_ready, worker_shutdown
 
-# IMPORTANT: Load environment variables FIRST before importing settings
-from llm_eval.utils.env import load_env
-
-load_env()
-
-from llm_eval.settings import SETTINGS  # noqa: E402
-from llm_eval.utils.data_dir import setup_data_dir  # noqa: E402
-from llm_eval.utils.ssl import setup_custom_ssl_cert  # noqa: E402
+from llm_eval.settings import SETTINGS
+from llm_eval.utils.data_dir import setup_data_dir
+from llm_eval.utils.ssl import setup_custom_ssl_cert
 
 setup_data_dir()
 setup_custom_ssl_cert()

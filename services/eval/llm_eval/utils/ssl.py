@@ -3,13 +3,11 @@ import os
 import certifi
 
 from llm_eval.config.paths import DATA_DIR
-from llm_eval.utils.env import load_env
-
-load_env()
+from llm_eval.settings import SETTINGS
 
 
 def setup_custom_ssl_cert() -> None:
-    custom_cert_file = os.environ.get("CUSTOM_SSL_CERT_FILE")
+    custom_cert_file = SETTINGS.custom_ssl_cert_file
 
     if custom_cert_file:
         combined_cert_path = DATA_DIR / "combined_cert.pem"
