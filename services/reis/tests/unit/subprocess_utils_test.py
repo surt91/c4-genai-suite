@@ -15,7 +15,7 @@ def is_running(pid: int) -> bool:
     try:
         with open(f"/proc/{pid}/stat") as f:
             # zombies are dead, they only wait to be reaped
-            return f.read().split(") ")[1][0] != "Z"
+            return f.read().rsplit(") ", 1)[1][0] not in {"Z", "X"}
     except FileNotFoundError:
         return False
 
@@ -33,10 +33,12 @@ def test_timeout_kills_the_whole_process_group(tmp_path: Path) -> None:
 
     with pytest.raises(subprocess.TimeoutExpired):
         # the background `sleep` simulates a helper process like `soffice.bin`
-        subprocess_utils.run(["sh", "-c", f"sleep 100 & echo $! > {pid_file}; wait"], timeout=1)
+        subprocess_utils.run(
+            ["sh", "-c", f"sleep 100 & echo $! > {pid_file}.tmp; mv {pid_file}.tmp {pid_file}; wait"], timeout=5
+        )
 
     pid = int(pid_file.read_text())
-    deadline = time.monotonic() + 5
+    deadline = time.monotonic() + 10
     while is_running(pid) and time.monotonic() < deadline:
         time.sleep(0.05)
     assert not is_running(pid)
