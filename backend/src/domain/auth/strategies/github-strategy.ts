@@ -20,7 +20,8 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         callbackURL: `${authService.config.baseUrl}/auth/login/github/callback`,
         clientID: authService.config.github?.clientId || 'INVALID',
         clientSecret: authService.config.github?.clientSecret || 'INVALID',
-        scope: ['profile', 'email'],
+        // GitHub has no `profile`/`email` scopes; `user:email` is needed to read private (primary) e-mail addresses.
+        scope: ['user:email'],
       }),
     );
   }
