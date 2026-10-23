@@ -38,7 +38,7 @@ describe(RebuildExtension.name, () => {
   });
 
   it('does not use the stored values of an extension of another type', async () => {
-    const handler = createHandler({ id: 1, name: 'open-api', enabled: true, values: { apiKey: 'secret' } });
+    const handler = createHandler({ id: 1, name: 'brave-web-search', enabled: true, values: { apiKey: 'secret' } });
 
     await expect(handler.execute(new RebuildExtension('mcp', { endpoint: 'http://attacker' }, 1))).rejects.toMatchObject({
       status: 404,

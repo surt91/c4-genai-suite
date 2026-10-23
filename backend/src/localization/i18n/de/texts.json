@@ -118,12 +118,6 @@
       "title": "Vollständige Dateien",
       "description": "Fügt den vollständigen Inhalt der in einem Chat über die Büroklammer hochgeladenen Dateien dem LLM-Kontext hinzu."
     },
-    "openapi": {
-      "title": "Open API",
-      "description": "Verbindet eine externe, standardisierte API als Tool.",
-      "endpointHint": "Endpunkt als URL.",
-      "headersHint": "Ein Header pro Zeile als Schlüssel=Wert"
-    },
     "speechToText": {
       "title": "Spracheingabe",
       "description": "Erlaubt Spracheingaben über ein Mikrofon-Icon"

@@ -31,7 +31,6 @@ import { FilesVisionExtension } from './tools/files-vision';
 import { GeminiImageExtension } from './tools/gemini-image';
 import { GPTImage1Extension } from './tools/gpt-image-1';
 import { MCPToolsExtension } from './tools/mcp-tools';
-import { OpenApiExtension } from './tools/open-api';
 import { WholeFilesExtension } from './tools/whole-files-conversation';
 
 const extensionClassSuffix = 'Extension';
@@ -118,7 +117,6 @@ export class ExtensionLibraryModule {
         OllamaModelExtension,
         OpenAICompatibleModelExtension,
         OpenAIModelExtension,
-        OpenApiExtension,
         SpeechToTextExtension,
         SummaryPromptExtension,
         UserArgsExtension,

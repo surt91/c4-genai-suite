@@ -118,12 +118,6 @@
       "title": "Complete Files",
       "description": "Adds the complete content of files uploaded via the paperclip to a conversation to the LLM context."
     },
-    "openapi": {
-      "title": "Open API",
-      "description": "Connects an external, standardized API as tool.",
-      "endpointHint": "Endpoint as URL.",
-      "headersHint": "One header per line as Key=Value"
-    },
     "speechToText": {
       "title": "Speech To Text",
       "description": "Allows speech input via microphone icon"

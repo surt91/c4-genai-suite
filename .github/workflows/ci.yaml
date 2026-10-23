@@ -72,7 +72,6 @@ jobs:
         run: |
           npm run generate-openapi-dev
           npm run generate-reis
-          npm run generate-tools
           git add -N . && git diff --exit-code .
       - run: npm test
       - name: Check migrations are complete

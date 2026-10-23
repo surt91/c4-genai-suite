@@ -27,7 +27,7 @@ Legende: ✅ vorhanden · ⚠️ teilweise/eingeschränkt · ❌ nicht vorhanden
 | | Reasoning-Anzeige | ✅ | ✅ | ✅ |
 | **Agenten & Tools** | Assistenten/Agenten (no-code) | ✅ nur Admins (Extensions, Usergruppen-Freigabe) | ✅ Agent Builder, Marketplace, Skills, Subagents, Agent-Teams | ✅ Workspace-Modelle, Tools, Functions, Skills |
 | | Externer Agent-Executor | ❌ (entfernt) | ⚠️ Subagents intern | ⚠️ Pipes |
-| | OpenAPI-Tools | ✅ | ✅ Actions | ✅ OpenAPI-Toolserver |
+| | OpenAPI-Tools | ❌ (eigenes Tools-Server-Protokoll entfernt, MCP deckt das ab) | ✅ Actions | ✅ OpenAPI-Toolserver |
 | | Human-in-the-loop (Bestätigung/Formulare) | ✅ Confirm/Input-UI für Extensions | ✅ seit v0.8.8-rc2 *(Pre-Release)* | ⚠️ *(unverifiziert)* |
 | **MCP** | Transporte | ⚠️ SSE + Streamable HTTP, stdio nur über Proxy | ✅ stdio, SSE, Streamable HTTP, WebSocket | ⚠️ nur Streamable HTTP (stdio über mcpo) |
 | | OAuth für MCP | ❌ nur statische Header | ✅ `requiresOAuth`, Auto-Detection | ✅ OAuth 2.1 (DCR + statisch) |
