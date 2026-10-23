@@ -29,6 +29,8 @@ function upsertToolCall(toolCalls: ToolCallState[] | undefined, update: ToolCall
   return existing.map((t) => (t.id === update.id ? { ...t, ...update, error: update.error ?? t.error } : t));
 }
 
+const responseStatus = (error: unknown) => (error instanceof ResponseError ? error.response.status : undefined);
+
 const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEnum) => {
   return messageType === 'ai' ? -1 : 0;
 };
@@ -60,16 +62,20 @@ export const useChatStream = (chatId: number) => {
       };
     },
     refetchOnWindowFocus: false,
-    retry: (failureCount, error: ResponseError) =>
-      error?.response?.status !== 404 && error?.response?.status !== 403 && failureCount < 3,
+    retry: (failureCount, error) => {
+      const status = responseStatus(error);
+      return status !== 404 && status !== 403 && failureCount < 3;
+    },
   });
 
   useEffect(() => {
     if (error) {
-      if (error.response.status === 403) {
+      // Network errors (e.g. the server cannot be reached) have no response.
+      const status = responseStatus(error);
+      if (status === 403) {
         toast.error(texts.chat.noAccessToConversation);
         void navigate('/chat');
-      } else if (error.response.status === 404) {
+      } else if (status === 404) {
         toast.error(texts.chat.conversationNotFound);
         void navigate('/chat');
       } else {
