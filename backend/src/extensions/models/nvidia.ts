@@ -133,7 +133,7 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
   // which is the way ai sdk sends them. We fix this in an ad hoc way here until it is fixed upstream.
   repairToolCall = (fetchFunction: Fetch) => async (url: string | Request | URL, options: RequestInit | undefined) => {
     if (options?.body && typeof options.body === 'string') {
-      const repairedBody = options.body.replace('"content":"",', '"content":null,');
+      const repairedBody = options.body.replaceAll('"content":"",', '"content":null,');
       options.body = repairedBody;
     }
     return await fetchFunction(url, options);
@@ -156,7 +156,8 @@ export class NvidiaModelExtension implements Extension<NvidiaModelExtensionConfi
         seed: config.seed,
         temperature: config.temperature,
         providerOptions: {
-          openai: {
+          // @ai-sdk/openai-compatible only reads `openaiCompatible` (not `openai`)
+          openaiCompatible: {
             reasoningEffort: config.effort ? config.effort : undefined,
             reasoningSummary: config.summary === 'off' ? undefined : config.summary || 'detailed',
             parallelToolCalls: config.parallelToolCalls ?? true,

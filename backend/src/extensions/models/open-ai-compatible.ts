@@ -168,7 +168,8 @@ export class OpenAICompatibleModelExtension implements Extension<OpenAICompatibl
         seed,
         maxOutputTokens,
         providerOptions: {
-          openai: effort
+          // @ai-sdk/openai-compatible only reads `openaiCompatible` (not `openai`)
+          openaiCompatible: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
                 reasoningSummary: summary === 'off' ? undefined : summary || 'detailed',
