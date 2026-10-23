@@ -74,6 +74,7 @@ export const en = {
     text: 'Text',
     title: 'Title',
     tryAgain: 'Try again',
+    loadFailed: 'The application could not be loaded. The server may not be reachable.',
     link: 'Link',
     tokens: 'Tokens',
     uploadLimit: 'You have reached the maximum upload limit of {{limit}} files for the {{extensionName}} extension.',

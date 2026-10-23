@@ -104,6 +104,7 @@ function load() {
       text: translate('common.text'),
       title: translate('common.title'),
       tryAgain: translate('common.tryAgain'),
+      loadFailed: translate('common.loadFailed'),
       link: translate('common.link'),
       tokens: translate('common.tokens'),
       uploadLimit: (limit: number, extensionName: string) => translate('common.uploadLimit', { limit, extensionName }),

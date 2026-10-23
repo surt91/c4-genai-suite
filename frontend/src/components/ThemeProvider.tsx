@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useApi } from 'src/api';
 import { Theme, ThemeContext } from 'src/hooks';
 import { texts } from 'src/texts';
+import { LoadError } from './LoadError';
 
 const defaultTheme = { name: texts.common.appName };
 
@@ -14,7 +15,11 @@ export function ThemeProvider(props: React.PropsWithChildren) {
 
   const { i18n } = useTranslation();
 
-  const { data: loadedSettings, refetch } = useQuery({
+  const {
+    data: loadedSettings,
+    refetch,
+    isError,
+  } = useQuery({
     queryKey: ['theme'],
     queryFn: () => api.settings.getSettings(),
     refetchOnWindowFocus: false,
@@ -52,7 +57,7 @@ export function ThemeProvider(props: React.PropsWithChildren) {
   }, [refetch, setTheme, theme]);
 
   if (!loadedSettings) {
-    return null;
+    return isError ? <LoadError onRetry={() => void refetch()} /> : null;
   }
 
   return <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>;

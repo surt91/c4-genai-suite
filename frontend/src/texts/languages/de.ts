@@ -81,6 +81,7 @@ export const de: typeof en = {
     errorLoading: 'Fehler beim Laden.',
     errorSourcePdfViewer: 'Das Dokument wurde in der Zwischenzeit gelöscht und kann daher nicht mehr angezeigt werden.',
     tryAgain: 'Neu versuchen',
+    loadFailed: 'Die Anwendung konnte nicht geladen werden. Möglicherweise ist der Server nicht erreichbar.',
     configurableArguments: 'Konfigurierbar',
     rowsSelected: '{{rowCount}} Zeile(n) ausgewählt',
   },
