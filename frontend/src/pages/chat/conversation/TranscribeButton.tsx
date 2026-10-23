@@ -1,5 +1,6 @@
 import { ActionIcon } from '@mantine/core';
 import { IconMicrophone } from '@tabler/icons-react';
+import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { texts } from 'src/texts';
 
 interface TranscribeButtonProps {
@@ -25,19 +26,19 @@ export function TranscribeButton({ isRecording, isTranscribing, onToggle }: Tran
   };
 
   return (
-    <ActionIcon
-      variant={isRecording ? 'filled' : 'outline'}
-      size="lg"
-      color={getButtonColor()}
-      className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
-      onClick={onToggle}
-      data-tooltip-id="default"
-      data-tooltip-content={getButtonText()}
-      disabled={isTranscribing}
-      loading={isTranscribing}
-      aria-label={getButtonText()}
-    >
-      <IconMicrophone className="w-4" />
-    </ActionIcon>
+    <DisabledAwareTooltip label={getButtonText()}>
+      <ActionIcon
+        variant={isRecording ? 'filled' : 'outline'}
+        size="lg"
+        color={getButtonColor()}
+        className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
+        onClick={onToggle}
+        disabled={isTranscribing}
+        loading={isTranscribing}
+        aria-label={getButtonText()}
+      >
+        <IconMicrophone className="w-4" />
+      </ActionIcon>
+    </DisabledAwareTooltip>
   );
 }

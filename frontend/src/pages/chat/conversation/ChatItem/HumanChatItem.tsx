@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Textarea } from '@mantine/core';
+import { ActionIcon, Button, Textarea, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard, IconPencil } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -62,30 +62,30 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
         <>
           <div className="max-w-full rounded-xl bg-gray-100 px-4 py-3 whitespace-pre-wrap">{textContent}</div>
           <div className={'flex items-center justify-end opacity-0 group-focus-within:opacity-100 group-hover:opacity-100'}>
-            <ActionIcon
-              color="gray"
-              c="black"
-              size={'lg'}
-              variant="subtle"
-              onClick={copyTextToClipboard}
-              aria-label={texts.common.copy}
-              data-tooltip-id="default"
-              data-tooltip-content={texts.common.copy}
-            >
-              <IconClipboard className="w-4" />
-            </ActionIcon>
-            <ActionIcon
-              color="gray"
-              c="black"
-              size={'lg'}
-              variant="subtle"
-              onClick={() => setIsEditing(true)}
-              aria-label={texts.common.edit}
-              data-tooltip-id="default"
-              data-tooltip-content={texts.common.edit}
-            >
-              <IconPencil className="w-4" />
-            </ActionIcon>
+            <Tooltip label={texts.common.copy}>
+              <ActionIcon
+                color="gray"
+                c="black"
+                size={'lg'}
+                variant="subtle"
+                onClick={copyTextToClipboard}
+                aria-label={texts.common.copy}
+              >
+                <IconClipboard className="w-4" />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label={texts.common.edit}>
+              <ActionIcon
+                color="gray"
+                c="black"
+                size={'lg'}
+                variant="subtle"
+                onClick={() => setIsEditing(true)}
+                aria-label={texts.common.edit}
+              >
+                <IconPencil className="w-4" />
+              </ActionIcon>
+            </Tooltip>
           </div>
         </>
       )}

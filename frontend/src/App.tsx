@@ -5,7 +5,6 @@ import { ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { Tooltip } from 'react-tooltip';
 import {
   RouteWhenAdmin,
   RouteWhenPrivate,
@@ -36,7 +35,6 @@ const ThemeProviders = ({ children }: { children: ReactNode }) => {
           <ThemeStyle />
           <ThemeTitle />
           {children}
-          <Tooltip id="default" place="bottom" style={{ fontSize: '0.75rem', padding: '4px 8px' }} />
           <ToastContainer />
         </DialogProvider>
       </MantineThemeProvider>

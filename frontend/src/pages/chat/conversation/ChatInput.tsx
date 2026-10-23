@@ -1,9 +1,10 @@
-import { ActionIcon, Button, Portal } from '@mantine/core';
+import { ActionIcon, Button, Portal, Tooltip } from '@mantine/core';
 import { IconArrowUp, IconFilter, IconPaperclip } from '@tabler/icons-react';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { Markdown } from 'src/components';
+import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useTranscribe } from 'src/hooks/useTranscribe';
@@ -261,19 +262,19 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                       htmlFor="file-upload"
                       className={`cursor-pointer ${uploadLimitReached ? 'pointer-events-none opacity-50' : ''}`}
                     >
-                      <ActionIcon
-                        component="div"
-                        size="lg"
-                        variant="outline"
-                        color="black"
-                        disabled={uploadLimitReached}
-                        aria-label={texts.common.attachFile}
-                        data-tooltip-id="default"
-                        data-tooltip-content={texts.common.attachFile}
-                        className={`cursor-pointer border-gray-200 ${uploadLimitReached ? 'pointer-events-none opacity-50' : ''}`}
-                      >
-                        <IconPaperclip className="w-4" />
-                      </ActionIcon>
+                      <Tooltip label={texts.common.attachFile}>
+                        <ActionIcon
+                          component="div"
+                          size="lg"
+                          variant="outline"
+                          color="black"
+                          disabled={uploadLimitReached}
+                          aria-label={texts.common.attachFile}
+                          className={`cursor-pointer border-gray-200 ${uploadLimitReached ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                          <IconPaperclip className="w-4" />
+                        </ActionIcon>
+                      </Tooltip>
                     </label>
                   </>
                 )}
@@ -301,17 +302,17 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 ) : showTranscribe ? (
                   <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
                 ) : null}
-                <ActionIcon
-                  type="submit"
-                  size="lg"
-                  disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
-                  data-testid="chat-submit-button"
-                  aria-label={texts.common.send}
-                  data-tooltip-id="default"
-                  data-tooltip-content={texts.common.send}
-                >
-                  <IconArrowUp />
-                </ActionIcon>
+                <DisabledAwareTooltip label={texts.common.send}>
+                  <ActionIcon
+                    type="submit"
+                    size="lg"
+                    disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                    data-testid="chat-submit-button"
+                    aria-label={texts.common.send}
+                  >
+                    <IconArrowUp />
+                  </ActionIcon>
+                </DisabledAwareTooltip>
               </div>
             </div>
           </div>

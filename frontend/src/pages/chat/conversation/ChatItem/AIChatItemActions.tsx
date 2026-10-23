@@ -1,4 +1,4 @@
-import { ActionIcon, Alert, Button, Flex } from '@mantine/core';
+import { ActionIcon, Alert, Button, Flex, Tooltip } from '@mantine/core';
 import { IconAlertCircle, IconCircleCheck, IconClipboard, IconThumbDown } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { MessageDtoRatingEnum, ProfileDto } from 'src/api';
@@ -57,30 +57,30 @@ export const AIChatItemActions = ({
           'flex items-center opacity-0 transition-all group-focus-within:opacity-100 group-hover:opacity-100',
         )}
       >
-        <ActionIcon
-          color="gray"
-          c="black"
-          size={'lg'}
-          variant="subtle"
-          onClick={copyTextToClipboard}
-          aria-label={texts.common.copy}
-          data-tooltip-id="default"
-          data-tooltip-content={texts.common.copy}
-        >
-          <IconClipboard className="w-4" />
-        </ActionIcon>
-        <ActionIcon
-          onClick={toggleVisibility}
-          color="gray"
-          c="black"
-          size={'lg'}
-          variant="subtle"
-          aria-label={texts.chat.rateMessage}
-          data-tooltip-id="default"
-          data-tooltip-content={texts.chat.rateMessage}
-        >
-          <IconThumbDown className="w-4" />
-        </ActionIcon>
+        <Tooltip label={texts.common.copy}>
+          <ActionIcon
+            color="gray"
+            c="black"
+            size={'lg'}
+            variant="subtle"
+            onClick={copyTextToClipboard}
+            aria-label={texts.common.copy}
+          >
+            <IconClipboard className="w-4" />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label={texts.chat.rateMessage}>
+          <ActionIcon
+            onClick={toggleVisibility}
+            color="gray"
+            c="black"
+            size={'lg'}
+            variant="subtle"
+            aria-label={texts.chat.rateMessage}
+          >
+            <IconThumbDown className="w-4" />
+          </ActionIcon>
+        </Tooltip>
 
         {user.isAdmin && tokenCount && tokenCount > 0 && (
           <div className="ms-2 text-sm text-gray-600">
@@ -92,15 +92,15 @@ export const AIChatItemActions = ({
       {isRatingSelectorVisible && (
         <>
           <div className="relative mt-2 mb-8 rounded-xl border border-gray-300 p-4">
-            <button
-              className="btn btn-ghost btn-sm absolute top-1 right-1 p-2"
-              onClick={setHiddenVisibility}
-              aria-label={texts.chat.updateRating.close}
-              data-tooltip-id="default"
-              data-tooltip-content={texts.chat.updateRating.close}
-            >
-              <Icon size={16} icon="close" />
-            </button>
+            <Tooltip label={texts.chat.updateRating.close}>
+              <button
+                className="btn btn-ghost btn-sm absolute top-1 right-1 p-2"
+                onClick={setHiddenVisibility}
+                aria-label={texts.chat.updateRating.close}
+              >
+                <Icon size={16} icon="close" />
+              </button>
+            </Tooltip>
 
             <div className="mb-2 text-sm">{texts.chat.ratingHint}</div>
 

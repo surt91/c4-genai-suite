@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Card, Flex, Text } from '@mantine/core';
+import { ActionIcon, Button, Card, Flex, Text, Tooltip } from '@mantine/core';
 import { IconThumbDown, IconThumbUp, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { texts } from 'src/texts';
@@ -49,15 +49,11 @@ export function Dialog({
           <Text size="sm" fw={500}>
             {thankYouText}
           </Text>
-          <ActionIcon
-            variant="subtle"
-            onClick={() => handleResult('dismiss')}
-            aria-label={texts.chat.updateRating.close}
-            data-tooltip-id="default"
-            data-tooltip-content={texts.chat.updateRating.close}
-          >
-            <IconX className="w-4" />
-          </ActionIcon>
+          <Tooltip label={texts.chat.updateRating.close}>
+            <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')} aria-label={texts.chat.updateRating.close}>
+              <IconX className="w-4" />
+            </ActionIcon>
+          </Tooltip>
         </Flex>
       </Card>
     );
@@ -70,15 +66,11 @@ export function Dialog({
           <Text size="sm" fw={500}>
             {title}
           </Text>
-          <ActionIcon
-            variant="subtle"
-            onClick={() => handleResult('dismiss')}
-            aria-label={texts.chat.updateRating.close}
-            data-tooltip-id="default"
-            data-tooltip-content={texts.chat.updateRating.close}
-          >
-            <IconX className="w-4" />
-          </ActionIcon>
+          <Tooltip label={texts.chat.updateRating.close}>
+            <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')} aria-label={texts.chat.updateRating.close}>
+              <IconX className="w-4" />
+            </ActionIcon>
+          </Tooltip>
         </Flex>
         <Flex gap="sm" mt="lg" align="center" justify="center">
           <Button

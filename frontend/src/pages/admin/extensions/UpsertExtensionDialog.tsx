@@ -13,6 +13,7 @@ import {
   useApi,
 } from 'src/api';
 import { ConfirmDialog, FormAlert, Modal } from 'src/components';
+import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { texts } from 'src/texts';
 import { ExtensionCard } from './ExtensionCard';
 import { ExtensionForm } from './ExtensionForm';
@@ -191,18 +192,18 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                       {texts.common.cancel}
                     </Button>
                     {modified && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        data-tooltip-id="default"
-                        data-tooltip-content={texts.extensions.testTooltip}
-                        onClick={() => form.onSubmit((v) => rebuild.mutate(v))()}
-                        loading={rebuild.isPending}
-                        disabled={rebuild.isPending}
-                      >
-                        <IconRefresh size={20} />
-                        {texts.extensions.rebuildSchema}
-                      </Button>
+                      <DisabledAwareTooltip label={texts.extensions.testTooltip}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => form.onSubmit((v) => rebuild.mutate(v))()}
+                          loading={rebuild.isPending}
+                          disabled={rebuild.isPending}
+                        >
+                          <IconRefresh size={20} />
+                          {texts.extensions.rebuildSchema}
+                        </Button>
+                      </DisabledAwareTooltip>
                     )}
                     {!modified && <Button type="submit">{texts.common.save}</Button>}
                   </div>

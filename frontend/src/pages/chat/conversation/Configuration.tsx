@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Select, SelectProps, Text } from '@mantine/core';
+import { ActionIcon, Group, Select, SelectProps, Text, Tooltip } from '@mantine/core';
 import { IconCheck, IconChevronDown, IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePersistentState } from 'src/hooks';
@@ -74,17 +74,17 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
         placeholder={texts.chat.searchAssistantsPlaceholder}
       />
       {assistant?.configurableArguments && (
-        <ActionIcon
-          data-testid="assistant-user-configuration"
-          onClick={() => setShowModal(true)}
-          size="xl"
-          variant="subtle"
-          aria-label={texts.chat.configureAssistant}
-          data-tooltip-id="default"
-          data-tooltip-content={texts.chat.configureAssistant}
-        >
-          <IconSettings data-testid="configuration-settings-icon" />
-        </ActionIcon>
+        <Tooltip label={texts.chat.configureAssistant}>
+          <ActionIcon
+            data-testid="assistant-user-configuration"
+            onClick={() => setShowModal(true)}
+            size="xl"
+            variant="subtle"
+            aria-label={texts.chat.configureAssistant}
+          >
+            <IconSettings data-testid="configuration-settings-icon" />
+          </ActionIcon>
+        </Tooltip>
       )}
       {assistant?.configurableArguments && showModal && (
         <ConfigurationUserValuesModal configuration={assistant} onSubmit={close} onClose={close} />

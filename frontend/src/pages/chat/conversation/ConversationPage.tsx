@@ -1,4 +1,4 @@
-import { ActionIcon } from '@mantine/core';
+import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconArrowDown } from '@tabler/icons-react';
 import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -115,16 +115,16 @@ export function ConversationPage(props: ConversationPageProps) {
                   showScrollToBottomButton ? 'fade-in opacity-100 delay-200' : 'pointer-events-none opacity-0',
                 )}
               >
-                <ActionIcon
-                  ref={scrollToBottomButtonRef}
-                  aria-label={texts.common.scrollToBottom}
-                  tabIndex={showScrollToBottomButton ? 0 : -1}
-                  onClick={handleScrollToBottom}
-                  data-tooltip-id="default"
-                  data-tooltip-content={texts.common.scrollToBottom}
-                >
-                  <IconArrowDown className="w-4" />
-                </ActionIcon>
+                <Tooltip label={texts.common.scrollToBottom}>
+                  <ActionIcon
+                    ref={scrollToBottomButtonRef}
+                    aria-label={texts.common.scrollToBottom}
+                    tabIndex={showScrollToBottomButton ? 0 : -1}
+                    onClick={handleScrollToBottom}
+                  >
+                    <IconArrowDown className="w-4" />
+                  </ActionIcon>
+                </Tooltip>
               </div>
               <ChatInput
                 textareaRef={textareaRef}

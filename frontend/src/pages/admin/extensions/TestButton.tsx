@@ -3,6 +3,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { CreateExtensionDto, useApi } from 'src/api';
+import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 
@@ -29,21 +30,21 @@ export function TestButton(props: TestButtonProps) {
   const isDisabled = !isTestable || testing.isPending;
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      data-tooltip-id="default"
-      data-tooltip-content={texts.extensions.testTooltip}
-      disabled={isDisabled}
-      onClick={() => {
-        const validation = form.validate();
-        if (!validation.hasErrors) {
-          testing.mutate(form.getValues());
-        }
-      }}
-      loading={testing.isPending}
-    >
-      {texts.extensions.test}
-    </Button>
+    <DisabledAwareTooltip label={texts.extensions.testTooltip}>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={isDisabled}
+        onClick={() => {
+          const validation = form.validate();
+          if (!validation.hasErrors) {
+            testing.mutate(form.getValues());
+          }
+        }}
+        loading={testing.isPending}
+      >
+        {texts.extensions.test}
+      </Button>
+    </DisabledAwareTooltip>
   );
 }

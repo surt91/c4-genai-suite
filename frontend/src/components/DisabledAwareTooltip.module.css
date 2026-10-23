@@ -1,0 +1,12 @@
+.wrapper {
+  display: inline-flex;
+}
+
+/* Let the wrapper receive the hover events of disabled children. */
+.wrapper > :where(:disabled, [data-disabled]) {
+  pointer-events: none;
+}
+
+.wrapper:has(> :where(:disabled, [data-disabled])) {
+  cursor: not-allowed;
+}

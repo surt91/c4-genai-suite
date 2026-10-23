@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Menu } from '@mantine/core';
+import { ActionIcon, Group, Menu, Tooltip } from '@mantine/core';
 import { IconChevronDown, IconMicrophone } from '@tabler/icons-react';
 import { texts } from 'src/texts';
 
@@ -29,19 +29,19 @@ export function SpeechRecognitionButton({
     <>
       <div className="flex" style={{ width: 'fit-content' }}>
         <Group wrap="nowrap" gap={0} align="stretch">
-          <ActionIcon
-            variant={listening ? 'filled' : 'outline'}
-            size="lg"
-            color={listening ? 'red' : 'black'}
-            className={`border-gray-200 ${listening ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
-            onClick={toggleSpeechRecognition}
-            data-tooltip-id="default"
-            data-tooltip-content={toolTipText}
-            style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
-            aria-label={toolTipText}
-          >
-            <IconMicrophone className="w-4" />
-          </ActionIcon>
+          <Tooltip label={toolTipText}>
+            <ActionIcon
+              variant={listening ? 'filled' : 'outline'}
+              size="lg"
+              color={listening ? 'red' : 'black'}
+              className={`border-gray-200 ${listening ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
+              onClick={toggleSpeechRecognition}
+              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
+              aria-label={toolTipText}
+            >
+              <IconMicrophone className="w-4" />
+            </ActionIcon>
+          </Tooltip>
           <Menu shadow="md" withInitialFocusPlaceholder={false}>
             <Menu.Target>
               <ActionIcon
