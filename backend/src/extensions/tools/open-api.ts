@@ -63,21 +63,16 @@ export class OpenApiExtension implements Extension<OpenApiExtensionConfiguration
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         try {
-          const tools = await context.cache.get(this.spec.name, extension.values, async () => {
-            const api = this.getApi(extension.values);
-
-            const result: InternalTool[] = [];
-            const tools = await api.getTools();
-
-            for (const tool of tools.items) {
-              result.push(new InternalTool(this.cache, context, tool, api, context.user, extension.externalId));
-            }
-
-            return result;
+          // Only the tool definitions are cached (across users and requests); the tools themselves are bound
+          // to the context of the current request (user, result stream, UI).
+          const toolDtos = await context.cache.get(this.spec.name, extension.values, async () => {
+            const { items } = await this.getApi(extension.values).getTools();
+            return items;
           });
 
-          for (const tool of tools) {
-            context.tools.push(tool);
+          const api = this.getApi(extension.values);
+          for (const tool of toolDtos) {
+            context.tools.push(new InternalTool(this.cache, context, tool, api, extension.externalId));
           }
         } catch (err) {
           this.logger.error({ message: 'Failed to invoke tool server at {endpoint}', endpoint: extension.values.endpoint }, err);
@@ -125,7 +120,6 @@ class InternalTool extends NamedStructuredTool {
     private readonly context: ChatContext,
     private readonly tool: ToolDto,
     private readonly api: ToolsApi,
-    private readonly user: User,
     private readonly extensionExternalId: string,
   ) {
     super();
