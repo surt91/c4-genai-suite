@@ -12,16 +12,17 @@ import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import classes from './UserProfileModal.module.css';
 
-const PASSWORD_CHANGE_SCHEMA = z
-  .object({
-    currentPassword: z.string().min(1, texts.common.required),
-    password: z.string().min(1, texts.common.required),
-    passwordConfirm: z.string().min(1, texts.common.required),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    message: texts.common.passwordsDoNotMatch,
-    path: ['passwordConfirm'],
-  });
+const createPasswordChangeSchema = () =>
+  z
+    .object({
+      currentPassword: z.string().min(1, texts.common.required),
+      password: z.string().min(1, texts.common.required),
+      passwordConfirm: z.string().min(1, texts.common.required),
+    })
+    .refine((data) => data.password === data.passwordConfirm, {
+      message: texts.common.passwordsDoNotMatch,
+      path: ['passwordConfirm'],
+    });
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export function UserProfileModal({ isOpen, onClose, canChangePassword }: UserPro
   const [activeTab, setActiveTab] = useState<'personal' | 'security'>('personal');
 
   const passwordForm = useForm<{ currentPassword?: string; password?: string; passwordConfirm?: string }>({
-    validate: zod4Resolver(PASSWORD_CHANGE_SCHEMA),
+    validate: zod4Resolver(createPasswordChangeSchema()),
     initialValues: { currentPassword: '', password: '', passwordConfirm: '' },
     mode: 'controlled',
   });

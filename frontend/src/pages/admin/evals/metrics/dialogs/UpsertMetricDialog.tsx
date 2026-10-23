@@ -15,50 +15,51 @@ type MetricConfigurationCreate = Configuration1;
 type MetricConfigurationUpdate = Configuration2;
 
 // Module-level schema constant (Gaible pattern)
-const SCHEME = z
-  .object({
-    // Common fields
-    type: z.enum(['ANSWER_RELEVANCY', 'FAITHFULNESS', 'HALLUCINATION', 'G_EVAL']),
-    name: z.string().min(1, texts.evals.metric.nameRequired),
-    threshold: z.number().min(0).max(1),
-    chatModelId: z.string().min(1, texts.evals.metric.chatModelRequired),
-    strictMode: z.boolean(),
+const createScheme = () =>
+  z
+    .object({
+      // Common fields
+      type: z.enum(['ANSWER_RELEVANCY', 'FAITHFULNESS', 'HALLUCINATION', 'G_EVAL']),
+      name: z.string().min(1, texts.evals.metric.nameRequired),
+      threshold: z.number().min(0).max(1),
+      chatModelId: z.string().min(1, texts.evals.metric.chatModelRequired),
+      strictMode: z.boolean(),
 
-    // Simple metric fields (optional - only validated for simple types)
-    includeReason: z.boolean().optional(),
+      // Simple metric fields (optional - only validated for simple types)
+      includeReason: z.boolean().optional(),
 
-    // G-Eval fields (optional - only validated for G_EVAL type)
-    evaluationSteps: z.array(z.string()).optional(),
-    evaluationParams: z.array(z.string()).optional(),
-  })
-  .refine(
-    (data) => {
-      // Validate G-Eval specific fields when type is G_EVAL
-      if (data.type === 'G_EVAL') {
-        const steps = data.evaluationSteps ?? [];
-        return steps.length > 0 && steps.every((s) => s.length > 0);
-      }
-      return true;
-    },
-    {
-      message: texts.evals.metric.evaluationStepsRequired,
-      path: ['evaluationSteps'],
-    },
-  )
-  .refine(
-    (data) => {
-      // Validate G-Eval specific fields when type is G_EVAL
-      if (data.type === 'G_EVAL') {
-        const params = data.evaluationParams ?? [];
-        return params.length > 0;
-      }
-      return true;
-    },
-    {
-      message: texts.evals.metric.evaluationParamsRequired,
-      path: ['evaluationParams'],
-    },
-  );
+      // G-Eval fields (optional - only validated for G_EVAL type)
+      evaluationSteps: z.array(z.string()).optional(),
+      evaluationParams: z.array(z.string()).optional(),
+    })
+    .refine(
+      (data) => {
+        // Validate G-Eval specific fields when type is G_EVAL
+        if (data.type === 'G_EVAL') {
+          const steps = data.evaluationSteps ?? [];
+          return steps.length > 0 && steps.every((s) => s.length > 0);
+        }
+        return true;
+      },
+      {
+        message: texts.evals.metric.evaluationStepsRequired,
+        path: ['evaluationSteps'],
+      },
+    )
+    .refine(
+      (data) => {
+        // Validate G-Eval specific fields when type is G_EVAL
+        if (data.type === 'G_EVAL') {
+          const params = data.evaluationParams ?? [];
+          return params.length > 0;
+        }
+        return true;
+      },
+      {
+        message: texts.evals.metric.evaluationParamsRequired,
+        path: ['evaluationParams'],
+      },
+    );
 
 type BaseMetricProps = {
   type: 'update' | 'create';
@@ -86,7 +87,7 @@ export const CreateMetricDialog = (props: Omit<CreateMetricProps, 'type'>): Reac
   UpsertMetricDialog({ ...props, type: 'create' });
 
 // Metric type options for the Select dropdown
-const metricTypeOptions = [
+const getMetricTypeOptions = () => [
   { value: 'ANSWER_RELEVANCY', label: texts.evals.metric.typeAnswerRelevancy },
   { value: 'FAITHFULNESS', label: texts.evals.metric.typeFaithfulness },
   { value: 'HALLUCINATION', label: texts.evals.metric.typeHallucination },
@@ -150,7 +151,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
   };
 
   const form = useForm<MetricFormValues>({
-    validate: zod4Resolver(SCHEME) as unknown as (values: MetricFormValues) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()) as unknown as (values: MetricFormValues) => Record<string, string | null>,
     initialValues: getDefaultValues(),
     mode: 'controlled',
   });
@@ -263,7 +264,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
               withAsterisk
               label={texts.evals.metric.selectMetricType}
               description={texts.evals.metric.selectMetricTypeHint}
-              data={metricTypeOptions}
+              data={getMetricTypeOptions()}
               mb={16}
               disabled={!isCreating}
               key={form.key('type')}

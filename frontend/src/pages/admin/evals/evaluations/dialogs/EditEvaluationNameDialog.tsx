@@ -8,11 +8,12 @@ import { texts } from 'src/texts';
 import { useUpdateEvaluation } from '../hooks/useEvaluationMutations';
 
 // Module-level schema (Gaible pattern)
-const SCHEME = z.object({
-  name: z.string().min(1, texts.evals.evaluations.nameRequired),
-});
+const createScheme = () =>
+  z.object({
+    name: z.string().min(1, texts.evals.evaluations.nameRequired),
+  });
 
-type FormValues = z.infer<typeof SCHEME>;
+type FormValues = z.infer<ReturnType<typeof createScheme>>;
 
 interface EditEvaluationNameDialogProps {
   evaluation: EvaluationDetailSummary;
@@ -24,7 +25,7 @@ export function EditEvaluationNameDialog({ evaluation, onClose, onUpdated }: Edi
   const updateMutation = useUpdateEvaluation();
 
   const form = useForm<FormValues>({
-    validate: zod4Resolver(SCHEME),
+    validate: zod4Resolver(createScheme()),
     initialValues: {
       name: evaluation.name,
     },

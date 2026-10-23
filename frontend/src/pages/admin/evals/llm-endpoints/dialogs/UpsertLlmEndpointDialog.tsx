@@ -24,79 +24,80 @@ import {
 } from '../hooks/useLlmEndpointMutations';
 
 // Module-level schema constant (Gaible pattern)
-const SCHEME = z
-  .object({
-    // Common fields
-    type: z.enum(['OPENAI', 'AZURE_OPENAI']),
-    name: z.string().min(1, texts.evals.llmEndpoint.nameRequired),
-    parallelQueries: z.number().int().min(1).max(100),
-    maxRetries: z.number().int().min(0).max(10),
-    requestTimeout: z.number().int().min(1).max(600),
+const createScheme = () =>
+  z
+    .object({
+      // Common fields
+      type: z.enum(['OPENAI', 'AZURE_OPENAI']),
+      name: z.string().min(1, texts.evals.llmEndpoint.nameRequired),
+      parallelQueries: z.number().int().min(1).max(100),
+      maxRetries: z.number().int().min(0).max(10),
+      requestTimeout: z.number().int().min(1).max(600),
 
-    // API Key - required for create, optional for update
-    apiKey: z.string().optional(),
+      // API Key - required for create, optional for update
+      apiKey: z.string().optional(),
 
-    // OpenAI-specific fields
-    baseUrl: z.union([z.string().url(), z.literal(''), z.null()]).optional(),
-    model: z.string().optional(),
-    temperature: z.number().min(0).max(2).optional().nullable(),
-    language: z.nativeEnum(Language).optional().nullable(),
+      // OpenAI-specific fields
+      baseUrl: z.union([z.string().url(), z.literal(''), z.null()]).optional(),
+      model: z.string().optional(),
+      temperature: z.number().min(0).max(2).optional().nullable(),
+      language: z.nativeEnum(Language).optional().nullable(),
 
-    // Azure OpenAI-specific fields
-    endpoint: z.string().optional(),
-    deployment: z.string().optional(),
-    apiVersion: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Validate OpenAI-specific required fields
-      if (data.type === 'OPENAI') {
-        return data.model && data.model.length > 0;
-      }
-      return true;
-    },
-    {
-      message: texts.evals.llmEndpoint.modelRequired,
-      path: ['model'],
-    },
-  )
-  .refine(
-    (data) => {
-      // Validate Azure OpenAI-specific required fields
-      if (data.type === 'AZURE_OPENAI') {
-        return data.endpoint && data.endpoint.length > 0;
-      }
-      return true;
-    },
-    {
-      message: texts.evals.llmEndpoint.azureEndpointRequired,
-      path: ['endpoint'],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.type === 'AZURE_OPENAI') {
-        return data.deployment && data.deployment.length > 0;
-      }
-      return true;
-    },
-    {
-      message: texts.evals.llmEndpoint.deploymentRequired,
-      path: ['deployment'],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.type === 'AZURE_OPENAI') {
-        return data.apiVersion && data.apiVersion.length > 0;
-      }
-      return true;
-    },
-    {
-      message: texts.evals.llmEndpoint.apiVersionRequired,
-      path: ['apiVersion'],
-    },
-  );
+      // Azure OpenAI-specific fields
+      endpoint: z.string().optional(),
+      deployment: z.string().optional(),
+      apiVersion: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        // Validate OpenAI-specific required fields
+        if (data.type === 'OPENAI') {
+          return data.model && data.model.length > 0;
+        }
+        return true;
+      },
+      {
+        message: texts.evals.llmEndpoint.modelRequired,
+        path: ['model'],
+      },
+    )
+    .refine(
+      (data) => {
+        // Validate Azure OpenAI-specific required fields
+        if (data.type === 'AZURE_OPENAI') {
+          return data.endpoint && data.endpoint.length > 0;
+        }
+        return true;
+      },
+      {
+        message: texts.evals.llmEndpoint.azureEndpointRequired,
+        path: ['endpoint'],
+      },
+    )
+    .refine(
+      (data) => {
+        if (data.type === 'AZURE_OPENAI') {
+          return data.deployment && data.deployment.length > 0;
+        }
+        return true;
+      },
+      {
+        message: texts.evals.llmEndpoint.deploymentRequired,
+        path: ['deployment'],
+      },
+    )
+    .refine(
+      (data) => {
+        if (data.type === 'AZURE_OPENAI') {
+          return data.apiVersion && data.apiVersion.length > 0;
+        }
+        return true;
+      },
+      {
+        message: texts.evals.llmEndpoint.apiVersionRequired,
+        path: ['apiVersion'],
+      },
+    );
 
 type BaseLlmEndpointProps = {
   type: 'update' | 'create';
@@ -124,7 +125,7 @@ export const CreateLlmEndpointDialog = (props: Omit<CreateLlmEndpointProps, 'typ
   UpsertLlmEndpointDialog({ ...props, type: 'create' });
 
 // Endpoint type options for the Select dropdown
-const endpointTypeOptions = [
+const getEndpointTypeOptions = () => [
   { value: 'AZURE_OPENAI', label: texts.evals.llmEndpoint.typeAzureOpenAI },
   { value: 'OPENAI', label: texts.evals.llmEndpoint.typeOpenAI },
 ];
@@ -204,7 +205,7 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
   };
 
   const form = useForm<EndpointFormValues>({
-    validate: zod4Resolver(SCHEME) as unknown as (values: EndpointFormValues) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()) as unknown as (values: EndpointFormValues) => Record<string, string | null>,
     initialValues: getDefaultValues(),
     mode: 'controlled',
   });
@@ -324,7 +325,7 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
               withAsterisk
               label={texts.evals.llmEndpoint.selectEndpointType}
               description={texts.evals.llmEndpoint.selectEndpointTypeHint}
-              data={endpointTypeOptions}
+              data={getEndpointTypeOptions()}
               mb={16}
               disabled={!isCreating}
               key={form.key('type')}

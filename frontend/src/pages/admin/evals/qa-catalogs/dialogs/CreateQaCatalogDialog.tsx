@@ -14,17 +14,19 @@ import { texts } from 'src/texts';
 const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
 
 // Module-level schemas (Gaible pattern)
-const EMPTY_SCHEME = z.object({
-  name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
-});
+const createEmptyScheme = () =>
+  z.object({
+    name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
+  });
 
-const UPLOAD_SCHEME = z.object({
-  name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
-  file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
-});
+const createUploadScheme = () =>
+  z.object({
+    name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
+    file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
+  });
 
-type EmptyFormValues = z.infer<typeof EMPTY_SCHEME>;
-type UploadFormValues = z.infer<typeof UPLOAD_SCHEME>;
+type EmptyFormValues = z.infer<ReturnType<typeof createEmptyScheme>>;
+type UploadFormValues = z.infer<ReturnType<typeof createUploadScheme>>;
 
 interface CreateQaCatalogDialogProps {
   onClose: () => void;
@@ -37,7 +39,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
   const [activeTab, setActiveTab] = useState<string | null>('empty');
 
   const emptyForm = useForm<EmptyFormValues>({
-    validate: zod4Resolver(EMPTY_SCHEME),
+    validate: zod4Resolver(createEmptyScheme()),
     initialValues: {
       name: '',
     },
@@ -45,7 +47,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
   });
 
   const uploadForm = useForm<UploadFormValues>({
-    validate: zod4Resolver(UPLOAD_SCHEME),
+    validate: zod4Resolver(createUploadScheme()),
     initialValues: {
       name: '',
       file: null as unknown as File,

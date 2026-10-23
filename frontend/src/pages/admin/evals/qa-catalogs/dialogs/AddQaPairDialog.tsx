@@ -7,13 +7,14 @@ import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 
 // Module-level schema (Gaible pattern)
-const SCHEME = z.object({
-  question: z.string().min(1, texts.evals.qaCatalog.questionRequired),
-  expectedOutput: z.string().min(1, texts.evals.qaCatalog.expectedOutputRequired),
-  contexts: z.array(z.string()),
-});
+const createScheme = () =>
+  z.object({
+    question: z.string().min(1, texts.evals.qaCatalog.questionRequired),
+    expectedOutput: z.string().min(1, texts.evals.qaCatalog.expectedOutputRequired),
+    contexts: z.array(z.string()),
+  });
 
-type FormValues = z.infer<typeof SCHEME>;
+type FormValues = z.infer<ReturnType<typeof createScheme>>;
 
 interface AddQaPairDialogProps {
   onClose: () => void;
@@ -22,7 +23,7 @@ interface AddQaPairDialogProps {
 
 export function AddQaPairDialog({ onClose, onAdd }: AddQaPairDialogProps) {
   const form = useForm<FormValues>({
-    validate: zod4Resolver(SCHEME),
+    validate: zod4Resolver(createScheme()),
     initialValues: {
       question: '',
       expectedOutput: '',

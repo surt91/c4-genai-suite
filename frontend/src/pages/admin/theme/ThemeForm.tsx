@@ -5,7 +5,7 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
 import { SettingsDto, useApi } from 'src/api';
-import { CHAT_SUGGESTIONS_SCHEME, ChatSuggestions, FormAlert, MAX_SUGGESTIONS, SiteLinks } from 'src/components';
+import { ChatSuggestions, createChatSuggestionsScheme, FormAlert, MAX_SUGGESTIONS, SiteLinks } from 'src/components';
 import { Markdown } from 'src/components/Markdown';
 import { useTheme } from 'src/hooks';
 import { toast } from 'src/lib/notifications';
@@ -13,10 +13,11 @@ import { texts } from 'src/texts';
 import { i18next } from 'src/texts/i18n';
 import formClasses from '../forms.module.css';
 
-const SCHEME = z.object({
-  // Optional array of chat suggestions.
-  chatSuggestions: CHAT_SUGGESTIONS_SCHEME.optional(),
-});
+const createScheme = () =>
+  z.object({
+    // Optional array of chat suggestions.
+    chatSuggestions: createChatSuggestionsScheme().optional(),
+  });
 
 export function ThemeForm() {
   const api = useApi();
@@ -42,7 +43,7 @@ export function ThemeForm() {
   });
 
   const form = useForm<SettingsDto>({
-    validate: zod4Resolver(SCHEME) as (values: SettingsDto) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()) as (values: SettingsDto) => Record<string, string | null>,
     initialValues: settings ?? {
       chatSuggestions: [],
       siteLinks: [],

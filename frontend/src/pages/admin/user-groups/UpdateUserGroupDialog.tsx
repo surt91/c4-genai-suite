@@ -11,23 +11,24 @@ import { texts } from 'src/texts';
 import formClasses from '../forms.module.css';
 import classes from './UserGroups.module.css';
 
-const SCHEME = z.object({
-  name: z.string().min(1, texts.common.name),
-  monthlyTokens: z
-    .number()
-    .positive()
-    .nullable()
-    .optional()
-    .or(z.literal('').transform(() => null)),
-  monthlyUserTokens: z
-    .number()
-    .positive()
-    .nullable()
-    .optional()
-    .or(z.literal('').transform(() => null)),
-});
+const createScheme = () =>
+  z.object({
+    name: z.string().min(1, texts.common.name),
+    monthlyTokens: z
+      .number()
+      .positive()
+      .nullable()
+      .optional()
+      .or(z.literal('').transform(() => null)),
+    monthlyUserTokens: z
+      .number()
+      .positive()
+      .nullable()
+      .optional()
+      .or(z.literal('').transform(() => null)),
+  });
 
-type SchemaType = z.infer<typeof SCHEME>;
+type SchemaType = z.infer<ReturnType<typeof createScheme>>;
 
 export interface UpdateUserGroupDialogProps {
   target: UserGroupDto;
@@ -44,7 +45,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
   const userGroupDelete = useDeleteUserGroup(api, target, onDelete, onClose);
 
   const form = useForm<SchemaType>({
-    validate: zod4Resolver(SCHEME),
+    validate: zod4Resolver(createScheme()),
     initialValues: target,
     mode: 'controlled',
   });

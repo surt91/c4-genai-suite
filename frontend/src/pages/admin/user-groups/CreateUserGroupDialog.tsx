@@ -8,20 +8,21 @@ import { FormAlert, Modal } from 'src/components';
 import { texts } from 'src/texts';
 import classes from './UserGroups.module.css';
 
-const SCHEME = z.object({
-  name: z.string().min(1, texts.common.name),
-  monthlyTokens: z
-    .number()
-    .positive()
-    .nullable()
-    .or(z.literal('').transform(() => null)),
-  monthlyUserTokens: z
-    .number()
-    .positive()
-    .nullable()
-    .or(z.literal('').transform(() => null)),
-});
-type SchemaType = z.infer<typeof SCHEME>;
+const createScheme = () =>
+  z.object({
+    name: z.string().min(1, texts.common.name),
+    monthlyTokens: z
+      .number()
+      .positive()
+      .nullable()
+      .or(z.literal('').transform(() => null)),
+    monthlyUserTokens: z
+      .number()
+      .positive()
+      .nullable()
+      .or(z.literal('').transform(() => null)),
+  });
+type SchemaType = z.infer<ReturnType<typeof createScheme>>;
 
 export interface CreateUserGroupDialogProps {
   onClose: () => void;
@@ -42,7 +43,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
   });
 
   const form = useForm<SchemaType>({
-    validate: zod4Resolver(SCHEME),
+    validate: zod4Resolver(createScheme()),
     initialValues: { name: '', monthlyUserTokens: null, monthlyTokens: null },
     mode: 'controlled',
   });

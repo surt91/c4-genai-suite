@@ -15,39 +15,40 @@ import formClasses from '../forms.module.css';
 import { GenerateApiKeyButton } from './GenerateApiKeyButton';
 import classes from './Users.module.css';
 
-const SCHEME = z
-  .object({
-    // Required name.
-    name: z.string().min(1, texts.common.name),
+const createScheme = () =>
+  z
+    .object({
+      // Required name.
+      name: z.string().min(1, texts.common.name),
 
-    // Required email.
-    email: z.string().min(1, texts.common.email).email(),
+      // Required email.
+      email: z.string().min(1, texts.common.email).email(),
 
-    // Required user groups.
-    userGroupIds: z.array(z.string()).min(1, texts.common.userGroups),
+      // Required user groups.
+      userGroupIds: z.array(z.string()).min(1, texts.common.userGroups),
 
-    // Optional password fields
-    password: z.string().optional(),
-    passwordConfirm: z.string().optional(),
+      // Optional password fields
+      password: z.string().optional(),
+      passwordConfirm: z.string().optional(),
 
-    // Optional apiKey
-    apiKey: z.string().optional().nullable(),
+      // Optional apiKey
+      apiKey: z.string().optional().nullable(),
 
-    // Optional hasApiKey
-    hasApiKey: z.boolean().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.password || data.passwordConfirm) {
-        return data.password === data.passwordConfirm;
-      }
-      return true;
-    },
-    {
-      message: texts.common.passwordsDoNotMatch,
-      path: ['passwordConfirm'],
-    },
-  );
+      // Optional hasApiKey
+      hasApiKey: z.boolean().optional(),
+    })
+    .refine(
+      (data) => {
+        if (data.password || data.passwordConfirm) {
+          return data.password === data.passwordConfirm;
+        }
+        return true;
+      },
+      {
+        message: texts.common.passwordsDoNotMatch,
+        path: ['passwordConfirm'],
+      },
+    );
 
 type BaseUserProps = {
   type: 'update' | 'create';
@@ -99,7 +100,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
   }, [userGroups]);
 
   const form = useForm<UpsertUserDto>({
-    validate: zod4Resolver(SCHEME) as unknown as (values: UpsertUserDto) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()) as unknown as (values: UpsertUserDto) => Record<string, string | null>,
     initialValues: defaultValues,
     mode: 'controlled',
   });

@@ -26,11 +26,12 @@ function debounce<F extends (...args: never[]) => void>(func: F, wait: number): 
   };
 }
 
-const SCHEME = z.object({
-  name: z.string().min(1, texts.common.name),
-  endpoint: z.string().min(1, texts.common.endpoint),
-  allowedFileNameExtensions: z.array(z.string()).min(1),
-});
+const createScheme = () =>
+  z.object({
+    name: z.string().min(1, texts.common.name),
+    endpoint: z.string().min(1, texts.common.endpoint),
+    allowedFileNameExtensions: z.array(z.string()).min(1),
+  });
 
 interface UpsertBucketDialogProps {
   // The bucket to update.
@@ -75,7 +76,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
   });
 
   const form = useForm<UpsertBucketDto>({
-    validate: zod4Resolver(SCHEME) as unknown as (values: UpsertBucketDto) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()) as unknown as (values: UpsertBucketDto) => Record<string, string | null>,
     initialValues: (target as UpsertBucketDto) ?? {
       name: '',
       endpoint: '',

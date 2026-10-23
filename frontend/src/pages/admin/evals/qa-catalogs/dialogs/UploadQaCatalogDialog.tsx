@@ -18,17 +18,18 @@ interface UploadQaCatalogDialogProps {
 const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
 
 // Module-level schema (Gaible pattern)
-const SCHEME = z.object({
-  file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
-});
+const createScheme = () =>
+  z.object({
+    file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
+  });
 
-type FormValues = z.infer<typeof SCHEME>;
+type FormValues = z.infer<ReturnType<typeof createScheme>>;
 
 export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQaCatalogDialogProps) {
   const evalApi = useEvalApi();
 
   const form = useForm<FormValues>({
-    validate: zod4Resolver(SCHEME),
+    validate: zod4Resolver(createScheme()),
     initialValues: {
       file: null as unknown as File,
     },
