@@ -7,7 +7,7 @@ const PAGE_SIZE = 20;
  * Query hook to fetch grouped evaluation results with pagination
  * Returns results grouped by question/test case
  */
-export function useGroupedResults(evaluationId?: string, page: number = 1, limit = PAGE_SIZE) {
+export function useGroupedResults(evaluationId?: string, page: number = 1, limit = PAGE_SIZE, pollInterval?: number) {
   const evalApi = useEvalApi();
   const offset = (page - 1) * limit;
 
@@ -15,6 +15,7 @@ export function useGroupedResults(evaluationId?: string, page: number = 1, limit
     queryKey: ['groupedResults', evaluationId, page, limit],
     queryFn: () => evalApi.evaluationResults.evaluationResultsGetGrouped(evaluationId, offset, limit),
     enabled: !!evaluationId,
+    refetchInterval: pollInterval ?? false,
   });
 }
 

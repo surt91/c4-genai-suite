@@ -1,6 +1,6 @@
 import { Alert, Card, Container, Group, Loader, Pagination, Stack, Tabs, Title } from '@mantine/core';
 import { IconAlertCircle, IconInfoCircle, IconList } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Page } from 'src/components';
 import { texts } from 'src/texts';
@@ -12,7 +12,7 @@ import { TestCaseResultsTable } from './components/TestCaseResultsTable';
 import { DeleteEvaluationDialog } from './dialogs/DeleteEvaluationDialog';
 import { EditEvaluationNameDialog } from './dialogs/EditEvaluationNameDialog';
 import { useExportEvaluationResults } from './hooks/useEvaluationMutations';
-import { useEvaluationSummary } from './hooks/useEvaluationQueries';
+import { EVALUATION_POLL_INTERVAL, isEvaluationActive, useEvaluationSummary } from './hooks/useEvaluationQueries';
 import { useGroupedResults } from './hooks/useEvaluationResultsQueries';
 
 export function EvaluationDetailPage() {
@@ -28,27 +28,23 @@ export function EvaluationDetailPage() {
   // Fetch evaluation summary
   const { data: evaluation, isLoading, isError, error, refetch } = useEvaluationSummary(id);
 
-  // Fetch results (only when Results tab is active)
+  // The summary is polled while the evaluation is pending or running, the results as well while they are shown.
+  const isActive = isEvaluationActive(evaluation?.status);
   const {
     data: results = [],
     isFetching: isResultsFetching,
     isFetched: isResultsFetched,
     refetch: refetchResults,
-  } = useGroupedResults(id, resultsPage, 20);
+  } = useGroupedResults(id, resultsPage, 20, isActive && activeTab === 'results' ? EVALUATION_POLL_INTERVAL : undefined);
 
-  // Real-time polling for RUNNING evaluations
+  // the final results, when the evaluation has finished
+  const wasActive = useRef(isActive);
   useEffect(() => {
-    if (!evaluation || evaluation.status !== 'RUNNING') return;
-
-    const interval = setInterval(() => {
-      void refetch();
-      if (activeTab === 'results') {
-        void refetchResults();
-      }
-    }, 5000); // Poll every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [evaluation, refetch, refetchResults, activeTab]);
+    if (wasActive.current && !isActive) {
+      void refetchResults();
+    }
+    wasActive.current = isActive;
+  }, [isActive, refetchResults]);
 
   // Handlers
   const handleExport = () => {

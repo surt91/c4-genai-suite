@@ -173,6 +173,29 @@ describe('useEvaluationQueries', () => {
       expect(result.current.data).toEqual(mockSummary);
     });
 
+    it('should poll while the evaluation is pending or running', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      try {
+        mockEvaluationsApi.evaluationsGetEvaluationDetailSummary
+          .mockResolvedValueOnce({ ...mockSummary, status: 'PENDING' })
+          .mockResolvedValueOnce({ ...mockSummary, status: 'RUNNING' })
+          .mockResolvedValue(mockSummary);
+
+        const { result } = renderHook(() => useEvaluationSummary('1'), { wrapper });
+        await waitFor(() => expect(result.current.data?.status).toBe('PENDING'));
+
+        await vi.advanceTimersByTimeAsync(5000);
+        await waitFor(() => expect(result.current.data?.status).toBe('RUNNING'));
+        await vi.advanceTimersByTimeAsync(5000);
+        await waitFor(() => expect(result.current.data?.status).toBe('SUCCESS'));
+        await vi.advanceTimersByTimeAsync(20000);
+
+        expect(mockEvaluationsApi.evaluationsGetEvaluationDetailSummary).toHaveBeenCalledTimes(3);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it('should not fetch when id is undefined', () => {
       const { result } = renderHook(() => useEvaluationSummary(undefined), { wrapper });
 
