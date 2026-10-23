@@ -1,8 +1,6 @@
-FROM python:3.14.9-alpine3.24 AS builder
+FROM python:3.14.9-slim-trixie AS builder
 
 WORKDIR /reis
-
-RUN apk add --no-cache build-base=0.5-r4 linux-headers=7.0.0-r1 rust=1.96.1-r0 cargo=1.96.1-r0
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -13,30 +11,44 @@ ENV UV_COMPILE_BYTECODE=1 \
 # Copy the deps and lockfile to use caching.
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies
-RUN uv sync --frozen --no-install-project --no-dev
+# Install dependencies (all of them are available as prebuilt manylinux wheels, no compiler needed)
+RUN uv sync --frozen --no-install-project --no-dev --no-build
 
 #
 # RUNTIME
 #
-FROM python:3.14.9-alpine3.24 AS production
+FROM python:3.14.9-slim-trixie AS production
 
-# we need this library for extracting audio streams from videos and handeling office formats
-RUN apk add --no-cache \
-    ffmpeg=8.1.2-r0 \
-    libreoffice-calc=25.8.7.3-r0 \
-    libreoffice-impress=25.8.7.3-r0 \
-    libreoffice-writer=25.8.7.3-r0
-# Install fonts for pdf generation
-RUN apk --no-cache add \
-    msttcorefonts-installer=3.8.1-r1 \
-    fontconfig=2.17.1-r1 \
-    font-droid-nonlatin=20200215-r5 \
-    font-droid=20200215-r5 \
-    font-dejavu=2.37-r6 \
-    font-freefont=20120503-r4 \
-    ttf-liberation=2.1.5-r2 && \
-    update-ms-fonts && \
+# we need these packages for extracting audio streams from videos and handling office formats,
+# pango is needed by weasyprint for pdf generation
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ffmpeg \
+        libreoffice-calc-nogui \
+        libreoffice-impress-nogui \
+        libreoffice-writer-nogui \
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        libharfbuzz-subset0 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install fonts for pdf generation. The Microsoft core fonts are in `contrib` and are downloaded
+# from SourceForge during the installation; Carlito and Caladea are metric compatible to Calibri and Cambria.
+RUN sed -i 's/^Components: main$/Components: main contrib/' /etc/apt/sources.list.d/debian.sources && \
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        fontconfig \
+        fonts-crosextra-caladea \
+        fonts-crosextra-carlito \
+        fonts-dejavu-core \
+        fonts-dejavu-extra \
+        fonts-droid-fallback \
+        fonts-freefont-ttf \
+        fonts-liberation \
+        ttf-mscorefonts-installer && \
+    ls /usr/share/fonts/truetype/msttcorefonts | grep -qi '^arial\.ttf$' && \
+    rm -rf /var/lib/apt/lists/* /var/cache/debconf/*-old && \
     fc-cache -f
 
 ENV VIRTUAL_ENV=/reis/.venv \
