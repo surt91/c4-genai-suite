@@ -184,7 +184,8 @@ class InternalChatHistory extends MessagesHistory {
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'ai' });
       } else if (persistHuman) {
         if (editMessageId) {
-          const message = await this.messages.findOneBy({ id: editMessageId });
+          // only messages of this conversation can be edited (the id comes from the client)
+          const message = await this.messages.findOneBy({ id: editMessageId, conversationId: this.conversationId });
           this.currentParentId = message?.parentId;
         } else {
           // we actually need a replyToMessageId
