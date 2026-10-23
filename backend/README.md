@@ -55,6 +55,10 @@ LANGFUSE_PUBLIC_KEY="pk-lf-..."
 LANGFUSE_BASEURL="https://cloud.langfuse.com"
 ```
 
+The spans of the AI SDK (`experimental_telemetry`) are sent via OTLP/HTTP to `<LANGFUSE_BASEURL>/api/public/otel`
+(Basic auth with `<public key>:<secret key>`), all other spans are dropped. The conversation id is set as Langfuse
+session (`langfuse.session.id`), assistant and model are sent as metadata.
+
 ## Create Extensions
 
 Each extension class needs to meet the following criteria:

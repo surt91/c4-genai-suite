@@ -43,7 +43,7 @@ There are two types of middleware which are used to process incoming messages
 - extends the user data in the context
 
 #### LangfuseMiddleware
-- adds callback handler to context
+- enables the AI SDK telemetry (`context.telemetry`) when Langfuse is configured
 
 #### ChooseLllMiddleware
 - when no llm is present in context it sets the first given of the llms

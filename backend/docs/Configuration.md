@@ -77,8 +77,10 @@
 
 ## Langfuse
 
-| Env Variable        | Required  | Default                    | Description |
-|---------------------|-----------|----------------------------|-------------|
-| LANGFUSE_PUBLIC_KEY | No        | None                       |             |
-| LANGFUSE_BASE_URL   | No        | https://cloud.langfuse.com |             |
-| LANGFUSE_SECRET_KEY | No        | None                       |             |
+Tracing is enabled when both keys are set. The AI SDK spans are exported via OTLP to `<base url>/api/public/otel`.
+
+| Env Variable        | Required  | Default                    | Description                                          |
+|---------------------|-----------|----------------------------|------------------------------------------------------|
+| LANGFUSE_PUBLIC_KEY | No        | None                       | public key of the Langfuse project                   |
+| LANGFUSE_SECRET_KEY | No        | None                       | secret key of the Langfuse project                   |
+| LANGFUSE_BASEURL    | No        | https://cloud.langfuse.com | Langfuse URL (`LANGFUSE_BASE_URL` is also accepted)  |
