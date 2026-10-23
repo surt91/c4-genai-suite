@@ -184,6 +184,9 @@ export class ConfigurationsController {
     type: Number,
   })
   @ApiOkResponse({ type: ExtensionsDto })
+  // Admin only: the values contain endpoints, headers and prompts of (possibly restricted) assistants.
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
   async getExtensions(@Param('id') id: number) {
     const result: GetExtensionsResponse = await this.queryBus.execute(new GetExtensions(id, true));
     return ExtensionsDto.fromDomain(result.extensions, this.explorer.getExtensions().map(ConfiguredExtension.createInitial));

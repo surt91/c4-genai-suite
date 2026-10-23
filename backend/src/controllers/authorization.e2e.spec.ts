@@ -121,4 +121,14 @@ describe('Authorization', () => {
       expect((response.body as { headers: string }).headers).toBe('Authorization=Bearer reis-secret');
     });
   });
+
+  describe('extensions of a configuration (contain headers/endpoints)', () => {
+    it('are not readable by regular users', async () => {
+      await asUser(http().get(`/configurations/${configuration.id}/extensions`)).expect(403);
+    });
+
+    it('are readable by admins', async () => {
+      await asAdmin(http().get(`/configurations/${configuration.id}/extensions`)).expect(200);
+    });
+  });
 });
