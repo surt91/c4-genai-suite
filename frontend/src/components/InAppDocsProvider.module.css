@@ -1,0 +1,61 @@
+.root {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content {
+  flex-grow: 1;
+  width: 100%;
+  overflow: auto;
+
+  &[data-docs-visible] {
+    width: 0;
+
+    @media (min-width: 80em) {
+      width: 66.666667%;
+    }
+  }
+}
+
+.docs {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  background-color: var(--mantine-color-white);
+  color: var(--mantine-color-text);
+
+  @media (min-width: 80em) {
+    width: 33.333333%;
+  }
+}
+
+.docsHeader {
+  display: flex;
+  height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
+.docsTitle {
+  font-size: var(--mantine-font-size-lg);
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.docsBody {
+  height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+}

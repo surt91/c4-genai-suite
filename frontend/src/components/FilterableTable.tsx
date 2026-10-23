@@ -1,7 +1,7 @@
 import { IconSortAscending, IconSortDescending } from '@tabler/icons-react';
 import { flexRender, Table as TanTable } from '@tanstack/react-table';
 import { FileDto } from 'src/api';
-import { cn } from 'src/lib';
+import classes from './FilterableTable.module.css';
 
 export type TData = FileDto;
 
@@ -10,36 +10,34 @@ type FilterableTableProps = {
 };
 
 export function FilterableTable({ table }: FilterableTableProps) {
-  const containerClass = 'flex flex-row items-center justify-between';
-
   return (
-    <div className="flex w-full flex-col overflow-x-scroll">
-      <table className="w-full min-w-max table-auto border-collapse">
+    <div className={classes.root}>
+      <table className={classes.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <th key={header.id} colSpan={header.colSpan} className="border-b border-gray-300 px-2 py-1">
+                  <th key={header.id} colSpan={header.colSpan} className={classes.th}>
                     {header.isPlaceholder ? null : (
-                      <div className={cn(containerClass)}>
-                        <div className="flex flex-col">
-                          <div className="text-sm font-bold">
+                      <div className={classes.header}>
+                        <div className={classes.headerLabel}>
+                          <div className={classes.headerText}>
                             {flexRender(header.column.columnDef.header, header.getContext())}
                           </div>
                         </div>
                         <div
                           {...{
-                            className: header.column.getCanSort() ? 'cursor-pointer select-none' : '',
+                            className: header.column.getCanSort() ? classes.sortable : '',
                             onClick: header.column.getToggleSortingHandler(),
                           }}
                         >
                           {header.column.getCanSort()
                             ? ({
-                                asc: <IconSortAscending className="text-primary font-extrabold" size={18} />,
-                                desc: <IconSortDescending className="text-primary font-extrabold" size={18} />,
+                                asc: <IconSortAscending className={classes.sortActive} size={18} />,
+                                desc: <IconSortDescending className={classes.sortActive} size={18} />,
                               }[header.column.getIsSorted() as string] ?? (
-                                <IconSortAscending className="text-gray-300" size={18} />
+                                <IconSortAscending className={classes.sortInactive} size={18} />
                               ))
                             : null}
                         </div>
@@ -54,13 +52,10 @@ export function FilterableTable({ table }: FilterableTableProps) {
         <tbody>
           {table.getRowModel().rows.map((row) => {
             return (
-              <tr key={row.id} className="border-t border-gray-200 hover:bg-gray-50">
+              <tr key={row.id} className={classes.row}>
                 {row.getVisibleCells().map((cell) => {
                   return (
-                    <td
-                      key={cell.id}
-                      className="w-fit max-w-72 overflow-hidden p-2 text-sm font-normal text-nowrap overflow-ellipsis"
-                    >
+                    <td key={cell.id} className={classes.td}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   );

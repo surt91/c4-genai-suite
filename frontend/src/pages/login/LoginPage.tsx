@@ -1,4 +1,4 @@
-import { Button, PasswordInput, TextInput } from '@mantine/core';
+import { Alert, Anchor, Button, PasswordInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { Logo } from 'src/components';
 import { Theme, useLoginUrl, useTheme, useTransientNavigate } from 'src/hooks';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
 import { texts } from 'src/texts';
+import classes from './LoginPage.module.css';
 
 export function LoginPage() {
   const { theme } = useTheme();
@@ -16,8 +17,8 @@ export function LoginPage() {
   const oauthError = searchParams.get('error');
 
   return (
-    <div className="text-primary flex h-screen overflow-hidden font-medium">
-      <main className="bg-primary-content flex w-96 flex-none flex-col items-center justify-center p-8">
+    <div className={classes.root}>
+      <main className={classes.main}>
         <Sidebar theme={theme} authSettings={authSettings} isAuthSettingsError={isAuthSettingsError} oauthError={oauthError} />
       </main>
       {theme.backgroundLogoUrl && <BackgroundImage logoUrl={theme.backgroundLogoUrl} />}
@@ -33,10 +34,10 @@ function Sidebar(props: {
 }) {
   return (
     <>
-      <header className="flex h-1/4 w-full items-start justify-start p-4">
+      <header className={classes.header}>
         {props.theme.logoUrl && <Logo size={{ height: '2rem' }} url={props.theme.logoUrl} />}
       </header>
-      <div className="mb-4 flex grow flex-col items-center justify-center p-4">
+      <div className={classes.providers}>
         <LoginProviders
           welcomeText={props.theme.welcomeText}
           authSettings={props.authSettings}
@@ -44,7 +45,7 @@ function Sidebar(props: {
           oauthError={props.oauthError}
         />
       </div>
-      <nav className="flex h-1/4 w-full items-end justify-start space-x-4 p-4 text-xs">
+      <nav className={classes.footer}>
         <LegalFooter siteLinks={props.theme.siteLinks} />
       </nav>
     </>
@@ -59,9 +60,7 @@ function LoginProviders(props: {
 }) {
   return (
     <>
-      <h1 className="mb-4 w-full justify-start text-4xl font-medium">
-        {renderTextWithBreaks(props.welcomeText || texts.login.welcome)}
-      </h1>
+      <h1 className={classes.welcome}>{renderTextWithBreaks(props.welcomeText || texts.login.welcome)}</h1>
 
       {props.error && (
         <div>
@@ -69,12 +68,12 @@ function LoginProviders(props: {
         </div>
       )}
       {props.oauthError && (
-        <div role={'alert'} className="alert alert-error mb-4">
+        <Alert variant="filled" color="red.4" mb={16}>
           {props.oauthError === 'forbidden' && texts.common.loginForbidden}
           {props.oauthError && props.oauthError !== 'forbidden' && texts.login.authError}
-        </div>
+        </Alert>
       )}
-      <div className="mb-4 w-full">
+      <div className={classes.providerList}>
         {props.authSettings?.providers.map((p) => (
           <LoginButton key={p.name} name={p.name} label={p.displayName} />
         ))}
@@ -82,7 +81,7 @@ function LoginProviders(props: {
 
       {props.authSettings?.enablePasswordAuth && <LoginForm />}
 
-      <div className="mb-4 w-full text-sm">
+      <div className={classes.hint}>
         <div>{props.authSettings?.providers.length === 0 && !props.authSettings.enablePasswordAuth && <NoAuthSettings />}</div>
       </div>
     </>
@@ -111,25 +110,25 @@ function LoginForm() {
   });
 
   return (
-    <form className="flex w-full flex-col text-black" onSubmit={form.onSubmit((v) => login.mutate(v))}>
+    <form className={classes.form} onSubmit={form.onSubmit((v) => login.mutate(v))}>
       {/* Error Message Placeholder */}
       {login.isError && (
-        <div role={'alert'} className="alert alert-error mb-4">
+        <Alert variant="filled" color="red.4" mb={16}>
           {login.error instanceof ResponseError && login.error.response.status === 403
             ? texts.common.loginForbidden
             : texts.common.loginFailed}
-        </div>
+        </Alert>
       )}
 
-      <div className="mb-3">
+      <div className={classes.field}>
         <TextInput placeholder={texts.common.email} autoFocus key={form.key('email')} {...form.getInputProps('email')} />
       </div>
 
-      <div className="mb-3">
+      <div className={classes.field}>
         <PasswordInput placeholder={texts.common.password} key={form.key('password')} {...form.getInputProps('password')} />
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button type="submit" fullWidth>
         {texts.common.loginButton}
       </Button>
     </form>
@@ -140,9 +139,9 @@ function LoginButton({ label, name }: { label: string; name: string }) {
   const url = useLoginUrl(name);
 
   return (
-    <a href={url} className="btn btn-primary bg-primary w-full rounded px-4 py-1.5">
+    <Button component="a" href={url} fullWidth radius="sm" className={classes.providerButton}>
       {texts.login.loginButton(label)}
-    </a>
+    </Button>
   );
 }
 
@@ -167,10 +166,10 @@ function LegalFooter(props: { siteLinks: { text: string; link: string }[] | unde
   return (
     <>
       {props.siteLinks?.map((siteLink) => (
-        <div key={siteLink.text} className={'line-clamp-1'}>
-          <a href={siteLink.link} className="link link-primary">
+        <div key={siteLink.text} className={classes.siteLink}>
+          <Anchor href={siteLink.link} underline="always" className={classes.link}>
             {siteLink.text}
-          </a>
+          </Anchor>
         </div>
       ))}
     </>
@@ -178,5 +177,5 @@ function LegalFooter(props: { siteLinks: { text: string; link: string }[] | unde
 }
 
 function BackgroundImage(props: { logoUrl: string }) {
-  return <img className="flex-grow object-cover" src={props.logoUrl} alt="Background Logo" />;
+  return <img className={classes.background} src={props.logoUrl} alt="Background Logo" />;
 }

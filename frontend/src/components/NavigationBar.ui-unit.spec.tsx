@@ -17,14 +17,14 @@ describe('NavigationBar component', () => {
     expect(logo).toBeInTheDocument();
     expect(logo.src).toContain(theme.logoUrl);
 
-    // Should have sr-only h1 for accessibility
+    // Should have a visually hidden h1 for accessibility
     const heading = screen.getByRole('heading', { level: 1, name: theme.name });
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveClass('sr-only');
+    expect(heading).toHaveClass('mantine-VisuallyHidden-root');
 
-    // Theme name should not be visible (only in sr-only element)
+    // Theme name should not be visible (only in the visually hidden element)
     const elements = screen.getAllByText(theme.name);
-    const visibleElements = elements.filter((el) => !el.classList.contains('sr-only'));
+    const visibleElements = elements.filter((el) => !el.classList.contains('mantine-VisuallyHidden-root'));
     expect(visibleElements.length).toEqual(0);
   });
 
@@ -38,12 +38,12 @@ describe('NavigationBar component', () => {
 
     // Should have a visible text element
     const elements = screen.getAllByText(theme.name);
-    expect(elements.length).toEqual(2); // sr-only h1 + visible element
+    expect(elements.length).toEqual(2); // visually hidden h1 + visible element
 
-    // Should have an sr-only h1 for accessibility
+    // Should have a visually hidden h1 for accessibility
     const heading = screen.getByRole('heading', { level: 1, name: theme.name });
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveClass('sr-only');
+    expect(heading).toHaveClass('mantine-VisuallyHidden-root');
 
     const logo = screen.queryByRole('img');
     expect(logo).not.toBeInTheDocument();

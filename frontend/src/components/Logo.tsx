@@ -1,5 +1,6 @@
+import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { cn } from 'src/lib';
+import classes from './Logo.module.css';
 
 interface LogoProps {
   // The file to use.
@@ -46,7 +47,8 @@ export function Logo(props: LogoProps) {
       key={key}
       data-testid="logo-preview"
       style={typeof size === 'string' ? { width: size, height: size } : size}
-      className={cn('object-scale-down', { invisible: !loaded }, className)}
+      className={clsx(classes.logo, className)}
+      data-loaded={loaded || undefined}
       src={path}
       onLoad={() => setLoaded(true)}
       alt={'Logo'}

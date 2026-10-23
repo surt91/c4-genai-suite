@@ -1,0 +1,7 @@
+.logo {
+  object-fit: scale-down;
+}
+
+.logo:not([data-loaded]) {
+  visibility: hidden;
+}

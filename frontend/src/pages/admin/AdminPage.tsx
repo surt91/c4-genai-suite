@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { useEvalAvailability } from 'src/api/state/useEvalAvailability';
@@ -6,6 +7,7 @@ import { NavigationBar } from 'src/components/NavigationBar';
 import { useTheme } from 'src/hooks';
 import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../chat/state/chat';
+import classes from './AdminPage.module.css';
 import { AuditLogPage } from './audit-log/AuditLogPage';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { EvaluationDetailPage } from './evals/evaluations/EvaluationDetailPage';
@@ -29,55 +31,56 @@ export function AdminPage() {
   const { isEvalAvailable } = useEvalAvailability();
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className={classes.root}>
       <NavigationBar theme={theme} redirectTo={`/chat/${chatId || ''}`} />
-      <div className="sidebar-admin flex min-h-0 grow" data-testid="sidebar-admin">
+      <div className={clsx('sidebar-admin', classes.body)} data-testid="sidebar-admin">
         {isNavigationBarOpen && (
-          <div className="shadow-xxl flex w-48 shrink-0 flex-col justify-between bg-white">
+          <div className={classes.sidebar}>
             <div>
-              <ul className="nav-menu nav-menu-bordered mt-4 gap-1">
+              <ul className={clsx('nav-menu nav-menu-bordered', classes.menu)}>
                 <li>
-                  <TransientNavLink className="block" to="/admin/dashboard">
+                  <TransientNavLink className={classes.link} to="/admin/dashboard">
                     {texts.common.dashboard}
                   </TransientNavLink>
                 </li>
                 <li>
-                  <TransientNavLink className="block" to="/admin/theme">
+                  <TransientNavLink className={classes.link} to="/admin/theme">
                     {texts.theme.headline}
                   </TransientNavLink>
                 </li>
                 <li>
-                  <TransientNavLink className="block" to="/admin/files">
+                  <TransientNavLink className={classes.link} to="/admin/files">
                     {texts.files.headline}
                   </TransientNavLink>
                 </li>
                 <li>
-                  <TransientNavLink className="block" to="/admin/assistants">
+                  <TransientNavLink className={classes.link} to="/admin/assistants">
                     {texts.extensions.configurations}
                   </TransientNavLink>
                 </li>
                 <li>
-                  <TransientNavLink className="block" to="/admin/users">
+                  <TransientNavLink className={classes.link} to="/admin/users">
                     {texts.users.headline}
                   </TransientNavLink>
                 </li>
                 <li>
-                  <TransientNavLink className="block" to="/admin/user-groups">
+                  <TransientNavLink className={classes.link} to="/admin/user-groups">
                     {texts.userGroups.headline}
                   </TransientNavLink>
                 </li>
                 <li>
-                  <TransientNavLink className="block" to="/admin/audit-log">
+                  <TransientNavLink className={classes.link} to="/admin/audit-log">
                     {texts.auditLog.headline}
                   </TransientNavLink>
                 </li>
                 {isEvalAvailable && (
                   <li>
-                    <button className="block w-full text-left" onClick={() => setIsEvalsOpen(!isEvalsOpen)}>
-                      <span className="flex items-center justify-between">
+                    <button className={classes.groupButton} onClick={() => setIsEvalsOpen(!isEvalsOpen)}>
+                      <span className={classes.groupLabel}>
                         {texts.evals.headline}
                         <svg
-                          className={`h-4 w-4 transition-transform ${isEvalsOpen ? 'rotate-90' : ''}`}
+                          className={classes.chevron}
+                          data-open={isEvalsOpen || undefined}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -87,24 +90,24 @@ export function AdminPage() {
                       </span>
                     </button>
                     {isEvalsOpen && (
-                      <ul className="mt-1 ml-4 space-y-1">
+                      <ul className={classes.submenu}>
                         <li>
-                          <TransientNavLink className="block" to="/admin/evals/evaluations">
+                          <TransientNavLink className={classes.link} to="/admin/evals/evaluations">
                             {texts.evals.evaluationsLabel}
                           </TransientNavLink>
                         </li>
                         <li>
-                          <TransientNavLink className="block" to="/admin/evals/qa-catalogs">
+                          <TransientNavLink className={classes.link} to="/admin/evals/qa-catalogs">
                             {texts.evals.qaCatalogs}
                           </TransientNavLink>
                         </li>
                         <li>
-                          <TransientNavLink className="block" to="/admin/evals/metrics">
+                          <TransientNavLink className={classes.link} to="/admin/evals/metrics">
                             {texts.evals.metrics}
                           </TransientNavLink>
                         </li>
                         <li>
-                          <TransientNavLink className="block" to="/admin/evals/llm-endpoints">
+                          <TransientNavLink className={classes.link} to="/admin/evals/llm-endpoints">
                             {texts.evals.llmEndpoints}
                           </TransientNavLink>
                         </li>
@@ -115,12 +118,12 @@ export function AdminPage() {
               </ul>
             </div>
 
-            <div className="p-2">
+            <div className={classes.profile}>
               <ProfileButton section="admin" />
             </div>
           </div>
         )}
-        <div className="flex min-w-0 grow flex-col items-stretch bg-gray-50">
+        <div className={classes.main}>
           <Routes>
             <Route path="/dashboard" element={<DashboardPage />} />
 
@@ -151,7 +154,7 @@ export function AdminPage() {
             <Route path="*" element={<TransientNavigate to="/admin/dashboard" />} />
           </Routes>
           <CollapseButton
-            className="left absolute top-1/2"
+            className={classes.collapse}
             side="left"
             isToggled={!isNavigationBarOpen}
             onClick={() => setIsNavigationBarOpen(!isNavigationBarOpen)}

@@ -1,9 +1,10 @@
-import { Select } from '@mantine/core';
+import { Card, Select, Text } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Page } from 'src/components';
 import { texts } from 'src/texts';
+import classes from './DashboardPage.module.css';
 import { FilterInterval, useAssistantsCount, useMessagesCount, useRatings, useUsage, useUsersCount } from './hooks';
 
 export function DashboardPage() {
@@ -18,8 +19,8 @@ export function DashboardPage() {
 
   return (
     <Page>
-      <div className="sticky top-0 z-[10] -mx-4 flex justify-between bg-gray-50 p-4">
-        <h2 className="text-3xl">{texts.common.dashboard}</h2>
+      <div className={classes.header}>
+        <h2 className={classes.title}>{texts.common.dashboard}</h2>
         <Select
           id="filter-interval"
           data={Object.values(FilterInterval).map((value) => ({ label: t(`dashboard.filterInterval.${value}`), value }))}
@@ -61,9 +62,9 @@ export function DashboardPage() {
         <Bar dataKey="total" fill="#003f5c" />
       </ChartContainer>
 
-      <div className="pt-6 text-gray-400 italic" data-testid={'version'}>
+      <Text component="div" pt={24} c="gray.6" fs="italic" data-testid={'version'}>
         Version: {version}
-      </div>
+      </Text>
     </Page>
   );
 }
@@ -72,9 +73,9 @@ export function DashboardPage() {
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 function ChartContainer({ title, children, data }: { title: string; children: ReactNode; data: any }) {
   return (
-    <div className="card bg-base-100 mb-4 shadow">
-      <div className="card-body">
-        <h3 className="mb-2 text-lg">{title}</h3>
+    <Card padding={24} radius="md" shadow="xs" mb={16}>
+      <div className={classes.cardBody}>
+        <h3 className={classes.chartTitle}>{title}</h3>
         <ResponsiveContainer height={300}>
           {/*data is actually of type any in the library*/}
           {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
@@ -89,6 +90,6 @@ function ChartContainer({ title, children, data }: { title: string; children: Re
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </Card>
   );
 }

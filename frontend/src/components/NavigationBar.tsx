@@ -1,12 +1,12 @@
-import { ActionIcon, Tooltip } from '@mantine/core';
+import { ActionIcon, Tooltip, VisuallyHidden } from '@mantine/core';
 import { IconHelp } from '@tabler/icons-react';
 import { PropsWithChildren } from 'react';
 import { Logo } from 'src/components/Logo';
 import { TransientNavLink } from 'src/components/TransientNavLink';
 import { Theme } from 'src/hooks';
-import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { useDocsContext } from './InAppDocsProvider';
+import classes from './NavigationBar.module.css';
 
 interface NavigationBarProps extends PropsWithChildren {
   theme: Theme;
@@ -16,19 +16,18 @@ interface NavigationBarProps extends PropsWithChildren {
 export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
   const { isDocsButtonVisible, toggleDocs } = useDocsContext();
   const content = theme.logoUrl ? <Logo key={theme.key} size={{ height: '60%' }} url={theme.logoUrl} /> : theme.name;
-  const className = 'flex h-12 items-center text-xl font-bold px-0';
   return (
-    <div className="bg-primary-content text-primary flex items-center justify-start px-2">
-      <h1 className="sr-only">{theme.name}</h1>
+    <div className={classes.root}>
+      <VisuallyHidden component="h1">{theme.name}</VisuallyHidden>
       {redirectTo ? (
-        <TransientNavLink className={cn('btn btn-ghost hover:bg-transparent', className)} to={redirectTo} data-testid="logo-link">
+        <TransientNavLink className={classes.logoLink} to={redirectTo} data-testid="logo-link">
           {content}
         </TransientNavLink>
       ) : (
-        <div className={className}>{content}</div>
+        <div className={classes.logo}>{content}</div>
       )}
       {isDocsButtonVisible && (
-        <div className="ml-auto">
+        <div className={classes.actions}>
           <ActionIcon onClick={toggleDocs} size="xl" variant="subtle" color="primary">
             <Tooltip label={texts.common.show(texts.common.docs)}>
               <IconHelp data-testid="docs-icon" />

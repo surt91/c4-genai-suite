@@ -10,6 +10,7 @@ import { ChangePasswordDto, useApi } from 'src/api';
 import { Modal } from 'src/components';
 import { useProfile } from 'src/hooks';
 import { texts } from 'src/texts';
+import classes from './UserProfileModal.module.css';
 
 const PASSWORD_CHANGE_SCHEMA = z
   .object({
@@ -70,7 +71,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   return (
     <Modal
       size="xl"
-      header={<div className="flex items-center gap-4">{texts.chat.settings.header}</div>}
+      header={<div className={classes.header}>{texts.chat.settings.header}</div>}
       onClose={() => {
         passwordForm.reset();
         updatePassword.reset();
@@ -78,8 +79,8 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       }}
       data-testid="user-profile-modal"
     >
-      <div className="flex h-96">
-        <div className="w-1/3 border-r border-gray-200 pr-4">
+      <div className={classes.layout}>
+        <div className={classes.tabs}>
           <Tabs
             value={activeTab}
             onChange={(value) => setActiveTab(value as 'personal' | 'security')}
@@ -105,27 +106,27 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           </Tabs>
         </div>
 
-        <div className="w-2/3 pl-4">
+        <div className={classes.panel}>
           {activeTab === 'personal' && (
             <div>
-              <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.personalInformation}</h3>
-              <div className="space-y-4">
+              <h3 className={classes.title}>{texts.chat.settings.personalInformation}</h3>
+              <div className={classes.fields}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">{texts.common.name}</label>
-                  <p className="mt-1 text-sm text-gray-900">{profile.name}</p>
+                  <label className={classes.label}>{texts.common.name}</label>
+                  <p className={classes.value}>{profile.name}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">{texts.common.email}</label>
-                  <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
+                  <label className={classes.label}>{texts.common.email}</label>
+                  <p className={classes.value}>{profile.email}</p>
                 </div>
               </div>
             </div>
           )}
           {activeTab === 'security' && (
             <div>
-              <h3 className="mb-4 text-lg font-semibold text-gray-900">{texts.chat.settings.security}</h3>
-              <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className="space-y-4">
-                <div className="space-y-4">
+              <h3 className={classes.title}>{texts.chat.settings.security}</h3>
+              <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className={classes.fields}>
+                <div className={classes.fields}>
                   <PasswordInput
                     id="currentPassword"
                     label={texts.chat.settings.currentPassword}
@@ -151,7 +152,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   />
                 </div>
 
-                <div className="flex justify-end pt-4">
+                <div className={classes.actions}>
                   <Button type="submit" disabled={updatePassword.isPending}>
                     {updatePassword.isPending ? texts.chat.settings.updatingPassword : texts.chat.settings.updatePassword}
                   </Button>

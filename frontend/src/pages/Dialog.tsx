@@ -51,7 +51,7 @@ export function Dialog({
           </Text>
           <Tooltip label={texts.chat.updateRating.close}>
             <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')} aria-label={texts.chat.updateRating.close}>
-              <IconX className="w-4" />
+              <IconX size={16} />
             </ActionIcon>
           </Tooltip>
         </Flex>
@@ -68,25 +68,15 @@ export function Dialog({
           </Text>
           <Tooltip label={texts.chat.updateRating.close}>
             <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')} aria-label={texts.chat.updateRating.close}>
-              <IconX className="w-4" />
+              <IconX size={16} />
             </ActionIcon>
           </Tooltip>
         </Flex>
         <Flex gap="sm" mt="lg" align="center" justify="center">
-          <Button
-            color="red"
-            onClick={() => handleResult('no')}
-            variant="outline"
-            leftSection={<IconThumbDown className="w-4" />}
-          >
+          <Button color="red" onClick={() => handleResult('no')} variant="outline" leftSection={<IconThumbDown size={16} />}>
             {noLabel}
           </Button>
-          <Button
-            color="green"
-            onClick={() => handleResult('yes')}
-            variant="outline"
-            leftSection={<IconThumbUp className="w-4" />}
-          >
+          <Button color="green" onClick={() => handleResult('yes')} variant="outline" leftSection={<IconThumbUp size={16} />}>
             {yesLabel}
           </Button>
         </Flex>

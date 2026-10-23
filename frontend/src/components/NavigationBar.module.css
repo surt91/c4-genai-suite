@@ -1,0 +1,31 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 0.5rem;
+  background-color: var(--color-primary-content);
+  color: var(--color-primary);
+}
+
+.logo {
+  display: flex;
+  height: 3rem;
+  align-items: center;
+  font-size: var(--mantine-font-size-xl);
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+
+.logoLink {
+  composes: logo;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: var(--mantine-radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.actions {
+  margin-left: auto;
+}

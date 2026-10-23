@@ -6,11 +6,12 @@
  */
 
 import { flip, Placement, size, useFloating } from '@floating-ui/react-dom';
+import { clsx } from 'clsx';
 import { CSSProperties, useEffect, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { useEventCallback } from 'src/hooks';
-import { cn } from 'src/lib';
 import { ClickOutside } from './ClickOutside';
+import classes from './Overlay.module.css';
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -155,7 +156,11 @@ export const OverlayDropdown = (props: OverlayDropdownProps) => {
 
   return (
     <>
-      <span className={cn('overlay-target flex flex-row', className, { open: show })} ref={refs.setReference} onClick={doOpen}>
+      <span
+        className={clsx('overlay-target', classes.target, className, { open: show })}
+        ref={refs.setReference}
+        onClick={doOpen}
+      >
         {button({ isOpen: show })}
       </span>
 

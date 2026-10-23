@@ -1,0 +1,55 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.layout {
+  display: flex;
+  height: 24rem;
+}
+
+.tabs {
+  width: 33.333333%;
+  padding-right: 1rem;
+  border-right: 1px solid var(--mantine-color-gray-3);
+}
+
+.panel {
+  width: 66.666667%;
+  padding-left: 1rem;
+}
+
+.title {
+  margin-bottom: 1rem;
+  font-size: var(--mantine-font-size-lg);
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: var(--mantine-color-gray-9);
+}
+
+/* space-y-4 */
+.fields > * + * {
+  margin-top: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--mantine-color-gray-8);
+}
+
+.value {
+  margin-top: 0.25rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-gray-9);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}

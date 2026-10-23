@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core';
+import { Button, Group } from '@mantine/core';
 import { PropsWithChildren, useMemo, useState } from 'react';
 import { DialogContext, DialogRequest, useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
@@ -45,7 +45,7 @@ export function DialogProvider(props: PropsWithChildren) {
           onClose={doClose}
           header={request.title}
           footer={
-            <div className="flex items-center justify-end gap-2">
+            <Group justify="flex-end" gap={8} wrap="nowrap">
               <Button variant="subtle" color="red" onClick={doCancel}>
                 {request.cancelText || texts.common.cancel}
               </Button>
@@ -53,7 +53,7 @@ export function DialogProvider(props: PropsWithChildren) {
               <Button color="red" onClick={doPerfom} autoFocus>
                 {request.performText || texts.common.confirm}
               </Button>
-            </div>
+            </Group>
           }
         >
           <p>{request.text}</p>

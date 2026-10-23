@@ -10,6 +10,7 @@ import { useStateOfSelectedChatId } from 'src/pages/chat/state/chat';
 import { isMobile } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { Avatar } from './Avatar';
+import classes from './ProfileButton.module.css';
 
 interface ProfileButtonProps {
   onClearConversations?: () => void;
@@ -27,15 +28,15 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
   return (
     <Menu width={250} withInitialFocusPlaceholder={false}>
       <Menu.Target data-testid="menu user">
-        <button className="btn btn-ghost h-auto w-full justify-start p-2 hover:bg-gray-200" aria-haspopup="menu">
-          <div className="flex max-w-full items-center gap-2">
-            <div className="shrink-0">
+        <button className={classes.button} aria-haspopup="menu">
+          <div className={classes.content}>
+            <div className={classes.avatar}>
               <Avatar user={profile} />
             </div>
 
-            <div className="min-w-0 text-left text-sm leading-5">
-              <div className="truncate font-semibold">{profile.name}</div>
-              <div className="lead truncate font-normal">{profile.email}</div>
+            <div className={classes.text}>
+              <div className={classes.name}>{profile.name}</div>
+              <div className={classes.email}>{profile.email}</div>
             </div>
           </div>
         </button>

@@ -1,0 +1,85 @@
+.title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.row {
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-dark-3);
+}
+
+.hint {
+  margin-left: 0.5rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-gray-6);
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.details {
+  max-height: 24rem;
+  overflow: auto;
+}
+
+.message {
+  border-radius: 0.25rem;
+  padding: 1rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+
+  &[data-variant='info'] {
+    background-color: var(--mantine-color-blue-0);
+    color: var(--mantine-color-blue-8);
+  }
+
+  &[data-variant='neutral'] {
+    background-color: var(--mantine-color-gray-1);
+    color: var(--mantine-color-dark-3);
+  }
+
+  &[data-variant='success'] {
+    background-color: var(--mantine-color-green-0);
+    color: var(--mantine-color-green-8);
+  }
+
+  &[data-variant='error'] {
+    background-color: var(--mantine-color-red-0);
+    color: var(--mantine-color-red-8);
+  }
+}
+
+.diff {
+  overflow: auto;
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+.logRow {
+  cursor: pointer;
+
+  @mixin hover {
+    background-color: var(--mantine-color-gray-0);
+  }
+}
+
+.entityId {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-dark-3);
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

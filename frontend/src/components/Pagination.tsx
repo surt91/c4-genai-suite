@@ -1,3 +1,4 @@
+import { Button, Group } from '@mantine/core';
 import { texts } from 'src/texts';
 
 interface PaginationProps {
@@ -27,16 +28,18 @@ export function Pagination(props: PaginationProps) {
   }
 
   return (
-    <div className="flex flex-row justify-end">
-      <div className="join mt-4">
-        <button className="btn join-item btn-sm" onClick={() => onPage(page - 1)} disabled={!canGoPrev}>
+    <Group justify="flex-end">
+      <Button.Group mt={16}>
+        <Button variant="default" size="xs" onClick={() => onPage(page - 1)} disabled={!canGoPrev}>
           «
-        </button>
-        <button className="btn join-item btn-sm">{texts.common.page(page + 1, numberOfPages)}</button>
-        <button className="btn join-item btn-sm" onClick={() => onPage(page + 1)} disabled={!canGoNext}>
+        </Button>
+        <Button variant="default" size="xs">
+          {texts.common.page(page + 1, numberOfPages)}
+        </Button>
+        <Button variant="default" size="xs" onClick={() => onPage(page + 1)} disabled={!canGoNext}>
           »
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Button.Group>
+    </Group>
   );
 }

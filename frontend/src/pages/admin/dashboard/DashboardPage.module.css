@@ -1,0 +1,27 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 -1rem;
+  padding: 1rem;
+  background-color: var(--mantine-color-gray-0);
+}
+
+.title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chartTitle {
+  margin-bottom: 0.5rem;
+  font-size: var(--mantine-font-size-lg);
+  line-height: 1.75rem;
+}

@@ -6,6 +6,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { texts } from 'src/texts';
 import { Markdown } from '../components/Markdown';
+import classes from './InAppDocsProvider.module.css';
 
 type DocsContextType = {
   isDocsButtonVisible: boolean;
@@ -29,20 +30,22 @@ type InAppDocsLayoutProps = {
 
 const InAppDocsLayout: React.FC<InAppDocsLayoutProps> = ({ docsMarkdown, isDocsVisible, toggleDocs, children }) => {
   return (
-    <div className="flex h-screen flex-col">
-      <div className="flex flex-1 overflow-hidden">
-        <div className={`flex-grow ${isDocsVisible ? 'w-0 xl:w-2/3' : 'w-full'} overflow-auto`}>{children}</div>
+    <div className={classes.root}>
+      <div className={classes.layout}>
+        <div className={classes.content} data-docs-visible={isDocsVisible || undefined}>
+          {children}
+        </div>
         {isDocsVisible && (
-          <div className="bg-base-100 text-base-content flex h-full w-full flex-col xl:w-1/3">
-            <div className="bg-primary text-primary-content flex h-12 items-center justify-between p-4">
-              <h2 className="text-lg font-semibold">{texts.common.docsHeader}</h2>
+          <div className={classes.docs}>
+            <div className={classes.docsHeader}>
+              <h2 className={classes.docsTitle}>{texts.common.docsHeader}</h2>
               <ActionIcon onClick={toggleDocs} size="xl" mr="xs" variant="subtle" color="primary-content">
                 <Tooltip label={texts.common.hide(texts.common.docs)}>
                   <IconX data-testid="close-icon" />
                 </Tooltip>
               </ActionIcon>
             </div>
-            <div className="h-0 flex-1 overflow-auto p-4">
+            <div className={classes.docsBody}>
               <Markdown>{docsMarkdown}</Markdown>
             </div>
           </div>

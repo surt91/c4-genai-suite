@@ -1,0 +1,77 @@
+.root {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.body {
+  display: flex;
+  min-height: 0;
+  flex-grow: 1;
+}
+
+.sidebar {
+  display: flex;
+  width: 12rem;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--mantine-color-white);
+}
+
+.menu {
+  margin-top: 1rem;
+}
+
+.link {
+  display: block;
+}
+
+.groupButton {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.groupLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chevron {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[data-open] {
+    transform: rotate(90deg);
+  }
+}
+
+.submenu {
+  margin-top: 0.25rem;
+  margin-left: 1rem;
+
+  & > * + * {
+    margin-top: 0.25rem;
+  }
+}
+
+.profile {
+  padding: 0.5rem;
+}
+
+.main {
+  display: flex;
+  min-width: 0;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: var(--mantine-color-gray-0);
+}
+
+.collapse {
+  position: absolute;
+  top: 50%;
+}

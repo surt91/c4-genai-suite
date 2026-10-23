@@ -1,0 +1,43 @@
+.root {
+  position: relative;
+  flex-grow: 1;
+}
+
+.menu {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  width: 270px;
+  flex-shrink: 0;
+  flex-grow: 1;
+  flex-direction: column;
+  overflow-y: hidden;
+  border-left: 1px solid var(--mantine-color-gray-3);
+  background-color: var(--mantine-color-white);
+}
+
+.main {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  background-color: var(--mantine-color-gray-0);
+
+  .root[data-with-menu] & {
+    left: 270px;
+  }
+}
+
+.content {
+  min-width: 500px;
+  max-width: 1100px;
+  padding: 2rem 3rem;
+
+  .root[data-with-menu] & {
+    max-width: 900px;
+  }
+}

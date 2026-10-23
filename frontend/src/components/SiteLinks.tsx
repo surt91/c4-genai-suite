@@ -1,4 +1,4 @@
-import { TextInput } from '@mantine/core';
+import { ActionIcon, Box, Button, Group, SimpleGrid, Stack, TextInput } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { texts } from 'src/texts';
 import { Icon } from './Icon';
@@ -28,44 +28,43 @@ export function SiteLinks(props: SiteLinkProps) {
   const removeItem = (index: number) => form.removeListItem(name, index);
 
   return (
-    <div className="grid gap-6">
+    <SimpleGrid cols={1} spacing={24} verticalSpacing={24}>
       {fields.map((_item: SiteLink, index: number) => (
-        <div className="flex flex-row gap-2" key={index}>
-          <div className="flex w-full flex-col gap-2">
-            <div className="flex flex-row gap-2">
-              <div className="w-1/2">
+        <Group gap={8} wrap="nowrap" align="flex-start" key={index}>
+          <Stack gap={8} w="100%">
+            <Group gap={8} wrap="nowrap" align="flex-start">
+              <Box w="50%">
                 <TextInput
                   placeholder={texts.common.text}
                   key={form.key(`${name}.${index}.text`)}
                   {...form.getInputProps(`${name}.${index}.text`)}
                 />
-              </div>
-              <div className="w-1/2">
+              </Box>
+              <Box w="50%">
                 <TextInput
                   placeholder={texts.common.link}
                   key={form.key(`${name}.${index}.link`)}
                   {...form.getInputProps(`${name}.${index}.link`)}
                 />
-              </div>
-            </div>
-          </div>
+              </Box>
+            </Group>
+          </Stack>
 
           <div>
-            <button type="button" className="btn btn-ghost text-error font-bold" onClick={() => removeItem(index)}>
+            <ActionIcon type="button" variant="subtle" color="red" size="lg" onClick={() => removeItem(index)}>
               <Icon size={16} icon="close" />
-            </button>
+            </ActionIcon>
           </div>
-        </div>
+        </Group>
       ))}
 
       {fields.length < 12 && (
         <div>
-          <button type="button" className="btn w-auto" onClick={addItem}>
-            <Icon size={16} icon="plus" />
+          <Button type="button" variant="default" leftSection={<Icon size={16} icon="plus" />} onClick={addItem}>
             <span>{texts.theme.linksAdd}</span>
-          </button>
+          </Button>
         </div>
       )}
-    </div>
+    </SimpleGrid>
   );
 }

@@ -1,5 +1,6 @@
-import { Badge, Modal, Select } from '@mantine/core';
+import { Badge, Card, Group, Modal, Select, Table } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { clsx } from 'clsx';
 import { create } from 'jsondiffpatch';
 import { format as formatHtmlDiff } from 'jsondiffpatch/formatters/html';
 import { useCallback, useMemo, useState } from 'react';
@@ -7,6 +8,7 @@ import { useApi } from 'src/api';
 import { AuditLogDetailDto, AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
 import { Page, Pagination } from 'src/components';
 import { texts } from 'src/texts';
+import classes from './AuditLogPage.module.css';
 
 const PAGE_SIZE = 20;
 
@@ -104,19 +106,22 @@ function DiffView({ currentSnapshot, previousSnapshot }: { currentSnapshot: obje
   }, [currentSnapshot, previousSnapshot]);
 
   if (!previousSnapshot) {
-    return <div className="rounded bg-blue-50 p-4 text-sm text-blue-700">{texts.auditLog.noPreviousSnapshot}</div>;
+    return (
+      <div className={classes.message} data-variant="info">
+        {texts.auditLog.noPreviousSnapshot}
+      </div>
+    );
   }
 
   if (!diffHtml) {
-    return <div className="rounded bg-gray-100 p-4 text-sm text-gray-500">{texts.auditLog.noChanges}</div>;
+    return (
+      <div className={classes.message} data-variant="neutral">
+        {texts.auditLog.noChanges}
+      </div>
+    );
   }
 
-  return (
-    <div
-      className="jsondiffpatch-unchanged-hidden overflow-auto rounded border p-4"
-      dangerouslySetInnerHTML={{ __html: diffHtml }}
-    />
-  );
+  return <div className={clsx('jsondiffpatch-unchanged-hidden', classes.diff)} dangerouslySetInnerHTML={{ __html: diffHtml }} />;
 }
 
 function DetailsModal({ auditLog, onClose }: { auditLog: AuditLogDetailDto | null; onClose: () => void }) {
@@ -136,47 +141,49 @@ function DetailsModal({ auditLog, onClose }: { auditLog: AuditLogDetailDto | nul
 
   return (
     <Modal opened={!!auditLog} onClose={onClose} title={texts.auditLog.snapshotDetails} size="lg">
-      <div className="mb-4 flex flex-wrap gap-4">
+      <Group gap={16} mb={16} align="flex-start">
         <div>
-          <span className="text-sm text-gray-500">{texts.auditLog.entityType}:</span>{' '}
-          <EntityTypeBadge entityType={auditLog.entityType} />
+          <span className={classes.label}>{texts.auditLog.entityType}:</span> <EntityTypeBadge entityType={auditLog.entityType} />
         </div>
         <div>
-          <span className="text-sm text-gray-500">{texts.auditLog.action}:</span> <ActionBadge action={auditLog.action} />
+          <span className={classes.label}>{texts.auditLog.action}:</span> <ActionBadge action={auditLog.action} />
         </div>
-      </div>
+      </Group>
       {isExtension && configurationName && (
-        <div className="mb-4">
-          <span className="text-sm text-gray-500">{texts.auditLog.configuration}:</span>{' '}
-          <span className="font-semibold">{configurationName}</span>
-          {configurationId && <span className="ml-2 text-sm text-gray-400">({configurationId})</span>}
+        <div className={classes.row}>
+          <span className={classes.label}>{texts.auditLog.configuration}:</span>{' '}
+          <span className={classes.strong}>{configurationName}</span>
+          {configurationId && <span className={classes.hint}>({configurationId})</span>}
         </div>
       )}
       {isExtension && extensionName && (
-        <div className="mb-4">
-          <span className="text-sm text-gray-500">{texts.auditLog.extension}:</span> <span>{extensionName}</span>
-          <span className="ml-2 text-sm text-gray-400">({auditLog.entityId})</span>
+        <div className={classes.row}>
+          <span className={classes.label}>{texts.auditLog.extension}:</span> <span>{extensionName}</span>
+          <span className={classes.hint}>({auditLog.entityId})</span>
         </div>
       )}
       {!isExtension && (
-        <div className="mb-4">
-          <span className="text-sm text-gray-500">{texts.auditLog.entityName}:</span>{' '}
-          <span className="font-semibold">{entityName}</span>
-          <span className="ml-2 text-sm text-gray-400">({auditLog.entityId})</span>
+        <div className={classes.row}>
+          <span className={classes.label}>{texts.auditLog.entityName}:</span> <span className={classes.strong}>{entityName}</span>
+          <span className={classes.hint}>({auditLog.entityId})</span>
         </div>
       )}
-      <div className="mb-4">
-        <span className="text-sm text-gray-500">{texts.auditLog.user}:</span> <span>{auditLog.userName || auditLog.userId}</span>
+      <div className={classes.row}>
+        <span className={classes.label}>{texts.auditLog.user}:</span> <span>{auditLog.userName || auditLog.userId}</span>
       </div>
-      <div className="mb-4">
-        <span className="text-sm text-gray-500">{texts.auditLog.timestamp}:</span> <span>{formatDate(auditLog.createdAt)}</span>
+      <div className={classes.row}>
+        <span className={classes.label}>{texts.auditLog.timestamp}:</span> <span>{formatDate(auditLog.createdAt)}</span>
       </div>
 
-      <div className="max-h-96 overflow-auto">
+      <div className={classes.details}>
         {isCreate ? (
-          <div className="rounded bg-green-50 p-4 text-sm text-green-700">{texts.auditLog.entityCreated}</div>
+          <div className={classes.message} data-variant="success">
+            {texts.auditLog.entityCreated}
+          </div>
         ) : isDelete ? (
-          <div className="rounded bg-red-50 p-4 text-sm text-red-700">{texts.auditLog.entityDeleted}</div>
+          <div className={classes.message} data-variant="error">
+            {texts.auditLog.entityDeleted}
+          </div>
         ) : (
           <DiffView currentSnapshot={auditLog.snapshot} previousSnapshot={auditLog.previousSnapshot ?? null} />
         )}
@@ -259,10 +266,10 @@ export function AuditLogPage() {
   return (
     <>
       <Page>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-3xl">{texts.auditLog.headline}</h2>
+        <Group justify="space-between" wrap="nowrap" mb={16}>
+          <h2 className={classes.title}>{texts.auditLog.headline}</h2>
 
-          <div className="flex gap-4">
+          <Group gap={16} wrap="nowrap" align="flex-start">
             <Select
               placeholder={texts.auditLog.filterByAssistant}
               data={configurationOptions}
@@ -270,7 +277,7 @@ export function AuditLogPage() {
               onChange={handleConfigurationFilterChange}
               clearable
               searchable
-              className="w-64"
+              w={256}
             />
             <Select
               placeholder={texts.auditLog.entityType}
@@ -279,53 +286,51 @@ export function AuditLogPage() {
               onChange={handleFilterChange}
               clearable
               disabled={!!configurationFilter}
-              className="w-48"
+              w={192}
             />
-          </div>
-        </div>
+          </Group>
+        </Group>
 
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <table className="table table-fixed text-base">
-              <thead>
-                <tr>
-                  <th className="w-32">{texts.auditLog.entityType}</th>
-                  <th className="w-24">{texts.auditLog.entityId}</th>
-                  <th>{texts.auditLog.entityName}</th>
-                  <th className="w-32">{texts.auditLog.action}</th>
-                  <th>{texts.auditLog.user}</th>
-                  <th className="w-52">{texts.auditLog.timestamp}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {auditLogs?.items.map((log) => (
-                  <tr className="cursor-pointer hover:bg-gray-50" key={log.id} onClick={() => setSelectedLog(log)}>
-                    <td>
-                      <EntityTypeBadge entityType={log.entityType} />
-                    </td>
-                    <td className="font-mono text-sm text-gray-500" title={log.entityId}>
-                      {truncateId(log.entityId)}
-                    </td>
-                    <td className="truncate overflow-hidden">{getEntityName(log)}</td>
-                    <td>
-                      <ActionBadge action={log.action} />
-                    </td>
-                    <td className="truncate overflow-hidden">{log.userName || log.userId}</td>
-                    <td>{formatDate(log.createdAt)}</td>
-                  </tr>
-                ))}
+        <Card padding={24} radius="md" shadow="xs">
+          <Table layout="fixed" fz="md" horizontalSpacing="md" verticalSpacing="sm">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th w={128}>{texts.auditLog.entityType}</Table.Th>
+                <Table.Th w={96}>{texts.auditLog.entityId}</Table.Th>
+                <Table.Th>{texts.auditLog.entityName}</Table.Th>
+                <Table.Th w={128}>{texts.auditLog.action}</Table.Th>
+                <Table.Th>{texts.auditLog.user}</Table.Th>
+                <Table.Th w={208}>{texts.auditLog.timestamp}</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {auditLogs?.items.map((log) => (
+                <Table.Tr className={classes.logRow} key={log.id} onClick={() => setSelectedLog(log)}>
+                  <Table.Td>
+                    <EntityTypeBadge entityType={log.entityType} />
+                  </Table.Td>
+                  <Table.Td className={classes.entityId} title={log.entityId}>
+                    {truncateId(log.entityId)}
+                  </Table.Td>
+                  <Table.Td className={classes.truncate}>{getEntityName(log)}</Table.Td>
+                  <Table.Td>
+                    <ActionBadge action={log.action} />
+                  </Table.Td>
+                  <Table.Td className={classes.truncate}>{log.userName || log.userId}</Table.Td>
+                  <Table.Td>{formatDate(log.createdAt)}</Table.Td>
+                </Table.Tr>
+              ))}
 
-                {auditLogs?.items.length === 0 && isFetched && (
-                  <tr>
-                    <td colSpan={6}>{texts.auditLog.empty}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+              {auditLogs?.items.length === 0 && isFetched && (
+                <Table.Tr>
+                  <Table.Td colSpan={6}>{texts.auditLog.empty}</Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
 
-            <Pagination page={page} pageSize={PAGE_SIZE} total={auditLogs?.total || 0} onPage={handleChangePage} />
-          </div>
-        </div>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={auditLogs?.total || 0} onPage={handleChangePage} />
+        </Card>
       </Page>
 
       <DetailsModal auditLog={selectedLogDetail ?? null} onClose={() => setSelectedLog(null)} />
