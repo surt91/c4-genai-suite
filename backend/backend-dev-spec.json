@@ -3557,6 +3557,11 @@
             "type": "string",
             "description": "The status of the file upload to the RAG-Service",
             "enum": ["successful", "inProgress"]
+          },
+          "bucketType": {
+            "type": "string",
+            "description": "The type of the bucket of the file, e.g. user for personal files.",
+            "enum": ["general", "user", "conversation"]
           }
         },
         "required": ["id", "fileName", "fileSize", "mimeType", "uploadedAt"]

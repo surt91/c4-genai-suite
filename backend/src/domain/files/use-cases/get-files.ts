@@ -107,11 +107,8 @@ export class GetFilesHandler implements IQueryHandler<GetFiles, GetFilesResponse
     }
     options.order = { fileName: 'ASC' };
 
-    if (withContent) {
-      options.relations = {
-        blobs: true,
-      };
-    }
+    // the bucket type tells personal files (user bucket) and files of the conversation apart
+    options.relations = withContent ? { blobs: true, bucket: true } : { bucket: true };
 
     const entities = await this.files.find(options);
     const result = entities?.map(buildFile);

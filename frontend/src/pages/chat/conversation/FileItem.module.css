@@ -79,3 +79,16 @@
   color: var(--mantine-color-red-7);
   cursor: pointer;
 }
+
+.origin {
+  overflow: hidden;
+  color: var(--mantine-color-dimmed);
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.root[data-origin="personal"] {
+  background-color: var(--mantine-color-blue-light);
+}

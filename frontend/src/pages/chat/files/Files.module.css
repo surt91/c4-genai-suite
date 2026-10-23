@@ -2,49 +2,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 6rem;
-  padding: 1rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 1rem;
   border: 2px dashed var(--mantine-color-gray-4);
   border-radius: 0.5rem;
   color: var(--mantine-color-gray-7);
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font-size: var(--mantine-font-size-xs);
   text-align: center;
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dropzone:hover {
-  border-color: var(--mantine-color-gray-5);
+.dropzone:hover,
+.dropzone:focus-visible {
+  border-color: var(--mantine-color-gray-6);
 }
 
 .list {
-  display: flex;
-  flex-direction: column;
+  max-height: 16rem;
   overflow: auto;
 }
 
-.listInner {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
 .pending {
-  display: flex;
-  flex-direction: column;
+  padding: 0.25rem 0;
+  color: var(--mantine-color-dimmed);
+}
+
+.checkboxBody {
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  height: 5rem;
-  border-radius: 0.5rem;
-  background-color: var(--mantine-color-gray-2);
-  color: var(--mantine-color-dark-3);
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  min-width: 0;
+}
+
+.checkboxLabel {
+  min-width: 0;
+}
+
+.fileName {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

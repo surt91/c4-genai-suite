@@ -1,0 +1,18 @@
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: min(70vh, 36rem);
+  overflow: auto;
+}
+
+.title {
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+}
+
+.sheet {
+  max-height: 85dvh;
+  border-top-left-radius: var(--mantine-radius-lg);
+  border-top-right-radius: var(--mantine-radius-lg);
+}

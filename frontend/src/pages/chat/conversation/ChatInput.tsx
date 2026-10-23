@@ -13,6 +13,8 @@ import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
 import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
+import { MyFilesButton } from 'src/pages/chat/files/MyFilesButton';
+import { useUserBucket } from 'src/pages/chat/useUserBucket';
 import { texts } from 'src/texts';
 import { closeInspectorIfOpen } from '../state/inspector';
 import { useChatDropzone } from '../useChatDropzone';
@@ -67,6 +69,9 @@ export function ChatInput({
     userBucket,
     remove,
   } = useChatDropzone();
+
+  // the personal files of the user (user bucket), selectable via "My files"
+  const { userBucket: personalBucket } = useUserBucket(configuration?.id ?? -1);
 
   const speechRecognitionLanguages: Language[] = [
     { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },
@@ -260,7 +265,7 @@ export function ChatInput({
 
         <div className={classes.wrap}>
           {chatFiles.map((file) => (
-            <FileItemComponent key={file.id} file={file} onRemove={remove} />
+            <FileItemComponent key={file.id} file={file} onRemove={remove} personal={file.bucketType === 'user'} />
           ))}
           {uploadingFiles.map((file, n) => (
             <FileItemComponent key={`${n}-${file.name}`} file={{ fileName: file.name }} loading={true} />
@@ -297,6 +302,14 @@ export function ChatInput({
             />
             <div className={classes.toolbar}>
               <div className={classes.actions}>
+                {personalBucket && configuration && (
+                  <MyFilesButton
+                    conversationId={chatId}
+                    configurationId={configuration.id}
+                    userBucket={personalBucket}
+                    selectedFiles={chatFiles.filter((file) => file.bucketType === 'user')}
+                  />
+                )}
                 {userBucket?.extensions && userBucket.extensions.length > 0 && (
                   <>
                     <input

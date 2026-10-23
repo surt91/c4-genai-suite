@@ -42,6 +42,13 @@ export class FileDto {
   })
   uploadStatus!: FileUploadStatus;
 
+  @ApiProperty({
+    description: 'The type of the bucket of the file, e.g. user for personal files.',
+    required: false,
+    enum: ['general', 'user', 'conversation'],
+  })
+  bucketType?: BucketType;
+
   static fromDomain(this: void, source: UploadedFile) {
     const result = new FileDto();
     result.id = source.id;
@@ -50,6 +57,7 @@ export class FileDto {
     result.mimeType = source.mimeType;
     result.uploadedAt = source.uploadedAt;
     result.uploadStatus = source.uploadStatus;
+    result.bucketType = source.bucketType;
 
     return result;
   }

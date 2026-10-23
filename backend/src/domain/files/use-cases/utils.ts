@@ -29,11 +29,13 @@ export function buildBucketSnapshot(bucket: Bucket): Record<string, unknown> {
 }
 
 export function buildFile(source: FileEntity): UploadedFile {
-  const { createdAt: uploadedAt, ...other } = source;
+  // the bucket is only used for its type (it contains secrets like headers)
+  const { createdAt: uploadedAt, bucket, ...other } = source;
 
   return {
     uploadedAt,
     ...other,
+    bucketType: bucket?.type,
     content: source.blobs?.map((x) => ({
       buffer: x.buffer,
       original: x.category === BlobCategory.FILE_ORIGINAL,

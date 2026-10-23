@@ -56,6 +56,11 @@ export const useConversationFiles = (conversationId: number) => {
     data: conversationAndUserFiles,
     ...userFilesFunctions,
     remove: (file: FileDto) => deleteFile.mutate(file),
+    // Forgets a selected personal file without calling the server (e.g. after it has been deleted).
+    forget: (file: FileDto) => {
+      userFilesFunctions.remove(file);
+      void refetch();
+    },
     toggle: (file: FileDto) => {
       if (conversationAndUserFiles.find((x) => x.id === file.id)) {
         deleteFile.mutate(file);

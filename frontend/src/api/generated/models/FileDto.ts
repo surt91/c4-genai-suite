@@ -56,6 +56,12 @@ export interface FileDto {
      * @memberof FileDto
      */
     uploadStatus?: FileDtoUploadStatusEnum;
+    /**
+     * The type of the bucket of the file, e.g. user for personal files.
+     * @type {string}
+     * @memberof FileDto
+     */
+    bucketType?: FileDtoBucketTypeEnum;
 }
 
 
@@ -67,6 +73,16 @@ export const FileDtoUploadStatusEnum = {
     InProgress: 'inProgress'
 } as const;
 export type FileDtoUploadStatusEnum = typeof FileDtoUploadStatusEnum[keyof typeof FileDtoUploadStatusEnum];
+
+/**
+ * @export
+ */
+export const FileDtoBucketTypeEnum = {
+    General: 'general',
+    User: 'user',
+    Conversation: 'conversation'
+} as const;
+export type FileDtoBucketTypeEnum = typeof FileDtoBucketTypeEnum[keyof typeof FileDtoBucketTypeEnum];
 
 
 /**
@@ -97,6 +113,7 @@ export function FileDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): F
         'mimeType': json['mimeType'],
         'uploadedAt': (new Date(json['uploadedAt'])),
         'uploadStatus': json['uploadStatus'] == null ? undefined : json['uploadStatus'],
+        'bucketType': json['bucketType'] == null ? undefined : json['bucketType'],
     };
 }
 
@@ -112,6 +129,7 @@ export function FileDtoToJSON(value?: FileDto | null): any {
         'mimeType': value['mimeType'],
         'uploadedAt': ((value['uploadedAt']).toISOString()),
         'uploadStatus': value['uploadStatus'],
+        'bucketType': value['bucketType'],
     };
 }
 

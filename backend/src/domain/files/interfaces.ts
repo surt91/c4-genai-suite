@@ -70,6 +70,9 @@ export interface UploadedFile {
 
   // The status of the file in relation to the RAG-Service
   uploadStatus: FileUploadStatus;
+
+  // The type of the bucket (if loaded), e.g. `user` for personal files.
+  bucketType?: BucketType;
 }
 
 export interface SearchResult {
