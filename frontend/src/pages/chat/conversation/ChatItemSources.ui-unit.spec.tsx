@@ -46,6 +46,31 @@ describe('mergeIdenticalSources', () => {
     ]);
   });
 
+  it('does not change the given sources, so merging again gives the same result', () => {
+    const sources: SourceDto[] = [
+      {
+        title: 'Source 1',
+        document: { uri: 'systemA', mimeType: 'text/plain' },
+        chunk: { pages: [1], content: '' },
+        metadata: { author: 'a' },
+      },
+      {
+        title: 'Source 1',
+        document: { uri: 'systemA', mimeType: 'text/plain' },
+        chunk: { pages: [2], content: '' },
+        metadata: { author: 'b' },
+      },
+    ];
+    const copy = structuredClone(sources);
+
+    const first = mergeIdenticalSources(sources);
+    const second = mergeIdenticalSources(sources);
+
+    expect(sources).toEqual(copy);
+    expect(second).toEqual(first);
+    expect(first[0].metadata).toEqual({ author: 'a, b', pages: '1-2' });
+  });
+
   it('should merge pages correctly and format them as ranges', () => {
     const sources: SourceDto[] = [
       {
@@ -118,7 +143,10 @@ describe('mergeIdenticalSources', () => {
     ];
 
     const result = mergeIdenticalSources(sources);
-    expect(result).toEqual(sources);
+    expect(result).toEqual([
+      { ...sources[0], metadata: { pages: '1, 3, 5' } },
+      { ...sources[1], metadata: { pages: '1, 4-5' } },
+    ]);
   });
 
   it('should merge different metadata values of sources with identical identities', () => {

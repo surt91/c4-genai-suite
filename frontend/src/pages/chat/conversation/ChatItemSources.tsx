@@ -42,10 +42,11 @@ export const mergeIdenticalSources = (sources: SourceDto[]): SourceDto[] => {
 
   const uniqueSources: SourceDto[] = [];
 
-  sources.forEach((source) => {
+  // The sources belong to the message in the store, so the merge works on copies (it must not change them, otherwise
+  // every new merge would merge the merged values again).
+  sources.forEach((original) => {
+    const source: SourceDto = { ...original, metadata: { ...original.metadata, pages: original.chunk.pages ?? [] } };
     const alreadyAddedSource = uniqueSources.find((s) => s.document?.uri && s.document.uri === source.document?.uri);
-    source.metadata ??= {};
-    source.metadata['pages'] = source.chunk.pages ?? [];
 
     if (!alreadyAddedSource) {
       uniqueSources.push(source);
