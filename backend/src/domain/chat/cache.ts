@@ -42,14 +42,8 @@ export class ChatCacheImpl implements ChatCache {
   private cache = new TTLMap<string>(10 * 60 * 1000);
 
   async get<T>(key: string, args: Record<string, any>, resolver: () => Promise<T> | T): Promise<T> {
-    let cacheKey = `EXTENSION_${key}`;
-
-    for (const [key, value] of Object.entries(args)) {
-      cacheKey += '_';
-      cacheKey += `${key}`;
-      cacheKey += '_';
-      cacheKey += `${value}`;
-    }
+    // JSON, because `${value}` would map all objects (e.g. MCP schema settings) to the same `[object Object]`.
+    const cacheKey = `EXTENSION_${key}_${JSON.stringify(args)}`;
 
     const value = this.cache.get<T>(cacheKey);
     if (value) {
