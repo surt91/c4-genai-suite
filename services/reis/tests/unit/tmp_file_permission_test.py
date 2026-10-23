@@ -1,3 +1,5 @@
+import os
+import tempfile
 from typing import Generator
 from fastapi import FastAPI
 import pytest
@@ -69,3 +71,9 @@ def test_path_traversal_attack() -> None:
     # Test path traversal prevention
     with pytest.raises(ValueError, match="Invalid file path"):
         get_new_file_path("../../../etc/passwd")
+    # a sibling directory sharing the prefix of the temp dir
+    sibling = os.path.basename(tempfile.gettempdir()) + "-other"
+    with pytest.raises(ValueError, match="Invalid file path"):
+        get_new_file_path(f"../{sibling}/x")
+    with pytest.raises(ValueError, match="Invalid file path"):
+        get_new_file_path(".")

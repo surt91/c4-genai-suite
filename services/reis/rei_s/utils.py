@@ -19,9 +19,10 @@ def get_new_file_path(base_name: str | None = None, extension: str | None = None
     if extension:
         base_name = base_name + "." + extension
 
-    joined_path = os.path.join(tempfile.gettempdir(), base_name)
-    normalized_path = os.path.normpath(joined_path)
-    if not normalized_path.startswith(tempfile.gettempdir()):
+    temp_dir = os.path.normpath(tempfile.gettempdir())
+    normalized_path = os.path.normpath(os.path.join(temp_dir, base_name))
+    # the file has to be a direct child of the temp dir (a prefix check would accept `/tmp/../tmpfoo/x`)
+    if os.path.dirname(normalized_path) != temp_dir:
         raise ValueError("Invalid file path")
     return normalized_path
 

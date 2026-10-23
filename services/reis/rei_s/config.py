@@ -77,6 +77,8 @@ class Config(BaseSettings):
     metrics_port: Annotated[int, Field(ge=0)] = 9200
     batch_size: Annotated[int, Field(ge=0)] = 200
     filesize_threshold: Annotated[int, Field(gt=0)] = 10**5
+    # maximum size of uploaded files in bytes, unlimited if not set
+    max_file_size: Annotated[int, Field(gt=0)] | None = None
 
     embeddings_type: Literal[
         "azure-openai", "openai", "openai-compatible", "random-test-embeddings", "ollama", "bedrock", "nvidia"

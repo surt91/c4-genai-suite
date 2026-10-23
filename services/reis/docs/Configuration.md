@@ -10,6 +10,7 @@
 | TMP_FILES_ROOT  | No       | None    | absolute path where temp files will be stored |
 | WORKERS         | No       | 1       | number of parallel workers                    |
 | BATCH_SIZE      | No       | None    | number of chunks im memory at the same time   |
+| MAX_FILE_SIZE   | No       | None    | maximum upload size in bytes (413 if larger)  |
 
 ## Metrics
 

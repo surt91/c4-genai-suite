@@ -1,7 +1,7 @@
 import re
 from typing import Annotated, Iterator, List, Optional
 from asyncio import wrap_future
-import uuid
+import os
 from urllib.parse import unquote
 
 import anyio
@@ -147,6 +147,35 @@ def _read_and_close(stream: ReadableStream, chunk_size: int = 64 * 1024) -> Iter
         stream.close()
 
 
+async def save_upload(request: Request, config: Config) -> str:
+    """Streams the request body into a new temp file and returns its path.
+
+    The temp file name is random: the client supplied id must not influence the path, and concurrent uploads of
+    the same id must not share a file.
+    """
+    max_size = config.max_file_size
+    content_length = request.headers.get("content-length")
+    if max_size is not None and content_length is not None and content_length.isdigit():
+        if int(content_length) > max_size:
+            raise HTTPException(status_code=413, detail="File too large")
+
+    dest_path = get_new_file_path()
+    try:
+        size = 0
+        async with await anyio.open_file(dest_path, "wb") as temp_file:
+            async for chunk in request.stream():
+                size += len(chunk)
+                if max_size is not None and size > max_size:
+                    raise HTTPException(status_code=413, detail="File too large")
+                await temp_file.write(chunk)
+    except BaseException:
+        # e.g. the client disconnected
+        if os.path.exists(dest_path):
+            os.remove(dest_path)
+        raise
+    return dest_path
+
+
 @router.post(
     "/files",
     tags=["files"],
@@ -180,16 +209,7 @@ async def post_files(
     """
     Processes the file into chunks and stores them in the vector store.
     """
-    if file_name is None:
-        raise ValueError("File name is not defined")
-    if file_mime_type is None:
-        raise ValueError("content_type is not defined")
-
-    dest_path = get_new_file_path(file_id)
-    async with await anyio.open_file(dest_path, "wb") as temp_file:
-        async for chunk in request.stream():
-            await temp_file.write(chunk)
-
+    dest_path = await save_upload(request, config)
     q = SourceFile(id=file_id, path=dest_path, file_name=unquote(file_name), mime_type=file_mime_type)
     try:
         files_added_to_queue.inc()
@@ -233,19 +253,8 @@ async def post_files_only_processing(
 
     In contrast to the POST /files endpoint, this one does not store the chunks in the vectorstore
     """
-    if file_name is None:
-        raise ValueError("File name is not defined")
-    if file_mime_type is None:
-        raise ValueError("content_type is not defined")
-
-    file_id = str(uuid.uuid4())
-
-    dest_path = get_new_file_path(file_id)
-    async with await anyio.open_file(dest_path, "wb") as temp_file:
-        async for chunk in request.stream():
-            await temp_file.write(chunk)
-
-    q = SourceFile(id=file_id, path=dest_path, file_name=unquote(file_name), mime_type=file_mime_type)
+    dest_path = await save_upload(request, config)
+    q = SourceFile(path=dest_path, file_name=unquote(file_name), mime_type=file_mime_type)
     try:
         result = await wrap_future(request.app.state.executor.submit(store_service.process_file, config, q, chunk_size))
     except Exception as e:
