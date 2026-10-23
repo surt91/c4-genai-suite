@@ -12,6 +12,8 @@ import { DataSource } from 'typeorm';
 import { AppModule } from '../app.module';
 import { SendMessage } from '../domain/chat';
 import {
+  BlobCategory,
+  BlobEntity,
   BucketEntity,
   BUILTIN_USER_GROUP_ADMIN,
   BUILTIN_USER_GROUP_DEFAULT,
@@ -165,6 +167,21 @@ describe('Authorization', () => {
 
     const wildcard = await asAdmin(http().get('/users?query=%25')).expect(200);
     expect((wildcard.body as Users).items).toEqual([]);
+  });
+
+  it('serves only generated images by blob id, not file contents', async () => {
+    const blobs = dataSource.getRepository(BlobEntity);
+    const image = await blobs.save({ id: randomUUID(), type: 'image/png', buffer: 'eA==', category: BlobCategory.LLM_IMAGE });
+    const original = await blobs.save({
+      id: randomUUID(),
+      type: 'text/html',
+      buffer: 'eA==',
+      category: BlobCategory.FILE_ORIGINAL,
+    });
+
+    const response = await asUser(http().get(`/blobs/${image.id}`)).expect(200);
+    expect(response.headers['x-content-type-options']).toBe('nosniff');
+    await asUser(http().get(`/blobs/${original.id}`)).expect(404);
   });
 
   it('answers non-numeric ids with 400 instead of a database error', async () => {

@@ -1,6 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BlobEntity, BlobRepository } from 'src/domain/database';
+import { In } from 'typeorm';
+import { BlobCategory, BlobEntity, BlobRepository } from 'src/domain/database';
 
 export class GetBlob {
   constructor(public readonly id: string) {}
@@ -20,7 +21,9 @@ export class GetBlobHandler implements IQueryHandler<GetBlob, GetBlobResponse> {
   async execute(request: GetBlob): Promise<GetBlobResponse> {
     const { id } = request;
 
-    const entity = await this.blobs.findOneBy({ id });
+    // Only generated images and logos are public by id; file contents (original/processed) are only accessible
+    // through the (user scoped) file endpoints.
+    const entity = await this.blobs.findOneBy({ id, category: In([BlobCategory.LLM_IMAGE, BlobCategory.LOGO]) });
 
     if (!entity) {
       return new GetBlobResponse();
