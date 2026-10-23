@@ -259,22 +259,38 @@ export class ConversationsController {
       response.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
+    // The client closed the connection (e.g. pressed stop) before the answer was complete. Note: `req` 'close' is
+    // emitted as soon as the request body has been read, so it cannot be used to detect disconnects.
+    let cancel: (() => void) | undefined;
+    let closed = false;
+    response.on('close', () => {
+      closed = true;
+      if (!response.writableFinished) {
+        cancel?.();
+      }
+    });
+
     try {
       const { stream, abort } = await getStream();
       const subscription = stream.subscribe({
         next: (event) => sendEvent('message', event),
-        error: (err: Error) => sendEvent('error', err),
+        error: (err: unknown) => {
+          sendEvent('error', toStreamError(err));
+          response.end();
+        },
         complete: () => response.end(),
       });
 
-      req.on('close', () => {
+      cancel = () => {
         subscription.unsubscribe();
-        response.end();
         abort.abort('cancelled');
-      });
+      };
+      if (closed) {
+        cancel();
+      }
     } catch (err) {
       this.logger.error('Error during message processing', err);
-      sendEvent('error', err as Error);
+      sendEvent('error', toStreamError(err));
       response.end();
     }
   }
@@ -381,4 +397,12 @@ export class ConversationsController {
   confirm(@Param('id') id: string, @Body() result: ChatUICallbackResultDto) {
     this.callbacks.complete(id, result);
   }
+}
+
+/** Errors are no plain objects (`message` is not enumerable), so they must be converted before they are serialized. */
+function toStreamError(err: unknown): object {
+  if (err instanceof Error) {
+    return { type: 'error', message: err.message };
+  }
+  return typeof err === 'object' && err !== null ? err : { type: 'error', message: String(err) };
 }
