@@ -6,6 +6,14 @@ import { AuthService } from 'src/domain/auth/auth.service';
 import { isString } from 'src/lib';
 import { AuthSettingsDto, LoginDto, ProfileDto } from './dtos';
 
+/**
+ * Only same-origin absolute paths are allowed. `//host` and `/\host` are protocol-relative URLs that browsers
+ * resolve to another origin, which would turn the post-login redirect into an open redirect.
+ */
+export function isSafeRedirectPath(redirect: unknown): redirect is string {
+  return isString(redirect) && /^\/(?![/\\])/.test(redirect) && !/[\r\n\t]/.test(redirect);
+}
+
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -111,7 +119,7 @@ export class AuthController {
 
   private redirectToApplication(req: Request, res: Response) {
     const redirect = req.cookies['post-login-redirect'] as string | undefined;
-    if (isString(redirect) && redirect.startsWith('/')) {
+    if (isSafeRedirectPath(redirect)) {
       const secure = this.authService.config.baseUrl.startsWith('https');
       const sameSite = secure ? 'none' : 'strict';
       res.clearCookie('post-login-redirect', { path: '/', secure, sameSite });
