@@ -10,7 +10,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { QACatalogVersionHistoryItem, QAPair } from 'src/api/generated-eval';
 import { QACatalogStatus } from 'src/api/generated-eval';
@@ -45,6 +45,12 @@ export function QaCatalogDetailPage() {
     hasPendingChanges,
     getPendingChangeCounts,
   } = useQaCatalogsStore();
+
+  // The pending changes belong to this catalog (version): forget changes of another one and when leaving the page.
+  useEffect(() => {
+    clearPendingChanges();
+    return () => clearPendingChanges();
+  }, [catalogId, clearPendingChanges]);
 
   const [page, setPage] = useState(0);
   const [editingPair, setEditingPair] = useState<QAPair | null>(null);
@@ -81,6 +87,16 @@ export function QaCatalogDetailPage() {
     queryFn: () => evalApi.qaCatalog.qaCatalogGetCatalogQaPairs(catalogId!, page * PAGE_SIZE, PAGE_SIZE),
     enabled: !!catalogId,
   });
+
+  // The pairs are loaded once the generation is finished (only the catalog is polled while it is generated).
+  const catalogStatus = catalog?.status;
+  const previousStatus = useRef(catalogStatus);
+  useEffect(() => {
+    if (previousStatus.current === QACatalogStatus.Generating && catalogStatus !== QACatalogStatus.Generating) {
+      void queryClient.invalidateQueries({ queryKey: ['qaPairs', catalogId] });
+    }
+    previousStatus.current = catalogStatus;
+  }, [catalogStatus, catalogId, queryClient]);
 
   // Fetch version history
   const { data: historyData } = useQuery({
@@ -143,7 +159,7 @@ export function QaCatalogDetailPage() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingChanges is needed to trigger recomputation; getEffectiveQaPairs uses get() internally
   const effectivePairs = useMemo(() => getEffectiveQaPairs(pairsData ?? []), [getEffectiveQaPairs, pairsData, pendingChanges]);
-  const pendingCounts = useMemo(() => getPendingChangeCounts(), [getPendingChangeCounts]);
+  const pendingCounts = getPendingChangeCounts();
   const hasChanges = hasPendingChanges();
 
   const handleVersionChange = useEventCallback((value: string | null) => {
@@ -212,6 +228,8 @@ export function QaCatalogDetailPage() {
   });
 
   const handleUploadSuccess = useEventCallback(() => {
+    // the upload replaces the pairs, the pending changes refer to the old ones
+    clearPendingChanges();
     void refetchCatalog();
     void refetchPairs();
     void queryClient.invalidateQueries({ queryKey: ['qaCatalogHistory', catalogId] });

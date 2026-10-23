@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 import { useEvalAvailability } from 'src/api/state/useEvalAvailability';
 import { CollapseButton, ProfileButton, TransientNavigate, TransientNavLink } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
+import { RemountOnParam } from 'src/components/RemountOnParam';
 import { useTheme } from 'src/hooks';
 import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../chat/state/chat';
@@ -142,11 +143,32 @@ export function AdminPage() {
             {isEvalAvailable && (
               <>
                 <Route path="/evals/evaluations" element={<EvaluationsPage />} />
-                <Route path="/evals/evaluations/:id" element={<EvaluationDetailPage />} />
+                <Route
+                  path="/evals/evaluations/:id"
+                  element={
+                    <RemountOnParam param="id">
+                      <EvaluationDetailPage />
+                    </RemountOnParam>
+                  }
+                />
                 <Route path="/evals/qa-catalogs" element={<QaCatalogsPage />} />
-                <Route path="/evals/qa-catalogs/:catalogId" element={<QaCatalogDetailPage />} />
+                <Route
+                  path="/evals/qa-catalogs/:catalogId"
+                  element={
+                    <RemountOnParam param="catalogId">
+                      <QaCatalogDetailPage />
+                    </RemountOnParam>
+                  }
+                />
                 <Route path="/evals/metrics" element={<MetricsPage />} />
-                <Route path="/evals/metrics/:metricId" element={<MetricDetailPage />} />
+                <Route
+                  path="/evals/metrics/:metricId"
+                  element={
+                    <RemountOnParam param="metricId">
+                      <MetricDetailPage />
+                    </RemountOnParam>
+                  }
+                />
                 <Route path="/evals/llm-endpoints" element={<LlmEndpointsPage />} />
               </>
             )}
