@@ -333,7 +333,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
       const changed = values.endpoint !== state?.endpoint;
 
       if (changed || !state.tools || forceRebuild) {
-        const { tools } = await this.getTools(values);
+        const tools = await this.listTools(values);
         this.resetUnmodifiedDescriptionNames(values.schema, tools);
         if (state.tools) {
           this.resetUnmodifiedDescriptionNames(values.schema, state.tools);
@@ -371,12 +371,17 @@ export class MCPToolsExtension implements Extension<Configuration> {
   }
 
   async getDocument(configuration: Configuration, documentUri: string, _user: User) {
-    const { client } = (await this.getTools(configuration)) ?? [];
     const req: ReadResourceRequest = {
       method: 'resources/read',
       params: { uri: documentUri },
     };
-    const res = await client.request(req, ReadResourceResultSchema);
+    const { client } = await this.getTools(configuration);
+    let res;
+    try {
+      res = await client.request(req, ReadResourceResultSchema);
+    } finally {
+      await this.closeClient(client);
+    }
     const content = res.contents[0];
 
     if (!('blob' in content)) {
@@ -396,7 +401,22 @@ export class MCPToolsExtension implements Extension<Configuration> {
   }
 
   async test(configuration: Configuration) {
-    return this.getTools(configuration);
+    return this.listTools(configuration);
+  }
+
+  /** Lists the tools with a short-lived connection. */
+  private async listTools(configuration: Configuration) {
+    const { tools, client } = await this.getTools(configuration);
+    await this.closeClient(client);
+    return tools;
+  }
+
+  private async closeClient(client: Client) {
+    try {
+      await client.close();
+    } catch (err) {
+      this.logger.warn('Failed to close the MCP client', err);
+    }
   }
 
   private resetUnmodifiedDescriptionNames(schema: Configuration['schema'], tools: ListToolsResult['tools']) {
@@ -475,7 +495,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
   ): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, _: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const { tools, client } = (await this.getTools(extension.values)) ?? [];
+        const { tools, client } = await this.getTools(extension.values);
         this.enableElicitRequests(client, context);
         const schemaData = extension.values.schema ?? {};
 
@@ -528,7 +548,13 @@ export class MCPToolsExtension implements Extension<Configuration> {
             });
           }),
         );
-        return next(context);
+
+        try {
+          return await next(context);
+        } finally {
+          // The tools are only used within this request; keep no connection open (SSE connections are long-lived).
+          await this.closeClient(client);
+        }
       },
     };
 
@@ -573,8 +599,13 @@ export class MCPToolsExtension implements Extension<Configuration> {
         : new SSEClientTransport(new URL(url), {
             requestInit: { headers },
           });
-    await client.connect(transport);
-    const { tools } = await client.request({ method: 'tools/list' }, ListToolsResultSchema);
-    return { tools, client };
+    try {
+      await client.connect(transport);
+      const { tools } = await client.request({ method: 'tools/list' }, ListToolsResultSchema);
+      return { tools, client };
+    } catch (err) {
+      await this.closeClient(client);
+      throw err;
+    }
   }
 }
