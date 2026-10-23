@@ -90,3 +90,47 @@ Fix: fall back to the document itself; use `.get("format")`.
 | P3-14 | Azure delete fetches chunk ids with one search; relies on SDK paging beyond 50 hits – unconfirmed | `azure_ai_search.py:206` | Verify against a real service |
 
 ## Status
+
+Every fixed bug has a regression test. The test suite grew from 88 to 153 tests.
+
+| ID | Status | Commit |
+|----|--------|--------|
+| P1-1 | Fixed (WeasyPrint only allows `data:` URLs) | `697b4b2` |
+| P1-2 | Fixed (`run_in_process` polls and fails when the child exits without result; helpers merged) | `25e65aa` |
+| P1-3 | Fixed (the child hands the preview to the parent, which reuses it; output dir removed on failure in `b307989`) | `25e65aa` |
+| P1-4 | Fixed (file stores return a stream, `GET /documents/pdf` streams it) | `e247f96` |
+| P1-5 | Fixed | `7219e0a` |
+| P2-1 | Fixed (also `get_documents` is a plain filter query now, part of P3-4) | `21f4671` |
+| P2-2 | Fixed (random temp names, direct-child check) | `5047dc4` |
+| P2-3 | Fixed | `5047dc4` |
+| P2-4 | Fixed (`delete` idempotent, `open_document` returns `None` → 404; filesystem ids with path components are rejected) | `e247f96` |
+| P2-5 | Fixed (existing chunks deleted before adding, rollback on failure). The backend side (missing `indexName`) stays with backend review P2-20 | `cfadf92` |
+| P2-6 | Fixed | `8591bd7` |
+| P2-7 | Fixed (adapters cached per config, `head_bucket` before `create_bucket`) | `9801e81` |
+| P2-8 | Fixed (LibreOffice 10 min, ffprobe 1 min, ffmpeg 1 h; process group killed) | `b307989` |
+| P2-9 | Fixed | `3b3107e` |
+| P2-10 | Fixed | `d1debde` |
+| P2-11 | Fixed (module and `mcp` dependency removed, nine transitive packages less) | `e6fe6ab` |
+| P3-1 | Fixed | `d1debde` |
+| P3-2 | Fixed (transcription cached on the `SourceFile`) | `329325f` |
+| P3-3 | Fixed | `71496b3` |
+| P3-4 | Fixed (known indexes remembered; `get_documents` in `21f4671`) | `107e415` |
+| P3-5 | Fixed: `previewable` (`329325f`), `DevNullFileStoreAdapter` (`e247f96`), header `None` checks (`5047dc4`), double `get_file_store` (`cfadf92`), video double extraction (`d1debde`), DTOs and provider registry (`2eb4edb`) | |
+| P3-6 | Messages fixed (also wrong variable names in the nvidia/openai-compatible checks). Validating the default index names is deferred: pgvector accepts names the Azure rules reject, so it could break existing deployments at startup | `136c611` |
+| P3-7 | Fixed (spec: `take` has `exclusiveMinimum: 0`; the generated backend client is unchanged) | `4712bbe` |
+| P3-8 | Fixed | `611f5c3` |
+| P3-9 | Fixed: optional `MAX_FILE_SIZE` (default unlimited, as before) | `5047dc4` |
+| P3-10 | Deferred: touches all providers for little gain; better done together with a decision on P3-11 | |
+| P3-11 | Deferred: changes what is indexed for existing HTML/e-mail uploads; needs a product decision (and re-indexing) | |
+| P3-12 | Fixed for PDFs (`9ce7f24`) and the filesystem store (`e247f96`); text formats still read the file at once (they are split in memory anyway) | |
+| P3-13 | Deferred: architectural (shared secret between backend and REI-S, network policy in the helm chart) | |
+| P3-14 | Deferred: unconfirmed, needs a real Azure AI Search service | |
+
+Behavior changes worth knowing:
+- `POST /files` with an existing id replaces the document (was: appended a second set of chunks).
+- `DELETE /files/{id}` succeeds when no pdf preview exists (was 404 for S3, 500 for the filesystem store);
+  `GET /documents/pdf` answers 404 for missing documents with the filesystem store (was 500).
+- `GET /files` with `take <= 0` answers 422 (was 500).
+- Error details of failed audio/video uploads no longer contain the ffmpeg output.
+- New optional setting `MAX_FILE_SIZE` (413 when exceeded).
+- Text files in Windows-1252 or with BOM are accepted (were 400).
