@@ -123,6 +123,12 @@ export class ProfileDto {
   })
   isAdmin!: boolean;
 
+  @ApiProperty({
+    description: 'Indicates if the user has a password (can log in and change the password locally).',
+    required: false,
+  })
+  hasPassword?: boolean;
+
   static fromDomain(source: User) {
     const result = new ProfileDto();
     result.id = source.id;
@@ -130,6 +136,8 @@ export class ProfileDto {
     result.isAdmin = Array.isArray(source.userGroupIds) && source.userGroupIds.includes(BUILTIN_USER_GROUP_ADMIN);
     result.name = source.name ?? source.email;
     result.picture = source.picture;
+    // the session contains the entity (with the hash) after a password login, otherwise the domain user
+    result.hasPassword = !!source.hasPassword || !!(source as { passwordHash?: string }).passwordHash;
 
     return result;
   }

@@ -434,6 +434,18 @@ export const en = {
     },
   },
   chat: {
+    chatSettings: {
+      title: 'Chat settings',
+      open: 'Chat settings',
+      assistant: 'Assistant',
+      assistantSettings: 'Settings of the assistant',
+      filters: 'Filters and options',
+      apply: 'Apply',
+      resetAll: 'Reset all',
+      saved: 'Settings applied',
+      saveFailed: 'Failed to save the settings',
+      chipLabel: '{{label}} (open chat settings)',
+    },
     conversationDeleted: 'Chat "{{name}}" deleted',
     conversationDeletedUnnamed: 'Chat deleted',
     undo: 'Undo',
@@ -646,6 +658,8 @@ export const en = {
     duplicateConversationSuccess: 'Conversation duplicated successfully',
     duplicateConversationFailed: 'Failed to duplicate conversation',
     settings: {
+      readOnlyHint: 'These values are provided by your identity provider and cannot be changed here.',
+      language: 'Language',
       currentPassword: 'Current Password',
       personalInformation: 'Personal Information',
       security: 'Security',

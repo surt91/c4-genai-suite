@@ -462,6 +462,18 @@ function load() {
       },
     },
     chat: {
+      chatSettings: {
+        title: translate('chat.chatSettings.title'),
+        open: translate('chat.chatSettings.open'),
+        assistant: translate('chat.chatSettings.assistant'),
+        assistantSettings: translate('chat.chatSettings.assistantSettings'),
+        filters: translate('chat.chatSettings.filters'),
+        apply: translate('chat.chatSettings.apply'),
+        resetAll: translate('chat.chatSettings.resetAll'),
+        saved: translate('chat.chatSettings.saved'),
+        saveFailed: translate('chat.chatSettings.saveFailed'),
+        chipLabel: (label: string | number) => translate('chat.chatSettings.chipLabel', { label }),
+      },
       conversationDeleted: (name: string | number) => translate('chat.conversationDeleted', { name }),
       conversationDeletedUnnamed: translate('chat.conversationDeletedUnnamed'),
       undo: translate('chat.undo'),
@@ -674,6 +686,8 @@ function load() {
       duplicateConversationSuccess: translate('chat.duplicateConversationSuccess'),
       duplicateConversationFailed: translate('chat.duplicateConversationFailed'),
       settings: {
+        readOnlyHint: translate('chat.settings.readOnlyHint'),
+        language: translate('chat.settings.language'),
         currentPassword: translate('chat.settings.currentPassword'),
         personalInformation: translate('chat.settings.personalInformation'),
         security: translate('chat.settings.security'),

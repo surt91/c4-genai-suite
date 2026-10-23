@@ -21,7 +21,6 @@ import { useChatDropzone } from '../useChatDropzone';
 import { ChatHistory } from './ChatHistory';
 import { ChatInput } from './ChatInput';
 import { ChatRating } from './ChatRating';
-import { Configuration } from './Configuration';
 import classes from './ConversationPage.module.css';
 import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 
@@ -100,9 +99,6 @@ export function ConversationPage(props: ConversationPageProps) {
       <VisuallyHidden aria-live="polite" role="status" data-testid="chat-live-region">
         {liveStatus}
       </VisuallyHidden>
-      <div className={classes.configuration}>
-        <Configuration canEditConfiguration={true} />
-      </div>
       {isChatLoading ? (
         <div className={clsx('fade-in', classes.loading)} />
       ) : (

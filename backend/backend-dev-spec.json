@@ -2636,6 +2636,10 @@
           "isAdmin": {
             "type": "boolean",
             "description": "Indicates if the user is an admin."
+          },
+          "hasPassword": {
+            "type": "boolean",
+            "description": "Indicates if the user has a password (can log in and change the password locally)."
           }
         },
         "required": ["id", "name", "email", "isAdmin"]

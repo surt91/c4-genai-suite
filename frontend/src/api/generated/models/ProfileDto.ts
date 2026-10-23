@@ -50,6 +50,12 @@ export interface ProfileDto {
      * @memberof ProfileDto
      */
     isAdmin: boolean;
+    /**
+     * Indicates if the user has a password (can log in and change the password locally).
+     * @type {boolean}
+     * @memberof ProfileDto
+     */
+    hasPassword?: boolean;
 }
 
 /**
@@ -78,6 +84,7 @@ export function ProfileDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'email': json['email'],
         'picture': json['picture'] == null ? undefined : json['picture'],
         'isAdmin': json['isAdmin'],
+        'hasPassword': json['hasPassword'] == null ? undefined : json['hasPassword'],
     };
 }
 
@@ -92,6 +99,7 @@ export function ProfileDtoToJSON(value?: ProfileDto | null): any {
         'email': value['email'],
         'picture': value['picture'],
         'isAdmin': value['isAdmin'],
+        'hasPassword': value['hasPassword'],
     };
 }
 

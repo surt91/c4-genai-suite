@@ -50,7 +50,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
           </Menu.Item>
         )}
 
-        {section === 'chat' && authSettings?.enablePasswordAuth && (
+        {section === 'chat' && (
           <Menu.Item leftSection={<IconSettings size={14} />} onClick={() => setIsUserModalOpen(true)}>
             {texts.common.settings}
           </Menu.Item>
@@ -82,7 +82,11 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
         </Menu.Item>
       </Menu.Dropdown>
 
-      <UserProfileModal isOpen={isUserModalOpen} onClose={() => setIsUserModalOpen(false)} />
+      <UserProfileModal
+        isOpen={isUserModalOpen}
+        onClose={() => setIsUserModalOpen(false)}
+        canChangePassword={!!authSettings?.enablePasswordAuth && !!profile.hasPassword}
+      />
     </Menu>
   );
 };

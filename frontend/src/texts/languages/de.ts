@@ -427,6 +427,18 @@ export const de: typeof en = {
     },
   },
   chat: {
+    chatSettings: {
+      title: 'Chat-Einstellungen',
+      open: 'Chat-Einstellungen',
+      assistant: 'Assistent',
+      assistantSettings: 'Einstellungen des Assistenten',
+      filters: 'Filter und Optionen',
+      apply: 'Übernehmen',
+      resetAll: 'Alle zurücksetzen',
+      saved: 'Einstellungen übernommen',
+      saveFailed: 'Die Einstellungen konnten nicht gespeichert werden',
+      chipLabel: '{{label}} (Chat-Einstellungen öffnen)',
+    },
     conversationDeleted: 'Chat „{{name}}“ gelöscht',
     conversationDeletedUnnamed: 'Chat gelöscht',
     undo: 'Rückgängig',
@@ -641,6 +653,8 @@ export const de: typeof en = {
     duplicateConversationSuccess: 'Konversation erfolgreich dupliziert',
     duplicateConversationFailed: 'Duplizieren der Konversation fehlgeschlagen',
     settings: {
+      readOnlyHint: 'Diese Angaben stammen von deinem Identitätsanbieter und können hier nicht geändert werden.',
+      language: 'Sprache',
       currentPassword: 'Aktuelles Passwort',
       personalInformation: 'Persönliche Informationen',
       security: 'Sicherheit',

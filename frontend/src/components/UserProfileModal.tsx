@@ -1,4 +1,4 @@
-import { Button, PasswordInput, Tabs } from '@mantine/core';
+import { Button, PasswordInput, Tabs, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconLock, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -26,9 +26,15 @@ const PASSWORD_CHANGE_SCHEMA = z
 interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // Only users with a local login (password) can change their password.
+  canChangePassword: boolean;
 }
 
-export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
+/**
+ * The profile of the user, available for all users. The personal data comes from the identity provider (read-only),
+ * the password can only be changed with a local login.
+ */
+export function UserProfileModal({ isOpen, onClose, canChangePassword }: UserProfileModalProps) {
   const profile = useProfile();
   const api = useApi();
   const queryClient = useQueryClient();
@@ -70,6 +76,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   return (
     <Modal
+      withinPortal
       size="xl"
       header={<div className={classes.header}>{texts.chat.settings.header}</div>}
       onClose={() => {
@@ -99,9 +106,11 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               <Tabs.Tab value="personal" leftSection={<IconUser size={16} />}>
                 {texts.chat.settings.personalInformation}
               </Tabs.Tab>
-              <Tabs.Tab value="security" leftSection={<IconLock size={16} />}>
-                {texts.chat.settings.security}
-              </Tabs.Tab>
+              {canChangePassword && (
+                <Tabs.Tab value="security" leftSection={<IconLock size={16} />}>
+                  {texts.chat.settings.security}
+                </Tabs.Tab>
+              )}
             </Tabs.List>
           </Tabs>
         </div>
@@ -111,18 +120,17 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             <div>
               <h3 className={classes.title}>{texts.chat.settings.personalInformation}</h3>
               <div className={classes.fields}>
-                <div>
-                  <label className={classes.label}>{texts.common.name}</label>
-                  <p className={classes.value}>{profile.name}</p>
-                </div>
-                <div>
-                  <label className={classes.label}>{texts.common.email}</label>
-                  <p className={classes.value}>{profile.email}</p>
-                </div>
+                <TextInput label={texts.common.name} value={profile.name} readOnly />
+                <TextInput label={texts.common.email} value={profile.email} readOnly />
+                {!canChangePassword && (
+                  <Text size="xs" c="dimmed">
+                    {texts.chat.settings.readOnlyHint}
+                  </Text>
+                )}
               </div>
             </div>
           )}
-          {activeTab === 'security' && (
+          {activeTab === 'security' && canChangePassword && (
             <div>
               <h3 className={classes.title}>{texts.chat.settings.security}</h3>
               <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)} className={classes.fields}>

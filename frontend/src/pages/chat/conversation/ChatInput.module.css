@@ -16,17 +16,8 @@
   gap: 0.5rem;
 }
 
-.filterChip {
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--mantine-color-gray-1);
-  font-family: var(--mantine-font-family-monospace);
-  font-size: 0.7rem;
-  cursor: pointer;
-}
-
-.filterChip:hover {
-  opacity: 0.6;
+.context {
+  margin-bottom: 0.5rem;
 }
 
 .inputBox {

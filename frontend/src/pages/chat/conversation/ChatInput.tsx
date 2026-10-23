@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Portal, Tooltip } from '@mantine/core';
-import { IconArrowUp, IconFilter, IconPaperclip, IconPlayerStopFilled } from '@tabler/icons-react';
+import { ActionIcon, Button, Group, Tooltip } from '@mantine/core';
+import { IconArrowUp, IconPaperclip, IconPlayerStopFilled } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -10,7 +10,6 @@ import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, us
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { useTranscribe } from 'src/hooks/useTranscribe';
 import { FileItemComponent } from 'src/pages/chat/conversation/FileItem';
-import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { MyFilesButton } from 'src/pages/chat/files/MyFilesButton';
@@ -19,6 +18,7 @@ import { texts } from 'src/texts';
 import { closeInspectorIfOpen } from '../state/inspector';
 import { useChatDropzone } from '../useChatDropzone';
 import classes from './ChatInput.module.css';
+import { ChatSettings } from './ChatSettings';
 import { Suggestions } from './Suggestions';
 import {
   getDefault,
@@ -101,21 +101,19 @@ export function ChatInput({
 
   const { theme } = useTheme();
   const [input, setInput] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     textareaRef?.current?.focus();
   }, [chatId, textareaRef]);
 
   const contextWithDefaults = context ?? defaultValues;
-  const extensionFilterChips = extensionsWithFilter.map((extension) => ({
-    extension: extension,
-    filterChips: contextWithDefaults[extension.id]
+  const settingsChips = extensionsWithFilter.flatMap((extension) =>
+    contextWithDefaults[extension.id]
       ? Object.entries(contextWithDefaults[extension.id] ?? {})
           .filter(valueIsDefined)
           .map(([key, value]) => `${extension?.userArguments[key]?.title}: ${valueToString(value)}`)
       : [],
-  }));
+  );
 
   const doSetInput = useEventCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -170,7 +168,6 @@ export function ChatInput({
 
   const doUpdate = (newContext: ExtensionContext) => {
     updateContext(newContext);
-    setShowFilter(false);
   };
 
   const handleUploadFileFromInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -272,22 +269,27 @@ export function ChatInput({
           ))}
         </div>
 
-        {extensionFilterChips.map(
-          (x, index) =>
-            x.filterChips?.length > 0 && (
-              <div key={index}>
-                <div className={classes.wrap}>
-                  {x.filterChips.map((item) => (
-                    <div className={classes.filterChip} onClick={() => setShowFilter(true)} key={item}>
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ),
-        )}
         <form onSubmit={doSubmit}>
           <div className={classes.inputBox}>
+            <Group gap={6} className={classes.context} data-testid="composer-context">
+              <ChatSettings
+                chatId={chatId}
+                configuration={configuration}
+                extensionsWithFilter={extensionsWithFilter}
+                context={context}
+                defaultValues={defaultValues}
+                onUpdateContext={doUpdate}
+                chips={settingsChips}
+              />
+              {personalBucket && configuration && (
+                <MyFilesButton
+                  conversationId={chatId}
+                  configurationId={configuration.id}
+                  userBucket={personalBucket}
+                  selectedFiles={chatFiles.filter((file) => file.bucketType === 'user')}
+                />
+              )}
+            </Group>
             <TextareaAutosize
               className={classes.textarea}
               maxRows={15}
@@ -302,14 +304,6 @@ export function ChatInput({
             />
             <div className={classes.toolbar}>
               <div className={classes.actions}>
-                {personalBucket && configuration && (
-                  <MyFilesButton
-                    conversationId={chatId}
-                    configurationId={configuration.id}
-                    userBucket={personalBucket}
-                    selectedFiles={chatFiles.filter((file) => file.bucketType === 'user')}
-                  />
-                )}
                 {userBucket?.extensions && userBucket.extensions.length > 0 && (
                   <>
                     <input
@@ -342,16 +336,6 @@ export function ChatInput({
                       </Tooltip>
                     </label>
                   </>
-                )}
-                {configuration?.extensions?.some(isExtensionWithUserArgs) && (
-                  <Button
-                    leftSection={<IconFilter size={16} />}
-                    variant="outline"
-                    type="button"
-                    onClick={() => setShowFilter(true)}
-                  >
-                    {texts.chat.filters}
-                  </Button>
                 )}
               </div>
               <div className={classes.submitActions}>
@@ -398,17 +382,6 @@ export function ChatInput({
 
         {footer && <Markdown className={classes.footer}>{footer}</Markdown>}
       </div>
-      {showFilter && (
-        <Portal>
-          <FilterModal
-            onClose={() => setShowFilter(false)}
-            extensions={extensionsWithFilter}
-            onSubmit={doUpdate}
-            values={context}
-            defaultValues={defaultValues}
-          />
-        </Portal>
-      )}
     </>
   );
 }
