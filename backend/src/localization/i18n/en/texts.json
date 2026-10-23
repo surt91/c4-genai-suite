@@ -136,11 +136,6 @@
       "freshness": "Freshness",
       "freshnessHint": "Filters search results by when they were discovered. pd: last 24 hours, pw: last 7 days, pm: last 31 days, py: last 365 days. Custom date range also supported (YYYY-MM-DDtoYYYY-MM-DD)."
     },
-    "duckduckgo": {
-      "title": "Duckduckgo Web Search",
-      "description": "Performs a web search using Duckduckgo",
-      "maxResults": "Number of search results"
-    },
     "azureDalle": {
       "title": "Azure Dall-E",
       "description": "Generates images with the Azure DALL-E image generator."
