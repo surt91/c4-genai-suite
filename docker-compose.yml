@@ -40,11 +40,13 @@ services:
 
   backend:
     image: ghcr.io/surt91/gaible/backend:${GAIBLE_TAG:-latest}
-    build: backend
+    build:
+      context: backend
+      args:
+        VERSION: ${VERSION:-dev}
     environment:
       BASE_URL: http://localhost:${FRONTEND_PORT:-3333}
       NODE_ENV: ${NODE_ENV:-production}
-      VERSION: ${VERSION:-dev}
       DB_URL: postgres://admin:secret@postgres:5432/gaible
       SESSION_SECRET: ${SESSION_SECRET:-random}
       AUTH_ENABLE_PASSWORD: "true"
