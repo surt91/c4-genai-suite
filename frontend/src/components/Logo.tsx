@@ -38,7 +38,10 @@ export function Logo(props: LogoProps) {
       return;
     }
 
-    setPath(window.URL.createObjectURL(previewLogo));
+    const objectUrl = window.URL.createObjectURL(previewLogo);
+    setPath(objectUrl);
+    // every new preview creates a new URL, which keeps the file in memory until it is revoked
+    return () => window.URL.revokeObjectURL(objectUrl);
   }, [url, previewLogo]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
