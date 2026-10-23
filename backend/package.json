@@ -17,7 +17,6 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "vitest run",
-    "test:cov": "vitest run --coverage",
     "generate-openapi-dev": "npm run build && node dist/openapi.js -- localFile && node dev/split-openapi.mjs backend-dev-spec.json backend-external-spec.json && npx prettier --write backend-*-spec.json",
     "generate-base": "npx @openapitools/openapi-generator-cli generate -g typescript-fetch --additional-properties=useSingleRequestParameter=false,ensureUniqueParams=false,importFileExtension=.js",
     "generate-reis": "node -e \"fs.rmSync('./src/domain/files/use-cases/generated', { recursive: true, force: true })\" && npm run generate-base -- -i ../services/reis/reis-dev-spec.json -o ./src/domain/files/use-cases/generated",
