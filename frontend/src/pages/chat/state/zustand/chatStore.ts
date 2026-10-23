@@ -1,6 +1,14 @@
-import { Observable, Subscription } from 'rxjs';
 import { create } from 'zustand';
-import { AppClient, ConversationDto, FileDto, MessageDto, SourceDto, StreamEventDto } from 'src/api';
+import {
+  AppClient,
+  ConversationDto,
+  FileDto,
+  MessageDto,
+  SourceDto,
+  StreamEventDto,
+  StreamObserver,
+  StreamSubscription,
+} from 'src/api';
 import { DocumentSource } from '../../SourcesChunkPreview';
 import { ChatMessage } from '../types';
 
@@ -8,7 +16,7 @@ type ChatData = {
   messages: ChatMessage[];
   chat: ConversationDto;
   isAiWriting: boolean;
-  activeStreamSubscription?: Subscription;
+  activeStreamSubscription?: StreamSubscription;
   streamingMessageId?: number;
   hasLoadedFromServer?: boolean;
 };
@@ -38,7 +46,7 @@ type ChatActions = {
   setIsAiWriting: (chatId: number, isAiWriting: boolean) => void;
   setStreamingMessageId: (chatId: number, messageId?: number) => void;
   appendToStreamingMessage: (chatId: number, text: string) => void;
-  setActiveStreamSubscription: (chatId: number, subscription?: Subscription) => void;
+  setActiveStreamSubscription: (chatId: number, subscription?: StreamSubscription) => void;
   cancelActiveStream: (chatId: number) => void;
   getStream: (
     chatId: number,
@@ -46,7 +54,8 @@ type ChatActions = {
     files: FileDto[] | undefined,
     api: AppClient,
     editMessageId: number | undefined,
-  ) => Observable<StreamEventDto>;
+    observer: StreamObserver<StreamEventDto>,
+  ) => StreamSubscription;
 
   updateReasoning: (chatId: number, content: string) => void;
   clearReasoning: (chatId: number) => void;
@@ -89,8 +98,8 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
       set({ currentChatId: chatId });
     },
 
-    getStream: (chatId, query, files, api, editMessageId) => {
-      return api.stream.streamPrompt(chatId, { query, files }, editMessageId);
+    getStream: (chatId, query, files, api, editMessageId, observer) => {
+      return api.stream.streamPrompt(chatId, { query, files }, editMessageId, observer);
     },
 
     setStreamingMessageId: (chatId, messageId) =>

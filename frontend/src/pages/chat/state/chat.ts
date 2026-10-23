@@ -110,7 +110,7 @@ export const useChatStream = (chatId: number) => {
     // Keep track of the actual message ID after it's saved
     let actualAiMessageId = aiMessageId;
 
-    const subscription = chatStore.getStream(chatId, input, files, api, editMessageId).subscribe({
+    const subscription = chatStore.getStream(chatId, input, files, api, editMessageId, {
       next: (msg) => {
         if (msg.type === 'error' || msg.type === 'completed') {
           chatStore.setIsAiWriting(chatId, false);
@@ -168,8 +168,8 @@ export const useChatStream = (chatId: number) => {
             listOfChatsStore.refetch();
         }
       },
-      error: (error: string | Error) => {
-        const message = error instanceof Error ? error.message : error;
+      error: (error) => {
+        const message = error instanceof Error ? error.message : String(error);
         chatStore.updateMessage(chatId, actualAiMessageId, { error: message });
         chatStore.setIsAiWriting(chatId, false);
         chatStore.setStreamingMessageId(chatId, undefined);

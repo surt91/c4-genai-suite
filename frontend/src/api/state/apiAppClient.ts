@@ -1,4 +1,3 @@
-import { Observable, ReplaySubject } from 'rxjs';
 import {
   AuditLogsApi,
   AuthApi,
@@ -66,35 +65,65 @@ export class AppClient {
   }
 }
 
+export interface StreamObserver<T> {
+  next: (value: T) => void;
+  error: (error: unknown) => void;
+  complete: () => void;
+}
+
+export interface StreamSubscription {
+  /** Stops delivering events to the observer. The request itself keeps running, so the server finishes the answer. */
+  unsubscribe: () => void;
+}
+
 class StreamApi {
   constructor(private readonly configuration: Configuration) {}
 
-  streamPrompt(conversationId: number, message: SendMessageDto, messageId?: number): Observable<StreamEventDto> {
-    const replaySubject = new ReplaySubject<StreamEventDto>();
+  streamPrompt(
+    conversationId: number,
+    message: SendMessageDto,
+    messageId: number | undefined,
+    observer: StreamObserver<StreamEventDto>,
+  ): StreamSubscription {
+    let active = true;
 
     const basePath = `${this.configuration.basePath}/api/conversations/${conversationId}`;
     const path = messageId ? `${basePath}/messages/${messageId}/sse` : `${basePath}/messages/sse`;
     const method = messageId ? 'PUT' : 'POST';
 
-    const observable = new Observable<StreamEventDto>((subscriber) => {
-      fetchEventStream(path, {
-        method: method,
-        body: JSON.stringify(message),
-        credentials: 'include',
-        headers: {
-          'Accept-Language': i18next.language,
-          'Content-Type': 'application/json',
-        },
-        onMessage(msg) {
-          const data = JSON.parse(msg.data) as StreamEventDto;
-          subscriber.next(data);
-        },
-      }).then(
-        () => subscriber.complete(),
-        (err) => subscriber.error(err),
-      );
-    });
-    observable.subscribe(replaySubject);
-    return replaySubject;
+    fetchEventStream(path, {
+      method: method,
+      body: JSON.stringify(message),
+      credentials: 'include',
+      headers: {
+        'Accept-Language': i18next.language,
+        'Content-Type': 'application/json',
+      },
+      onMessage(msg) {
+        const data = JSON.parse(msg.data) as StreamEventDto;
+        if (active) {
+          observer.next(data);
+        }
+      },
+    }).then(
+      () => {
+        if (active) {
+          active = false;
+          observer.complete();
+        }
+      },
+      (err) => {
+        if (active) {
+          active = false;
+          observer.error(err);
+        }
+      },
+    );
+
+    return {
+      unsubscribe: () => {
+        active = false;
+      },
+    };
   }
 }
