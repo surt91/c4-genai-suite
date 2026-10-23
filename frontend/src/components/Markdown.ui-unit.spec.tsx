@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react';
-import { screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import { Markdown } from 'src/components/Markdown';
@@ -84,5 +84,37 @@ describe('Markdown component', () => {
     expect(code).toHaveClass('language-unknownlang');
     expect(code).toHaveTextContent('<script>alert(1)</script>');
     expect(code?.querySelector('script')).toBeNull();
+  });
+
+  it.each(['https://example.com/page', 'HTTPS://example.com/page', '//example.com/page', 'mailto:info@example.com'])(
+    'opens the external link %s in a new tab',
+    (href) => {
+      render(
+        <MemoryRouter>
+          <Markdown>{`[Link](${href})`}</Markdown>
+        </MemoryRouter>,
+      );
+
+      const link = screen.getByRole('link', { name: 'Link' });
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    },
+  );
+
+  it('navigates within the application for links to its pages', () => {
+    render(
+      <MemoryRouter initialEntries={['/chat/1']}>
+        <Routes>
+          <Route path="/chat/1" element={<Markdown>{`[Link](${window.location.origin}/chat/2?x=1)`}</Markdown>} />
+          <Route path="/chat/2" element={<div>Other chat</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Link' });
+    expect(link).not.toHaveAttribute('target');
+    fireEvent.click(link);
+
+    expect(screen.getByText('Other chat')).toBeInTheDocument();
   });
 });

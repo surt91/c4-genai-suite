@@ -78,15 +78,26 @@ export function Markdown({ children, animateText, className }: MarkdownProps) {
   );
 }
 
+/** The path of a link to a page of this application, undefined for other origins and protocols (e.g. `mailto:`). */
+function internalPath(href: string) {
+  try {
+    const url = new URL(href, window.location.href);
+    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function LinkRenderer({ href, children }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const navigate = useTransientNavigate();
+  const path = href !== undefined ? internalPath(href) : undefined;
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    if (href !== undefined) {
+    if (path !== undefined) {
       e.preventDefault();
-      navigate(href);
+      navigate(path);
     }
   };
-  if (href !== undefined && (href.startsWith('http') || href.startsWith('mailto'))) {
+  if (href !== undefined && path === undefined) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer">
         <Icon className={classes.externalIcon} icon="external-link" size={12} />
