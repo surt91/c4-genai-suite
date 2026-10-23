@@ -18,7 +18,7 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
         withAsterisk
         label={texts.evals.llmEndpoint.azureEndpointLabel}
         placeholder={texts.evals.llmEndpoint.azureEndpointPlaceholder}
-        className="mb-4"
+        mb={16}
         key={form.key('endpoint')}
         {...form.getInputProps('endpoint')}
       />
@@ -28,7 +28,7 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
         label={texts.evals.llmEndpoint.apiKeyLabel}
         placeholder={isEdit ? UNCHANGED_API_KEY : texts.evals.llmEndpoint.apiKeyPlaceholder}
         description={isEdit ? texts.evals.llmEndpoint.apiKeyUnchanged : undefined}
-        className="mb-4"
+        mb={16}
         key={form.key('apiKey')}
         {...form.getInputProps('apiKey')}
       />
@@ -37,7 +37,7 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
         withAsterisk
         label={texts.evals.llmEndpoint.deploymentLabel}
         placeholder={texts.evals.llmEndpoint.deploymentPlaceholder}
-        className="mb-4"
+        mb={16}
         key={form.key('deployment')}
         {...form.getInputProps('deployment')}
       />
@@ -46,7 +46,7 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
         withAsterisk
         label={texts.evals.llmEndpoint.apiVersionLabel}
         placeholder={texts.evals.llmEndpoint.apiVersionPlaceholder}
-        className="mb-4"
+        mb={16}
         key={form.key('apiVersion')}
         {...form.getInputProps('apiVersion')}
       />
@@ -58,7 +58,7 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
         max={2}
         step={0.1}
         decimalScale={2}
-        className="mb-4"
+        mb={16}
         key={form.key('temperature')}
         {...form.getInputProps('temperature')}
       />
@@ -70,7 +70,7 @@ export function AzureOpenAiEndpointFields({ form, isEdit }: AzureOpenAiEndpointF
           { value: Language.English, label: 'English' },
           { value: Language.German, label: 'German' },
         ]}
-        className="mb-4"
+        mb={16}
         clearable
         key={form.key('language')}
         {...form.getInputProps('language')}

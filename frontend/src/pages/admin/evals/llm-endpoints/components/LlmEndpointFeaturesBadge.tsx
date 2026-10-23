@@ -1,3 +1,4 @@
+import { Badge, Group, Text } from '@mantine/core';
 import { PluginFeature } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
 
@@ -7,17 +8,21 @@ interface LlmEndpointFeaturesBadgeProps {
 
 export function LlmEndpointFeaturesBadge({ features }: LlmEndpointFeaturesBadgeProps) {
   if (!features || features.length === 0) {
-    return <span className="text-gray-400">-</span>;
+    return (
+      <Text span c="gray.6">
+        -
+      </Text>
+    );
   }
 
   return (
-    <div className="flex gap-1.5">
+    <Group gap={6} wrap="nowrap">
       {features.map((feature) => (
-        <span key={feature} className="badge badge-sm badge-outline">
+        <Badge key={feature} component="span" size="sm" variant="outline" color="dark" tt="none">
           {getFeatureLabel(feature)}
-        </span>
+        </Badge>
       ))}
-    </div>
+    </Group>
   );
 }
 

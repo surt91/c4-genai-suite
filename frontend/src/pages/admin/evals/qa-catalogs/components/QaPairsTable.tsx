@@ -1,8 +1,9 @@
-import { Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { IconArrowBackUp, IconEdit, IconTrash } from '@tabler/icons-react';
 import type { QAPair } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
 import type { PendingChange } from '../state';
+import classes from './QaPairsTable.module.css';
 
 interface QaPairsTableProps {
   pairs: (QAPair & { _pendingStatus?: 'added' | 'updated' | 'deleted' })[];
@@ -13,30 +14,6 @@ interface QaPairsTableProps {
 }
 
 export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }: QaPairsTableProps) {
-  const getRowClass = (pair: QAPair & { _pendingStatus?: string }) => {
-    switch (pair._pendingStatus) {
-      case 'added':
-      case 'updated':
-      case 'deleted':
-        return ''; // Will apply border to first cell instead
-      default:
-        return 'hover:bg-gray-50';
-    }
-  };
-
-  const getBorderClass = (pair: QAPair & { _pendingStatus?: string }) => {
-    switch (pair._pendingStatus) {
-      case 'added':
-        return 'border-l-4 border-green-500';
-      case 'updated':
-        return 'border-l-4 border-blue-500';
-      case 'deleted':
-        return 'border-l-4 border-red-500';
-      default:
-        return '';
-    }
-  };
-
   const truncate = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + '...';
@@ -50,73 +27,101 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
   };
 
   return (
-    <table className="w-full table-fixed text-base">
+    <table className={classes.table}>
       <thead>
-        <tr className="border-b-2 border-gray-200">
-          <th className="w-[35%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.question}</th>
-          <th className="w-[35%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.expectedOutput}</th>
-          <th className="w-[15%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.contexts}</th>
-          <th className="w-[15%] px-4 py-4 text-left font-semibold">{texts.evals.qaCatalog.actions}</th>
+        <tr className={classes.headRow}>
+          <th style={{ width: '35%' }}>{texts.evals.qaCatalog.question}</th>
+          <th style={{ width: '35%' }}>{texts.evals.qaCatalog.expectedOutput}</th>
+          <th style={{ width: '15%' }}>{texts.evals.qaCatalog.contexts}</th>
+          <th style={{ width: '15%' }}>{texts.evals.qaCatalog.actions}</th>
         </tr>
       </thead>
       <tbody>
         {pairs.map((pair) => (
-          <tr key={pair.id} className={getRowClass(pair)}>
-            <td className={`px-4 py-4 align-top ${getBorderClass(pair)}`}>
-              <div className={pair._pendingStatus === 'deleted' ? 'text-gray-500 line-through' : ''}>
+          <tr key={pair.id} className={classes.row} data-pending-status={pair._pendingStatus}>
+            <td className={classes.firstCell} data-pending-status={pair._pendingStatus}>
+              <div className={classes.cellContent} data-deleted={pair._pendingStatus === 'deleted' || undefined}>
                 <Tooltip label={pair.question} multiline w={400} disabled={pair.question.length <= 100}>
-                  <span className="break-words whitespace-pre-wrap">{truncate(pair.question, 100)}</span>
+                  <span className={classes.text}>{truncate(pair.question, 100)}</span>
                 </Tooltip>
               </div>
             </td>
-            <td className="px-4 py-4 align-top">
-              <div className={pair._pendingStatus === 'deleted' ? 'text-gray-500 line-through' : ''}>
+            <td>
+              <div className={classes.cellContent} data-deleted={pair._pendingStatus === 'deleted' || undefined}>
                 <Tooltip label={pair.expectedOutput} multiline w={400} disabled={pair.expectedOutput.length <= 100}>
-                  <span className="break-words whitespace-pre-wrap">{truncate(pair.expectedOutput, 100)}</span>
+                  <span className={classes.text}>{truncate(pair.expectedOutput, 100)}</span>
                 </Tooltip>
               </div>
             </td>
-            <td className="px-4 py-4 align-top">
-              <div className={pair._pendingStatus === 'deleted' ? 'text-gray-500 line-through' : ''}>
+            <td>
+              <div className={classes.cellContent} data-deleted={pair._pendingStatus === 'deleted' || undefined}>
                 {pair.contexts.length > 0 ? (
                   <Tooltip label={pair.contexts.join('\n---\n')} multiline w={400}>
-                    <span className="text-sm text-gray-600">{pair.contexts.length} context(s)</span>
+                    <span className={classes.contexts}>{pair.contexts.length} context(s)</span>
                   </Tooltip>
                 ) : (
-                  <span className="text-sm text-gray-400">-</span>
+                  <span className={classes.noContexts}>-</span>
                 )}
               </div>
             </td>
-            <td className="px-4 py-4 align-top">
-              <div className="flex gap-1">
+            <td>
+              <Group gap={4} wrap="nowrap">
                 {pair._pendingStatus === 'deleted' ? (
                   <Tooltip label={texts.evals.qaCatalog.undoChange}>
-                    <button type="button" className="btn btn-ghost btn-sm text-warning" onClick={() => onUndo(pair.id)}>
+                    <ActionIcon
+                      variant="subtle"
+                      size="lg"
+                      color="orange"
+                      c="orange.8"
+                      data-action="undo"
+                      onClick={() => onUndo(pair.id)}
+                    >
                       <IconArrowBackUp size={18} />
-                    </button>
+                    </ActionIcon>
                   </Tooltip>
                 ) : (
                   <>
                     <Tooltip label={texts.common.edit}>
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => onEdit(pair)}>
+                      <ActionIcon
+                        variant="subtle"
+                        size="lg"
+                        color="gray"
+                        c="black"
+                        data-action="edit"
+                        onClick={() => onEdit(pair)}
+                      >
                         <IconEdit size={18} />
-                      </button>
+                      </ActionIcon>
                     </Tooltip>
                     <Tooltip label={texts.common.remove}>
-                      <button type="button" className="btn btn-ghost btn-sm text-error" onClick={() => onDelete(pair)}>
+                      <ActionIcon
+                        variant="subtle"
+                        size="lg"
+                        color="red"
+                        c="red.7"
+                        data-action="delete"
+                        onClick={() => onDelete(pair)}
+                      >
                         <IconTrash size={18} />
-                      </button>
+                      </ActionIcon>
                     </Tooltip>
                     {isPending(pair.id) && (
                       <Tooltip label={texts.evals.qaCatalog.undoChange}>
-                        <button type="button" className="btn btn-ghost btn-sm text-warning" onClick={() => onUndo(pair.id)}>
+                        <ActionIcon
+                          variant="subtle"
+                          size="lg"
+                          color="orange"
+                          c="orange.8"
+                          data-action="undo"
+                          onClick={() => onUndo(pair.id)}
+                        >
                           <IconArrowBackUp size={18} />
-                        </button>
+                        </ActionIcon>
                       </Tooltip>
                     )}
                   </>
                 )}
-              </div>
+              </Group>
             </td>
           </tr>
         ))}

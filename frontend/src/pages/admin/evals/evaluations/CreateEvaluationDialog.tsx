@@ -1,4 +1,4 @@
-import { Button, Portal, Stepper } from '@mantine/core';
+import { Button, Group, Portal, Stack, Stepper } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import type { Dto } from 'src/api/generated-eval';
@@ -100,11 +100,11 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
         size="xl"
         footer={
           <fieldset disabled={isPending}>
-            <div className="flex flex-row justify-between">
+            <Group justify="space-between" wrap="nowrap" gap={0}>
               <Button type="button" variant="subtle" onClick={handleClose}>
                 {texts.common.cancel}
               </Button>
-              <div className="flex gap-2">
+              <Group gap={8} wrap="nowrap">
                 {!isFirstStep && (
                   <Button type="button" variant="default" onClick={previousStep}>
                     {texts.common.back}
@@ -119,12 +119,12 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
                     {texts.evals.evaluations.createEvaluation}
                   </Button>
                 )}
-              </div>
-            </div>
+              </Group>
+            </Group>
           </fieldset>
         }
       >
-        <fieldset disabled={isPending} className="flex flex-col gap-4">
+        <Stack renderRoot={(props) => <fieldset {...props} disabled={isPending} />} gap={16}>
           <FormAlert common={texts.evals.evaluations.createFailed} error={createEvaluationMutation.error as Error | null} />
 
           {/* Stepper */}
@@ -158,7 +158,7 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
 
           {/* Step Content */}
           <div style={{ minHeight: '300px' }}>{renderStepContent()}</div>
-        </fieldset>
+        </Stack>
       </Modal>
     </Portal>
   );

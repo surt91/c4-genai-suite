@@ -16,7 +16,7 @@ export function SimpleMetricFields({ form }: SimpleMetricFieldsProps) {
       <Switch
         label={texts.evals.metric.includeReasonLabel}
         description={texts.evals.metric.includeReasonHint}
-        className="mb-4"
+        mb={16}
         key={form.key('includeReason')}
         {...form.getInputProps('includeReason', { type: 'checkbox' })}
       />

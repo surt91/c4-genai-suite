@@ -47,7 +47,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
             <Stack gap="sm">
               {/* QA Catalog */}
               <Group gap="xs">
-                <IconDatabase size={18} className="text-gray-600" />
+                <IconDatabase size={18} color="var(--mantine-color-gray-7)" />
                 <Text size="sm" fw={500}>
                   {texts.evals.evaluations.qaCatalog}:
                 </Text>
@@ -70,7 +70,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
               {/* Gaible Assistant */}
               {evaluation.gaibleAssistantId && (
                 <Group gap="xs">
-                  <IconRobot size={18} className="text-gray-600" />
+                  <IconRobot size={18} color="var(--mantine-color-gray-7)" />
                   <Text size="sm" fw={500}>
                     Assistant:
                   </Text>
@@ -82,7 +82,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
 
               {/* Test Cases */}
               <Group gap="xs">
-                <IconRocket size={18} className="text-gray-600" />
+                <IconRocket size={18} color="var(--mantine-color-gray-7)" />
                 <Text size="sm" fw={500}>
                   Test Cases:
                 </Text>
@@ -93,7 +93,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
 
               {/* Metrics */}
               <Group gap="xs">
-                <IconChartBar size={18} className="text-gray-600" />
+                <IconChartBar size={18} color="var(--mantine-color-gray-7)" />
                 <Text size="sm" fw={500}>
                   {texts.evals.evaluations.metrics}:
                 </Text>
@@ -104,7 +104,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
 
               {/* Created At */}
               <Group gap="xs">
-                <IconCalendar size={18} className="text-gray-600" />
+                <IconCalendar size={18} color="var(--mantine-color-gray-7)" />
                 <Text size="sm" fw={500}>
                   {texts.evals.evaluations.createdAt}:
                 </Text>

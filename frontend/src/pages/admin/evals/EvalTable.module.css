@@ -1,0 +1,27 @@
+/* Shared styles of the eval list tables (metrics, LLM endpoints). */
+.clickableRow {
+  cursor: pointer;
+}
+
+.cell {
+  overflow: hidden;
+}
+
+.nameCell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.truncatedCell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyCell {
+  padding-block: 2rem;
+  text-align: center;
+  color: var(--mantine-color-dark-3);
+}

@@ -73,9 +73,9 @@ export function ReviewStep() {
         <Stack gap="xs">
           <Group gap="xs">
             {mode === 'catalog' ? (
-              <IconDatabase size={18} className="text-blue-600" />
+              <IconDatabase size={18} color="var(--mantine-color-blue-8)" />
             ) : (
-              <IconEdit size={18} className="text-green-600" />
+              <IconEdit size={18} color="var(--mantine-color-green-8)" />
             )}
             <Text fw={600}>Source</Text>
           </Group>
@@ -122,7 +122,7 @@ export function ReviewStep() {
       <Card padding="md" withBorder>
         <Stack gap="xs">
           <Group gap="xs">
-            <IconChartBar size={18} className="text-blue-600" />
+            <IconChartBar size={18} color="var(--mantine-color-blue-8)" />
             <Text fw={600}>Metrics ({selectedMetrics.length})</Text>
           </Group>
           <Group gap="xs">
@@ -139,7 +139,7 @@ export function ReviewStep() {
       <Card padding="md" withBorder>
         <Stack gap="xs">
           <Group gap="xs">
-            <IconRobot size={18} className="text-blue-600" />
+            <IconRobot size={18} color="var(--mantine-color-blue-8)" />
             <Text fw={600}>Assistant</Text>
           </Group>
           {gaibleAssistantId && (

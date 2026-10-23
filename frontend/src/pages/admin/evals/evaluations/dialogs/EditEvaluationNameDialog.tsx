@@ -1,4 +1,4 @@
-import { Button, Portal, TextInput } from '@mantine/core';
+import { Button, Group, Portal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -54,14 +54,14 @@ export function EditEvaluationNameDialog({ evaluation, onClose, onUpdated }: Edi
           header={texts.evals.evaluations.editNameTitle}
           footer={
             <fieldset disabled={updateMutation.isPending}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap={16} wrap="nowrap">
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
                 <Button type="submit" loading={updateMutation.isPending}>
                   {texts.common.save}
                 </Button>
-              </div>
+              </Group>
             </fieldset>
           }
         >
@@ -71,7 +71,7 @@ export function EditEvaluationNameDialog({ evaluation, onClose, onUpdated }: Edi
               withAsterisk
               label={texts.evals.evaluations.nameLabel}
               placeholder={texts.evals.evaluations.namePlaceholder}
-              className="mb-4"
+              mb={16}
               key={form.key('name')}
               {...form.getInputProps('name')}
             />

@@ -1,4 +1,4 @@
-import { Button, Portal } from '@mantine/core';
+import { Button, Group, Portal, Text } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import type { EvaluationDetailSummary } from 'src/api/generated-eval';
 import { Modal } from 'src/components';
@@ -36,21 +36,21 @@ export function DeleteEvaluationDialog({ evaluation, onClose, onDeleted }: Delet
         header={texts.evals.evaluations.deleteConfirmTitle}
         footer={
           <fieldset disabled={deleteMutation.isPending}>
-            <div className="flex flex-row justify-end gap-4">
+            <Group justify="flex-end" gap={16} wrap="nowrap">
               <Button type="button" variant="subtle" onClick={onClose}>
                 {texts.common.cancel}
               </Button>
               <Button type="button" color="red" onClick={handleConfirm} loading={deleteMutation.isPending}>
                 {texts.common.remove}
               </Button>
-            </div>
+            </Group>
           </fieldset>
         }
       >
-        <div className="flex items-start gap-3">
-          <IconAlertTriangle size={24} className="text-error shrink-0" />
-          <p className="text-gray-700">{texts.evals.evaluations.deleteConfirmText(evaluation.name)}</p>
-        </div>
+        <Group align="flex-start" gap={12} wrap="nowrap">
+          <IconAlertTriangle size={24} color="var(--mantine-color-red-7)" style={{ flexShrink: 0 }} />
+          <Text c="gray.8">{texts.evals.evaluations.deleteConfirmText(evaluation.name)}</Text>
+        </Group>
       </Modal>
     </Portal>
   );

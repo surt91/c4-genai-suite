@@ -1,4 +1,4 @@
-import { Loader, Tooltip } from '@mantine/core';
+import { Badge, Loader, Tooltip } from '@mantine/core';
 import { IconAlertTriangle, IconCheck } from '@tabler/icons-react';
 import { QACatalogStatus } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
@@ -12,10 +12,9 @@ export function QaCatalogStatusChip({ status, error }: QaCatalogStatusChipProps)
   const statusConfig = getStatusConfig(status, error);
 
   const chip = (
-    <div className={`badge gap-1.5 ${statusConfig.badgeClass}`}>
-      {statusConfig.icon}
-      <span>{statusConfig.label}</span>
-    </div>
+    <Badge color={statusConfig.color} variant={statusConfig.variant} size="lg" tt="none" fw={400} leftSection={statusConfig.icon}>
+      {statusConfig.label}
+    </Badge>
   );
 
   if (statusConfig.tooltip) {
@@ -34,28 +33,32 @@ function getStatusConfig(status: QACatalogStatus, error?: string | null) {
     case QACatalogStatus.Generating:
       return {
         label: texts.evals.qaCatalog.statusGenerating,
-        badgeClass: 'badge-warning',
+        color: 'yellow',
+        variant: 'filled' as const,
         icon: <Loader size={12} />,
         tooltip: texts.evals.qaCatalog.statusGeneratingTooltip,
       };
     case QACatalogStatus.Ready:
       return {
         label: texts.evals.qaCatalog.statusReady,
-        badgeClass: 'badge-success',
+        color: 'green',
+        variant: 'filled' as const,
         icon: <IconCheck size={14} />,
         tooltip: texts.evals.qaCatalog.statusReadyTooltip,
       };
     case QACatalogStatus.Failure:
       return {
         label: texts.evals.qaCatalog.statusFailure,
-        badgeClass: 'badge-error',
+        color: 'red',
+        variant: 'filled' as const,
         icon: <IconAlertTriangle size={14} />,
         tooltip: error ? texts.evals.qaCatalog.statusFailureTooltip(error) : texts.evals.qaCatalog.statusFailure,
       };
     default:
       return {
         label: String(status),
-        badgeClass: 'badge-ghost',
+        color: 'gray',
+        variant: 'light' as const,
         icon: null,
         tooltip: null,
       };

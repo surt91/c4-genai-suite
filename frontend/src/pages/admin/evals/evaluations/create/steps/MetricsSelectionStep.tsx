@@ -3,6 +3,7 @@ import { IconAlertCircle, IconChartBar } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { useWizardStore } from '../../state/zustand/wizardState';
+import classes from './SelectableCard.module.css';
 
 export function MetricsSelectionStep() {
   const { metricIds, addMetricId, removeMetricId } = useWizardStore();
@@ -79,7 +80,8 @@ export function MetricsSelectionStep() {
               key={metric.id}
               padding="md"
               withBorder
-              className={`cursor-pointer transition-all ${isSelected ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'}`}
+              className={classes.card}
+              data-selected={isSelected || undefined}
               onClick={() => handleToggleMetric(metric.id)}
             >
               <Group wrap="nowrap" align="flex-start">
@@ -88,9 +90,9 @@ export function MetricsSelectionStep() {
                   onChange={() => handleToggleMetric(metric.id)}
                   onClick={(e) => e.stopPropagation()}
                 />
-                <Stack gap="xs" className="flex-1">
+                <Stack gap="xs" flex={1}>
                   <Group gap="xs">
-                    <IconChartBar size={18} className="text-blue-600" />
+                    <IconChartBar size={18} color="var(--mantine-color-blue-8)" />
                     <Text fw={600}>{metric._configuration.name}</Text>
                   </Group>
                   <Badge variant="light" size="sm" color="gray">

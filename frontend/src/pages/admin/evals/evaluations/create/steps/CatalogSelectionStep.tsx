@@ -53,7 +53,7 @@ export function CatalogSelectionStep() {
             <Card padding="md" withBorder>
               <Stack gap="xs">
                 <Group gap="xs">
-                  <IconDatabase size={18} className="text-blue-600" />
+                  <IconDatabase size={18} color="var(--mantine-color-blue-8)" />
                   <Text fw={600}>{selectedCatalog.name}</Text>
                   <Badge variant="light" color="green">
                     Ready

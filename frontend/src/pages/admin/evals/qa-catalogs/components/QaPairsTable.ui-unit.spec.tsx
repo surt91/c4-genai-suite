@@ -64,8 +64,7 @@ describe('QaPairsTable', () => {
     );
 
     const firstCell = screen.getByText('New question').closest('td');
-    expect(firstCell).toHaveClass('border-l-4');
-    expect(firstCell).toHaveClass('border-green-500');
+    expect(firstCell).toHaveAttribute('data-pending-status', 'added');
   });
 
   it('should render updated pair with blue left border', () => {
@@ -87,8 +86,7 @@ describe('QaPairsTable', () => {
     );
 
     const firstCell = screen.getByText('Updated question').closest('td');
-    expect(firstCell).toHaveClass('border-l-4');
-    expect(firstCell).toHaveClass('border-blue-500');
+    expect(firstCell).toHaveAttribute('data-pending-status', 'updated');
   });
 
   it('should render deleted pair with red left border and strikethrough', () => {
@@ -109,11 +107,10 @@ describe('QaPairsTable', () => {
     );
 
     const firstCell = screen.getByText('What is the capital of France?').closest('td');
-    expect(firstCell).toHaveClass('border-l-4');
-    expect(firstCell).toHaveClass('border-red-500');
+    expect(firstCell).toHaveAttribute('data-pending-status', 'deleted');
 
     // Check for strikethrough on text
-    const strikeThroughDiv = firstCell?.querySelector('.line-through');
+    const strikeThroughDiv = firstCell?.querySelector('[data-deleted]');
     expect(strikeThroughDiv).toBeInTheDocument();
   });
 
@@ -140,7 +137,7 @@ describe('QaPairsTable', () => {
 
     // Check for undo button by button class or icon
     const buttons = screen.getAllByRole('button');
-    const undoButton = buttons.find((btn) => btn.className.includes('text-warning'));
+    const undoButton = buttons.find((btn) => btn.dataset.action === 'undo');
     expect(undoButton).toBeInTheDocument();
   });
 
@@ -164,7 +161,7 @@ describe('QaPairsTable', () => {
 
     // Check for undo button by button class
     const buttons = screen.getAllByRole('button');
-    const undoButton = buttons.find((btn) => btn.className.includes('text-warning'));
+    const undoButton = buttons.find((btn) => btn.dataset.action === 'undo');
     expect(undoButton).toBeInTheDocument();
   });
 
@@ -189,7 +186,7 @@ describe('QaPairsTable', () => {
 
     // Should have only 1 button (undo)
     expect(buttons.length).toBe(1);
-    expect(buttons[0].className).toContain('text-warning');
+    expect(buttons[0]).toHaveAttribute('data-action', 'undo');
   });
 
   it('should call onEdit when edit button is clicked', async () => {
@@ -211,7 +208,7 @@ describe('QaPairsTable', () => {
     const user = userEvent.setup();
     const buttons = screen.getAllByRole('button');
     // Second button should be delete
-    const deleteButton = buttons.find((btn) => btn.className.includes('text-error'));
+    const deleteButton = buttons.find((btn) => btn.dataset.action === 'delete');
     await user.click(deleteButton!);
 
     expect(onDelete).toHaveBeenCalledWith(mockPair);
@@ -237,7 +234,7 @@ describe('QaPairsTable', () => {
 
     const user = userEvent.setup();
     const buttons = screen.getAllByRole('button');
-    const undoButton = buttons.find((btn) => btn.className.includes('text-warning'));
+    const undoButton = buttons.find((btn) => btn.dataset.action === 'undo');
     await user.click(undoButton!);
 
     expect(onUndo).toHaveBeenCalledWith('pair-1');
@@ -247,9 +244,6 @@ describe('QaPairsTable', () => {
     render(<QaPairsTable pairs={[mockPair]} pendingChanges={[]} onEdit={vi.fn()} onDelete={vi.fn()} onUndo={vi.fn()} />);
 
     const firstCell = screen.getByText('What is the capital of France?').closest('td');
-    expect(firstCell).not.toHaveClass('border-l-4');
-    expect(firstCell).not.toHaveClass('border-green-500');
-    expect(firstCell).not.toHaveClass('border-blue-500');
-    expect(firstCell).not.toHaveClass('border-red-500');
+    expect(firstCell).not.toHaveAttribute('data-pending-status');
   });
 });

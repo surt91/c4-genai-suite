@@ -1,0 +1,30 @@
+.field {
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.required {
+  margin-left: 0.25rem;
+  color: var(--mantine-color-red-7);
+}
+
+.hint {
+  margin-bottom: 0.75rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-gray-7);
+}
+
+.error {
+  margin-top: 0.25rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-red-7);
+}

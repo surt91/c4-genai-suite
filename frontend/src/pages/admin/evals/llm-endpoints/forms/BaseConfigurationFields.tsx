@@ -15,7 +15,7 @@ export function BaseConfigurationFields({ form, isEdit: _isEdit }: BaseConfigura
         withAsterisk
         label={texts.evals.llmEndpoint.nameLabel}
         placeholder={texts.evals.llmEndpoint.namePlaceholder}
-        className="mb-4"
+        mb={16}
         key={form.key('name')}
         {...form.getInputProps('name')}
       />
@@ -26,7 +26,7 @@ export function BaseConfigurationFields({ form, isEdit: _isEdit }: BaseConfigura
         description={texts.evals.llmEndpoint.parallelQueriesHint}
         min={1}
         max={100}
-        className="mb-4"
+        mb={16}
         key={form.key('parallelQueries')}
         {...form.getInputProps('parallelQueries')}
       />
@@ -37,7 +37,7 @@ export function BaseConfigurationFields({ form, isEdit: _isEdit }: BaseConfigura
         description={texts.evals.llmEndpoint.maxRetriesHint}
         min={0}
         max={10}
-        className="mb-4"
+        mb={16}
         key={form.key('maxRetries')}
         {...form.getInputProps('maxRetries')}
       />
@@ -48,7 +48,7 @@ export function BaseConfigurationFields({ form, isEdit: _isEdit }: BaseConfigura
         description={texts.evals.llmEndpoint.requestTimeoutHint}
         min={1}
         max={600}
-        className="mb-4"
+        mb={16}
         key={form.key('requestTimeout')}
         {...form.getInputProps('requestTimeout')}
       />

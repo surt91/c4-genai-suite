@@ -1,4 +1,4 @@
-import { Button, Portal } from '@mantine/core';
+import { Button, Group, Portal, Text } from '@mantine/core';
 import type { LLMEndpoint } from 'src/api/generated-eval';
 import { Modal } from 'src/components';
 import { texts } from 'src/texts';
@@ -35,18 +35,18 @@ export function DeleteLlmEndpointDialog({ endpoint, onClose, onDeleted }: Delete
         header={texts.evals.llmEndpoint.deleteConfirmTitle}
         footer={
           <fieldset disabled={deleteMutation.isPending}>
-            <div className="flex flex-row justify-end gap-4">
+            <Group justify="flex-end" gap="md">
               <Button type="button" variant="subtle" onClick={onClose}>
                 {texts.common.cancel}
               </Button>
               <Button type="button" color="red" onClick={handleConfirm} loading={deleteMutation.isPending}>
                 {texts.common.remove}
               </Button>
-            </div>
+            </Group>
           </fieldset>
         }
       >
-        <p className="text-gray-700">{texts.evals.llmEndpoint.deleteConfirmText(endpoint.name)}</p>
+        <Text c="gray.8">{texts.evals.llmEndpoint.deleteConfirmText(endpoint.name)}</Text>
       </Modal>
     </Portal>
   );

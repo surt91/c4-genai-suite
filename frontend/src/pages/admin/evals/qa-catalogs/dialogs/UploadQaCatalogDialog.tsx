@@ -1,4 +1,4 @@
-import { Button, FileInput, Portal } from '@mantine/core';
+import { Button, FileInput, Group, Portal, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
@@ -63,21 +63,23 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
           header={texts.evals.qaCatalog.uploadTitle}
           footer={
             <fieldset disabled={uploadMutation.isPending}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap={16} wrap="nowrap">
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
                 <Button type="submit" leftSection={<IconUpload size={16} />} loading={uploadMutation.isPending}>
                   {texts.evals.qaCatalog.uploadFile}
                 </Button>
-              </div>
+              </Group>
             </fieldset>
           }
         >
           <fieldset disabled={uploadMutation.isPending}>
             <FormAlert common={texts.evals.qaCatalog.uploadFailed} error={uploadMutation.error as Error | null} />
 
-            <p className="mb-4 text-sm text-gray-500">{texts.evals.qaCatalog.uploadHint}</p>
+            <Text mb={16} fz="sm" c="dark.3">
+              {texts.evals.qaCatalog.uploadHint}
+            </Text>
 
             <FileInput
               id="file"
@@ -87,7 +89,7 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
               placeholder={texts.evals.qaCatalog.uploadFileHint}
               accept={ACCEPTED_FILE_TYPES}
               leftSection={<IconUpload size={16} />}
-              className="mb-4"
+              mb={16}
               key={form.key('file')}
               {...form.getInputProps('file')}
             />

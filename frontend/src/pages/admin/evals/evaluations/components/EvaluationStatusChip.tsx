@@ -1,4 +1,4 @@
-import { Loader, Tooltip } from '@mantine/core';
+import { Badge, Loader, Tooltip } from '@mantine/core';
 import { IconAlertTriangle, IconCheck, IconClock } from '@tabler/icons-react';
 import { EvaluationStatus } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
@@ -11,10 +11,9 @@ export function EvaluationStatusChip({ status }: EvaluationStatusChipProps) {
   const statusConfig = getStatusConfig(status);
 
   const chip = (
-    <div className={`badge gap-1.5 whitespace-nowrap ${statusConfig.badgeClass}`}>
-      {statusConfig.icon}
-      <span>{statusConfig.label}</span>
-    </div>
+    <Badge color={statusConfig.color} variant={statusConfig.variant} size="lg" tt="none" fw={400} leftSection={statusConfig.icon}>
+      {statusConfig.label}
+    </Badge>
   );
 
   if (statusConfig.tooltip) {
@@ -33,35 +32,40 @@ function getStatusConfig(status: EvaluationStatus) {
     case EvaluationStatus.Pending:
       return {
         label: texts.evals.evaluations.statusPending,
-        badgeClass: 'badge-ghost',
+        color: 'gray',
+        variant: 'light' as const,
         icon: <IconClock size={14} />,
         tooltip: texts.evals.evaluations.statusPendingTooltip,
       };
     case EvaluationStatus.Running:
       return {
         label: texts.evals.evaluations.statusRunning,
-        badgeClass: 'badge-info',
+        color: 'blue',
+        variant: 'filled' as const,
         icon: <Loader size={12} />,
         tooltip: texts.evals.evaluations.statusRunningTooltip,
       };
     case EvaluationStatus.Success:
       return {
         label: texts.evals.evaluations.statusSuccess,
-        badgeClass: 'badge-success',
+        color: 'green',
+        variant: 'filled' as const,
         icon: <IconCheck size={14} />,
         tooltip: texts.evals.evaluations.statusSuccessTooltip,
       };
     case EvaluationStatus.Failure:
       return {
         label: texts.evals.evaluations.statusFailure,
-        badgeClass: 'badge-error',
+        color: 'red',
+        variant: 'filled' as const,
         icon: <IconAlertTriangle size={14} />,
         tooltip: texts.evals.evaluations.statusFailureTooltip,
       };
     default:
       return {
         label: String(status),
-        badgeClass: 'badge-ghost',
+        color: 'gray',
+        variant: 'light' as const,
         icon: null,
         tooltip: null,
       };

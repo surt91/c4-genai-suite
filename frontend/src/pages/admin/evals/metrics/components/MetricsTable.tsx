@@ -1,7 +1,8 @@
-import { Skeleton } from '@mantine/core';
+import { ActionIcon, Group, Skeleton, Table, Text } from '@mantine/core';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import type { Metric } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
+import classes from '../../EvalTable.module.css';
 import { MetricTypeChip } from './MetricTypeChip';
 
 interface MetricsTableProps {
@@ -24,60 +25,48 @@ export function MetricsTable({ metrics, isFetching, isFetched, onRowClick, onEdi
   };
 
   return (
-    <table className="table table-fixed text-base">
-      <thead>
-        <tr>
-          <th>{texts.evals.metric.name}</th>
-          <th className="w-48">{texts.evals.metric.type}</th>
-          <th className="w-32">{texts.evals.metric.threshold}</th>
-          <th className="w-48">{texts.evals.metric.chatModel}</th>
-          <th className="w-36">{texts.evals.metric.createdAt}</th>
-          <th className="w-28">{texts.evals.metric.actions}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {isFetching && !isFetched && (
-          <>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i}>
-                <td>
+    <Table layout="fixed" fz="md" verticalSpacing={12} horizontalSpacing={16} highlightOnHover>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>{texts.evals.metric.name}</Table.Th>
+          <Table.Th w={192}>{texts.evals.metric.type}</Table.Th>
+          <Table.Th w={128}>{texts.evals.metric.threshold}</Table.Th>
+          <Table.Th w={192}>{texts.evals.metric.chatModel}</Table.Th>
+          <Table.Th w={144}>{texts.evals.metric.createdAt}</Table.Th>
+          <Table.Th w={112}>{texts.evals.metric.actions}</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {isFetching &&
+          !isFetched &&
+          Array.from({ length: 5 }).map((_, i) => (
+            <Table.Tr key={i}>
+              {Array.from({ length: 6 }).map((_, j) => (
+                <Table.Td key={j}>
                   <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-              </tr>
-            ))}
-          </>
-        )}
+                </Table.Td>
+              ))}
+            </Table.Tr>
+          ))}
 
         {isFetched &&
           metrics.map((metric) => (
-            <tr className="cursor-pointer hover:bg-gray-50" key={metric.id} onClick={() => onRowClick(metric)}>
-              <td className="truncate overflow-hidden font-semibold">{metric._configuration.name}</td>
-              <td className="overflow-hidden">
+            <Table.Tr className={classes.clickableRow} key={metric.id} onClick={() => onRowClick(metric)}>
+              <Table.Td className={classes.nameCell}>{metric._configuration.name}</Table.Td>
+              <Table.Td className={classes.cell}>
                 <MetricTypeChip type={metric._configuration.type} />
-              </td>
-              <td className="overflow-hidden">{metric._configuration.threshold.toFixed(2)}</td>
-              <td className="truncate overflow-hidden text-sm">{metric._configuration.chatModelId}</td>
-              <td className="overflow-hidden">{formatDate(metric.createdAt)}</td>
-              <td className="overflow-hidden">
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
+              </Table.Td>
+              <Table.Td className={classes.cell}>{metric._configuration.threshold.toFixed(2)}</Table.Td>
+              <Table.Td className={classes.truncatedCell} fz="sm">
+                {metric._configuration.chatModelId}
+              </Table.Td>
+              <Table.Td className={classes.cell}>{formatDate(metric.createdAt)}</Table.Td>
+              <Table.Td className={classes.cell}>
+                <Group gap={4} wrap="nowrap">
+                  <ActionIcon
+                    variant="subtle"
+                    color="dark"
+                    size={32}
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(metric);
@@ -86,10 +75,11 @@ export function MetricsTable({ metrics, isFetching, isFetched, onRowClick, onEdi
                     aria-label={texts.common.edit}
                   >
                     <IconPencil size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm text-error"
+                  </ActionIcon>
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    size={32}
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(metric);
@@ -98,23 +88,27 @@ export function MetricsTable({ metrics, isFetching, isFetched, onRowClick, onEdi
                     aria-label={texts.common.remove}
                   >
                     <IconTrash size={18} />
-                  </button>
-                </div>
-              </td>
-            </tr>
+                  </ActionIcon>
+                </Group>
+              </Table.Td>
+            </Table.Tr>
           ))}
 
         {isFetched && metrics.length === 0 && (
-          <tr>
-            <td colSpan={6} className="py-8 text-center">
-              <div className="text-gray-500">
-                <p className="mb-2">{texts.evals.metric.empty}</p>
-                <p className="text-sm">{texts.evals.metric.emptyHint}</p>
+          <Table.Tr>
+            <Table.Td colSpan={6} className={classes.emptyCell}>
+              <div>
+                <Text mb={8} inherit>
+                  {texts.evals.metric.empty}
+                </Text>
+                <Text fz="sm" c="inherit">
+                  {texts.evals.metric.emptyHint}
+                </Text>
               </div>
-            </td>
-          </tr>
+            </Table.Td>
+          </Table.Tr>
         )}
-      </tbody>
-    </table>
+      </Table.Tbody>
+    </Table>
   );
 }

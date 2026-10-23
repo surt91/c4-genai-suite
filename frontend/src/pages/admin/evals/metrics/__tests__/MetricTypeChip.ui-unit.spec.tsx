@@ -10,8 +10,8 @@ describe('MetricTypeChip', () => {
     const text = screen.getByText(texts.evals.metric.typeAnswerRelevancy);
     expect(text).toBeInTheDocument();
 
-    const chip = text.closest('.badge');
-    expect(chip).toHaveClass('badge-info');
+    const chip = text.closest('[data-color]');
+    expect(chip).toHaveAttribute('data-color', 'blue');
   });
 
   it('should render Faithfulness chip with green color', () => {
@@ -20,8 +20,8 @@ describe('MetricTypeChip', () => {
     const text = screen.getByText(texts.evals.metric.typeFaithfulness);
     expect(text).toBeInTheDocument();
 
-    const chip = text.closest('.badge');
-    expect(chip).toHaveClass('badge-success');
+    const chip = text.closest('[data-color]');
+    expect(chip).toHaveAttribute('data-color', 'green');
   });
 
   it('should render Hallucination chip with red color', () => {
@@ -30,8 +30,8 @@ describe('MetricTypeChip', () => {
     const text = screen.getByText(texts.evals.metric.typeHallucination);
     expect(text).toBeInTheDocument();
 
-    const chip = text.closest('.badge');
-    expect(chip).toHaveClass('badge-error');
+    const chip = text.closest('[data-color]');
+    expect(chip).toHaveAttribute('data-color', 'red');
   });
 
   it('should render G-Eval chip with purple color', () => {
@@ -40,7 +40,7 @@ describe('MetricTypeChip', () => {
     const text = screen.getByText(texts.evals.metric.typeGEval);
     expect(text).toBeInTheDocument();
 
-    const chip = text.closest('.badge');
-    expect(chip).toHaveClass('badge-secondary');
+    const chip = text.closest('[data-color]');
+    expect(chip).toHaveAttribute('data-color', 'grape');
   });
 });

@@ -166,8 +166,6 @@ describe('MetricsPage', () => {
   });
 
   it('should navigate to detail page when row is clicked', async () => {
-    // Note: Navigation is tested by the component working correctly in the real app
-    // Mocking useNavigate in tests is complex due to vi.mock hoisting
     render(<MetricsPage />);
 
     // Wait for page to load
@@ -176,9 +174,11 @@ describe('MetricsPage', () => {
     });
 
     const row = screen.getByText('Answer Relevancy Test').closest('tr');
+    await userEvent.setup().click(row!);
 
-    // Verify row is clickable (actual navigation works in real app)
-    expect(row).toHaveClass('cursor-pointer');
+    // The test providers use a BrowserRouter, so the navigation updates the jsdom location.
+    expect(window.location.pathname).toBe('/admin/evals/metrics/metric-1');
+    window.history.pushState({}, '', '/');
   });
 
   it('should update metric successfully', async () => {

@@ -1,6 +1,7 @@
 import { Card, Group, Radio, Stack, Text } from '@mantine/core';
 import { IconDatabase, IconEdit } from '@tabler/icons-react';
 import { type EvaluationMode, useWizardStore } from '../../state/zustand/wizardState';
+import classes from './SelectableCard.module.css';
 
 export function ModeSelectionStep() {
   const { mode, setMode } = useWizardStore();
@@ -19,14 +20,15 @@ export function ModeSelectionStep() {
           <Card
             padding="md"
             withBorder
-            className={`cursor-pointer transition-all ${mode === 'catalog' ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'}`}
+            className={classes.card}
+            data-selected={mode === 'catalog' || undefined}
             onClick={() => setMode('catalog')}
           >
             <Group wrap="nowrap" align="flex-start">
               <Radio value="catalog" />
-              <Stack gap="xs" className="flex-1">
+              <Stack gap="xs" flex={1}>
                 <Group gap="xs">
-                  <IconDatabase size={20} className="text-blue-600" />
+                  <IconDatabase size={20} color="var(--mantine-color-blue-8)" />
                   <Text fw={600}>By QA Catalog</Text>
                 </Group>
                 <Text size="sm" c="dimmed">
@@ -40,14 +42,15 @@ export function ModeSelectionStep() {
           <Card
             padding="md"
             withBorder
-            className={`cursor-pointer transition-all ${mode === 'manual' ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'}`}
+            className={classes.card}
+            data-selected={mode === 'manual' || undefined}
             onClick={() => setMode('manual')}
           >
             <Group wrap="nowrap" align="flex-start">
               <Radio value="manual" />
-              <Stack gap="xs" className="flex-1">
+              <Stack gap="xs" flex={1}>
                 <Group gap="xs">
-                  <IconEdit size={20} className="text-green-600" />
+                  <IconEdit size={20} color="var(--mantine-color-green-8)" />
                   <Text fw={600}>Manual Test Cases</Text>
                 </Group>
                 <Text size="sm" c="dimmed">

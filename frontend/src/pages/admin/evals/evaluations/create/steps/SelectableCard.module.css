@@ -1,0 +1,13 @@
+.card {
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:not([data-selected]):hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+.card[data-selected] {
+  border-color: var(--mantine-color-blue-6);
+  background-color: var(--mantine-color-blue-0);
+}

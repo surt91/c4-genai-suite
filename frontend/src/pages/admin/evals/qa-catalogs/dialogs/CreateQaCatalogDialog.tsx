@@ -1,4 +1,4 @@
-import { Button, FileInput, Portal, Tabs, TextInput } from '@mantine/core';
+import { Button, FileInput, Group, Portal, Tabs, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconFile, IconFileUpload, IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
@@ -107,7 +107,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
           header={texts.evals.qaCatalog.createTitle}
           footer={
             <fieldset disabled={isPending}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap={16} wrap="nowrap">
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
@@ -121,7 +121,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
                     {texts.evals.qaCatalog.create}
                   </Button>
                 )}
-              </div>
+              </Group>
             </fieldset>
           }
         >
@@ -139,14 +139,16 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
               <fieldset disabled={createEmptyMutation.isPending}>
                 <FormAlert common={texts.evals.qaCatalog.createFailed} error={error} />
 
-                <p className="mb-4 text-sm text-gray-500">{texts.evals.qaCatalog.createEmptyDescription}</p>
+                <Text mb={16} fz="sm" c="dark.3">
+                  {texts.evals.qaCatalog.createEmptyDescription}
+                </Text>
 
                 <TextInput
                   id="empty-name"
                   withAsterisk
                   label={texts.evals.qaCatalog.catalogName}
                   placeholder={texts.evals.qaCatalog.catalogNamePlaceholder}
-                  className="mb-4"
+                  mb={16}
                   key={emptyForm.key('name')}
                   {...emptyForm.getInputProps('name')}
                 />
@@ -162,7 +164,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
                   withAsterisk
                   label={texts.evals.qaCatalog.catalogName}
                   placeholder={texts.evals.qaCatalog.catalogNamePlaceholder}
-                  className="mb-4"
+                  mb={16}
                   key={uploadForm.key('name')}
                   {...uploadForm.getInputProps('name')}
                 />
@@ -175,7 +177,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
                   placeholder={texts.evals.qaCatalog.uploadFileHint}
                   accept={ACCEPTED_FILE_TYPES}
                   leftSection={<IconUpload size={16} />}
-                  className="mb-4"
+                  mb={16}
                   key={uploadForm.key('file')}
                   {...uploadForm.getInputProps('file')}
                 />

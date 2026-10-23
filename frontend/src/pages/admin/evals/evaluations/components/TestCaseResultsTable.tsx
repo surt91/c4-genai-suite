@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Group, Skeleton, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Box, Group, Paper, Skeleton, Stack, Table, Text, Tooltip } from '@mantine/core';
 import {
   IconArrowsSort,
   IconCheck,
@@ -10,6 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import type { EvaluationDetailSummaryMetric, GroupedEvaluationResult } from 'src/api/generated-eval';
+import tableClasses from './DataTable.module.css';
 
 interface TestCaseResultsTableProps {
   results: GroupedEvaluationResult[];
@@ -162,11 +163,11 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
   return (
     <Stack gap="md">
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="table w-full text-base">
+      <div style={{ overflowX: 'auto' }}>
+        <table className={tableClasses.table}>
           <thead>
             <tr>
-              <th className="w-10"></th>
+              <th style={{ width: '2.5rem' }}></th>
               <th>
                 <Group gap="xs" wrap="nowrap">
                   <span>Status</span>
@@ -224,7 +225,7 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                 return (
                   <>
                     {/* Main QA pair row */}
-                    <tr key={row.key} className="cursor-pointer hover:bg-gray-50" onClick={() => toggleRow(row.key)}>
+                    <tr key={row.key} className={tableClasses.clickableRow} onClick={() => toggleRow(row.key)}>
                       <td>
                         <ActionIcon variant="subtle" size="sm">
                           {isExpanded ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />}
@@ -242,14 +243,14 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                       </td>
                       <td>
                         <Tooltip label={row.input} multiline maw={400} withArrow>
-                          <Text size="sm" className="line-clamp-2 cursor-help">
+                          <Text size="sm" lineClamp={2} style={{ cursor: 'help' }}>
                             {row.input}
                           </Text>
                         </Tooltip>
                       </td>
                       <td>
                         <Tooltip label={row.expectedOutput} multiline maw={400} withArrow>
-                          <Text size="sm" className="line-clamp-2 cursor-help">
+                          <Text size="sm" lineClamp={2} style={{ cursor: 'help' }}>
                             {row.expectedOutput}
                           </Text>
                         </Tooltip>
@@ -271,11 +272,11 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                     {/* Expanded details row */}
                     {isExpanded && (
                       <tr key={`${row.key}-expanded`}>
-                        <td colSpan={5} className="bg-gray-50 p-0">
-                          <div className="p-4">
+                        <td colSpan={5} className={tableClasses.details}>
+                          <Box p="md">
                             <Stack gap="md">
                               {row.testCases.map((tc) => (
-                                <div key={tc.id} className="rounded-lg border bg-white p-3">
+                                <Paper key={tc.id} withBorder radius="md" p={12}>
                                   <Group justify="space-between" mb="sm">
                                     <Group gap="sm">
                                       <Text size="sm" fw={500}>
@@ -332,10 +333,10 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                                       ))}
                                     </Table.Tbody>
                                   </Table>
-                                </div>
+                                </Paper>
                               ))}
                             </Stack>
-                          </div>
+                          </Box>
                         </td>
                       </tr>
                     )}
@@ -346,10 +347,10 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
             {/* Empty state */}
             {isFetched && qaPairRows.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-8 text-center">
-                  <div className="text-gray-500">
-                    <p className="mb-2">No results found for this evaluation.</p>
-                    <p className="text-sm">Results will appear here once the evaluation completes.</p>
+                <td colSpan={5} className={tableClasses.empty}>
+                  <div>
+                    <Text mb={8}>No results found for this evaluation.</Text>
+                    <Text fz="sm">Results will appear here once the evaluation completes.</Text>
                   </div>
                 </td>
               </tr>

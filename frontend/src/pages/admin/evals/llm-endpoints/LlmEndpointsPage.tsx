@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core';
+import { Button, Card, Flex, Group, Text } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useCallback, useState } from 'react';
 import type { LLMEndpoint } from 'src/api/generated-eval';
@@ -77,33 +77,33 @@ export function LlmEndpointsPage() {
   return (
     <>
       <Page>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-3xl">{texts.evals.llmEndpoints}</h2>
+        <Group justify="space-between" mb={16} wrap="nowrap">
+          <Text component="h2" fz={30} lh="2.25rem">
+            {texts.evals.llmEndpoints}
+          </Text>
 
-          <div className="flex gap-4">
+          <Flex gap="md">
             <Search value={query} onSearch={handleSearch} />
 
             <Button leftSection={<IconPlus />} onClick={() => setShowCreateDialog(true)}>
               {texts.evals.llmEndpoint.create}
             </Button>
-          </div>
-        </div>
+          </Flex>
+        </Group>
 
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <LlmEndpointsTable
-              endpoints={endpoints}
-              isFetching={isFetching}
-              isFetched={isFetched}
-              onRowClick={handleRowClick}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              isDeleting={!!endpointToDelete}
-            />
+        <Card shadow="xs" radius="md" padding={24}>
+          <LlmEndpointsTable
+            endpoints={endpoints}
+            isFetching={isFetching}
+            isFetched={isFetched}
+            onRowClick={handleRowClick}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isDeleting={!!endpointToDelete}
+          />
 
-            <Pagination page={page} pageSize={PAGE_SIZE} total={effectiveTotal} onPage={handleChangePage} />
-          </div>
-        </div>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={effectiveTotal} onPage={handleChangePage} />
+        </Card>
       </Page>
 
       {showCreateDialog && <CreateLlmEndpointDialog onClose={handleCloseCreateDialog} onCreate={handleCreated} />}

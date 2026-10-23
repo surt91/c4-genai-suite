@@ -1,4 +1,4 @@
-import { Button, TextInput } from '@mantine/core';
+import { Box, Button, Card, Group, TextInput, Title } from '@mantine/core';
 import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -25,31 +25,31 @@ export function EvaluationsPage() {
 
   return (
     <Page>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-3xl">{texts.evals.evaluations.title}</h2>
+      <Group justify="space-between" wrap="nowrap" mb={16}>
+        <Title order={2} fz={30} lh="2.25rem" fw={400}>
+          {texts.evals.evaluations.title}
+        </Title>
 
-        <div className="flex gap-4">
+        <Group gap={16} wrap="nowrap">
           <Button leftSection={<IconPlus />} onClick={() => setShowCreateDialog(true)}>
             {texts.evals.evaluations.create}
           </Button>
-        </div>
-      </div>
+        </Group>
+      </Group>
 
-      <div className="mb-4">
+      <Box mb={16}>
         <TextInput
           placeholder={texts.evals.evaluations.searchPlaceholder}
           leftSection={<IconSearch size={16} />}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-md"
+          maw="28rem"
         />
-      </div>
+      </Box>
 
-      <div className="card bg-base-100 shadow">
-        <div className="card-body">
-          <EvaluationsTable evaluations={evaluations} isFetching={isFetching} isFetched={isFetched} onRowClick={handleRowClick} />
-        </div>
-      </div>
+      <Card shadow="xs" padding={24} radius="md">
+        <EvaluationsTable evaluations={evaluations} isFetching={isFetching} isFetched={isFetched} onRowClick={handleRowClick} />
+      </Card>
 
       {showCreateDialog && (
         <CreateEvaluationDialog onClose={() => setShowCreateDialog(false)} onCreate={() => setShowCreateDialog(false)} />

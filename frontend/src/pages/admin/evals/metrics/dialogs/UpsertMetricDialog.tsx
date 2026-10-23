@@ -1,4 +1,4 @@
-import { Button, Portal, Select } from '@mantine/core';
+import { Button, Divider, Flex, Group, Portal, Select, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -241,14 +241,14 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
           size="lg"
           footer={
             <fieldset disabled={isPending}>
-              <div className="flex flex-row justify-end gap-4">
+              <Group justify="flex-end" gap="md">
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
                 <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
                   {texts.common.save}
                 </Button>
-              </div>
+              </Group>
             </fieldset>
           }
         >
@@ -264,7 +264,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
               label={texts.evals.metric.selectMetricType}
               description={texts.evals.metric.selectMetricTypeHint}
               data={metricTypeOptions}
-              className="mb-4"
+              mb={16}
               disabled={!isCreating}
               key={form.key('type')}
               {...form.getInputProps('type')}
@@ -276,22 +276,24 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
             {/* Danger Zone - only in update mode */}
             {!isCreating && (
               <>
-                <hr className="my-6" />
+                <Divider my={24} />
 
-                <div className="flex flex-row">
-                  <label className="mt-3 w-48 shrink-0 text-sm font-semibold">{texts.common.dangerZone}</label>
+                <Flex>
+                  <Text component="label" mt={12} w={192} flex="none" fz="sm" fw={600}>
+                    {texts.common.dangerZone}
+                  </Text>
                   <ConfirmDialog
                     title={texts.evals.metric.deleteConfirmTitle}
                     text={texts.evals.metric.deleteConfirmText(props.target._configuration.name)}
                     onPerform={handleDelete}
                   >
                     {({ onClick }) => (
-                      <button type="button" className="btn btn-error" onClick={onClick}>
+                      <Button type="button" color="red" onClick={onClick}>
                         {texts.common.remove}
-                      </button>
+                      </Button>
                     )}
                   </ConfirmDialog>
-                </div>
+                </Flex>
               </>
             )}
           </fieldset>

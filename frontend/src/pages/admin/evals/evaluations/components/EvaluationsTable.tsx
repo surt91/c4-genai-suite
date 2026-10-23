@@ -1,6 +1,8 @@
-import { Skeleton } from '@mantine/core';
+import { Badge, Skeleton, Text } from '@mantine/core';
+import { clsx } from 'clsx';
 import type { GetAllEvaluationResult } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
+import tableClasses from './DataTable.module.css';
 import { EvaluationProgressBar } from './EvaluationProgressBar';
 import { EvaluationStatusChip } from './EvaluationStatusChip';
 
@@ -27,15 +29,15 @@ export function EvaluationsTable({ evaluations, isFetching, isFetched, onRowClic
   };
 
   return (
-    <table className="table table-fixed text-base">
+    <table className={clsx(tableClasses.table, tableClasses.fixed)}>
       <thead>
         <tr>
           <th>{texts.evals.evaluations.name}</th>
-          <th className="w-48">{texts.evals.evaluations.qaCatalog}</th>
-          <th className="w-24">{texts.evals.evaluations.metrics}</th>
-          <th className="w-32">{texts.evals.evaluations.status}</th>
-          <th className="w-48">{texts.evals.evaluations.progress}</th>
-          <th className="w-40">{texts.evals.evaluations.createdAt}</th>
+          <th style={{ width: '12rem' }}>{texts.evals.evaluations.qaCatalog}</th>
+          <th style={{ width: '6rem' }}>{texts.evals.evaluations.metrics}</th>
+          <th style={{ width: '8rem' }}>{texts.evals.evaluations.status}</th>
+          <th style={{ width: '12rem' }}>{texts.evals.evaluations.progress}</th>
+          <th style={{ width: '10rem' }}>{texts.evals.evaluations.createdAt}</th>
         </tr>
       </thead>
       <tbody>
@@ -68,37 +70,47 @@ export function EvaluationsTable({ evaluations, isFetching, isFetched, onRowClic
 
         {isFetched &&
           evaluations.map((evaluation) => (
-            <tr className="cursor-pointer hover:bg-gray-50" key={evaluation.id} onClick={() => onRowClick(evaluation)}>
-              <td className="truncate overflow-hidden font-semibold">{evaluation.name}</td>
-              <td className="truncate overflow-hidden">
+            <tr className={tableClasses.clickableRow} key={evaluation.id} onClick={() => onRowClick(evaluation)}>
+              <td className={tableClasses.truncate} style={{ fontWeight: 600 }}>
+                {evaluation.name}
+              </td>
+              <td className={tableClasses.truncate}>
                 {evaluation.catalog ? (
-                  <span className="text-sm">{evaluation.catalog.name}</span>
+                  <Text span fz="sm">
+                    {evaluation.catalog.name}
+                  </Text>
                 ) : (
-                  <span className="text-xs text-gray-500">{texts.evals.evaluations.manualTestCases}</span>
+                  <Text span fz="xs" c="dark.3">
+                    {texts.evals.evaluations.manualTestCases}
+                  </Text>
                 )}
               </td>
-              <td className="text-center">
-                <span className="badge badge-sm">{getMetricsCount(evaluation)}</span>
+              <td style={{ textAlign: 'center' }}>
+                <Badge component="span" size="sm" variant="default" tt="none" fw={400}>
+                  {getMetricsCount(evaluation)}
+                </Badge>
               </td>
-              <td className="overflow-hidden">
+              <td style={{ overflow: 'hidden' }}>
                 <EvaluationStatusChip status={evaluation.status} />
               </td>
-              <td className="overflow-hidden">
+              <td style={{ overflow: 'hidden' }}>
                 <EvaluationProgressBar progress={evaluation.testCaseProgress} showLabel={false} />
-                <div className="mt-1 text-xs text-gray-600">
+                <Text component="div" mt={4} fz="xs" lh="1rem" c="gray.7">
                   {evaluation.testCaseProgress.done} / {evaluation.testCaseProgress.total}
-                </div>
+                </Text>
               </td>
-              <td className="overflow-hidden text-sm">{formatDate(evaluation.createdAt)}</td>
+              <td style={{ overflow: 'hidden' }} className={tableClasses.small}>
+                {formatDate(evaluation.createdAt)}
+              </td>
             </tr>
           ))}
 
         {isFetched && evaluations.length === 0 && (
           <tr>
-            <td colSpan={6} className="py-8 text-center">
-              <div className="text-gray-500">
-                <p className="mb-2">{texts.evals.evaluations.empty}</p>
-                <p className="text-sm">{texts.evals.evaluations.emptyHint}</p>
+            <td colSpan={6} className={tableClasses.empty}>
+              <div>
+                <Text mb={8}>{texts.evals.evaluations.empty}</Text>
+                <Text fz="sm">{texts.evals.evaluations.emptyHint}</Text>
               </div>
             </td>
           </tr>

@@ -18,7 +18,7 @@ export function OpenAiEndpointFields({ form, isEdit }: OpenAiEndpointFieldsProps
         label={texts.evals.llmEndpoint.baseUrlLabel}
         placeholder={texts.evals.llmEndpoint.baseUrlPlaceholder}
         description={texts.evals.llmEndpoint.baseUrlHint}
-        className="mb-4"
+        mb={16}
         key={form.key('baseUrl')}
         {...form.getInputProps('baseUrl')}
       />
@@ -28,7 +28,7 @@ export function OpenAiEndpointFields({ form, isEdit }: OpenAiEndpointFieldsProps
         label={texts.evals.llmEndpoint.apiKeyLabel}
         placeholder={isEdit ? UNCHANGED_API_KEY : texts.evals.llmEndpoint.apiKeyPlaceholder}
         description={isEdit ? texts.evals.llmEndpoint.apiKeyUnchanged : undefined}
-        className="mb-4"
+        mb={16}
         key={form.key('apiKey')}
         {...form.getInputProps('apiKey')}
       />
@@ -37,7 +37,7 @@ export function OpenAiEndpointFields({ form, isEdit }: OpenAiEndpointFieldsProps
         withAsterisk
         label={texts.evals.llmEndpoint.modelLabel}
         placeholder={texts.evals.llmEndpoint.modelPlaceholder}
-        className="mb-4"
+        mb={16}
         key={form.key('model')}
         {...form.getInputProps('model')}
       />
@@ -49,7 +49,7 @@ export function OpenAiEndpointFields({ form, isEdit }: OpenAiEndpointFieldsProps
         max={2}
         step={0.1}
         decimalScale={2}
-        className="mb-4"
+        mb={16}
         key={form.key('temperature')}
         {...form.getInputProps('temperature')}
       />
@@ -61,7 +61,7 @@ export function OpenAiEndpointFields({ form, isEdit }: OpenAiEndpointFieldsProps
           { value: Language.English, label: 'English' },
           { value: Language.German, label: 'German' },
         ]}
-        className="mb-4"
+        mb={16}
         clearable
         key={form.key('language')}
         {...form.getInputProps('language')}

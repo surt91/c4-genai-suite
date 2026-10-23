@@ -21,7 +21,7 @@ export function MetricResultsSection({ metricResults }: MetricResultsSectionProp
       <Stack gap="lg">
         {/* Section Header */}
         <Group gap="xs">
-          <IconChartBar size={20} className="text-gray-600" />
+          <IconChartBar size={20} color="var(--mantine-color-gray-7)" />
           <Text fw={600} size="lg">
             Metric Results
           </Text>

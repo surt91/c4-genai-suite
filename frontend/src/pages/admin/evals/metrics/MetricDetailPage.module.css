@@ -1,0 +1,42 @@
+.title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.sectionTitle {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.label {
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-dark-3);
+}
+
+.value {
+  font-weight: 500;
+}
+
+.steps {
+  margin-top: 0.25rem;
+  padding: 0;
+  list-style: decimal inside;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.empty {
+  padding-block: 2rem;
+  text-align: center;
+  color: var(--mantine-color-dark-3);
+}

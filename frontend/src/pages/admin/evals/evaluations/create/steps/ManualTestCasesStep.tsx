@@ -96,7 +96,7 @@ export function ManualTestCasesStep() {
           {testCases.map((testCase, index) => (
             <Card key={index} padding="md" withBorder>
               <Group justify="space-between" align="flex-start">
-                <Stack gap="xs" className="flex-1">
+                <Stack gap="xs" flex={1}>
                   <Group gap="xs">
                     <Badge size="sm" variant="outline">
                       #{index + 1}
@@ -105,14 +105,14 @@ export function ManualTestCasesStep() {
                       Question:
                     </Text>
                   </Group>
-                  <Text size="sm" className="whitespace-pre-wrap">
+                  <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
                     {testCase.input}
                   </Text>
 
                   <Text fw={600} size="sm" mt="xs">
                     Expected Output:
                   </Text>
-                  <Text size="sm" className="whitespace-pre-wrap">
+                  <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
                     {testCase.expectedOutput}
                   </Text>
 

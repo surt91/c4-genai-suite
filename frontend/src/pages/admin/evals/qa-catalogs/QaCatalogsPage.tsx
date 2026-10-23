@@ -1,6 +1,7 @@
-import { Button, Skeleton } from '@mantine/core';
+import { ActionIcon, Button, Card, Group, Skeleton, Text, Title } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { clsx } from 'clsx';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -9,6 +10,7 @@ import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { ConfirmDialog, Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
+import tableClasses from '../evaluations/components/DataTable.module.css';
 import { QaCatalogStatusChip } from './components/QaCatalogStatusChip';
 import { CreateQaCatalogDialog } from './dialogs/CreateQaCatalogDialog';
 
@@ -76,109 +78,113 @@ export function QaCatalogsPage() {
   return (
     <>
       <Page>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-3xl">{texts.evals.qaCatalogs}</h2>
+        <Group justify="space-between" wrap="nowrap" mb={16}>
+          <Title order={2} fz={30} lh="2.25rem" fw={400}>
+            {texts.evals.qaCatalogs}
+          </Title>
 
-          <div className="flex gap-4">
+          <Group gap={16} wrap="nowrap">
             <Search value={query} onSearch={handleSearch} />
 
             <Button leftSection={<IconPlus />} onClick={() => setShowCreateDialog(true)}>
               {texts.evals.qaCatalog.create}
             </Button>
-          </div>
-        </div>
+          </Group>
+        </Group>
 
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <table className="table table-fixed text-base">
-              <thead>
-                <tr>
-                  <th>{texts.evals.qaCatalog.name}</th>
-                  <th className="w-28">{texts.evals.qaCatalog.length}</th>
-                  <th className="w-32">{texts.evals.qaCatalog.status}</th>
-                  <th className="w-36">{texts.evals.qaCatalog.createdAt}</th>
-                  <th className="w-36">{texts.evals.qaCatalog.updatedAt}</th>
-                  <th className="w-20">{texts.evals.qaCatalog.actions}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isFetching && !isFetched && (
-                  <>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <tr key={i}>
-                        <td>
-                          <Skeleton height={20} />
-                        </td>
-                        <td>
-                          <Skeleton height={20} />
-                        </td>
-                        <td>
-                          <Skeleton height={20} />
-                        </td>
-                        <td>
-                          <Skeleton height={20} />
-                        </td>
-                        <td>
-                          <Skeleton height={20} />
-                        </td>
-                        <td>
-                          <Skeleton height={20} />
-                        </td>
-                      </tr>
-                    ))}
-                  </>
-                )}
-
-                {isFetched &&
-                  catalogs?.map((catalog) => (
-                    <tr className="cursor-pointer hover:bg-gray-50" key={catalog.id} onClick={() => handleRowClick(catalog)}>
-                      <td className="truncate overflow-hidden font-semibold">{catalog.name}</td>
-                      <td className="overflow-hidden">{catalog.length}</td>
-                      <td className="overflow-hidden">
-                        <QaCatalogStatusChip status={catalog.status} />
+        <Card shadow="xs" padding={24} radius="md">
+          <table className={clsx(tableClasses.table, tableClasses.fixed)}>
+            <thead>
+              <tr>
+                <th>{texts.evals.qaCatalog.name}</th>
+                <th style={{ width: '7rem' }}>{texts.evals.qaCatalog.length}</th>
+                <th style={{ width: '8rem' }}>{texts.evals.qaCatalog.status}</th>
+                <th style={{ width: '9rem' }}>{texts.evals.qaCatalog.createdAt}</th>
+                <th style={{ width: '9rem' }}>{texts.evals.qaCatalog.updatedAt}</th>
+                <th style={{ width: '5rem' }}>{texts.evals.qaCatalog.actions}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isFetching && !isFetched && (
+                <>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i}>
+                      <td>
+                        <Skeleton height={20} />
                       </td>
-                      <td className="overflow-hidden">{formatDate(catalog.createdAt)}</td>
-                      <td className="overflow-hidden">{formatDate(catalog.updatedAt)}</td>
-                      <td className="overflow-hidden">
-                        <ConfirmDialog
-                          title={texts.evals.qaCatalog.deleteConfirmTitle}
-                          text={texts.evals.qaCatalog.deleteConfirmText(catalog.name)}
-                          onPerform={() => deleteMutation.mutate(catalog.id)}
-                        >
-                          {({ onClick }) => (
-                            <button
-                              type="button"
-                              className="btn btn-ghost btn-sm text-error"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onClick();
-                              }}
-                              disabled={deleteMutation.isPending}
-                            >
-                              <IconTrash size={18} />
-                            </button>
-                          )}
-                        </ConfirmDialog>
+                      <td>
+                        <Skeleton height={20} />
+                      </td>
+                      <td>
+                        <Skeleton height={20} />
+                      </td>
+                      <td>
+                        <Skeleton height={20} />
+                      </td>
+                      <td>
+                        <Skeleton height={20} />
+                      </td>
+                      <td>
+                        <Skeleton height={20} />
                       </td>
                     </tr>
                   ))}
+                </>
+              )}
 
-                {isFetched && catalogs?.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center">
-                      <div className="text-gray-500">
-                        <p className="mb-2">{texts.evals.qaCatalog.empty}</p>
-                        <p className="text-sm">{texts.evals.qaCatalog.emptyHint}</p>
-                      </div>
+              {isFetched &&
+                catalogs?.map((catalog) => (
+                  <tr className={tableClasses.clickableRow} key={catalog.id} onClick={() => handleRowClick(catalog)}>
+                    <td className={tableClasses.truncate} style={{ fontWeight: 600 }}>
+                      {catalog.name}
+                    </td>
+                    <td className={tableClasses.clip}>{catalog.length}</td>
+                    <td className={tableClasses.clip}>
+                      <QaCatalogStatusChip status={catalog.status} />
+                    </td>
+                    <td className={tableClasses.clip}>{formatDate(catalog.createdAt)}</td>
+                    <td className={tableClasses.clip}>{formatDate(catalog.updatedAt)}</td>
+                    <td className={tableClasses.clip}>
+                      <ConfirmDialog
+                        title={texts.evals.qaCatalog.deleteConfirmTitle}
+                        text={texts.evals.qaCatalog.deleteConfirmText(catalog.name)}
+                        onPerform={() => deleteMutation.mutate(catalog.id)}
+                      >
+                        {({ onClick }) => (
+                          <ActionIcon
+                            variant="subtle"
+                            size="lg"
+                            color="red"
+                            c="red.7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onClick();
+                            }}
+                            disabled={deleteMutation.isPending}
+                          >
+                            <IconTrash size={18} />
+                          </ActionIcon>
+                        )}
+                      </ConfirmDialog>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                ))}
 
-            <Pagination page={page} pageSize={PAGE_SIZE} total={catalogs?.length ?? 0} onPage={handleChangePage} />
-          </div>
-        </div>
+              {isFetched && catalogs?.length === 0 && (
+                <tr>
+                  <td colSpan={6} className={tableClasses.empty}>
+                    <div>
+                      <Text mb={8}>{texts.evals.qaCatalog.empty}</Text>
+                      <Text fz="sm">{texts.evals.qaCatalog.emptyHint}</Text>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          <Pagination page={page} pageSize={PAGE_SIZE} total={catalogs?.length ?? 0} onPage={handleChangePage} />
+        </Card>
       </Page>
 
       {showCreateDialog && <CreateQaCatalogDialog onClose={handleCloseCreateDialog} onCreated={handleCreated} />}

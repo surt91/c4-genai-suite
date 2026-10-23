@@ -1,4 +1,4 @@
-import { Button, Menu, Select, Skeleton } from '@mantine/core';
+import { Box, Button, Card, Group, Menu, Paper, Select, Skeleton, Stack, Text, Title } from '@mantine/core';
 import {
   IconArrowLeft,
   IconChevronDown,
@@ -239,14 +239,12 @@ export function QaCatalogDetailPage() {
   if (isCatalogLoading) {
     return (
       <Page>
-        <div className="mb-4">
+        <Box mb={16}>
           <Skeleton height={32} width={300} />
-        </div>
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <Skeleton height={400} />
-          </div>
-        </div>
+        </Box>
+        <Card shadow="xs" padding={24} radius="md">
+          <Skeleton height={400} />
+        </Card>
       </Page>
     );
   }
@@ -254,17 +252,19 @@ export function QaCatalogDetailPage() {
   if (!catalog) {
     return (
       <Page>
-        <div className="py-12 text-center">
-          <p className="text-lg text-gray-500">{texts.evals.qaCatalog.errorNotFound}</p>
+        <Box py={48} ta="center">
+          <Text fz="lg" lh="1.75rem" c="dark.3">
+            {texts.evals.qaCatalog.errorNotFound}
+          </Text>
           <Button
             variant="subtle"
             leftSection={<IconArrowLeft size={18} />}
-            className="mt-4"
+            mt={16}
             onClick={() => navigate('/admin/evals/qa-catalogs')}
           >
             {texts.evals.qaCatalogs}
           </Button>
-        </div>
+        </Box>
       </Page>
     );
   }
@@ -273,8 +273,8 @@ export function QaCatalogDetailPage() {
     <>
       <Page>
         {/* Header */}
-        <div className="mb-4">
-          <div className="mb-2 flex items-center gap-2">
+        <Box mb={16}>
+          <Group gap={8} wrap="nowrap" mb={8}>
             <Button
               variant="subtle"
               size="sm"
@@ -283,15 +283,17 @@ export function QaCatalogDetailPage() {
             >
               {texts.evals.qaCatalogs}
             </Button>
-          </div>
+          </Group>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h2 className="text-3xl">{catalog.name}</h2>
+          <Group justify="space-between" wrap="nowrap" gap={0}>
+            <Group gap={16} wrap="nowrap">
+              <Title order={2} fz={30} lh="2.25rem" fw={400}>
+                {catalog.name}
+              </Title>
               <QaCatalogStatusChip status={catalog.status} error={catalog.error} />
-            </div>
+            </Group>
 
-            <div className="flex items-center gap-2">
+            <Group gap={8} wrap="nowrap">
               {/* Version selector */}
               {versionOptions.length > 0 && (
                 <Select
@@ -300,7 +302,7 @@ export function QaCatalogDetailPage() {
                   value={catalogId}
                   onChange={handleVersionChange}
                   clearable
-                  className="w-48"
+                  w="12rem"
                 />
               )}
 
@@ -337,11 +339,11 @@ export function QaCatalogDetailPage() {
               <Button leftSection={<IconPlus size={16} />} onClick={() => setShowAddDialog(true)}>
                 {texts.evals.qaCatalog.addQaPair}
               </Button>
-            </div>
-          </div>
+            </Group>
+          </Group>
 
           {/* Metadata */}
-          <div className="mt-2 flex gap-4 text-sm text-gray-500">
+          <Group component="div" gap={16} mt={8} fz="sm" lh="1.25rem" c="dark.3" wrap="nowrap">
             <span>
               {texts.evals.qaCatalog.revision}: {catalog.revision}
             </span>
@@ -351,87 +353,91 @@ export function QaCatalogDetailPage() {
             <span>
               {texts.evals.qaCatalog.updatedAt}: {formatDate(catalog.updatedAt)}
             </span>
-          </div>
-        </div>
+          </Group>
+        </Box>
 
         {/* Pending changes bar */}
         {hasChanges && (
-          <div className="mb-4 flex items-center justify-between rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-            <div className="flex items-center gap-4 text-sm">
-              <span className="font-medium">{texts.evals.qaCatalog.pendingChanges(pendingChanges.length)}</span>
-              {pendingCounts.additions > 0 && (
-                <span className="text-green-600">
-                  +{pendingCounts.additions} {texts.evals.qaCatalog.pendingAdditions(pendingCounts.additions)}
-                </span>
-              )}
-              {pendingCounts.updates > 0 && (
-                <span className="text-blue-600">
-                  ~{pendingCounts.updates} {texts.evals.qaCatalog.pendingUpdates(pendingCounts.updates)}
-                </span>
-              )}
-              {pendingCounts.deletions > 0 && (
-                <span className="text-red-600">
-                  -{pendingCounts.deletions} {texts.evals.qaCatalog.pendingDeletions(pendingCounts.deletions)}
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <ConfirmDialog
-                title={texts.evals.qaCatalog.cancelAllChanges}
-                text={texts.evals.qaCatalog.discardChangesConfirm(pendingChanges.length)}
-                onPerform={clearPendingChanges}
-              >
-                {({ onClick }) => (
-                  <Button variant="subtle" size="sm" leftSection={<IconX size={16} />} onClick={onClick}>
-                    {texts.evals.qaCatalog.cancelAllChanges}
-                  </Button>
+          <Paper withBorder radius="md" p={12} mb={16} bg="yellow.0" style={{ borderColor: 'var(--mantine-color-yellow-3)' }}>
+            <Group justify="space-between" wrap="nowrap" gap={0}>
+              <Group gap={16} wrap="nowrap" fz="sm" lh="1.25rem">
+                <Text span fz="sm" fw={500}>
+                  {texts.evals.qaCatalog.pendingChanges(pendingChanges.length)}
+                </Text>
+                {pendingCounts.additions > 0 && (
+                  <Text span fz="sm" c="green.8">
+                    +{pendingCounts.additions} {texts.evals.qaCatalog.pendingAdditions(pendingCounts.additions)}
+                  </Text>
                 )}
-              </ConfirmDialog>
-              <Button
-                size="sm"
-                leftSection={<IconDeviceFloppy size={16} />}
-                onClick={() => saveMutation.mutate()}
-                loading={saveMutation.isPending}
-              >
-                {texts.evals.qaCatalog.saveAllChanges}
-              </Button>
-            </div>
-          </div>
+                {pendingCounts.updates > 0 && (
+                  <Text span fz="sm" c="blue.8">
+                    ~{pendingCounts.updates} {texts.evals.qaCatalog.pendingUpdates(pendingCounts.updates)}
+                  </Text>
+                )}
+                {pendingCounts.deletions > 0 && (
+                  <Text span fz="sm" c="red.7">
+                    -{pendingCounts.deletions} {texts.evals.qaCatalog.pendingDeletions(pendingCounts.deletions)}
+                  </Text>
+                )}
+              </Group>
+              <Group gap={8} wrap="nowrap">
+                <ConfirmDialog
+                  title={texts.evals.qaCatalog.cancelAllChanges}
+                  text={texts.evals.qaCatalog.discardChangesConfirm(pendingChanges.length)}
+                  onPerform={clearPendingChanges}
+                >
+                  {({ onClick }) => (
+                    <Button variant="subtle" size="sm" leftSection={<IconX size={16} />} onClick={onClick}>
+                      {texts.evals.qaCatalog.cancelAllChanges}
+                    </Button>
+                  )}
+                </ConfirmDialog>
+                <Button
+                  size="sm"
+                  leftSection={<IconDeviceFloppy size={16} />}
+                  onClick={() => saveMutation.mutate()}
+                  loading={saveMutation.isPending}
+                >
+                  {texts.evals.qaCatalog.saveAllChanges}
+                </Button>
+              </Group>
+            </Group>
+          </Paper>
         )}
 
         {/* Q&A Pairs Table */}
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            {isPairsLoading ? (
-              <div className="space-y-2">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <Skeleton key={i} height={60} />
-                ))}
-              </div>
-            ) : (
-              <>
-                <QaPairsTable
-                  pairs={effectivePairs}
-                  pendingChanges={pendingChanges}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onUndo={handleUndo}
-                />
+        <Card shadow="xs" padding={24} radius="md">
+          {isPairsLoading ? (
+            <Stack gap={8}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <Skeleton key={i} height={60} />
+              ))}
+            </Stack>
+          ) : (
+            <>
+              <QaPairsTable
+                pairs={effectivePairs}
+                pendingChanges={pendingChanges}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onUndo={handleUndo}
+              />
 
-                {effectivePairs.length === 0 && (
-                  <div className="py-8 text-center text-gray-500">{texts.evals.qaCatalog.noQaPairs}</div>
-                )}
+              {effectivePairs.length === 0 && (
+                <Box py={32} ta="center" c="dark.3">
+                  {texts.evals.qaCatalog.noQaPairs}
+                </Box>
+              )}
 
-                <Pagination
-                  page={page}
-                  pageSize={PAGE_SIZE}
-                  total={(pairsData?.length ?? 0) + pendingCounts.additions}
-                  onPage={setPage}
-                />
-              </>
-            )}
-          </div>
-        </div>
+              <Pagination
+                page={page}
+                pageSize={PAGE_SIZE}
+                total={(pairsData?.length ?? 0) + pendingCounts.additions}
+                onPage={setPage}
+              />
+            </>
+          )}
+        </Card>
       </Page>
 
       {/* Dialogs */}

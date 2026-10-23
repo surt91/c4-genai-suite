@@ -1,0 +1,64 @@
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.headRow {
+  border-bottom: 2px solid var(--mantine-color-gray-2);
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 1rem;
+  vertical-align: top;
+}
+
+.row:not([data-pending-status]):hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+.firstCell[data-pending-status] {
+  border-left: 4px solid;
+}
+
+.firstCell[data-pending-status='added'] {
+  border-left-color: var(--mantine-color-green-6);
+}
+
+.firstCell[data-pending-status='updated'] {
+  border-left-color: var(--mantine-color-blue-6);
+}
+
+.firstCell[data-pending-status='deleted'] {
+  border-left-color: var(--mantine-color-red-6);
+}
+
+.cellContent[data-deleted] {
+  color: var(--mantine-color-dark-3);
+  text-decoration-line: line-through;
+}
+
+.text {
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.contexts {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--mantine-color-gray-7);
+}
+
+.noContexts {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--mantine-color-gray-6);
+}

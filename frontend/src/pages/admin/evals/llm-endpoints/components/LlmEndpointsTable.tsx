@@ -1,7 +1,8 @@
-import { Skeleton } from '@mantine/core';
+import { ActionIcon, Group, Skeleton, Table, Text } from '@mantine/core';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import type { LLMEndpoint } from 'src/api/generated-eval';
 import { texts } from 'src/texts';
+import classes from '../../EvalTable.module.css';
 import { LlmEndpointFeaturesBadge } from './LlmEndpointFeaturesBadge';
 import { LlmEndpointTypeChip } from './LlmEndpointTypeChip';
 
@@ -33,62 +34,48 @@ export function LlmEndpointsTable({
   };
 
   return (
-    <table className="table table-fixed text-base">
-      <thead>
-        <tr>
-          <th>{texts.evals.llmEndpoint.name}</th>
-          <th className="w-40">{texts.evals.llmEndpoint.type}</th>
-          <th className="w-48">{texts.evals.llmEndpoint.features}</th>
-          <th className="w-36">{texts.evals.llmEndpoint.createdAt}</th>
-          <th className="w-36">{texts.evals.llmEndpoint.updatedAt}</th>
-          <th className="w-28">{texts.evals.llmEndpoint.actions}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {isFetching && !isFetched && (
-          <>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i}>
-                <td>
+    <Table layout="fixed" fz="md" verticalSpacing={12} horizontalSpacing={16} highlightOnHover>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>{texts.evals.llmEndpoint.name}</Table.Th>
+          <Table.Th w={160}>{texts.evals.llmEndpoint.type}</Table.Th>
+          <Table.Th w={192}>{texts.evals.llmEndpoint.features}</Table.Th>
+          <Table.Th w={144}>{texts.evals.llmEndpoint.createdAt}</Table.Th>
+          <Table.Th w={144}>{texts.evals.llmEndpoint.updatedAt}</Table.Th>
+          <Table.Th w={112}>{texts.evals.llmEndpoint.actions}</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {isFetching &&
+          !isFetched &&
+          Array.from({ length: 5 }).map((_, i) => (
+            <Table.Tr key={i}>
+              {Array.from({ length: 6 }).map((_, j) => (
+                <Table.Td key={j}>
                   <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-                <td>
-                  <Skeleton height={20} />
-                </td>
-              </tr>
-            ))}
-          </>
-        )}
+                </Table.Td>
+              ))}
+            </Table.Tr>
+          ))}
 
         {isFetched &&
           endpoints.map((endpoint) => (
-            <tr className="cursor-pointer hover:bg-gray-50" key={endpoint.id} onClick={() => onRowClick(endpoint)}>
-              <td className="truncate overflow-hidden font-semibold">{endpoint.name}</td>
-              <td className="overflow-hidden">
+            <Table.Tr className={classes.clickableRow} key={endpoint.id} onClick={() => onRowClick(endpoint)}>
+              <Table.Td className={classes.nameCell}>{endpoint.name}</Table.Td>
+              <Table.Td className={classes.cell}>
                 <LlmEndpointTypeChip type={endpoint._configuration.type} />
-              </td>
-              <td className="overflow-hidden">
+              </Table.Td>
+              <Table.Td className={classes.cell}>
                 <LlmEndpointFeaturesBadge features={endpoint.supportedFeatures} />
-              </td>
-              <td className="overflow-hidden">{formatDate(endpoint.createdAt)}</td>
-              <td className="overflow-hidden">{formatDate(endpoint.updatedAt)}</td>
-              <td className="overflow-hidden">
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
+              </Table.Td>
+              <Table.Td className={classes.cell}>{formatDate(endpoint.createdAt)}</Table.Td>
+              <Table.Td className={classes.cell}>{formatDate(endpoint.updatedAt)}</Table.Td>
+              <Table.Td className={classes.cell}>
+                <Group gap={4} wrap="nowrap">
+                  <ActionIcon
+                    variant="subtle"
+                    color="dark"
+                    size={32}
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(endpoint);
@@ -96,10 +83,11 @@ export function LlmEndpointsTable({
                     disabled={isDeleting}
                   >
                     <IconPencil size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm text-error"
+                  </ActionIcon>
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    size={32}
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(endpoint);
@@ -107,23 +95,27 @@ export function LlmEndpointsTable({
                     disabled={isDeleting}
                   >
                     <IconTrash size={18} />
-                  </button>
-                </div>
-              </td>
-            </tr>
+                  </ActionIcon>
+                </Group>
+              </Table.Td>
+            </Table.Tr>
           ))}
 
         {isFetched && endpoints.length === 0 && (
-          <tr>
-            <td colSpan={6} className="py-8 text-center">
-              <div className="text-gray-500">
-                <p className="mb-2">{texts.evals.llmEndpoint.empty}</p>
-                <p className="text-sm">{texts.evals.llmEndpoint.emptyHint}</p>
+          <Table.Tr>
+            <Table.Td colSpan={6} className={classes.emptyCell}>
+              <div>
+                <Text mb={8} inherit>
+                  {texts.evals.llmEndpoint.empty}
+                </Text>
+                <Text fz="sm" c="inherit">
+                  {texts.evals.llmEndpoint.emptyHint}
+                </Text>
               </div>
-            </td>
-          </tr>
+            </Table.Td>
+          </Table.Tr>
         )}
-      </tbody>
-    </table>
+      </Table.Tbody>
+    </Table>
   );
 }

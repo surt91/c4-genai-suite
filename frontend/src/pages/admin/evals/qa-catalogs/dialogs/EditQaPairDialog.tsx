@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Portal, Textarea, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Button, Group, Portal, Stack, Text, Textarea, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconPlus, IconX } from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -57,12 +57,12 @@ export function EditQaPairDialog({ pair, onClose, onSave }: EditQaPairDialogProp
           onClose={onClose}
           header={texts.evals.qaCatalog.editQaPair}
           footer={
-            <div className="flex flex-row justify-end gap-4">
+            <Group justify="flex-end" gap={16} wrap="nowrap">
               <Button type="button" variant="subtle" onClick={onClose}>
                 {texts.common.cancel}
               </Button>
               <Button type="submit">{texts.common.save}</Button>
-            </div>
+            </Group>
           }
         >
           <Textarea
@@ -71,7 +71,7 @@ export function EditQaPairDialog({ pair, onClose, onSave }: EditQaPairDialogProp
             label={texts.evals.qaCatalog.questionLabel}
             placeholder={texts.evals.qaCatalog.questionPlaceholder}
             minRows={3}
-            className="mb-4"
+            mb={16}
             key={form.key('question')}
             {...form.getInputProps('question')}
           />
@@ -82,45 +82,51 @@ export function EditQaPairDialog({ pair, onClose, onSave }: EditQaPairDialogProp
             label={texts.evals.qaCatalog.expectedOutputLabel}
             placeholder={texts.evals.qaCatalog.expectedOutputPlaceholder}
             minRows={3}
-            className="mb-4"
+            mb={16}
             key={form.key('expectedOutput')}
             {...form.getInputProps('expectedOutput')}
           />
 
-          <div className="mb-4">
-            <div className="mb-2 flex items-center justify-between">
-              <label className="text-sm font-medium">{texts.evals.qaCatalog.contextsLabel}</label>
+          <Box mb={16}>
+            <Group justify="space-between" wrap="nowrap" gap={0} mb={8}>
+              <Text component="label" fz="sm" fw={500}>
+                {texts.evals.qaCatalog.contextsLabel}
+              </Text>
               <Tooltip label={texts.evals.qaCatalog.addContext}>
                 <ActionIcon variant="light" size="sm" onClick={addContext}>
                   <IconPlus size={16} />
                 </ActionIcon>
               </Tooltip>
-            </div>
-            <p className="mb-2 text-xs text-gray-500">{texts.evals.qaCatalog.contextsHint}</p>
+            </Group>
+            <Text mb={8} fz="xs" lh="1rem" c="dark.3">
+              {texts.evals.qaCatalog.contextsHint}
+            </Text>
 
             {form.values.contexts.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">No contexts added</p>
+              <Text fz="sm" c="gray.6" fs="italic">
+                No contexts added
+              </Text>
             ) : (
-              <div className="space-y-2">
+              <Stack gap={8}>
                 {form.values.contexts.map((_, index) => (
-                  <div key={index} className="flex gap-2">
+                  <Group key={index} gap={8} wrap="nowrap" align="flex-start">
                     <Textarea
-                      className="flex-1"
+                      flex={1}
                       placeholder={texts.evals.qaCatalog.contextsPlaceholder}
                       minRows={2}
                       key={form.key(`contexts.${index}`)}
                       {...form.getInputProps(`contexts.${index}`)}
                     />
                     <Tooltip label={texts.evals.qaCatalog.removeContext}>
-                      <ActionIcon variant="subtle" color="red" className="mt-1" onClick={() => removeContext(index)}>
+                      <ActionIcon variant="subtle" color="red" mt={4} onClick={() => removeContext(index)}>
                         <IconX size={16} />
                       </ActionIcon>
                     </Tooltip>
-                  </div>
+                  </Group>
                 ))}
-              </div>
+              </Stack>
             )}
-          </div>
+          </Box>
         </Modal>
       </form>
     </Portal>

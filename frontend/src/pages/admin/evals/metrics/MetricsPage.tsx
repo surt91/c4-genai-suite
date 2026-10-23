@@ -1,4 +1,4 @@
-import { Button } from '@mantine/core';
+import { Button, Card, Flex, Group, Text } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -71,33 +71,33 @@ export function MetricsPage() {
   return (
     <>
       <Page>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-3xl">{texts.evals.metrics}</h2>
+        <Group justify="space-between" mb={16} wrap="nowrap">
+          <Text component="h2" fz={30} lh="2.25rem">
+            {texts.evals.metrics}
+          </Text>
 
-          <div className="flex gap-4">
+          <Flex gap="md">
             <Search value={query} onSearch={handleSearch} />
 
             <Button leftSection={<IconPlus />} onClick={() => setShowCreateDialog(true)}>
               {texts.evals.metric.create}
             </Button>
-          </div>
-        </div>
+          </Flex>
+        </Group>
 
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <MetricsTable
-              metrics={loadedMetrics ?? []}
-              isFetching={isFetching}
-              isFetched={isFetched}
-              onRowClick={handleRowClick}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              isDeleting={metricToDelete?.id}
-            />
+        <Card shadow="xs" radius="md" padding={24}>
+          <MetricsTable
+            metrics={loadedMetrics ?? []}
+            isFetching={isFetching}
+            isFetched={isFetched}
+            onRowClick={handleRowClick}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isDeleting={metricToDelete?.id}
+          />
 
-            <Pagination page={page} pageSize={PAGE_SIZE} total={loadedMetrics?.length ?? 0} onPage={handleChangePage} />
-          </div>
-        </div>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={loadedMetrics?.length ?? 0} onPage={handleChangePage} />
+        </Card>
       </Page>
 
       {showCreateDialog && <CreateMetricDialog onClose={handleCloseCreateDialog} onCreate={handleCreated} />}

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ConfigurationDto } from 'src/api/generated';
 import { useApi } from 'src/api/state/apiAppClient';
 import { useWizardStore } from '../../state/zustand/wizardState';
+import classes from './SelectableCard.module.css';
 
 export function AssistantSelectionStep() {
   const { gaibleAssistantId, setGaibleAssistant } = useWizardStore();
@@ -78,16 +79,15 @@ export function AssistantSelectionStep() {
               key={assistant.id}
               padding="md"
               withBorder
-              className={`cursor-pointer transition-all ${
-                gaibleAssistantId === assistant.id ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'
-              }`}
+              className={classes.card}
+              data-selected={gaibleAssistantId === assistant.id || undefined}
               onClick={() => setGaibleAssistant(assistant.id, assistant.name)}
             >
               <Group wrap="nowrap" align="flex-start">
                 <Radio value={assistant.id.toString()} />
-                <Stack gap="xs" className="flex-1">
+                <Stack gap="xs" flex={1}>
                   <Group gap="xs">
-                    <IconRobot size={18} className="text-blue-600" />
+                    <IconRobot size={18} color="var(--mantine-color-blue-8)" />
                     <Text fw={600}>{assistant.name}</Text>
                   </Group>
                   {assistant.description && (

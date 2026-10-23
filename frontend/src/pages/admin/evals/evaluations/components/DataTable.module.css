@@ -1,0 +1,62 @@
+/* Plain data table of the evals pages (former daisyUI `table`). */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.fixed {
+  table-layout: fixed;
+}
+
+.table :where(th, td) {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+.table :where(thead tr, tbody tr:not(:last-child)) {
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.table thead {
+  white-space: nowrap;
+  color: var(--mantine-color-dark-3);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.clickableRow {
+  cursor: pointer;
+}
+
+.clickableRow:hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  padding-block: 2rem;
+  text-align: center;
+  color: var(--mantine-color-dark-3);
+}
+
+.small {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.details {
+  padding: 0;
+  background-color: var(--mantine-color-gray-0);
+}
+
+.clip {
+  overflow: hidden;
+}

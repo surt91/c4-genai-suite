@@ -1,4 +1,4 @@
-import { Button, MultiSelect, Portal, Radio, Stack } from '@mantine/core';
+import { Box, Button, Group, MultiSelect, Portal, Radio, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDownload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
@@ -82,19 +82,21 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
           onClose={onClose}
           header={texts.evals.qaCatalog.downloadTitle}
           footer={
-            <div className="flex flex-row justify-end gap-4">
+            <Group justify="flex-end" gap={16} wrap="nowrap">
               <Button type="button" variant="subtle" onClick={onClose}>
                 {texts.common.cancel}
               </Button>
               <Button type="submit" leftSection={<IconDownload size={16} />} loading={downloadMutation.isPending}>
                 {texts.evals.qaCatalog.downloadStart}
               </Button>
-            </div>
+            </Group>
           }
         >
           {/* Format selection */}
-          <div className="mb-6">
-            <label className="mb-2 block text-sm font-medium">{texts.evals.qaCatalog.downloadFormat}</label>
+          <Box mb={24}>
+            <Text component="label" display="block" mb={8} fz="sm" fw={500}>
+              {texts.evals.qaCatalog.downloadFormat}
+            </Text>
             <Radio.Group value={form.values.format} onChange={(value) => form.setFieldValue('format', value)}>
               <Stack gap="xs">
                 <Radio value={SupportedQACatalogDownloadFormat.Csv} label={texts.evals.qaCatalog.downloadFormatCsv} />
@@ -103,11 +105,13 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
                 <Radio value={SupportedQACatalogDownloadFormat.Xlsx} label={texts.evals.qaCatalog.downloadFormatXlsx} />
               </Stack>
             </Radio.Group>
-          </div>
+          </Box>
 
           {/* Version selection */}
-          <div className="mb-4">
-            <label className="mb-2 block text-sm font-medium">{texts.evals.qaCatalog.downloadVersions}</label>
+          <Box mb={16}>
+            <Text component="label" display="block" mb={8} fz="sm" fw={500}>
+              {texts.evals.qaCatalog.downloadVersions}
+            </Text>
             <Radio.Group value={form.values.versionSelection} onChange={(value) => form.setFieldValue('versionSelection', value)}>
               <Stack gap="xs">
                 <Radio value="current" label={texts.evals.qaCatalog.downloadCurrentVersion} />
@@ -119,7 +123,7 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
                 )}
               </Stack>
             </Radio.Group>
-          </div>
+          </Box>
 
           {/* Specific versions selector */}
           {form.values.versionSelection === 'specific' && (
@@ -128,7 +132,7 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
               data={versionOptions}
               value={form.values.selectedVersions}
               onChange={(value) => form.setFieldValue('selectedVersions', value)}
-              className="mb-4"
+              mb={16}
             />
           )}
         </Modal>
