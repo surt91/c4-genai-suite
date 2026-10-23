@@ -248,7 +248,7 @@ export const useConfirmAiAction = (requestId: string) => {
 
   return useMutation({
     mutationFn: (result: ChatUICallbackResultDto) => {
-      return api.conversations.confirm(requestId, result);
+      return api.conversations.confirm(currentChatId, requestId, result);
     },
     onSuccess: () => {
       chatStore.updateMessage(currentChatId, getMessagePlaceholderId('ai'), { ui: undefined });

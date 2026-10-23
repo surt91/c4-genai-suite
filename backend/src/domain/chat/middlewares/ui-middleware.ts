@@ -27,7 +27,7 @@ class ChatUIImpl implements ChatUI {
       return { action: FormActionType.CANCEL };
     }
 
-    const { id, result } = this.callbacks.form();
+    const { id, result } = this.callbacks.form({ userId: this.context.user.id, conversationId: this.context.conversationId });
 
     // When the generation is stopped, nobody can answer the form anymore.
     const onAbort = () => this.callbacks.complete(id, { action: FormActionType.CANCEL });

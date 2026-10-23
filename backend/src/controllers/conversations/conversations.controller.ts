@@ -18,6 +18,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiExtraModels,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -386,17 +387,35 @@ export class ConversationsController {
     await this.commandBus.execute(new DeleteConversation(+id, req.user));
   }
 
-  @Delete('confirm/:id')
-  @ApiOperation({ operationId: 'confirm' })
+  @Delete(':id/confirm/:requestId')
+  @ApiOperation({
+    operationId: 'confirm',
+    description: 'Answers a pending form request (e.g. a confirmation) of the generation in the conversation.',
+  })
   @ApiParam({
     name: 'id',
+    description: 'The ID of the conversation.',
+    required: true,
+    type: Number,
+  })
+  @ApiParam({
+    name: 'requestId',
     description: 'The ID of the confirmation request.',
     required: true,
     type: String,
   })
   @ApiNoContentResponse()
-  confirm(@Param('id') id: string, @Body() result: ChatUICallbackResultDto) {
-    this.callbacks.complete(id, result);
+  @ApiNotFoundResponse({ description: 'There is no pending request with this ID for the user and conversation.' })
+  confirm(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('requestId') requestId: string,
+    @Body() result: ChatUICallbackResultDto,
+  ) {
+    // Do not reveal whether a request of another user or conversation exists.
+    if (!this.callbacks.answer(requestId, { userId: req.user.id, conversationId: id }, result)) {
+      throw new NotFoundException();
+    }
   }
 }
 

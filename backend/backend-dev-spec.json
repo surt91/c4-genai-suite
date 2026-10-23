@@ -607,12 +607,22 @@
         "tags": ["conversation"]
       }
     },
-    "/api/conversations/confirm/{id}": {
+    "/api/conversations/{id}/confirm/{requestId}": {
       "delete": {
+        "description": "Answers a pending form request (e.g. a confirmation) of the generation in the conversation.",
         "operationId": "confirm",
         "parameters": [
           {
             "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "requestId",
             "required": true,
             "in": "path",
             "description": "The ID of the confirmation request.",
@@ -634,6 +644,9 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "404": {
+            "description": "There is no pending request with this ID for the user and conversation."
           }
         },
         "summary": "",

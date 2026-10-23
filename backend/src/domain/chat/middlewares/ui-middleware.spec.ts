@@ -16,7 +16,12 @@ describe(UIMiddleware.name, () => {
   });
 
   async function createContext() {
-    const context = { abort: new AbortController(), result: new ReplaySubject<StreamEvent>() } as unknown as ChatContext;
+    const context = {
+      abort: new AbortController(),
+      result: new ReplaySubject<StreamEvent>(),
+      user: { id: 'user1' },
+      conversationId: 7,
+    } as unknown as ChatContext;
     await new UIMiddleware(callbacks).invoke(
       context,
       () => context,
@@ -36,9 +41,49 @@ describe(UIMiddleware.name, () => {
 
     const request = events.find((x) => x.type === 'ui');
     expect(request).toBeDefined();
-    callbacks.complete(request!.type === 'ui' ? request!.request.id : '', { action: FormActionType.ACCEPT, data: { a: 1 } });
+    const answered = callbacks.answer(
+      request!.type === 'ui' ? request!.request.id : '',
+      { userId: 'user1', conversationId: 7 },
+      { action: FormActionType.ACCEPT, data: { a: 1 } },
+    );
 
+    expect(answered).toBe(true);
     await expect(result).resolves.toEqual({ action: FormActionType.ACCEPT, data: { a: 1 } });
+  });
+
+  it('does not accept answers from other users or conversations', async () => {
+    const context = await createContext();
+    const events: StreamEvent[] = [];
+    context.result.subscribe((event) => events.push(event));
+
+    const result = context.ui.form('Are you sure?', schema);
+    let resolved = false;
+    void result.then(() => (resolved = true));
+
+    const request = events.find((x) => x.type === 'ui');
+    const id = request!.type === 'ui' ? request!.request.id : '';
+
+    expect(callbacks.answer(id, { userId: 'user2', conversationId: 7 }, { action: FormActionType.ACCEPT })).toBe(false);
+    expect(callbacks.answer(id, { userId: 'user1', conversationId: 8 }, { action: FormActionType.ACCEPT })).toBe(false);
+    expect(callbacks.answer('unknown', { userId: 'user1', conversationId: 7 }, { action: FormActionType.ACCEPT })).toBe(false);
+    await Promise.resolve();
+    expect(resolved).toBe(false);
+
+    // the owner can still answer it
+    expect(callbacks.answer(id, { userId: 'user1', conversationId: 7 }, { action: FormActionType.REJECT })).toBe(true);
+    await expect(result).resolves.toEqual({ action: FormActionType.REJECT });
+
+    // and only once
+    expect(callbacks.answer(id, { userId: 'user1', conversationId: 7 }, { action: FormActionType.ACCEPT })).toBe(false);
+  });
+
+  it('cancels a pending form after the timeout', async () => {
+    const context = await createContext();
+
+    const result = context.ui.form('Are you sure?', schema);
+    jest.advanceTimersByTime(5 * 60 * 1000 + 1000);
+
+    await expect(result).resolves.toEqual({ action: FormActionType.CANCEL });
   });
 
   it('cancels a pending form when the generation is stopped', async () => {
