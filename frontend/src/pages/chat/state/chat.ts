@@ -64,7 +64,7 @@ export const useChatStream = (chatId: number) => {
     refetchOnWindowFocus: false,
     retry: (failureCount, error) => {
       const status = responseStatus(error);
-      return status !== 404 && status !== 403 && failureCount < 3;
+      return status !== 400 && status !== 404 && status !== 403 && failureCount < 3;
     },
   });
 
@@ -75,7 +75,8 @@ export const useChatStream = (chatId: number) => {
       if (status === 403) {
         toast.error(texts.chat.noAccessToConversation);
         void navigate('/chat');
-      } else if (status === 404) {
+      } else if (status === 404 || status === 400) {
+        // 400: the ID in the URL is not a number
         toast.error(texts.chat.conversationNotFound);
         void navigate('/chat');
       } else {

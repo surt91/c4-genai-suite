@@ -50,8 +50,8 @@ describe('useChatStream', () => {
     );
   });
 
-  it('reports an unknown chat', async () => {
-    api.conversations.getConversation.mockRejectedValue(new ResponseError(new Response(null, { status: 404 })));
+  it.each([404, 400])('reports an unknown chat (%i)', async (status) => {
+    api.conversations.getConversation.mockRejectedValue(new ResponseError(new Response(null, { status })));
 
     renderHook(() => useChatStream(1));
 
