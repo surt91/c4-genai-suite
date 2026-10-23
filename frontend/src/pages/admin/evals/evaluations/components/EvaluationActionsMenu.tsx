@@ -28,12 +28,12 @@ export function EvaluationActionsMenu({
     <Menu shadow="md" width={200} position="bottom-end">
       <Menu.Target>
         <Button variant="default" rightSection={<IconDots size={16} />} disabled={disabled}>
-          Actions
+          {texts.evals.evaluations.actions}
         </Button>
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label>Evaluation Actions</Menu.Label>
+        <Menu.Label>{texts.evals.evaluations.evaluationActions}</Menu.Label>
 
         <Menu.Item leftSection={<IconFileDownload size={16} />} onClick={onExport} disabled={!canExport}>
           {texts.evals.evaluations.exportCsv}

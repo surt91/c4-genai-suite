@@ -2,12 +2,14 @@ import { Alert, Badge, Card, Checkbox, Group, SimpleGrid, Skeleton, Stack, Text 
 import { IconAlertCircle, IconChartBar } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
+import { texts } from 'src/texts';
 import { useWizardStore } from '../../state/zustand/wizardState';
 import classes from './SelectableCard.module.css';
 
 export function MetricsSelectionStep() {
   const { metricIds, addMetricId, removeMetricId } = useWizardStore();
   const evalApi = useEvalApi();
+  const t = texts.evals.wizard.metrics;
 
   // Fetch available metrics
   const {
@@ -31,7 +33,7 @@ export function MetricsSelectionStep() {
     return (
       <Stack gap="lg">
         <Text size="lg" fw={500}>
-          Select Metrics
+          {t.title}
         </Text>
         <Stack gap="sm">
           <Skeleton height={80} />
@@ -46,10 +48,10 @@ export function MetricsSelectionStep() {
     return (
       <Stack gap="lg">
         <Text size="lg" fw={500}>
-          Select Metrics
+          {t.title}
         </Text>
-        <Alert icon={<IconAlertCircle size={16} />} color="red" title="No Metrics Available">
-          No metrics found. Please create at least one metric before creating an evaluation.
+        <Alert icon={<IconAlertCircle size={16} />} color="red" title={isError ? t.loadFailedTitle : t.noneTitle}>
+          {isError ? texts.evals.wizard.loadFailed : t.none}
         </Alert>
       </Stack>
     );
@@ -58,16 +60,15 @@ export function MetricsSelectionStep() {
   return (
     <Stack gap="lg">
       <Text size="lg" fw={500}>
-        Select Metrics
+        {t.title}
       </Text>
       <Text size="sm" c="dimmed">
-        Choose one or more metrics to evaluate your test cases. Each metric will score the LLM&apos;s responses according to
-        different criteria.
+        {t.hint}
       </Text>
 
       {metricIds.length === 0 && (
         <Alert icon={<IconAlertCircle size={16} />} color="blue">
-          Select at least one metric to proceed.
+          {t.selectAtLeastOne}
         </Alert>
       )}
 
@@ -89,6 +90,7 @@ export function MetricsSelectionStep() {
                   checked={isSelected}
                   onChange={() => handleToggleMetric(metric.id)}
                   onClick={(e) => e.stopPropagation()}
+                  aria-label={metric._configuration.name}
                 />
                 <Stack gap="xs" flex={1}>
                   <Group gap="xs">
@@ -99,7 +101,7 @@ export function MetricsSelectionStep() {
                     {metric._configuration.type}
                   </Badge>
                   <Text size="sm" c="dimmed">
-                    Threshold: {metric._configuration.threshold?.toFixed(2) || 'N/A'}
+                    {t.threshold(metric._configuration.threshold?.toFixed(2) || t.notAvailable)}
                   </Text>
                 </Stack>
               </Group>
@@ -114,7 +116,7 @@ export function MetricsSelectionStep() {
             <Text component="span" fw={700} c="blue">
               {metricIds.length}
             </Text>{' '}
-            metric{metricIds.length !== 1 ? 's' : ''} selected
+            {t.selected}
           </Text>
         </Card>
       )}

@@ -57,7 +57,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
               <div className={classes.cellContent} data-deleted={pair._pendingStatus === 'deleted' || undefined}>
                 {pair.contexts.length > 0 ? (
                   <Tooltip label={pair.contexts.join('\n---\n')} multiline w={400}>
-                    <span className={classes.contexts}>{pair.contexts.length} context(s)</span>
+                    <span className={classes.contexts}>{texts.evals.qaCatalog.contextCount(pair.contexts.length)}</span>
                   </Tooltip>
                 ) : (
                   <span className={classes.noContexts}>-</span>

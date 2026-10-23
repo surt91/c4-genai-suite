@@ -1,5 +1,6 @@
 import { Group, Stack, Text } from '@mantine/core';
 import { Cell, Pie, PieChart } from 'recharts';
+import { texts } from 'src/texts';
 
 interface TestCasesPieChartProps {
   passed: number;
@@ -14,8 +15,8 @@ export function TestCasesPieChart({ passed, failed }: TestCasesPieChartProps) {
   const total = passed + failed;
 
   const data = [
-    { name: 'Passed', value: passed, color: 'var(--mantine-color-green-6)' },
-    { name: 'Failed', value: failed, color: 'var(--mantine-color-red-6)' },
+    { name: texts.evals.evaluations.passed, value: passed, color: 'var(--mantine-color-green-6)' },
+    { name: texts.evals.evaluations.failed, value: failed, color: 'var(--mantine-color-red-6)' },
   ].filter((d) => d.value > 0);
 
   // If no data, show empty state
@@ -23,7 +24,7 @@ export function TestCasesPieChart({ passed, failed }: TestCasesPieChartProps) {
     return (
       <Stack align="center" gap="xs">
         <Text size="sm" c="dimmed">
-          No results yet
+          {texts.evals.evaluations.noResultsYet}
         </Text>
       </Stack>
     );
@@ -79,7 +80,7 @@ export function TestCasesPieChart({ passed, failed }: TestCasesPieChartProps) {
               }}
             />
             <Text size="xs" c="dimmed">
-              Passed
+              {texts.evals.evaluations.passed}
             </Text>
           </Group>
         )}
@@ -94,7 +95,7 @@ export function TestCasesPieChart({ passed, failed }: TestCasesPieChartProps) {
               }}
             />
             <Text size="xs" c="dimmed">
-              Failed
+              {texts.evals.evaluations.failed}
             </Text>
           </Group>
         )}

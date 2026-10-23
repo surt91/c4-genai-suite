@@ -2,11 +2,13 @@ import { Badge, Card, Group, NumberInput, Select, Skeleton, Stack, Text } from '
 import { IconDatabase } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
+import { texts } from 'src/texts';
 import { useWizardStore } from '../../state/zustand/wizardState';
 
 export function CatalogSelectionStep() {
   const { catalogId, setCatalogId, testCasesPerQaPair, setTestCasesPerQaPair } = useWizardStore();
   const evalApi = useEvalApi();
+  const t = texts.evals.wizard.catalog;
 
   // Fetch QA catalogs (only READY ones)
   const { data: catalogs = [], isLoading } = useQuery({
@@ -22,10 +24,10 @@ export function CatalogSelectionStep() {
   return (
     <Stack gap="lg">
       <Text size="lg" fw={500}>
-        Select QA Catalog
+        {t.title}
       </Text>
       <Text size="sm" c="dimmed">
-        Choose a QA catalog to use as the source for your evaluation test cases
+        {t.hint}
       </Text>
 
       {isLoading ? (
@@ -36,17 +38,17 @@ export function CatalogSelectionStep() {
       ) : (
         <>
           <Select
-            label="QA Catalog"
-            placeholder="Select a catalog"
+            label={t.catalog}
+            placeholder={t.catalogPlaceholder}
             required
             value={catalogId}
             onChange={(value) => setCatalogId(value)}
             data={readyCatalogs.map((catalog) => ({
               value: catalog.id,
-              label: `${catalog.name} (${catalog.length} Q&A pairs)`,
+              label: t.option(catalog.name, catalog.length),
             }))}
             searchable
-            nothingFoundMessage="No ready catalogs found"
+            nothingFoundMessage={t.nothingFound}
           />
 
           {selectedCatalog && (
@@ -56,20 +58,20 @@ export function CatalogSelectionStep() {
                   <IconDatabase size={18} color="var(--mantine-color-blue-8)" />
                   <Text fw={600}>{selectedCatalog.name}</Text>
                   <Badge variant="light" color="green">
-                    Ready
+                    {texts.evals.qaCatalog.statusReady}
                   </Badge>
                 </Group>
                 <Text size="sm" c="dimmed">
-                  {selectedCatalog.length} Q&A pairs • Revision {selectedCatalog.revision}
+                  {t.details(selectedCatalog.length, selectedCatalog.revision)}
                 </Text>
               </Stack>
             </Card>
           )}
 
           <NumberInput
-            label="Test Cases per Q&A Pair"
-            description="Number of test cases to generate from each Q&A pair. Higher numbers provide more thorough testing but take longer."
-            placeholder="Enter number"
+            label={t.testCasesPerPair}
+            description={t.testCasesPerPairDescription}
+            placeholder={t.testCasesPerPairPlaceholder}
             required
             min={1}
             max={10}
@@ -80,11 +82,11 @@ export function CatalogSelectionStep() {
           {selectedCatalog && testCasesPerQaPair && (
             <Card padding="sm" withBorder bg="blue.0">
               <Text size="sm" c="dimmed">
-                This will generate approximately{' '}
+                {t.estimateBefore}{' '}
                 <Text component="span" fw={700} c="blue">
                   {selectedCatalog.length * (testCasesPerQaPair || 1)}
                 </Text>{' '}
-                test cases for this evaluation.
+                {t.estimateAfter}
               </Text>
             </Card>
           )}

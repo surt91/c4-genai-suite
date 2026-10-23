@@ -24,6 +24,7 @@ export function EvaluationDetailPage() {
   const [resultsPage, setResultsPage] = useState(1);
 
   const exportMutation = useExportEvaluationResults();
+  const t = texts.evals.evaluations.detail;
 
   // Fetch evaluation summary
   const { data: evaluation, isLoading, isError, error, refetch } = useEvaluationSummary(id);
@@ -75,7 +76,7 @@ export function EvaluationDetailPage() {
         <Container size="lg">
           <Stack gap="md" align="center" pt="xl">
             <Loader size="lg" />
-            <Title order={3}>Loading evaluation...</Title>
+            <Title order={3}>{t.loading}</Title>
           </Stack>
         </Container>
       </Page>
@@ -116,15 +117,15 @@ export function EvaluationDetailPage() {
 
           {/* Status Banner for Running Evaluations */}
           {evaluation.status === 'RUNNING' && (
-            <Alert color="blue" title="Evaluation in Progress">
-              This evaluation is currently running. Results will update automatically.
+            <Alert color="blue" title={t.runningTitle}>
+              {t.running}
             </Alert>
           )}
 
           {/* Status Banner for Failed Evaluations */}
           {evaluation.status === 'FAILURE' && (
-            <Alert icon={<IconAlertCircle size={16} />} color="red" title="Evaluation Failed">
-              This evaluation failed to complete. Check the logs for more information.
+            <Alert icon={<IconAlertCircle size={16} />} color="red" title={t.failedTitle}>
+              {t.failed}
             </Alert>
           )}
 
@@ -132,10 +133,10 @@ export function EvaluationDetailPage() {
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Tabs.List>
               <Tabs.Tab value="overview" leftSection={<IconInfoCircle size={16} />}>
-                Overview
+                {t.overview}
               </Tabs.Tab>
               <Tabs.Tab value="results" leftSection={<IconList size={16} />}>
-                Results ({evaluation.testCaseProgress.total})
+                {t.results(evaluation.testCaseProgress.total)}
               </Tabs.Tab>
             </Tabs.List>
 
@@ -156,7 +157,7 @@ export function EvaluationDetailPage() {
               <Stack gap="lg">
                 <Card padding="lg" radius="md" withBorder>
                   <Stack gap="md">
-                    <Title order={4}>Test Case Results</Title>
+                    <Title order={4}>{t.testCaseResults}</Title>
 
                     <TestCaseResultsTable
                       results={results}

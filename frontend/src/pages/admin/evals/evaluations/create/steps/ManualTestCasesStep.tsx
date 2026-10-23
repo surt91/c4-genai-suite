@@ -2,13 +2,15 @@ import { ActionIcon, Alert, Badge, Button, Card, Group, Stack, Text, Textarea } 
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { RunEvaluationByTestCasesTestCase } from 'src/api/generated-eval';
+import { texts } from 'src/texts';
 import { useWizardStore } from '../../state/zustand/wizardState';
 
 export function ManualTestCasesStep() {
-  const { testCases, addTestCase, removeTestCase, updateTestCase: _updateTestCase } = useWizardStore();
+  const { testCases, addTestCase, removeTestCase } = useWizardStore();
   const [currentInput, setCurrentInput] = useState('');
   const [currentExpectedOutput, setCurrentExpectedOutput] = useState('');
   const [currentContext, setCurrentContext] = useState('');
+  const t = texts.evals.wizard.manual;
 
   const handleAddTestCase = () => {
     if (!currentInput.trim() || !currentExpectedOutput.trim()) return;
@@ -31,26 +33,26 @@ export function ManualTestCasesStep() {
   return (
     <Stack gap="lg">
       <Text size="lg" fw={500}>
-        Add Test Cases
+        {t.title}
       </Text>
       <Text size="sm" c="dimmed">
-        Define test cases manually by providing input questions and expected outputs
+        {t.hint}
       </Text>
 
       {testCases.length === 0 && (
         <Alert icon={<IconAlertCircle size={16} />} color="blue">
-          Add at least one test case to proceed. You can add more test cases later.
+          {t.addAtLeastOne}
         </Alert>
       )}
 
       {/* Add New Test Case Form */}
       <Card padding="md" withBorder>
         <Stack gap="md">
-          <Text fw={600}>New Test Case</Text>
+          <Text fw={600}>{t.newTestCase}</Text>
 
           <Textarea
-            label="Question / Input"
-            placeholder="Enter the question or input for the LLM"
+            label={t.input}
+            placeholder={t.inputPlaceholder}
             required
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
@@ -58,8 +60,8 @@ export function ManualTestCasesStep() {
           />
 
           <Textarea
-            label="Expected Output"
-            placeholder="Enter the expected answer or output"
+            label={t.expectedOutput}
+            placeholder={t.expectedOutputPlaceholder}
             required
             value={currentExpectedOutput}
             onChange={(e) => setCurrentExpectedOutput(e.target.value)}
@@ -67,9 +69,9 @@ export function ManualTestCasesStep() {
           />
 
           <Textarea
-            label="Context (Optional)"
-            description="Additional context or background information (one per line)"
-            placeholder="Enter context lines..."
+            label={t.context}
+            description={t.contextDescription}
+            placeholder={t.contextPlaceholder}
             value={currentContext}
             onChange={(e) => setCurrentContext(e.target.value)}
             minRows={2}
@@ -77,7 +79,7 @@ export function ManualTestCasesStep() {
 
           <Group justify="flex-end">
             <Button leftSection={<IconPlus size={16} />} onClick={handleAddTestCase} disabled={!canAddTestCase}>
-              Add Test Case
+              {t.add}
             </Button>
           </Group>
         </Stack>
@@ -87,9 +89,9 @@ export function ManualTestCasesStep() {
       {testCases.length > 0 && (
         <Stack gap="sm">
           <Group justify="space-between">
-            <Text fw={600}>Test Cases ({testCases.length})</Text>
+            <Text fw={600}>{t.testCases(testCases.length)}</Text>
             <Badge variant="light" color="blue">
-              {testCases.length} test case{testCases.length !== 1 ? 's' : ''}
+              {t.count(testCases.length)}
             </Badge>
           </Group>
 
@@ -102,7 +104,7 @@ export function ManualTestCasesStep() {
                       #{index + 1}
                     </Badge>
                     <Text fw={600} size="sm">
-                      Question:
+                      {t.question}
                     </Text>
                   </Group>
                   <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
@@ -110,7 +112,7 @@ export function ManualTestCasesStep() {
                   </Text>
 
                   <Text fw={600} size="sm" mt="xs">
-                    Expected Output:
+                    {t.expectedOutputLabel}
                   </Text>
                   <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
                     {testCase.expectedOutput}
@@ -119,7 +121,7 @@ export function ManualTestCasesStep() {
                   {testCase.context && testCase.context.length > 0 && (
                     <>
                       <Text fw={600} size="sm" mt="xs">
-                        Context:
+                        {t.contextLabel}
                       </Text>
                       <Stack gap="xs">
                         {testCase.context.map((ctx, ctxIndex) => (
@@ -132,7 +134,13 @@ export function ManualTestCasesStep() {
                   )}
                 </Stack>
 
-                <ActionIcon color="red" variant="subtle" onClick={() => removeTestCase(index)} title="Remove test case">
+                <ActionIcon
+                  color="red"
+                  variant="subtle"
+                  onClick={() => removeTestCase(index)}
+                  title={t.remove}
+                  aria-label={t.remove}
+                >
                   <IconTrash size={18} />
                 </ActionIcon>
               </Group>

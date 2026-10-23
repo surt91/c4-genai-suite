@@ -1,18 +1,20 @@
 import { Card, Group, Radio, Stack, Text } from '@mantine/core';
 import { IconDatabase, IconEdit } from '@tabler/icons-react';
+import { texts } from 'src/texts';
 import { type EvaluationMode, useWizardStore } from '../../state/zustand/wizardState';
 import classes from './SelectableCard.module.css';
 
 export function ModeSelectionStep() {
   const { mode, setMode } = useWizardStore();
+  const t = texts.evals.wizard.mode;
 
   return (
     <Stack gap="lg">
       <Text size="lg" fw={500}>
-        Select Evaluation Mode
+        {t.title}
       </Text>
       <Text size="sm" c="dimmed">
-        Choose how you want to create your evaluation
+        {t.hint}
       </Text>
 
       <Radio.Group value={mode || ''} onChange={(value) => setMode(value as EvaluationMode)}>
@@ -29,11 +31,10 @@ export function ModeSelectionStep() {
               <Stack gap="xs" flex={1}>
                 <Group gap="xs">
                   <IconDatabase size={20} color="var(--mantine-color-blue-8)" />
-                  <Text fw={600}>By QA Catalog</Text>
+                  <Text fw={600}>{t.catalog}</Text>
                 </Group>
                 <Text size="sm" c="dimmed">
-                  Use an existing QA catalog to run evaluations. Test cases will be automatically generated from the
-                  catalog&apos;s Q&A pairs.
+                  {t.catalogDescription}
                 </Text>
               </Stack>
             </Group>
@@ -51,11 +52,10 @@ export function ModeSelectionStep() {
               <Stack gap="xs" flex={1}>
                 <Group gap="xs">
                   <IconEdit size={20} color="var(--mantine-color-green-8)" />
-                  <Text fw={600}>Manual Test Cases</Text>
+                  <Text fw={600}>{t.manual}</Text>
                 </Group>
                 <Text size="sm" c="dimmed">
-                  Create an evaluation by manually defining test cases. Useful for custom scenarios or when you don&apos;t have a
-                  QA catalog yet.
+                  {t.manualDescription}
                 </Text>
               </Stack>
             </Group>

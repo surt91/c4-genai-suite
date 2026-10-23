@@ -15,7 +15,7 @@ export function DashboardPage() {
   const assistantsCount = useAssistantsCount(filterInterval);
   const messagesCount = useMessagesCount(filterInterval);
   const usersCount = useUsersCount(filterInterval);
-  const version = (import.meta.env.VITE_VERSION as string) || 'No hash available';
+  const version = (import.meta.env.VITE_VERSION as string) || texts.dashboard.noVersion;
 
   return (
     <Page>
@@ -63,7 +63,7 @@ export function DashboardPage() {
       </ChartContainer>
 
       <Text component="div" pt={24} c="gray.6" fs="italic" data-testid={'version'}>
-        Version: {version}
+        {texts.dashboard.version(version)}
       </Text>
     </Page>
   );

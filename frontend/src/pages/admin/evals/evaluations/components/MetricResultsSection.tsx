@@ -1,6 +1,7 @@
 import { Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconChartBar } from '@tabler/icons-react';
 import type { MetricResult } from 'src/api/generated-eval';
+import { texts } from 'src/texts';
 import { MetricDonutChart } from './MetricDonutChart';
 
 interface MetricResultsSectionProps {
@@ -23,7 +24,7 @@ export function MetricResultsSection({ metricResults }: MetricResultsSectionProp
         <Group gap="xs">
           <IconChartBar size={20} color="var(--mantine-color-gray-7)" />
           <Text fw={600} size="lg">
-            Metric Results
+            {texts.evals.evaluations.metricResults}
           </Text>
         </Group>
 

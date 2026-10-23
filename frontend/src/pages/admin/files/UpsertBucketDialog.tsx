@@ -177,8 +177,8 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
             <TextInput
               id="indexName"
               label={texts.common.indexName}
-              placeholder="[use default index name]"
-              description="Only change the default index name if you are sure you need a separate index."
+              placeholder={texts.files.defaultIndexName}
+              description={texts.files.indexNameHint}
               key={form.key('indexName')}
               {...form.getInputProps('indexName')}
               mb="sm"

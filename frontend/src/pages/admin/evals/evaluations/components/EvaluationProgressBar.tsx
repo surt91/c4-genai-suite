@@ -1,5 +1,6 @@
 import { Box, Progress, Text } from '@mantine/core';
 import type { TestCaseProgress } from 'src/api/generated-eval';
+import { texts } from 'src/texts';
 
 interface EvaluationProgressBarProps {
   progress: TestCaseProgress;
@@ -14,7 +15,7 @@ export function EvaluationProgressBar({ progress, showLabel = true }: Evaluation
       <Progress value={percentage} size="sm" />
       {showLabel && (
         <Text component="div" mt={4} fz="xs" lh="1rem" c="gray.7">
-          {progress.done} / {progress.total} test cases completed
+          {texts.evals.evaluations.progressText(progress.done, progress.total)}
         </Text>
       )}
     </Box>

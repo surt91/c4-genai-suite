@@ -72,10 +72,10 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
                 <Group gap="xs">
                   <IconRobot size={18} color="var(--mantine-color-gray-7)" />
                   <Text size="sm" fw={500}>
-                    Assistant:
+                    {texts.evals.evaluations.card.assistant}
                   </Text>
                   <Text size="sm" c="dimmed">
-                    {evaluation.gaibleAssistantName ?? `ID: ${evaluation.gaibleAssistantId}`}
+                    {evaluation.gaibleAssistantName ?? texts.evals.wizard.review.assistantId(evaluation.gaibleAssistantId)}
                   </Text>
                 </Group>
               )}
@@ -84,7 +84,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
               <Group gap="xs">
                 <IconRocket size={18} color="var(--mantine-color-gray-7)" />
                 <Text size="sm" fw={500}>
-                  Test Cases:
+                  {texts.evals.evaluations.card.testCases}
                 </Text>
                 <Text size="sm" c="dimmed">
                   {evaluation.testCaseProgress.done} / {evaluation.testCaseProgress.total}
@@ -98,7 +98,7 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
                   {texts.evals.evaluations.metrics}:
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {evaluation.metrics.length} metric{evaluation.metrics.length !== 1 ? 's' : ''}
+                  {texts.evals.evaluations.card.metricCount(evaluation.metrics.length)}
                 </Text>
               </Group>
 

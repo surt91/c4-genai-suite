@@ -3,14 +3,16 @@ import { IconAlertCircle, IconRobot } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import type { ConfigurationDto } from 'src/api/generated';
 import { useApi } from 'src/api/state/apiAppClient';
+import { texts } from 'src/texts';
 import { useWizardStore } from '../../state/zustand/wizardState';
 import classes from './SelectableCard.module.css';
 
 export function AssistantSelectionStep() {
   const { gaibleAssistantId, setGaibleAssistant } = useWizardStore();
   const api = useApi();
+  const t = texts.evals.wizard.assistant;
 
-  // Fetch Gaible configurations (assistants)
+  // Fetch the configurations (assistants)
   const {
     data: configurations,
     isLoading,
@@ -26,7 +28,7 @@ export function AssistantSelectionStep() {
     return (
       <Stack gap="lg">
         <Text size="lg" fw={500}>
-          Select Assistant
+          {t.title}
         </Text>
         <Stack gap="sm">
           <Skeleton height={80} />
@@ -41,10 +43,10 @@ export function AssistantSelectionStep() {
     return (
       <Stack gap="lg">
         <Text size="lg" fw={500}>
-          Select Assistant
+          {t.title}
         </Text>
-        <Alert icon={<IconAlertCircle size={16} />} color="red" title="No Assistants Available">
-          No Gaible assistants found. Please create at least one assistant (configuration) before creating an evaluation.
+        <Alert icon={<IconAlertCircle size={16} />} color="red" title={isError ? t.loadFailedTitle : t.noneTitle}>
+          {isError ? texts.evals.wizard.loadFailed : t.none}
         </Alert>
       </Stack>
     );
@@ -53,16 +55,15 @@ export function AssistantSelectionStep() {
   return (
     <Stack gap="lg">
       <Text size="lg" fw={500}>
-        Select Assistant
+        {t.title}
       </Text>
       <Text size="sm" c="dimmed">
-        Choose the Gaible assistant that will be evaluated. The evaluation will send test case questions to this assistant and
-        measure its responses.
+        {t.hint}
       </Text>
 
       {!gaibleAssistantId && (
         <Alert icon={<IconAlertCircle size={16} />} color="blue">
-          Select an assistant to proceed.
+          {t.selectOne}
         </Alert>
       )}
 
@@ -84,7 +85,7 @@ export function AssistantSelectionStep() {
               onClick={() => setGaibleAssistant(assistant.id, assistant.name)}
             >
               <Group wrap="nowrap" align="flex-start">
-                <Radio value={assistant.id.toString()} />
+                <Radio value={assistant.id.toString()} aria-label={assistant.name} />
                 <Stack gap="xs" flex={1}>
                   <Group gap="xs">
                     <IconRobot size={18} color="var(--mantine-color-blue-8)" />
@@ -97,11 +98,11 @@ export function AssistantSelectionStep() {
                   )}
                   <Group gap="xs">
                     <Badge variant="light" size="sm" color="blue">
-                      Assistant
+                      {t.badge}
                     </Badge>
                     {assistant.extensions && assistant.extensions.length > 0 && (
                       <Badge variant="outline" size="sm">
-                        {assistant.extensions.length} extension{assistant.extensions.length !== 1 ? 's' : ''}
+                        {t.extensions(assistant.extensions.length)}
                       </Badge>
                     )}
                   </Group>

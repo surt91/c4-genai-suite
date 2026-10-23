@@ -8,8 +8,9 @@ import {
   IconSortDescending,
   IconX,
 } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import type { EvaluationDetailSummaryMetric, GroupedEvaluationResult } from 'src/api/generated-eval';
+import { texts } from 'src/texts';
 import tableClasses from './DataTable.module.css';
 
 interface TestCaseResultsTableProps {
@@ -143,9 +144,9 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
   };
 
   const getSortTooltip = () => {
-    if (sortOrder === 'none') return 'Sort by status';
-    if (sortOrder === 'passed-first') return 'Passed first';
-    return 'Failed first';
+    if (sortOrder === 'none') return texts.evals.evaluations.results.sortByStatus;
+    if (sortOrder === 'passed-first') return texts.evals.evaluations.results.passedFirst;
+    return texts.evals.evaluations.results.failedFirst;
   };
 
   const toggleRow = (key: string) => {
@@ -170,12 +171,13 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
               <th style={{ width: '2.5rem' }}></th>
               <th>
                 <Group gap="xs" wrap="nowrap">
-                  <span>Status</span>
+                  <span>{texts.evals.evaluations.results.status}</span>
                   <Tooltip label={getSortTooltip()} withArrow>
                     <ActionIcon
                       variant={sortOrder !== 'none' ? 'light' : 'subtle'}
                       color={sortOrder !== 'none' ? 'blue' : 'gray'}
                       size="sm"
+                      aria-label={getSortTooltip()}
                       onClick={(e) => {
                         e.stopPropagation();
                         cycleSortOrder();
@@ -186,9 +188,9 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                   </Tooltip>
                 </Group>
               </th>
-              <th>Question</th>
-              <th>Expected Output</th>
-              <th>Iterations</th>
+              <th>{texts.evals.evaluations.results.question}</th>
+              <th>{texts.evals.evaluations.results.expectedOutput}</th>
+              <th>{texts.evals.evaluations.results.iterations}</th>
             </tr>
           </thead>
           <tbody>
@@ -223,7 +225,7 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                 const isExpanded = expandedRows.has(row.key);
 
                 return (
-                  <>
+                  <Fragment key={row.key}>
                     {/* Main QA pair row */}
                     <tr key={row.key} className={tableClasses.clickableRow} onClick={() => toggleRow(row.key)}>
                       <td>
@@ -238,7 +240,7 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                           leftSection={row.allPassed ? <IconCheck size={12} /> : <IconX size={12} />}
                           size="sm"
                         >
-                          {row.allPassed ? 'Passed' : 'Failed'}
+                          {row.allPassed ? texts.evals.evaluations.passed : texts.evals.evaluations.failed}
                         </Badge>
                       </td>
                       <td>
@@ -258,11 +260,11 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                       <td>
                         <Group gap="xs">
                           <Badge variant="light" color="teal" size="sm">
-                            {row.passedCount} passed
+                            {texts.evals.evaluations.results.passedCount(row.passedCount)}
                           </Badge>
                           {row.failedCount > 0 && (
                             <Badge variant="light" color="red" size="sm">
-                              {row.failedCount} failed
+                              {texts.evals.evaluations.results.failedCount(row.failedCount)}
                             </Badge>
                           )}
                         </Group>
@@ -280,14 +282,16 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                                   <Group justify="space-between" mb="sm">
                                     <Group gap="sm">
                                       <Text size="sm" fw={500}>
-                                        Iteration {tc.index + 1}
+                                        {texts.evals.evaluations.results.iteration(tc.index + 1)}
                                       </Text>
                                       <Badge
                                         variant={tc.allPassed ? 'light' : 'filled'}
                                         color={tc.allPassed ? 'teal' : 'red'}
                                         size="xs"
                                       >
-                                        {tc.allPassed ? 'All Passed' : 'Has Failures'}
+                                        {tc.allPassed
+                                          ? texts.evals.evaluations.results.allPassed
+                                          : texts.evals.evaluations.results.hasFailures}
                                       </Badge>
                                     </Group>
                                   </Group>
@@ -295,10 +299,10 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                                   <Table withTableBorder={false} verticalSpacing="xs" horizontalSpacing="sm">
                                     <Table.Thead>
                                       <Table.Tr>
-                                        <Table.Th>Metric</Table.Th>
-                                        <Table.Th>Score</Table.Th>
-                                        <Table.Th>Threshold</Table.Th>
-                                        <Table.Th>Status</Table.Th>
+                                        <Table.Th>{texts.evals.evaluations.results.metric}</Table.Th>
+                                        <Table.Th>{texts.evals.evaluations.results.score}</Table.Th>
+                                        <Table.Th>{texts.evals.evaluations.results.threshold}</Table.Th>
+                                        <Table.Th>{texts.evals.evaluations.results.status}</Table.Th>
                                       </Table.Tr>
                                     </Table.Thead>
                                     <Table.Tbody>
@@ -311,7 +315,7 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                                           </Table.Td>
                                           <Table.Td>
                                             <Badge variant="light" color={getScoreColor(mr.score)} size="sm">
-                                              {mr.score !== null ? mr.score.toFixed(3) : 'N/A'}
+                                              {mr.score !== null ? mr.score.toFixed(3) : texts.evals.wizard.metrics.notAvailable}
                                             </Badge>
                                           </Table.Td>
                                           <Table.Td>
@@ -326,7 +330,7 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                                               leftSection={mr.success ? <IconCheck size={10} /> : <IconX size={10} />}
                                               size="xs"
                                             >
-                                              {mr.success ? 'Passed' : 'Failed'}
+                                              {mr.success ? texts.evals.evaluations.passed : texts.evals.evaluations.failed}
                                             </Badge>
                                           </Table.Td>
                                         </Table.Tr>
@@ -340,7 +344,7 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
 
@@ -349,8 +353,8 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
               <tr>
                 <td colSpan={5} className={tableClasses.empty}>
                   <div>
-                    <Text mb={8}>No results found for this evaluation.</Text>
-                    <Text fz="sm">Results will appear here once the evaluation completes.</Text>
+                    <Text mb={8}>{texts.evals.evaluations.results.empty}</Text>
+                    <Text fz="sm">{texts.evals.evaluations.results.emptyHint}</Text>
                   </div>
                 </td>
               </tr>

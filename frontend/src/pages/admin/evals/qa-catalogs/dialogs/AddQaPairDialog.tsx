@@ -102,7 +102,7 @@ export function AddQaPairDialog({ onClose, onAdd }: AddQaPairDialogProps) {
 
             {form.values.contexts.length === 0 ? (
               <Text fz="sm" c="gray.6" fs="italic">
-                No contexts added
+                {texts.evals.qaCatalog.noContexts}
               </Text>
             ) : (
               <Stack gap={8}>

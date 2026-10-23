@@ -20,7 +20,9 @@ export const Bucket = memo(({ bucket, onDelete, onUpdate }: BucketProps) => {
         {bucket.type === BucketDtoTypeEnum.User && (
           <div className={clsx(classes.badge, classes.badgePrimary)}>{texts.common.userBucketBadge}</div>
         )}
-        {bucket.type === BucketDtoTypeEnum.Conversation && <div className={clsx(classes.badge, classes.badgePrimary)}>Chat</div>}
+        {bucket.type === BucketDtoTypeEnum.Conversation && (
+          <div className={clsx(classes.badge, classes.badgePrimary)}>{texts.common.chat}</div>
+        )}
         {bucket.name}
       </TransientNavLink>
 
