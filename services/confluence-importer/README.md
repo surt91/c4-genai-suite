@@ -1,9 +1,9 @@
-# Confluence Importer for c4 GenAI Suite
+# Confluence Importer for Gaible
 
 > [!WARNING]
 > This application is currently a proof of concept and in early development.
 
-Imports Confluence pages into c4 Buckets, enabling c4 Assistants to quickly and accurately answer questions using your
+Imports Confluence pages into Gaible Buckets, enabling Gaible Assistants to quickly and accurately answer questions using your
 organization's Confluence content.
 
 Start an import with

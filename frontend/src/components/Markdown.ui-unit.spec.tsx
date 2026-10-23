@@ -20,7 +20,7 @@ vi.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({
 
 describe('Markdown component', () => {
   it('renders table correctly', () => {
-    const content = '| Header1 | Header2 |\n|---------|---------|\n| Hello   | C4   |';
+    const content = '| Header1 | Header2 |\n|---------|---------|\n| Hello   | Gaible   |';
     render(<Markdown>{content}</Markdown>);
 
     const markdownTable = screen.getByRole('table');
@@ -33,9 +33,9 @@ describe('Markdown component', () => {
     expect(header2).toBeInTheDocument();
 
     const cellHello = screen.getByRole('cell', { name: 'Hello' });
-    const cellC4 = screen.getByRole('cell', { name: 'C4' });
+    const cellGaible = screen.getByRole('cell', { name: 'Gaible' });
     expect(cellHello).toBeInTheDocument();
-    expect(cellC4).toBeInTheDocument();
+    expect(cellGaible).toBeInTheDocument();
   });
 
   it('renders img correctly', () => {

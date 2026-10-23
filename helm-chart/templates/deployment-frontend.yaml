@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-frontend
+  name: {{ include "gaible.fullname" . }}-frontend
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
     {{- if .Values.frontend.labels }}
     {{- toYaml .Values.frontend.labels | nindent 4 }}
@@ -19,12 +19,12 @@ spec:
     {{ toYaml .Values.frontend.updateStrategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      {{- include "gaible.commonSelectors" . | nindent 6 }}
       app.kubernetes.io/component: frontend
   template:
     metadata:
       labels:
-        {{- include "c4genaisuite.commonLabels" . | nindent 8 }}
+        {{- include "gaible.commonLabels" . | nindent 8 }}
         app.kubernetes.io/component: frontend
         {{- if .Values.frontend.podLabels }}
         {{- toYaml .Values.frontend.podLabels | nindent 8 }}

@@ -1,4 +1,5 @@
 {
+  "name": "gaible",
   "license": "Apache-2.0",
   "scripts": {
     "prepare": "husky && npm run install-all && npm run env",

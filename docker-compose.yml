@@ -1,23 +1,23 @@
 services:
-  c4-frontend:
-    image: ghcr.io/codecentric/c4-genai-suite/frontend:latest
+  gaible-frontend:
+    image: ghcr.io/surt91/gaible/frontend:latest
     volumes:
       - ./dev/Caddyfile:/etc/caddy/Caddyfile
     ports:
       - "3333:3080"
     depends_on:
-      c4-backend:
+      gaible-backend:
         condition: service_started
 
-  c4-backend:
-    image: ghcr.io/codecentric/c4-genai-suite/backend:latest
-    hostname: c4-backend
+  gaible-backend:
+    image: ghcr.io/surt91/gaible/backend:latest
+    hostname: gaible-backend
     environment:
       AUTH_ENABLE_PASSWORD: true
       BASE_URL: http://localhost:3333
       AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
       AUTH_INITIAL_ADMIN_PASSWORD: secret
-      DB_URL: postgres://admin:secret@postgres:5432/cccc
+      DB_URL: postgres://admin:secret@postgres:5432/gaible
       NODE_ENV: dev
       SESSION_SECRET: random
     depends_on:
@@ -29,15 +29,15 @@ services:
       timeout: 1s
       retries: 100
 
-  c4-reis:
-    image: ghcr.io/codecentric/c4-genai-suite/reis:latest
+  gaible-reis:
+    image: ghcr.io/surt91/gaible/reis:latest
     hostname: reis
     environment:
       EMBEDDINGS_TYPE: ollama
       EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
       EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
       STORE_TYPE: pgvector
-      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
+      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/gaible
       STORE_PGVECTOR_INDEX_NAME: basisreistest
       FILE_STORE_TYPE: s3
       FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
@@ -83,12 +83,12 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=cccc
+      - POSTGRES_DB=gaible
       - PGPORT=5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d cccc" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d gaible" ]
       interval: 1s
       timeout: 1s
       retries: 20

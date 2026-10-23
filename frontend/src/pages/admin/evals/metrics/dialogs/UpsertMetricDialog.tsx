@@ -14,7 +14,7 @@ import { useCreateMetric, useDeleteMetric, useUpdateMetric } from '../hooks/useM
 type MetricConfigurationCreate = Configuration1;
 type MetricConfigurationUpdate = Configuration2;
 
-// Module-level schema constant (C4 pattern)
+// Module-level schema constant (Gaible pattern)
 const SCHEME = z
   .object({
     // Common fields
@@ -79,7 +79,7 @@ type CreateMetricProps = {
 
 type UpsertMetricDialogProps = UpdateMetricProps | CreateMetricProps;
 
-// Exported wrapper components (C4 pattern)
+// Exported wrapper components (Gaible pattern)
 export const UpdateMetricDialog = (props: Omit<UpdateMetricProps, 'type'>): React.ReactElement =>
   UpsertMetricDialog({ ...props, type: 'update' });
 export const CreateMetricDialog = (props: Omit<CreateMetricProps, 'type'>): React.ReactElement =>

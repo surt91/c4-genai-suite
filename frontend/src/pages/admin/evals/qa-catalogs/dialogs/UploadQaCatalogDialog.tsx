@@ -17,7 +17,7 @@ interface UploadQaCatalogDialogProps {
 
 const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
 
-// Module-level schema (C4 pattern)
+// Module-level schema (Gaible pattern)
 const SCHEME = z.object({
   file: z.instanceof(File, { message: texts.evals.qaCatalog.fileRequired }),
 });

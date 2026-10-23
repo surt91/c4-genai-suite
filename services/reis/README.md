@@ -2,7 +2,7 @@
 
 **R**etrieval **E**xtraction **I**ngestion **S**erver
 
-This server offers RAG functionality for c4.
+This server offers RAG functionality for Gaible.
 
 ## Getting started
 
@@ -49,7 +49,7 @@ To generate the specs `reis-dev-spec.json`, run `uv run python rei_s/generate_op
 
 ## Vector stores
 
-Currently REI-S supports Azure AI Search and pgvector (e.g. provided by the [c4 docker compose dev setup](../../dev/postgres/docker-compose.yml))
+Currently REI-S supports Azure AI Search and pgvector (e.g. provided by the [Gaible docker compose dev setup](../../dev/postgres/docker-compose.yml))
 
 The used store can be specified using the environment variables:
 
@@ -64,7 +64,7 @@ STORE_TYPE=azure-ai-search
 
 ```bash
 STORE_TYPE=pgvector
-STORE_PGVECTOR_URL=postgres+psycopg://admin:secret@localhost:5432/cccc
+STORE_PGVECTOR_URL=postgres+psycopg://admin:secret@localhost:5432/gaible
 ```
 
 ## File stores
@@ -73,7 +73,7 @@ Optionally, REIS can save a pdf preview of the uploaded file in a file store.
 
 This feature is activated by supplying a FILE_STORE_TYPE env variable.
 
-If it is activated, c4 will be able to show a pdf version of the uploaded file,
+If it is activated, Gaible will be able to show a pdf version of the uploaded file,
 if a user clicks on a source.
 
 Note that activation of this feature will lead to every file to be converted to
@@ -99,11 +99,9 @@ This option will save the files at a specified location in the file system.
 
 This is not advised to use in production, but provided for easy setup for experiments and development.
 
-## Example configuration in c4
+## Example configuration in Gaible
 
-In c4, the configuration is a multi step process.
-
-![video showing the process of configuring file search for an assistant](./docs/rag.webp)
+In Gaible, the configuration is a multi step process.
 
 ### Create a bucket
 

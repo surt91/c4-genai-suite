@@ -15,8 +15,8 @@ export function ReviewStep() {
     testCasesPerQaPair,
     testCases,
     metricIds,
-    c4AssistantId,
-    c4AssistantName,
+    gaibleAssistantId,
+    gaibleAssistantName,
   } = useWizardStore();
 
   const evalApi = useEvalApi();
@@ -142,11 +142,11 @@ export function ReviewStep() {
             <IconRobot size={18} className="text-blue-600" />
             <Text fw={600}>Assistant</Text>
           </Group>
-          {c4AssistantId && (
+          {gaibleAssistantId && (
             <>
-              <Text size="sm">{c4AssistantName ?? `Assistant ID: ${c4AssistantId}`}</Text>
+              <Text size="sm">{gaibleAssistantName ?? `Assistant ID: ${gaibleAssistantId}`}</Text>
               <Badge variant="light" size="sm" color="blue">
-                C4 Assistant
+                Gaible Assistant
               </Badge>
             </>
           )}

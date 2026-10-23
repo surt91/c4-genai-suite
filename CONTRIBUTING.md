@@ -63,7 +63,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
    git push origin my-fix-branch
    ```
 
-1. In GitHub, send a pull request to `codecentric/c4-genai-suite:main`.
+1. In GitHub, send a pull request to `surt91/gaible:main`.
 
 - If we suggest changes then:
 
@@ -210,9 +210,9 @@ A detailed explanation can be found in this [document][commit-message-format].
 
 
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
-[dev-doc]: https://github.com/codecentric/c4-genai-suite/blob/main/DEVELOPERS.md
-[github]: https://github.com/codecentric/c4-genai-suite
+[dev-doc]: https://github.com/surt91/gaible/blob/main/DEVELOPERS.md
+[github]: https://github.com/surt91/gaible
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
-[new_issue]: https://github.com/codecentric/c4-genai-suite/issues/new
-[gh_prs]: https://github.com/codecentric/c4-genai-suite/pulls
-[commits_samples]: https://github.com/codecentric/c4-genai-suite/commits/main
+[new_issue]: https://github.com/surt91/gaible/issues/new
+[gh_prs]: https://github.com/surt91/gaible/pulls
+[commits_samples]: https://github.com/surt91/gaible/commits/main

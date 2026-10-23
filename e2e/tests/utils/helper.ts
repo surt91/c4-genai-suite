@@ -472,7 +472,7 @@ export async function addAzureModelToConfiguration(
   await page.getByLabel('API Key').click();
   await page.getByLabel('API Key').fill(azure.apiKey ?? config.AZURE_OPEN_AI_API_KEY);
   await page.getByLabel('Deployment Name').fill(azure.deployment);
-  await page.getByLabel('Instance Name').fill('cccc-testing');
+  await page.getByLabel('Instance Name').fill('gaible-testing');
   await page.getByLabel('Seed').fill('42');
   await setSliderValue(page, 'Temperature', 0);
   await page.getByRole('button', { name: 'Test' }).click();

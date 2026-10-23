@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 
-// Module-level schema (C4 pattern)
+// Module-level schema (Gaible pattern)
 const SCHEME = z.object({
   question: z.string().min(1, texts.evals.qaCatalog.questionRequired),
   expectedOutput: z.string().min(1, texts.evals.qaCatalog.expectedOutputRequired),

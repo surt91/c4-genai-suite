@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-reis-config
+  name: {{ include "gaible.fullname" . }}-reis-config
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: reis
 data:
   BATCH_SIZE: {{ .Values.reis.batchSize | quote }}

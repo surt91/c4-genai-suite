@@ -16,11 +16,11 @@ from llm_eval.utils.decorators import async_retry_on_error
 from llm_eval.utils.json_types import JSONObject
 
 
-class C4AssistantQuery(LLMQuery):
+class GaibleAssistantQuery(LLMQuery):
     """
-    Query class for C4 assistants using API key service account auth.
+    Query class for Gaible assistants using API key service account auth.
 
-    Authenticates with C4 backend using the eval service account's API key
+    Authenticates with Gaible backend using the eval service account's API key
     sent via the standard x-api-key header.
     """
 
@@ -43,7 +43,7 @@ class C4AssistantQuery(LLMQuery):
 
     @property
     def endpoint(self) -> str:
-        return SETTINGS.c4_backend.url
+        return SETTINGS.gaible_backend.url
 
     @property
     def common_headers(self) -> dict[str, str]:
@@ -51,8 +51,8 @@ class C4AssistantQuery(LLMQuery):
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        if SETTINGS.c4_backend.api_key:
-            headers["x-api-key"] = SETTINGS.c4_backend.api_key
+        if SETTINGS.gaible_backend.api_key:
+            headers["x-api-key"] = SETTINGS.gaible_backend.api_key
         return headers
 
     async def query(self, prompt: str, meta_data: JSONObject) -> LLMQueryResult:

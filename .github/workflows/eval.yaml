@@ -60,7 +60,7 @@ jobs:
         env:
           POSTGRES_USER: admin
           POSTGRES_PASSWORD: secret
-          POSTGRES_DB: cccc
+          POSTGRES_DB: gaible
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -86,7 +86,7 @@ jobs:
           PG_HOST: localhost
           PG_USER: admin
           PG_PASSWORD: secret
-          PG_DB: cccc
+          PG_DB: gaible
           PG_PORT: 5432
           PG_SCHEMA: llm_eval
           LLM_EVAL_ENCRYPTION_KEY: ${{ steps.gen-key.outputs.key }}

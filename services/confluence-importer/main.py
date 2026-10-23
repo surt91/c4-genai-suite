@@ -1,8 +1,8 @@
-"""Main module for the Confluence to C4 synchronization process."""
+"""Main module for the Confluence to Gaible synchronization process."""
 
 from dataclasses import dataclass
 from confluence_importer import confluence
-from confluence_importer.c4 import clear_previous_ingests, import_confluence_page
+from confluence_importer.gaible import clear_previous_ingests, import_confluence_page
 from confluence_importer.markdown import html_to_markdown
 from confluence_importer.logger import logger
 
@@ -23,7 +23,7 @@ class PageImportCounter:
 def process_confluence_spaces(page_import_counter: PageImportCounter) -> None:
     """Processes all Confluence spaces specified in the configuration.
 
-    Fetches all pages from each space and imports them into C4.
+    Fetches all pages from each space and imports them into Gaible.
 
     Args:
         page_import_counter: PageImportCounter dataclass to track successful and failed imports
@@ -57,7 +57,7 @@ def process_confluence_spaces(page_import_counter: PageImportCounter) -> None:
 def process_individual_pages(page_import_counter: PageImportCounter) -> None:
     """Processes individual Confluence pages specified in the configuration.
 
-    Fetches each page by ID and imports it into C4.
+    Fetches each page by ID and imports it into Gaible.
 
     Args:
         page_import_counter: PageImportCounter dataclass to track successful and failed imports
@@ -91,23 +91,23 @@ def log_final_results(page_import_counter: PageImportCounter) -> None:
     """
     if page_import_counter.error > 0:
         logger.error(
-            "Synchronization Confluence to c4 completed with errors! See log for more information.",
+            "Synchronization Confluence to Gaible completed with errors! See log for more information.",
             page_import_counter=page_import_counter,
         )
     else:
-        logger.info("Synchronization Confluence to c4 completed.")
+        logger.info("Synchronization Confluence to Gaible completed.")
 
 
 def main() -> None:
-    """Main entry point for the Confluence to C4 synchronization process.
+    """Main entry point for the Confluence to Gaible synchronization process.
 
     Orchestrates the entire import process:
-    1. Clears previous ingests from C4
+    1. Clears previous ingests from Gaible
     2. Processes all configured Confluence spaces
     3. Processes individual Confluence pages
     4. Logs the final results
     """
-    logger.info("Starting synchronization Confluence to c4")
+    logger.info("Starting synchronization Confluence to Gaible")
 
     clear_previous_ingests()
 

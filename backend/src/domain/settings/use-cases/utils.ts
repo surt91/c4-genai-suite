@@ -5,7 +5,7 @@ export function buildSettings(source: SettingEntity): Settings {
   // eslint-disable-next-line prefer-const
   let { name, language, primaryColor, primaryContentColor, ...other } = source;
 
-  name ??= 'c4 GenAI Suite';
+  name ??= 'Gaible';
   primaryColor ||= '#555555';
   primaryContentColor ||= '#F4F4F4';
 

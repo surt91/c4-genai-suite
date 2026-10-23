@@ -17,7 +17,7 @@ tests:
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-c4-genai-suite-backend
+          value: RELEASE-NAME-gaible-backend
 
   - it: name should use fullnameOverride when provided
     set:

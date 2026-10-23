@@ -7,7 +7,7 @@ import { Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { useUpdateEvaluation } from '../hooks/useEvaluationMutations';
 
-// Module-level schema (C4 pattern)
+// Module-level schema (Gaible pattern)
 const SCHEME = z.object({
   name: z.string().min(1, texts.evals.evaluations.nameRequired),
 });

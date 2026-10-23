@@ -2,9 +2,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-backend
+  name: {{ include "gaible.fullname" . }}-backend
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: backend-metrics
     {{- if .Values.backend.metrics.serviceMonitor.labels }}
     {{- toYaml .Values.backend.metrics.serviceMonitor.labels | nindent 4 }}
@@ -12,7 +12,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      {{- include "gaible.commonSelectors" . | nindent 6 }}
       app.kubernetes.io/component: backend-metrics
   endpoints:
       - port: metrics

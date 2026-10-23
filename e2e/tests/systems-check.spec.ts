@@ -4,7 +4,7 @@ import { config } from './utils/config';
 test.describe('Login Page', () => {
   test('is up and running', async ({ page }) => {
     await page.goto(`${config.URL}/login`);
-    const textElem = page.getByText('Welcome to the c4 GenAI Suite');
+    const textElem = page.getByText('Welcome to Gaible');
     await expect(textElem).toBeVisible();
   });
 

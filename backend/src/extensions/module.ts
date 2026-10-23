@@ -43,7 +43,7 @@ import { WholeFilesExtension } from './tools/whole-files-conversation';
 const extensionClassSuffix = 'Extension';
 
 function getDynamicExtensionModules() {
-  const extensionModulesFolder = path.join(__dirname, '..', '..', 'node_modules', '@c4', 'extensions');
+  const extensionModulesFolder = path.join(__dirname, '..', '..', 'node_modules', '@gaible', 'extensions');
   if (fs.existsSync(extensionModulesFolder)) {
     const entries = fs.readdirSync(extensionModulesFolder, { withFileTypes: true });
 
@@ -51,7 +51,7 @@ function getDynamicExtensionModules() {
       .filter((x) => x.isDirectory())
       .map((entry) => {
         copyDirFiles(path.join(extensionModulesFolder, entry.name, 'i18n'), path.join(__dirname, '..', 'localization', 'i18n'));
-        return `@c4/extensions/${entry.name}`;
+        return `@gaible/extensions/${entry.name}`;
       });
   }
 

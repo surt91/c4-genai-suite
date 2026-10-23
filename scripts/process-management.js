@@ -110,7 +110,7 @@ export async function dockerCleanups() {
     let containers = [];
     try {
       const result = execSync(
-        'docker ps --format "{{.Names}}" | grep "^c4-"',
+        'docker ps --format "{{.Names}}" | grep "^gaible-"',
         { encoding: 'utf8' }
       );
       containers = result

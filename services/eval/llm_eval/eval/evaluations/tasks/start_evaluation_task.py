@@ -62,7 +62,7 @@ async def start_evaluation_task(session: AsyncSession, evaluation_id: str) -> No
         c = chain(
             retrieve_answer_task.si(
                 test_case.id,
-                evaluation.c4_assistant_id,
+                evaluation.gaible_assistant_id,
             ).on_error(handle_test_case_task.s(test_case.id)),
             evaluate_test_case_task.si(
                 test_case.id, [metric.id for metric in metrics]

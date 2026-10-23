@@ -67,7 +67,7 @@
             "properties": {
                 "enabled": {
                     "type": "boolean",
-                    "description": "Specifies whether c4 should be deployed",
+                    "description": "Specifies whether Gaible should be deployed",
                     "default": true
                 },
                 "baseUrl": {
@@ -110,7 +110,7 @@
                         },
                         "existingAdminSecret": {
                             "type": "string",
-                            "description": "The name of the existing k8s secret. `c4.auth.initialAdminUsername` and `c4.auth.initialAdminPassword` will be ignored. The keys must be `adminUsername` and `adminPassword`.",
+                            "description": "The name of the existing k8s secret. `backend.auth.initialAdminUsername` and `backend.auth.initialAdminPassword` will be ignored. The keys must be `adminUsername` and `adminPassword`.",
                             "default": "\"\""
                         },
                         "authorizationUrl": {
@@ -140,12 +140,12 @@
                         },
                         "existingClientId": {
                             "type": "string",
-                            "description": "The name of the existing k8s secret. `c4.auth.clientId` will be ignored. The key must be `clientId`",
+                            "description": "The name of the existing k8s secret. `backend.auth.clientId` will be ignored. The key must be `clientId`",
                             "default": "\"\""
                         },
                         "existingClientSecret": {
                             "type": "string",
-                            "description": "The name of the existing k8s secret. `c4.auth.clientSecret` will be ignored. The key must be `clientSecret`",
+                            "description": "The name of the existing k8s secret. `backend.auth.clientSecret` will be ignored. The key must be `clientSecret`",
                             "default": "\"\""
                         },
                         "microsoftClientId": {
@@ -165,22 +165,22 @@
                         },
                         "existingMicrosoftClientId": {
                             "type": "string",
-                            "description": "The name of the existing k8s secret. `c4.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`",
+                            "description": "The name of the existing k8s secret. `backend.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`",
                             "default": "\"\""
                         },
                         "existingMicrosoftClientSecret": {
                             "type": "string",
-                            "description": "The name of the existing k8s secret. `c4.auth.microsoftClientSecret` will be ignored. The key must be `microsoftClientSecret`",
+                            "description": "The name of the existing k8s secret. `backend.auth.microsoftClientSecret` will be ignored. The key must be `microsoftClientSecret`",
                             "default": "\"\""
                         },
                         "existingMicrosoftTenant": {
                             "type": "string",
-                            "description": "The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`",
+                            "description": "The name of the existing k8s secret. `backend.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`",
                             "default": "\"\""
                         },
                         "acceptUserGroupsFromAuthProvider": {
                             "type": "boolean",
-                            "description": "Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)",
+                            "description": "Sets if user groups from the identity provider are saved in the Gaible user. (All groups manually selected in Gaible will be overwritten!)",
                             "default": false
                         },
                         "userGroupsPropertyName": {
@@ -246,7 +246,7 @@
                         "repository": {
                             "type": "string",
                             "description": "The image repository including host, port, repo",
-                            "default": "ghcr.io/codecentric/c4-genai-suite/backend"
+                            "default": "ghcr.io/surt91/gaible/backend"
                         },
                         "tag": {
                             "type": "string",
@@ -283,7 +283,7 @@
                     "properties": {
                         "type": {
                             "type": "string",
-                            "description": "c4 deployment strategy type.",
+                            "description": "Gaible deployment strategy type.",
                             "default": "RollingUpdate"
                         }
                     }
@@ -303,12 +303,12 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean",
-                            "description": "Specifies whether a service for c4 metrics should be created",
+                            "description": "Specifies whether a service for Gaible metrics should be created",
                             "default": false
                         },
                         "port": {
                             "type": "number",
-                            "description": "The c4 metrics port",
+                            "description": "The Gaible metrics port",
                             "default": 9100
                         },
                         "prometheusRule": {
@@ -316,12 +316,12 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean",
-                                    "description": "Specifies whether a PrometheusRule for c4 should be created",
+                                    "description": "Specifies whether a PrometheusRule for Gaible should be created",
                                     "default": false
                                 },
                                 "ruleGroupLabels": {
                                     "type": "object",
-                                    "description": "Labels to add to the c4 rule group",
+                                    "description": "Labels to add to the Gaible rule group",
                                     "default": {}
                                 }
                             }
@@ -331,7 +331,7 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean",
-                                    "description": "Specifies whether a c4 ServiceMonitor should be created",
+                                    "description": "Specifies whether a Gaible ServiceMonitor should be created",
                                     "default": false
                                 },
                                 "interval": {
@@ -346,7 +346,7 @@
                                 },
                                 "labels": {
                                     "type": "object",
-                                    "description": "Map of labels to add to the c4 ServiceMonitor",
+                                    "description": "Map of labels to add to the Gaible ServiceMonitor",
                                     "default": {}
                                 }
                             }
@@ -365,22 +365,22 @@
                 },
                 "labels": {
                     "type": "object",
-                    "description": "Map of labels to add to the c4 deployment",
+                    "description": "Map of labels to add to the Gaible deployment",
                     "default": {}
                 },
                 "annotations": {
                     "type": "object",
-                    "description": "Map of annotations to add to the c4 deployment",
+                    "description": "Map of annotations to add to the Gaible deployment",
                     "default": {}
                 },
                 "podLabels": {
                     "type": "object",
-                    "description": "Map of labels to add to the c4 pods",
+                    "description": "Map of labels to add to the Gaible pods",
                     "default": {}
                 },
                 "podAnnotations": {
                     "type": "object",
-                    "description": "Map of annotations to add to the c4 pods",
+                    "description": "Map of annotations to add to the Gaible pods",
                     "default": {}
                 },
                 "podSecurityContext": {
@@ -409,7 +409,7 @@
                         "repository": {
                             "type": "string",
                             "description": "The image repository including host, port, repo",
-                            "default": "ghcr.io/codecentric/c4-genai-suite/frontend"
+                            "default": "ghcr.io/surt91/gaible/frontend"
                         },
                         "tag": {
                             "type": "string",
@@ -552,7 +552,7 @@
                         "repository": {
                             "type": "string",
                             "description": "The image repository including host, port, repo",
-                            "default": "ghcr.io/codecentric/c4-genai-suite/reis"
+                            "default": "ghcr.io/surt91/gaible/reis"
                         },
                         "tag": {
                             "type": "string",
@@ -584,7 +584,7 @@
                                 },
                                 "ruleGroupLabels": {
                                     "type": "object",
-                                    "description": "Labels to add to the c4 rule group",
+                                    "description": "Labels to add to the Gaible rule group",
                                     "default": {}
                                 }
                             }

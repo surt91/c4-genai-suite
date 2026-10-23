@@ -168,9 +168,11 @@ class Evaluation(Base, CreatedTrait, UpdatedTrait, DeletedTrait):
         back_populates="evaluation", cascade="all, delete-orphan"
     )
 
-    # C4 assistant fields
-    c4_assistant_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    c4_assistant_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Gaible assistant fields
+    gaible_assistant_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    gaible_assistant_name: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )
 
     metrics: Mapped[List["EvaluationMetric"]] = relationship(
         secondary=evaluation_evaluation_metric_association_table,

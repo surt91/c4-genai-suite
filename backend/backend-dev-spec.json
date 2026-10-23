@@ -2463,8 +2463,8 @@
     }
   },
   "info": {
-    "title": "c4 GenAI Suite",
-    "description": "c4 GenAI Suite",
+    "title": "Gaible",
+    "description": "Gaible",
     "version": "1.0",
     "contact": {}
   },
@@ -3734,7 +3734,7 @@
           "format": {
             "type": "string",
             "description": "The editor.",
-            "enum": ["input", "textarea", "password", "select", "date", "email", "c4-ui"]
+            "enum": ["input", "textarea", "password", "select", "date", "email", "gaible-ui"]
           },
           "examples": {
             "description": "The examples.",

@@ -51,10 +51,10 @@ export const getDefault = (spec: ExtensionUserInfoDtoUserArgumentsValue): UserAr
       return getDefaultValuesFromNestedObject(spec);
   }
 };
-const isFilterValueWithoutCustomC4UI = (argumentValue: ExtensionUserInfoDtoUserArgumentsValue) =>
-  ({ format: undefined, ...argumentValue }).format !== 'c4-ui';
+const isFilterValueWithoutCustomGaibleUI = (argumentValue: ExtensionUserInfoDtoUserArgumentsValue) =>
+  ({ format: undefined, ...argumentValue }).format !== 'gaible-ui';
 export const isExtensionWithUserArgs = (e: ExtensionUserInfoDto) =>
-  Object.values(e.userArguments || {}).some(isFilterValueWithoutCustomC4UI);
+  Object.values(e.userArguments || {}).some(isFilterValueWithoutCustomGaibleUI);
 
 function getDefaultValuesFromNestedObject(spec: ExtensionArgumentObjectSpecDto) {
   const defaultValues: Record<string, unknown> = {};

@@ -3,7 +3,7 @@ export const en = {
     administration: 'Admin',
     administrator: 'Admin',
     apiKey: 'API Key',
-    appName: 'c4 GenAI Suite',
+    appName: 'Gaible',
     builtIn: 'System Default',
     back: 'Back',
     cancel: 'Cancel',
@@ -249,7 +249,7 @@ export const en = {
       updatedAt: 'Updated',
       actions: 'Actions',
       // Types
-      typeC4: 'C4 GenAI',
+      typeGaible: 'Gaible',
       typeOpenAI: 'OpenAI',
       typeAzureOpenAI: 'Azure OpenAI',
       // Features
@@ -280,10 +280,10 @@ export const en = {
       apiKeyPlaceholder: 'Enter API key',
       apiKeyRequired: 'API key is required',
       apiKeyUnchanged: 'Leave unchanged to keep existing key',
-      // Fields - C4
-      c4EndpointLabel: 'Endpoint URL',
-      c4EndpointPlaceholder: 'https://api.example.com',
-      c4EndpointRequired: 'Endpoint URL is required',
+      // Fields - Gaible
+      gaibleEndpointLabel: 'Endpoint URL',
+      gaibleEndpointPlaceholder: 'https://api.example.com',
+      gaibleEndpointRequired: 'Endpoint URL is required',
       configurationIdLabel: 'Configuration ID',
       configurationIdPlaceholder: 'Enter configuration ID',
       configurationIdRequired: 'Configuration ID is required',
@@ -309,7 +309,7 @@ export const en = {
       azureEndpointPlaceholder: 'https://my-resource.openai.azure.com',
       azureEndpointRequired: 'Azure endpoint URL is required',
       // Type descriptions
-      c4Description: 'Connect to C4 GenAI Suite for managed LLM access',
+      gaibleDescription: 'Connect to Gaible for managed LLM access',
       openAiDescription: 'Use OpenAI API or compatible services',
       azureOpenAiDescription: 'Connect to Azure OpenAI Service',
       // Messages
@@ -726,7 +726,7 @@ export const en = {
   login: {
     loginButton: 'Login with {{provider}}',
     loginHint: 'Login to your account',
-    welcome: 'Welcome to the c4 GenAI Suite 👋',
+    welcome: 'Welcome to Gaible 👋',
     authError: 'An error occurred while trying to authenticate. Please try again later.',
     emptyAuthSettings: 'No authentication settings found',
   },

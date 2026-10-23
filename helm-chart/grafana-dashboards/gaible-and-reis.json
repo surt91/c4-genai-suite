@@ -108,13 +108,13 @@
                         "uid": "prometheus"
                     },
                     "editorMode": "code",
-                    "expr": "sum(rate(c4_chats{namespace=~\"$namespace\"}[$interval])) by (service)",
+                    "expr": "sum(rate(gaible_chats{namespace=~\"$namespace\"}[$interval])) by (service)",
                     "legendFormat": "__auto",
                     "range": true,
                     "refId": "A"
                 }
             ],
-            "title": "c4 Chats per Deployment",
+            "title": "Gaible Chats per Deployment",
             "type": "timeseries"
         },
         {
@@ -204,13 +204,13 @@
                         "uid": "prometheus"
                     },
                     "editorMode": "code",
-                    "expr": "sum(rate(c4_prompts{namespace=~\"$namespace\"}[$interval])) by (service)",
+                    "expr": "sum(rate(gaible_prompts{namespace=~\"$namespace\"}[$interval])) by (service)",
                     "legendFormat": "__auto",
                     "range": true,
                     "refId": "A"
                 }
             ],
-            "title": "C4 Prompts per Deployment",
+            "title": "Gaible Prompts per Deployment",
             "type": "timeseries"
         },
         {
@@ -794,10 +794,7 @@
                 "type": "datasource"
             },
             {
-                "current": {
-                    "text": "cc-projects-k8s-prod",
-                    "value": "cc-projects-k8s-prod"
-                },
+                "current": {},
                 "definition": "label_values(cluster)",
                 "label": "Cluster",
                 "name": "cluster",
@@ -812,17 +809,8 @@
                 "type": "query"
             },
             {
-                "current": {
-                    "text": [
-                        "cc-company-chat",
-                        "cc-company-chat-customer-demo"
-                    ],
-                    "value": [
-                        "cc-company-chat",
-                        "cc-company-chat-customer-demo"
-                    ]
-                },
-                "definition": "label_values(c4_chats,namespace)",
+                "current": {},
+                "definition": "label_values(gaible_chats,namespace)",
                 "includeAll": false,
                 "label": "Namespace",
                 "multi": true,
@@ -830,7 +818,7 @@
                 "options": [],
                 "query": {
                     "qryType": 1,
-                    "query": "label_values(c4_chats,namespace)",
+                    "query": "label_values(gaible_chats,namespace)",
                     "refId": "PrometheusVariableQueryEditor-VariableQuery"
                 },
                 "refresh": 1,
@@ -911,7 +899,7 @@
     },
     "timepicker": {},
     "timezone": "browser",
-    "title": "C4 & REIS",
+    "title": "Gaible & REIS",
     "uid": "fecc6626u9pmoc",
     "version": 18,
     "weekStart": ""

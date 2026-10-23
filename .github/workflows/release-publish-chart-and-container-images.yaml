@@ -116,7 +116,7 @@ jobs:
       - name: Package and Push Helm Chart
         run: |
           helm package helm-chart/
-          helm push c4-genai-suite-*.tgz oci://ghcr.io/${{ github.repository }}/charts/
+          helm push gaible-*.tgz oci://ghcr.io/${{ github.repository }}/charts/
 
   notify-slack:
     runs-on: ubuntu-latest

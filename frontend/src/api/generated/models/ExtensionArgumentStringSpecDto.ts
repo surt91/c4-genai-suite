@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * c4 GenAI Suite
- * c4 GenAI Suite
+ * Gaible
+ * Gaible
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -105,7 +105,7 @@ export const ExtensionArgumentStringSpecDtoFormatEnum = {
     Select: 'select',
     Date: 'date',
     Email: 'email',
-    C4Ui: 'c4-ui'
+    GaibleUi: 'gaible-ui'
 } as const;
 export type ExtensionArgumentStringSpecDtoFormatEnum = typeof ExtensionArgumentStringSpecDtoFormatEnum[keyof typeof ExtensionArgumentStringSpecDtoFormatEnum];
 

@@ -27,7 +27,7 @@ ingress:
 
 ## @section Backend
 backend:
-  ## @param backend.enabled Specifies whether c4 should be deployed
+  ## @param backend.enabled Specifies whether Gaible should be deployed
   enabled: true
   ## @param backend.baseUrl [string] Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.
   baseUrl: ""
@@ -43,7 +43,7 @@ backend:
     initialAdminUsername: ""
     ## @param backend.auth.initialAdminPassword [string] The initial admin user Password hashed and saved in DB
     initialAdminPassword: ""
-    ## @param backend.auth.existingAdminSecret [string] The name of the existing k8s secret. `c4.auth.initialAdminUsername` and `c4.auth.initialAdminPassword` will be ignored. The keys must be `adminUsername` and `adminPassword`.
+    ## @param backend.auth.existingAdminSecret [string] The name of the existing k8s secret. `backend.auth.initialAdminUsername` and `backend.auth.initialAdminPassword` will be ignored. The keys must be `adminUsername` and `adminPassword`.
     existingAdminSecret: ""
     ## @param backend.auth.authorizationUrl [string] The OpenID Connect authorizationUrl
     authorizationUrl: ""
@@ -55,9 +55,9 @@ backend:
     clientId: ""
     ## @param backend.auth.clientSecret [string] The OpenID Connect clientSecret
     clientSecret: ""
-    ## @param backend.auth.existingClientId [string] The name of the existing k8s secret. `c4.auth.clientId` will be ignored. The key must be `clientId`
+    ## @param backend.auth.existingClientId [string] The name of the existing k8s secret. `backend.auth.clientId` will be ignored. The key must be `clientId`
     existingClientId: ""
-    ## @param backend.auth.existingClientSecret [string] The name of the existing k8s secret. `c4.auth.clientSecret` will be ignored. The key must be `clientSecret`
+    ## @param backend.auth.existingClientSecret [string] The name of the existing k8s secret. `backend.auth.clientSecret` will be ignored. The key must be `clientSecret`
     existingClientSecret: ""
     ## @param backend.auth.microsoftClientId [string] The Microsoft Entra ID clientId
     microsoftClientId: ""
@@ -65,13 +65,13 @@ backend:
     microsoftClientSecret: ""
     ## @param backend.auth.microsoftTenant [string] The Microsoft Entra ID tenant
     microsoftTenant: ""
-    ## @param backend.auth.existingMicrosoftClientId [string] The name of the existing k8s secret. `c4.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`
+    ## @param backend.auth.existingMicrosoftClientId [string] The name of the existing k8s secret. `backend.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`
     existingMicrosoftClientId: ""
-    ## @param backend.auth.existingMicrosoftClientSecret [string] The name of the existing k8s secret. `c4.auth.microsoftClientSecret` will be ignored. The key must be `microsoftClientSecret`
+    ## @param backend.auth.existingMicrosoftClientSecret [string] The name of the existing k8s secret. `backend.auth.microsoftClientSecret` will be ignored. The key must be `microsoftClientSecret`
     existingMicrosoftClientSecret: ""
-    ## @param backend.auth.existingMicrosoftTenant [string] The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`
+    ## @param backend.auth.existingMicrosoftTenant [string] The name of the existing k8s secret. `backend.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`
     existingMicrosoftTenant: ""
-    ## @param backend.auth.acceptUserGroupsFromAuthProvider Sets if user groups from the identity provider are saved in the c4 user. (All groups manually selected in c4 will be overwritten!)
+    ## @param backend.auth.acceptUserGroupsFromAuthProvider Sets if user groups from the identity provider are saved in the Gaible user. (All groups manually selected in Gaible will be overwritten!)
     acceptUserGroupsFromAuthProvider: false
     ## @param backend.auth.userGroupsPropertyName [string] The property in the auth token from where the user groups are read. Default is "groups".
     userGroupsPropertyName: ""
@@ -95,7 +95,7 @@ backend:
       clientKeySecretKey: client.key
   image:
     ## @param backend.image.repository The image repository including host, port, repo
-    repository: "ghcr.io/codecentric/c4-genai-suite/backend"
+    repository: "ghcr.io/surt91/gaible/backend"
     ## @param backend.image.tag [string] The image tag
     tag: ""
   ## @param backend.extraEnvVars An extra list of environment variables to add to the deployment.
@@ -106,7 +106,7 @@ backend:
   extraVolumeMounts: []
   ## @param backend.replicaCount The number of replicas to create.
   replicaCount: 1
-  ## @param backend.updateStrategy.type c4 deployment strategy type.
+  ## @param backend.updateStrategy.type Gaible deployment strategy type.
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   ## Example:
   ## updateStrategy:
@@ -123,34 +123,34 @@ backend:
   ## @param backend.existingSessionSecret [string] The name of the existing k8s secret. `sessionSecret` will be ignored. The key must be `sessionSecret`
   existingSessionSecret: ""
   metrics:
-    ## @param backend.metrics.enabled Specifies whether a service for c4 metrics should be created
+    ## @param backend.metrics.enabled Specifies whether a service for Gaible metrics should be created
     enabled: false
-    ## @param backend.metrics.port The c4 metrics port
+    ## @param backend.metrics.port The Gaible metrics port
     port: 9100
     prometheusRule:
-      ## @param backend.metrics.prometheusRule.enabled Specifies whether a PrometheusRule for c4 should be created
+      ## @param backend.metrics.prometheusRule.enabled Specifies whether a PrometheusRule for Gaible should be created
       enabled: false
-      ## @param backend.metrics.prometheusRule.ruleGroupLabels Labels to add to the c4 rule group
+      ## @param backend.metrics.prometheusRule.ruleGroupLabels Labels to add to the Gaible rule group
       ruleGroupLabels: {}
     serviceMonitor:
-      ## @param backend.metrics.serviceMonitor.enabled Specifies whether a c4 ServiceMonitor should be created
+      ## @param backend.metrics.serviceMonitor.enabled Specifies whether a Gaible ServiceMonitor should be created
       enabled: false
       ## @param backend.metrics.serviceMonitor.interval Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.
       interval: ""
       ## @param backend.metrics.serviceMonitor.scrapeTimeout Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.
       scrapeTimeout: ""
-      ## @param backend.metrics.serviceMonitor.labels Map of labels to add to the c4 ServiceMonitor
+      ## @param backend.metrics.serviceMonitor.labels Map of labels to add to the Gaible ServiceMonitor
       labels: {}
   service:
     ## @param backend.service.type [string] The service type to use, one of: ClusterIP, NodePort, LoadBalancer
     type: "ClusterIP"
-  ## @param backend.labels Map of labels to add to the c4 deployment
+  ## @param backend.labels Map of labels to add to the Gaible deployment
   labels: {}
-  ## @param backend.annotations Map of annotations to add to the c4 deployment
+  ## @param backend.annotations Map of annotations to add to the Gaible deployment
   annotations: {}
-  ## @param backend.podLabels Map of labels to add to the c4 pods
+  ## @param backend.podLabels Map of labels to add to the Gaible pods
   podLabels: {}
-  ## @param backend.podAnnotations Map of annotations to add to the c4 pods
+  ## @param backend.podAnnotations Map of annotations to add to the Gaible pods
   podAnnotations: {}
   ## @param backend.podSecurityContext Configure the Security Context for the Pod
   podSecurityContext: {}
@@ -163,7 +163,7 @@ frontend:
   enabled: true
   image:
     ## @param frontend.image.repository The image repository including host, port, repo
-    repository: "ghcr.io/codecentric/c4-genai-suite/frontend"
+    repository: "ghcr.io/surt91/gaible/frontend"
     ## @param frontend.image.tag [string] The image tag
     tag: ""
   ## @param frontend.replicaCount The number of replicas to create
@@ -232,7 +232,7 @@ reis:
   host: "0.0.0.0"
   image:
     ## @param reis.image.repository The image repository including host, port, repo
-    repository: "ghcr.io/codecentric/c4-genai-suite/reis"
+    repository: "ghcr.io/surt91/gaible/reis"
     ## @param reis.image.tag [string] The image tag
     tag: ""
   metrics:
@@ -243,7 +243,7 @@ reis:
     prometheusRule:
       ## @param reis.metrics.prometheusRule.enabled Specifies whether a PrometheusRule for REIS should be created
       enabled: false
-      ## @param reis.metrics.prometheusRule.ruleGroupLabels Labels to add to the c4 rule group
+      ## @param reis.metrics.prometheusRule.ruleGroupLabels Labels to add to the Gaible rule group
       ruleGroupLabels: {}
     serviceMonitor:
       ## @param reis.metrics.serviceMonitor.enabled Specifies whether a REIS ServiceMonitor should be created

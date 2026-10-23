@@ -34,7 +34,7 @@
       }
     }
   },
-  "info": { "title": "CCCC", "description": "CodeCentric Company Chat", "version": "1.0", "contact": {} },
+  "info": { "title": "Gaible", "description": "Gaible", "version": "1.0", "contact": {} },
   "tags": [{ "name": "tools", "description": "" }],
   "servers": [],
   "components": {

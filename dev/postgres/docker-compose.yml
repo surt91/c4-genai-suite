@@ -3,11 +3,11 @@ version: '3.9'
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: c4-dev-postgres
+    container_name: gaible-dev-postgres
     ports:
       - 5432:5432
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=cccc
+      - POSTGRES_DB=gaible
       - PGPORT=5432

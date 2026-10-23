@@ -1,4 +1,4 @@
-# c4 GenAI Suite
+# Gaible
 
 An AI chatbot application with Model Context Provider (MCP) integration, powered by ai-sdk and compatibility for all major Large Language Models (LLMs) and Embedding Models.
 
@@ -8,13 +8,11 @@ Users can interact with assistants through a user-friendly interface. Depending 
 
 The application is designed to be modular and extensible, allowing users to create assistants with different capabilities by adding extensions.
 
-![short demo video of basic usage](demo/preview.webp)
-
 ## Features
 
 ### Large Language Models (LLM) and Multimodal Models
 
-The c4 GenAI Suite supports already many models directly. And if your preferred model is not supported already, it should be easy to write an extension to support it.
+Gaible supports already many models directly. And if your preferred model is not supported already, it should be easy to write an extension to support it.
 
 * OpenAI compatible models
 * Azure OpenAI models
@@ -24,7 +22,7 @@ The c4 GenAI Suite supports already many models directly. And if your preferred 
 
 ### Retrieval Augmented Generation (RAG)
 
-The c4 GenAI Suite includes REI-S, a server to prepare files for consumption by the LLM.
+Gaible includes REI-S, a server to prepare files for consumption by the LLM.
 
 * REI-S, a custom integrated RAG server
   * Vector stores
@@ -40,7 +38,7 @@ The c4 GenAI Suite includes REI-S, a server to prepare files for consumption by 
 
 ### Extensions
 
-The c4 GenAI Suite is designed for extensibility. Writing extensions is easy, as is using an already existing MCP server.
+Gaible is designed for extensibility. Writing extensions is easy, as is using an already existing MCP server.
 
 * Model Context Protocol (MCP) servers
 * Custom systemprompt
@@ -55,15 +53,13 @@ The c4 GenAI Suite is designed for extensibility. Writing extensions is easy, as
 - Run `docker compose up` in the project root.
 - Open the [application](http://localhost:3333) in a browser. The default login credentials are user `admin@example.com` and password `secret`.
 
-![video showing assistant configuration](demo/assistants.webp)
-
 ### Using Helm & Kubernetes
 
 For deployment in Kubernetes environments, please refer to the [README of our Helm Chart](./helm-chart/README.md).
 
 ### Setting up Assistants and Extensions
 
-The c4 GenAI Suite revolves around *assistants*.
+Gaible revolves around *assistants*.
 Each assistant consists of a set of extensions, which determine the LLM model and which tools it can use.
 
 - In the admin area (click the username on the bottom left), go to the [assistants section](http://localhost:3333/admin/assistants).
@@ -72,7 +68,7 @@ Each assistant consists of a set of extensions, which determine the LLM model an
 - Select the model and fill in the credentials.
 - Use the `Test` Button to check that it works and `save`.
 
-Now you can return to the [chat page](http://localhost:3333/chat) (click on `c4 GenAI Suite` in the top left) and start a new conversation with your new assistant.
+Now you can return to the [chat page](http://localhost:3333/chat) (click on `Gaible` in the top left) and start a new conversation with your new assistant.
 
 > [!TIP]
 > Our `docker-compose` includes a local Ollama, which runs on the CPU. You can use this for quick testing. But it will be slow and you probably want to use another model. If you want to use it, just create the following model extension in your Assistant.
@@ -88,7 +84,7 @@ Each MCP server can be configured in detail as an extension.
 ### Retrieval Augmented Generation (RAG) / File Search [optional]
 
 Use our RAG server `REI-S` to search user provided files. Just configure a `Search Files` extension for the assistant.
-This process is described in detail in [the `services/reis` subdirectory](services/reis/#example-configuration-in-c4).
+This process is described in detail in [the `services/reis` subdirectory](services/reis/#example-configuration-in-gaible).
 
 ## Contributing & Development
 

@@ -120,7 +120,7 @@ Connect to an LLM by Mistral, that will do the talking.
 | API Key                | You own OpenAI API Key from [mistral.ai](https://mistral.ai/)
 | Model Name             | Choose the model you want to use.
 
-*For the most stable environment via c4 we recommend using the "Azure-OpenAI" extension instead.*
+*For the most stable environment via Gaible we recommend using the "Azure-OpenAI" extension instead.*
 
 ### Bing Web Search
 Enable the chat to search on the internet (with a Bing API key).
@@ -220,4 +220,4 @@ Some of the file tools are incompatible.
 
 ## Custom Extensions
 
-c4 supports the integration of custom extensions. These can be tailored to your specific needs and will be available to your company only. Please contact your service owner for details.
+Gaible supports the integration of custom extensions. These can be tailored to your specific needs and will be available to your company only. Please contact your service owner for details.

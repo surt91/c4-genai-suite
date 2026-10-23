@@ -18,7 +18,7 @@ tests:
           path: metadata.labels.grafana_dashboard
           value: "1"
 
-  - it: contains the C4 & REIS dashboard
+  - it: contains the Gaible & REIS dashboard
     asserts:
       - exists:
-          path: data["c4-and-reis.json"]
+          path: data["gaible-and-reis.json"]

@@ -6,7 +6,7 @@
             "port": 5432,
             "driver": "PostgreSQL",
             "name": "pg",
-            "database": "cccc",
+            "database": "gaible",
             "username": "admin",
             "password": "secret"
         }

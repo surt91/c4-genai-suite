@@ -3,7 +3,7 @@
 /* eslint-disable */
 /**
  * LLM Eval Service
- * Internal evaluation service for C4 GenAI Suite
+ * Internal evaluation service for Gaible
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -28,53 +28,53 @@ import {
 } from './QACatalogGenerationModelConfigurationSchema';
 
 /**
- * Request to generate a QA catalog from files in a C4 bucket.
+ * Request to generate a QA catalog from files in a Gaible bucket.
  * @export
- * @interface QACatalogGenerationFromC4BucketRequest
+ * @interface QACatalogGenerationFromGaibleBucketRequest
  */
-export interface QACatalogGenerationFromC4BucketRequest {
+export interface QACatalogGenerationFromGaibleBucketRequest {
     /**
      * 
      * @type {number}
-     * @memberof QACatalogGenerationFromC4BucketRequest
+     * @memberof QACatalogGenerationFromGaibleBucketRequest
      */
     bucketId: number;
     /**
      * 
      * @type {Array<number>}
-     * @memberof QACatalogGenerationFromC4BucketRequest
+     * @memberof QACatalogGenerationFromGaibleBucketRequest
      */
     fileIds: Array<number>;
     /**
      * 
      * @type {string}
-     * @memberof QACatalogGenerationFromC4BucketRequest
+     * @memberof QACatalogGenerationFromGaibleBucketRequest
      */
     name: string;
     /**
      * 
      * @type {string}
-     * @memberof QACatalogGenerationFromC4BucketRequest
+     * @memberof QACatalogGenerationFromGaibleBucketRequest
      */
     type: string;
     /**
      * 
      * @type {QACatalogGenerationConfig}
-     * @memberof QACatalogGenerationFromC4BucketRequest
+     * @memberof QACatalogGenerationFromGaibleBucketRequest
      */
     config: QACatalogGenerationConfig;
     /**
      * 
      * @type {QACatalogGenerationModelConfigurationSchema}
-     * @memberof QACatalogGenerationFromC4BucketRequest
+     * @memberof QACatalogGenerationFromGaibleBucketRequest
      */
     modelConfigSchema: QACatalogGenerationModelConfigurationSchema;
 }
 
 /**
- * Check if a given object implements the QACatalogGenerationFromC4BucketRequest interface.
+ * Check if a given object implements the QACatalogGenerationFromGaibleBucketRequest interface.
  */
-export function instanceOfQACatalogGenerationFromC4BucketRequest(value: object): value is QACatalogGenerationFromC4BucketRequest {
+export function instanceOfQACatalogGenerationFromGaibleBucketRequest(value: object): value is QACatalogGenerationFromGaibleBucketRequest {
     if (!('bucketId' in value) || value['bucketId'] === undefined) return false;
     if (!('fileIds' in value) || value['fileIds'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
@@ -84,11 +84,11 @@ export function instanceOfQACatalogGenerationFromC4BucketRequest(value: object):
     return true;
 }
 
-export function QACatalogGenerationFromC4BucketRequestFromJSON(json: any): QACatalogGenerationFromC4BucketRequest {
-    return QACatalogGenerationFromC4BucketRequestFromJSONTyped(json, false);
+export function QACatalogGenerationFromGaibleBucketRequestFromJSON(json: any): QACatalogGenerationFromGaibleBucketRequest {
+    return QACatalogGenerationFromGaibleBucketRequestFromJSONTyped(json, false);
 }
 
-export function QACatalogGenerationFromC4BucketRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): QACatalogGenerationFromC4BucketRequest {
+export function QACatalogGenerationFromGaibleBucketRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): QACatalogGenerationFromGaibleBucketRequest {
     if (json == null) {
         return json;
     }
@@ -103,7 +103,7 @@ export function QACatalogGenerationFromC4BucketRequestFromJSONTyped(json: any, i
     };
 }
 
-export function QACatalogGenerationFromC4BucketRequestToJSON(value?: QACatalogGenerationFromC4BucketRequest | null): any {
+export function QACatalogGenerationFromGaibleBucketRequestToJSON(value?: QACatalogGenerationFromGaibleBucketRequest | null): any {
     if (value == null) {
         return value;
     }

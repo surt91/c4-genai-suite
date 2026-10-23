@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectMetric, makeCounterProvider } from '@willsoto/nestjs-prometheus';
 import { Counter } from 'prom-client';
 
-const appPrefix = 'c4';
+const appPrefix = 'gaible';
 
 export const MetricCounter = {
   CHATS: { name: `${appPrefix}_chats`, help: 'number of chats that are created', labelNames: ['user'] as const },

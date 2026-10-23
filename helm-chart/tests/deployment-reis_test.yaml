@@ -21,7 +21,7 @@ tests:
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-c4-genai-suite-rei-s
+          value: RELEASE-NAME-gaible-rei-s
 
   - it: name should use fullnameOverride when provided
     template: deployment-reis.yaml
@@ -48,7 +48,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "ghcr.io/codecentric/c4-genai-suite/reis:v44.71.3"
+          value: "ghcr.io/surt91/gaible/reis:v44.71.3"
 
   - it: should use custom image tag when explicitly overridden
     template: deployment-reis.yaml
@@ -57,7 +57,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "ghcr.io/codecentric/c4-genai-suite/reis:v1.2.3"
+          value: "ghcr.io/surt91/gaible/reis:v1.2.3"
 
   - it: has update strategy Rolling Update by default
     template: deployment-reis.yaml

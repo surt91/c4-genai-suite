@@ -24,8 +24,8 @@ class RunEvaluationByQaCatalog(ApiModel):
     catalog_id: str
     metrics: list[str]
     test_cases_per_qa_pair: int = 3
-    c4_assistant_id: int
-    c4_assistant_name: str | None = None
+    gaible_assistant_id: int
+    gaible_assistant_name: str | None = None
 
 
 class StartRunEvaluationByQaCatalogLogic:
@@ -53,9 +53,9 @@ class StartRunEvaluationByQaCatalogLogic:
             catalog_id=dto.catalog_id,
             status=EvaluationStatus.PENDING,
             metrics=metrics,
-            # Store C4 assistant info
-            c4_assistant_id=dto.c4_assistant_id,
-            c4_assistant_name=dto.c4_assistant_name,
+            # Store Gaible assistant info
+            gaible_assistant_id=dto.gaible_assistant_id,
+            gaible_assistant_name=dto.gaible_assistant_name,
         )
 
         self._session.add(evaluation)

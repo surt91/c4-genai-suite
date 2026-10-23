@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "c4 GenAI Suite",
+    "title": "Gaible",
     "version": "1.0"
   },
   "paths": {

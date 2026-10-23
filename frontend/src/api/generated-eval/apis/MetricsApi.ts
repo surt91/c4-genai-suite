@@ -3,7 +3,7 @@
 /* eslint-disable */
 /**
  * LLM Eval Service
- * Internal evaluation service for C4 GenAI Suite
+ * Internal evaluation service for Gaible
  *
  * The version of the OpenAPI document: 1.0.0
  * 

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * CCCC
- * CodeCentric Company Chat
+ * Gaible
+ * Gaible
  *
  * The version of the OpenAPI document: 1.0
  * 

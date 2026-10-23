@@ -2,23 +2,23 @@
 kind: PrometheusRule
 apiVersion: monitoring.coreos.com/v1
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-backend
+  name: {{ include "gaible.fullname" . }}-backend
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
-    app.kubernetes.io/component: c4
+    {{- include "gaible.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: Gaible
 spec:
   groups:
-    - name: c4-alerts
+    - name: gaible-alerts
       {{- if .Values.backend.metrics.prometheusRule.ruleGroupLabels }}
       labels:
         {{- .Values.backend.metrics.prometheusRule.ruleGroupLabels | toYaml | nindent 8 }}
       {{- end }}
       rules:
-        - alert: C4UnexpectedContainerRestart
+        - alert: GaibleUnexpectedContainerRestart
           annotations:
             description: Pod container restarted {{`{{$labels.namespace}}`}}/{{`{{$labels.pod}}`}}/{{`{{$labels.container}}`}}
-            summary: C4 Container Restarted
-          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container="{{ include "c4genaisuite.fullname" . }}"}[30m]) > 0
+            summary: Gaible Container Restarted
+          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container="{{ include "gaible.fullname" . }}"}[30m]) > 0
           labels:
             severity: warning
 {{- end }}

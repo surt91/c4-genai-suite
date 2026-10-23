@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/DashboardApi.ts
 apis/EvaluationResultsApi.ts
 apis/EvaluationsApi.ts
@@ -79,7 +80,7 @@ models/PluginFeature.ts
 models/QACatalog.ts
 models/QACatalogGenerationConfig.ts
 models/QACatalogGenerationData.ts
-models/QACatalogGenerationFromC4BucketRequest.ts
+models/QACatalogGenerationFromGaibleBucketRequest.ts
 models/QACatalogGenerationModelConfigurationSchema.ts
 models/QACatalogGenerationResult.ts
 models/QACatalogPreview.ts

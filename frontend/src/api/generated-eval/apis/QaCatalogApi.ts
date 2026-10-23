@@ -3,7 +3,7 @@
 /* eslint-disable */
 /**
  * LLM Eval Service
- * Internal evaluation service for C4 GenAI Suite
+ * Internal evaluation service for Gaible
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -24,7 +24,7 @@ import type {
   HTTPValidationError,
   QACatalog,
   QACatalogGenerationData,
-  QACatalogGenerationFromC4BucketRequest,
+  QACatalogGenerationFromGaibleBucketRequest,
   QACatalogGenerationResult,
   QACatalogPreview,
   QACatalogUpdateRequest,
@@ -48,8 +48,8 @@ import {
     QACatalogToJSON,
     QACatalogGenerationDataFromJSON,
     QACatalogGenerationDataToJSON,
-    QACatalogGenerationFromC4BucketRequestFromJSON,
-    QACatalogGenerationFromC4BucketRequestToJSON,
+    QACatalogGenerationFromGaibleBucketRequestFromJSON,
+    QACatalogGenerationFromGaibleBucketRequestToJSON,
     QACatalogGenerationResultFromJSON,
     QACatalogGenerationResultToJSON,
     QACatalogPreviewFromJSON,
@@ -88,8 +88,8 @@ export interface QaCatalogGenerateRequest {
     qACatalogGenerationData: QACatalogGenerationData;
 }
 
-export interface QaCatalogGenerateFromC4BucketRequest {
-    qACatalogGenerationFromC4BucketRequest: QACatalogGenerationFromC4BucketRequest;
+export interface QaCatalogGenerateFromGaibleBucketRequest {
+    qACatalogGenerationFromGaibleBucketRequest: QACatalogGenerationFromGaibleBucketRequest;
 }
 
 export interface QaCatalogGetRequest {
@@ -392,14 +392,14 @@ export class QaCatalogApi extends runtime.BaseAPI {
     }
 
     /**
-     * Generate QA catalog from files in a C4 bucket
-     * Generate From C4 Bucket
+     * Generate QA catalog from files in a Gaible bucket
+     * Generate From Gaible Bucket
      */
-    async qaCatalogGenerateFromC4BucketRaw(requestParameters: QaCatalogGenerateFromC4BucketRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QACatalogGenerationResult>> {
-        if (requestParameters['qACatalogGenerationFromC4BucketRequest'] == null) {
+    async qaCatalogGenerateFromGaibleBucketRaw(requestParameters: QaCatalogGenerateFromGaibleBucketRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QACatalogGenerationResult>> {
+        if (requestParameters['qACatalogGenerationFromGaibleBucketRequest'] == null) {
             throw new runtime.RequiredError(
-                'qACatalogGenerationFromC4BucketRequest',
-                'Required parameter "qACatalogGenerationFromC4BucketRequest" was null or undefined when calling qaCatalogGenerateFromC4Bucket().'
+                'qACatalogGenerationFromGaibleBucketRequest',
+                'Required parameter "qACatalogGenerationFromGaibleBucketRequest" was null or undefined when calling qaCatalogGenerateFromGaibleBucket().'
             );
         }
 
@@ -410,22 +410,22 @@ export class QaCatalogApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/v1/qa-catalog/generator/from-c4-bucket`,
+            path: `/v1/qa-catalog/generator/from-gaible-bucket`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: QACatalogGenerationFromC4BucketRequestToJSON(requestParameters['qACatalogGenerationFromC4BucketRequest']),
+            body: QACatalogGenerationFromGaibleBucketRequestToJSON(requestParameters['qACatalogGenerationFromGaibleBucketRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => QACatalogGenerationResultFromJSON(jsonValue));
     }
 
     /**
-     * Generate QA catalog from files in a C4 bucket
-     * Generate From C4 Bucket
+     * Generate QA catalog from files in a Gaible bucket
+     * Generate From Gaible Bucket
      */
-    async qaCatalogGenerateFromC4Bucket(qACatalogGenerationFromC4BucketRequest: QACatalogGenerationFromC4BucketRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QACatalogGenerationResult> {
-        const response = await this.qaCatalogGenerateFromC4BucketRaw({ qACatalogGenerationFromC4BucketRequest: qACatalogGenerationFromC4BucketRequest }, initOverrides);
+    async qaCatalogGenerateFromGaibleBucket(qACatalogGenerationFromGaibleBucketRequest: QACatalogGenerationFromGaibleBucketRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QACatalogGenerationResult> {
+        const response = await this.qaCatalogGenerateFromGaibleBucketRaw({ qACatalogGenerationFromGaibleBucketRequest: qACatalogGenerationFromGaibleBucketRequest }, initOverrides);
         return await response.value();
     }
 

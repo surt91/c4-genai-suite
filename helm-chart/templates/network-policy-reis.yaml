@@ -2,14 +2,14 @@
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-reis
+  name: {{ include "gaible.fullname" . }}-reis
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: reis
 spec:
   podSelector:
     matchLabels:
-      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      {{- include "gaible.commonSelectors" . | nindent 6 }}
       app.kubernetes.io/component: reis
   policyTypes:
     - Egress
@@ -27,7 +27,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              {{- include "c4genaisuite.commonSelectors" . | nindent 14 }}
+              {{- include "gaible.commonSelectors" . | nindent 14 }}
               app.kubernetes.io/component: backend
       ports:
         - port: 3201

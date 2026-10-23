@@ -1,4 +1,4 @@
-{{- define "c4genaisuite.fullname" -}}
+{{- define "gaible.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -11,20 +11,20 @@
 {{- end }}
 {{- end }}
 
-{{- define "c4genaisuite.name" -}}
+{{- define "gaible.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
-{{- define "c4genaisuite.commonLabels" -}}
-app.kubernetes.io/name: {{ include "c4genaisuite.name" . }}
+{{- define "gaible.commonLabels" -}}
+app.kubernetes.io/name: {{ include "gaible.name" . }}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/part-of: {{ include "c4genaisuite.name" . }}
+app.kubernetes.io/part-of: {{ include "gaible.name" . }}
 app.kubernetes.io/version: "{{ .Chart.Version }}"
 {{- end }}
 
-{{- define "c4genaisuite.commonSelectors" -}}
-app.kubernetes.io/name: {{ include "c4genaisuite.name" . }}
+{{- define "gaible.commonSelectors" -}}
+app.kubernetes.io/name: {{ include "gaible.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

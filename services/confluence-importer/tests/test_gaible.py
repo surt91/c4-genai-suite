@@ -1,12 +1,12 @@
-"""Tests for the C4 API interaction functionality."""
+"""Tests for the Gaible API interaction functionality."""
 
 from unittest.mock import call
 
 import pytest
 from pytest_mock import MockerFixture
 
-from confluence_importer.c4 import (
-    C4ImportError,
+from confluence_importer.gaible import (
+    GaibleImportError,
     clear_previous_ingests,
     delete_confluence_page,
     fetch_bucket_files_list,
@@ -14,20 +14,20 @@ from confluence_importer.c4 import (
 )
 
 
-class TestC4:
-    """Tests for the c4 module functionality."""
+class TestGaible:
+    """Tests for the Gaible module functionality."""
 
     def test_delete_confluence_page(self, mocker: MockerFixture) -> None:
-        """Test that delete_confluence_page correctly calls the C4 API.
+        """Test that delete_confluence_page correctly calls the Gaible API.
 
         Args:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_requests = mocker.patch("confluence_importer.c4.requests")
-        mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
-        mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
+        mock_requests = mocker.patch("confluence_importer.gaible.requests")
+        mocker.patch("confluence_importer.gaible.gaible_base_url", "http://test-url")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
+        mocker.patch("confluence_importer.gaible.config.gaible_token", "test-token")
         file_id = 23
 
         mock_response = mocker.MagicMock()
@@ -49,11 +49,11 @@ class TestC4:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_requests = mocker.patch("confluence_importer.c4.requests")
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
-        mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
+        mock_requests = mocker.patch("confluence_importer.gaible.requests")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.gaible_base_url", "http://test-url")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
+        mocker.patch("confluence_importer.gaible.config.gaible_token", "test-token")
 
         mock_response = mocker.MagicMock()
         mock_response.json.return_value = {
@@ -87,11 +87,11 @@ class TestC4:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_requests = mocker.patch("confluence_importer.c4.requests")
-        mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
-        mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
+        mock_requests = mocker.patch("confluence_importer.gaible.requests")
+        mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.gaible_base_url", "http://test-url")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
+        mocker.patch("confluence_importer.gaible.config.gaible_token", "test-token")
 
         first_response = mocker.MagicMock()
         first_response.json.return_value = {
@@ -138,11 +138,11 @@ class TestC4:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_requests = mocker.patch("confluence_importer.c4.requests")
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
-        mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
+        mock_requests = mocker.patch("confluence_importer.gaible.requests")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.gaible_base_url", "http://test-url")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
+        mocker.patch("confluence_importer.gaible.config.gaible_token", "test-token")
 
         page_id = 12345
         page_markdown = "# Test Page"
@@ -165,17 +165,17 @@ class TestC4:
         mock_logger.error.assert_not_called()
 
     def test_import_confluence_page_error(self, mocker: MockerFixture) -> None:
-        """Test that import_confluence_page raises C4ImportError on error API responses.
+        """Test that import_confluence_page raises GaibleImportError on error API responses.
 
         Args:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_requests = mocker.patch("confluence_importer.c4.requests")
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.c4_base_url", "http://test-url")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
-        mocker.patch("confluence_importer.c4.config.c4_token", "test-token")
+        mock_requests = mocker.patch("confluence_importer.gaible.requests")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.gaible_base_url", "http://test-url")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
+        mocker.patch("confluence_importer.gaible.config.gaible_token", "test-token")
 
         page_id = 12345
         page_markdown = "# Test Page"
@@ -186,7 +186,7 @@ class TestC4:
         mock_requests.post.return_value = mock_response
 
         # act & assert
-        with pytest.raises(C4ImportError) as exc_info:
+        with pytest.raises(GaibleImportError) as exc_info:
             import_confluence_page(page_id, page_markdown)
 
         assert "Failed to import page 12345" in str(exc_info.value)
@@ -201,23 +201,23 @@ class TestC4:
         mock_logger.error.assert_called_once()
 
     def test_clear_previous_ingests(self, mocker: MockerFixture) -> None:
-        """Test that clear_previous_ingests correctly deletes Confluence pages from C4.
+        """Test that clear_previous_ingests correctly deletes Confluence pages from Gaible.
 
         Args:
             mocker: Pytest fixture for mocking
         """
         # arrange
         mock_fetch_bucket_files = mocker.patch(
-            "confluence_importer.c4.fetch_bucket_files_list",
+            "confluence_importer.gaible.fetch_bucket_files_list",
             return_value=[
                 {"id": 1, "fileName": "confluence_page_1.md"},
                 {"id": 2, "fileName": "other_file.txt"},
                 {"id": 3, "fileName": "confluence_page_2.md"},
             ],
         )
-        mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
+        mock_delete_confluence_page = mocker.patch("confluence_importer.gaible.delete_confluence_page")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
 
         # act
         clear_previous_ingests()
@@ -236,10 +236,10 @@ class TestC4:
             mocker: Pytest fixture for mocking
         """
         # arrange
-        mock_fetch_bucket_files = mocker.patch("confluence_importer.c4.fetch_bucket_files_list", return_value=[])
-        mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
+        mock_fetch_bucket_files = mocker.patch("confluence_importer.gaible.fetch_bucket_files_list", return_value=[])
+        mock_delete_confluence_page = mocker.patch("confluence_importer.gaible.delete_confluence_page")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
 
         # act
         clear_previous_ingests()
@@ -257,7 +257,7 @@ class TestC4:
         """
         # arrange
         mock_fetch_bucket_files = mocker.patch(
-            "confluence_importer.c4.fetch_bucket_files_list",
+            "confluence_importer.gaible.fetch_bucket_files_list",
             return_value=[
                 {"id": 1, "fileName": "confluence_page_1.md"},
                 {"id": 2, "fileName": "confluence_page_2.md"},
@@ -269,10 +269,10 @@ class TestC4:
                 raise Exception("Delete failed")
 
         mock_delete_confluence_page = mocker.patch(
-            "confluence_importer.c4.delete_confluence_page", side_effect=delete_side_effect
+            "confluence_importer.gaible.delete_confluence_page", side_effect=delete_side_effect
         )
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
 
         # act
         clear_previous_ingests()
@@ -292,12 +292,12 @@ class TestC4:
         from requests import HTTPError
 
         mock_fetch_bucket_files = mocker.patch(
-            "confluence_importer.c4.fetch_bucket_files_list",
+            "confluence_importer.gaible.fetch_bucket_files_list",
             side_effect=HTTPError("401 Unauthorized"),
         )
-        mock_delete_confluence_page = mocker.patch("confluence_importer.c4.delete_confluence_page")
-        mock_logger = mocker.patch("confluence_importer.c4.logger")
-        mocker.patch("confluence_importer.c4.bucket_id", "test-bucket")
+        mock_delete_confluence_page = mocker.patch("confluence_importer.gaible.delete_confluence_page")
+        mock_logger = mocker.patch("confluence_importer.gaible.logger")
+        mocker.patch("confluence_importer.gaible.bucket_id", "test-bucket")
 
         # act & assert
         with pytest.raises(HTTPError):

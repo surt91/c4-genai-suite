@@ -3,7 +3,7 @@
 /* eslint-disable */
 /**
  * LLM Eval Service
- * Internal evaluation service for C4 GenAI Suite
+ * Internal evaluation service for Gaible
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -68,13 +68,13 @@ export interface Dto {
      * @type {number}
      * @memberof Dto
      */
-    c4AssistantId: number;
+    gaibleAssistantId: number;
     /**
      * 
      * @type {string}
      * @memberof Dto
      */
-    c4AssistantName?: string;
+    gaibleAssistantName?: string;
     /**
      * 
      * @type {Array<RunEvaluationByTestCasesTestCase>}
@@ -90,7 +90,7 @@ export function instanceOfDto(value: object): value is Dto {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('catalogId' in value) || value['catalogId'] === undefined) return false;
     if (!('metrics' in value) || value['metrics'] === undefined) return false;
-    if (!('c4AssistantId' in value) || value['c4AssistantId'] === undefined) return false;
+    if (!('gaibleAssistantId' in value) || value['gaibleAssistantId'] === undefined) return false;
     if (!('testCases' in value) || value['testCases'] === undefined) return false;
     return true;
 }
@@ -109,8 +109,8 @@ export function DtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Dto {
         'catalogId': json['catalogId'],
         'metrics': json['metrics'],
         'testCasesPerQaPair': json['testCasesPerQaPair'] == null ? undefined : json['testCasesPerQaPair'],
-        'c4AssistantId': json['c4AssistantId'],
-        'c4AssistantName': json['c4AssistantName'] == null ? undefined : json['c4AssistantName'],
+        'gaibleAssistantId': json['gaibleAssistantId'],
+        'gaibleAssistantName': json['gaibleAssistantName'] == null ? undefined : json['gaibleAssistantName'],
         'testCases': ((json['testCases'] as Array<any>).map(RunEvaluationByTestCasesTestCaseFromJSON)),
     };
 }
@@ -125,8 +125,8 @@ export function DtoToJSON(value?: Dto | null): any {
         'catalogId': value['catalogId'],
         'metrics': value['metrics'],
         'testCasesPerQaPair': value['testCasesPerQaPair'],
-        'c4AssistantId': value['c4AssistantId'],
-        'c4AssistantName': value['c4AssistantName'],
+        'gaibleAssistantId': value['gaibleAssistantId'],
+        'gaibleAssistantName': value['gaibleAssistantName'],
         'testCases': ((value['testCases'] as Array<any>).map(RunEvaluationByTestCasesTestCaseToJSON)),
     };
 }

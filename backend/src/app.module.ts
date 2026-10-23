@@ -71,7 +71,7 @@ import { PrometheusModule } from './metrics/prometheus.module';
           url,
           type: 'postgres',
           retryAttempts: 10,
-          retryDelay: config.get('C4_DB_RETRY_DELAY', 100),
+          retryDelay: config.get('GAIBLE_DB_RETRY_DELAY', 100),
           synchronize: false,
           migrationsRun: true,
           entities: [path.join(__dirname, 'domain', 'database', 'entities', '*{.ts,.js}')],

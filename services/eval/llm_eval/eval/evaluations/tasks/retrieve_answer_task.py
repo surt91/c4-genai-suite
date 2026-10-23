@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from llm_eval.database.model import TestCaseStatus
 from llm_eval.eval.evaluate_results.db.find_test_case import find_test_case
-from llm_eval.llm_query.c4_assistant_query import C4AssistantQuery
+from llm_eval.llm_query.gaible_assistant_query import GaibleAssistantQuery
 from llm_eval.tasks import app
 from llm_eval.utils.task import async_task, with_session
 
@@ -19,7 +19,7 @@ from llm_eval.utils.task import async_task, with_session
 async def retrieve_answer_task(
     session: AsyncSession,
     test_case_id: str,
-    c4_assistant_id: int,
+    gaible_assistant_id: int,
 ) -> None:
     test_case = await find_test_case(session, test_case_id)
 
@@ -33,8 +33,8 @@ async def retrieve_answer_task(
         )
         return
 
-    query = C4AssistantQuery(
-        assistant_id=c4_assistant_id,
+    query = GaibleAssistantQuery(
+        assistant_id=gaible_assistant_id,
     )
 
     result = await query.query(

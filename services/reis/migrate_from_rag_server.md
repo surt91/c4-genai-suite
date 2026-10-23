@@ -17,15 +17,15 @@ Also note there is no undo button for the import.
 For example, a migration can be performed with these calls to the endpoints. Ensure that you use the correct hostnames and index names.
 
 ```bash
-curl http://rag:3200/files/dump?indexName=cc-rag-server > dump.json
-curl -X POST --data "@dump.json" -H 'Content-Type: application/json' http://reis:3201/files/import?indexName=cc-reis-server
+curl http://rag:3200/files/dump?indexName=rag-server-index > dump.json
+curl -X POST --data "@dump.json" -H 'Content-Type: application/json' http://reis:3201/files/import?indexName=reis-index
 ```
 
-After the import, the endpoint of the bucket configuration can be switched in the admin menu of c4 under Files > Bucket.
+After the import, the endpoint of the bucket configuration can be switched in the admin menu of Gaible under Files > Bucket.
 
 ## Known problems
 
-* It seems that for pgvector the `indexName` (e.g. `cc-reis-server`) can not be updated if it was first imported with, e.g., a typo.
+* It seems that for pgvector the `indexName` (e.g. `reis-index`) can not be updated if it was first imported with, e.g., a typo.
   In the presumably very rare case that it is needed, there are some solution strategies depending on the content of the database before the import:
   * if pgvector was never used for REIS before: drop the `langchain_pg_embedding` table.
   * if the `indexName` with the typo did not exist before: remove all entries of `langchain_pg_embedding` with the wrong value in the column `collection_id`

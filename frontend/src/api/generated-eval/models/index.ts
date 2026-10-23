@@ -73,7 +73,7 @@ export * from './PluginFeature';
 export * from './QACatalog';
 export * from './QACatalogGenerationConfig';
 export * from './QACatalogGenerationData';
-export * from './QACatalogGenerationFromC4BucketRequest';
+export * from './QACatalogGenerationFromGaibleBucketRequest';
 export * from './QACatalogGenerationModelConfigurationSchema';
 export * from './QACatalogGenerationResult';
 export * from './QACatalogPreview';

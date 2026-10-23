@@ -56,7 +56,7 @@ if (!config.AZURE_OPEN_AI_API_KEY) {
       await sendMessage(page, configuration, {
         message: 'Describe the picture. If this contains text, retrieve the content of the text',
       });
-      const testOutput = await page.waitForSelector(`:has-text("codecentric")`);
+      const testOutput = await page.waitForSelector(`:has-text("Gaible")`);
       expect(testOutput).not.toBeNull();
     });
   });

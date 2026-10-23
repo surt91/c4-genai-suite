@@ -3,7 +3,7 @@
 /* eslint-disable */
 /**
  * LLM Eval Service
- * Internal evaluation service for C4 GenAI Suite
+ * Internal evaluation service for Gaible
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -98,13 +98,13 @@ export interface GetAllEvaluationResult {
      * @type {number}
      * @memberof GetAllEvaluationResult
      */
-    c4AssistantId?: number | null;
+    gaibleAssistantId?: number | null;
     /**
      * 
      * @type {string}
      * @memberof GetAllEvaluationResult
      */
-    c4AssistantName?: string | null;
+    gaibleAssistantName?: string | null;
 }
 
 
@@ -142,8 +142,8 @@ export function GetAllEvaluationResultFromJSONTyped(json: any, ignoreDiscriminat
         'status': EvaluationStatusFromJSON(json['status']),
         'testCaseProgress': TestCaseProgressFromJSON(json['testCaseProgress']),
         'version': json['version'],
-        'c4AssistantId': json['c4AssistantId'] == null ? undefined : json['c4AssistantId'],
-        'c4AssistantName': json['c4AssistantName'] == null ? undefined : json['c4AssistantName'],
+        'gaibleAssistantId': json['gaibleAssistantId'] == null ? undefined : json['gaibleAssistantId'],
+        'gaibleAssistantName': json['gaibleAssistantName'] == null ? undefined : json['gaibleAssistantName'],
     };
 }
 
@@ -161,8 +161,8 @@ export function GetAllEvaluationResultToJSON(value?: GetAllEvaluationResult | nu
         'status': EvaluationStatusToJSON(value['status']),
         'testCaseProgress': TestCaseProgressToJSON(value['testCaseProgress']),
         'version': value['version'],
-        'c4AssistantId': value['c4AssistantId'],
-        'c4AssistantName': value['c4AssistantName'],
+        'gaibleAssistantId': value['gaibleAssistantId'],
+        'gaibleAssistantName': value['gaibleAssistantName'],
     };
 }
 

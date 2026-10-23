@@ -72,7 +72,7 @@ export class FilesExtension<
           fileIdFilter: {
             type: 'string',
             title: this.i18n.t('texts.extensions.common.fileIds'),
-            format: 'c4-ui',
+            format: 'gaible-ui',
           },
         },
       },

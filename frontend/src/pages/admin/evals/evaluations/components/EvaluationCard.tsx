@@ -67,15 +67,15 @@ export function EvaluationCard({ evaluation }: EvaluationCardProps) {
                 )}
               </Group>
 
-              {/* C4 Assistant */}
-              {evaluation.c4AssistantId && (
+              {/* Gaible Assistant */}
+              {evaluation.gaibleAssistantId && (
                 <Group gap="xs">
                   <IconRobot size={18} className="text-gray-600" />
                   <Text size="sm" fw={500}>
                     Assistant:
                   </Text>
                   <Text size="sm" c="dimmed">
-                    {evaluation.c4AssistantName ?? `ID: ${evaluation.c4AssistantId}`}
+                    {evaluation.gaibleAssistantName ?? `ID: ${evaluation.gaibleAssistantId}`}
                   </Text>
                 </Group>
               )}

@@ -1,4 +1,4 @@
-title = "c4 Gitleaks configuration"
+title = "Gaible Gitleaks configuration"
 
 [extend]
 useDefault = true

@@ -64,8 +64,8 @@ describe('useEvaluationMutations', () => {
       const createDto: Dto = {
         name: 'New Evaluation',
         catalogId: 'catalog-1',
-        c4AssistantId: 1,
-        c4AssistantName: 'Test Assistant',
+        gaibleAssistantId: 1,
+        gaibleAssistantName: 'Test Assistant',
         metrics: ['metric-1'],
         testCasesPerQaPair: 1,
         testCases: [],
@@ -90,8 +90,8 @@ describe('useEvaluationMutations', () => {
       const createDto: Dto = {
         name: 'Test',
         catalogId: 'catalog-1',
-        c4AssistantId: 1,
-        c4AssistantName: 'Test Assistant',
+        gaibleAssistantId: 1,
+        gaibleAssistantName: 'Test Assistant',
         metrics: ['metric-1'],
         testCasesPerQaPair: 1,
         testCases: [],

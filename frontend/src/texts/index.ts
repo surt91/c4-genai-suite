@@ -365,7 +365,7 @@ function load() {
         updatedAt: translate('evals.llmEndpoint.updatedAt'),
         actions: translate('evals.llmEndpoint.actions'),
         // Types
-        typeC4: translate('evals.llmEndpoint.typeC4'),
+        typeGaible: translate('evals.llmEndpoint.typeGaible'),
         typeOpenAI: translate('evals.llmEndpoint.typeOpenAI'),
         typeAzureOpenAI: translate('evals.llmEndpoint.typeAzureOpenAI'),
         // Features
@@ -396,10 +396,10 @@ function load() {
         apiKeyPlaceholder: translate('evals.llmEndpoint.apiKeyPlaceholder'),
         apiKeyRequired: translate('evals.llmEndpoint.apiKeyRequired'),
         apiKeyUnchanged: translate('evals.llmEndpoint.apiKeyUnchanged'),
-        // Fields - C4
-        c4EndpointLabel: translate('evals.llmEndpoint.c4EndpointLabel'),
-        c4EndpointPlaceholder: translate('evals.llmEndpoint.c4EndpointPlaceholder'),
-        c4EndpointRequired: translate('evals.llmEndpoint.c4EndpointRequired'),
+        // Fields - Gaible
+        gaibleEndpointLabel: translate('evals.llmEndpoint.gaibleEndpointLabel'),
+        gaibleEndpointPlaceholder: translate('evals.llmEndpoint.gaibleEndpointPlaceholder'),
+        gaibleEndpointRequired: translate('evals.llmEndpoint.gaibleEndpointRequired'),
         configurationIdLabel: translate('evals.llmEndpoint.configurationIdLabel'),
         configurationIdPlaceholder: translate('evals.llmEndpoint.configurationIdPlaceholder'),
         configurationIdRequired: translate('evals.llmEndpoint.configurationIdRequired'),
@@ -425,7 +425,7 @@ function load() {
         azureEndpointPlaceholder: translate('evals.llmEndpoint.azureEndpointPlaceholder'),
         azureEndpointRequired: translate('evals.llmEndpoint.azureEndpointRequired'),
         // Type descriptions
-        c4Description: translate('evals.llmEndpoint.c4Description'),
+        gaibleDescription: translate('evals.llmEndpoint.gaibleDescription'),
         openAiDescription: translate('evals.llmEndpoint.openAiDescription'),
         azureOpenAiDescription: translate('evals.llmEndpoint.azureOpenAiDescription'),
         // Messages

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "LLM Eval Service",
-    "description": "Internal evaluation service for C4 GenAI Suite",
+    "description": "Internal evaluation service for Gaible",
     "version": "1.0.0"
   },
   "paths": {
@@ -1211,19 +1211,19 @@
         }
       }
     },
-    "/v1/qa-catalog/generator/from-c4-bucket": {
+    "/v1/qa-catalog/generator/from-gaible-bucket": {
       "post": {
         "tags": [
           "qa-catalog"
         ],
-        "summary": "Generate From C4 Bucket",
-        "description": "Generate QA catalog from files in a C4 bucket",
-        "operationId": "qa-catalog_generate_from_c4_bucket",
+        "summary": "Generate From Gaible Bucket",
+        "description": "Generate QA catalog from files in a Gaible bucket",
+        "operationId": "qa-catalog_generate_from_gaible_bucket",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QACatalogGenerationFromC4BucketRequest"
+                "$ref": "#/components/schemas/QACatalogGenerationFromGaibleBucketRequest"
               }
             }
           },
@@ -2855,7 +2855,7 @@
             "type": "integer",
             "title": "Version"
           },
-          "c4AssistantId": {
+          "gaibleAssistantId": {
             "anyOf": [
               {
                 "type": "integer"
@@ -2864,9 +2864,9 @@
                 "type": "null"
               }
             ],
-            "title": "C4Assistantid"
+            "title": "Gaibleassistantid"
           },
-          "c4AssistantName": {
+          "gaibleAssistantName": {
             "anyOf": [
               {
                 "type": "string"
@@ -2875,7 +2875,7 @@
                 "type": "null"
               }
             ],
-            "title": "C4Assistantname"
+            "title": "Gaibleassistantname"
           }
         },
         "type": "object",
@@ -3360,7 +3360,7 @@
             "type": "integer",
             "title": "Version"
           },
-          "c4AssistantId": {
+          "gaibleAssistantId": {
             "anyOf": [
               {
                 "type": "integer"
@@ -3369,9 +3369,9 @@
                 "type": "null"
               }
             ],
-            "title": "C4Assistantid"
+            "title": "Gaibleassistantid"
           },
-          "c4AssistantName": {
+          "gaibleAssistantName": {
             "anyOf": [
               {
                 "type": "string"
@@ -3380,7 +3380,7 @@
                 "type": "null"
               }
             ],
-            "title": "C4Assistantname"
+            "title": "Gaibleassistantname"
           }
         },
         "type": "object",
@@ -4718,7 +4718,7 @@
         ],
         "title": "QACatalogGenerationData"
       },
-      "QACatalogGenerationFromC4BucketRequest": {
+      "QACatalogGenerationFromGaibleBucketRequest": {
         "properties": {
           "bucketId": {
             "type": "integer",
@@ -4756,8 +4756,8 @@
           "config",
           "modelConfigSchema"
         ],
-        "title": "QACatalogGenerationFromC4BucketRequest",
-        "description": "Request to generate a QA catalog from files in a C4 bucket."
+        "title": "QACatalogGenerationFromGaibleBucketRequest",
+        "description": "Request to generate a QA catalog from files in a Gaible bucket."
       },
       "QACatalogGenerationModelConfigurationSchema": {
         "properties": {
@@ -5020,11 +5020,11 @@
             "title": "Testcasesperqapair",
             "default": 3
           },
-          "c4AssistantId": {
+          "gaibleAssistantId": {
             "type": "integer",
-            "title": "C4Assistantid"
+            "title": "Gaibleassistantid"
           },
-          "c4AssistantName": {
+          "gaibleAssistantName": {
             "anyOf": [
               {
                 "type": "string"
@@ -5033,7 +5033,7 @@
                 "type": "null"
               }
             ],
-            "title": "C4Assistantname"
+            "title": "Gaibleassistantname"
           }
         },
         "type": "object",
@@ -5041,7 +5041,7 @@
           "name",
           "catalogId",
           "metrics",
-          "c4AssistantId"
+          "gaibleAssistantId"
         ],
         "title": "RunEvaluationByQaCatalog"
       },

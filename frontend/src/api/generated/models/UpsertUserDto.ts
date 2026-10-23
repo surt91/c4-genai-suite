@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * c4 GenAI Suite
- * c4 GenAI Suite
+ * Gaible
+ * Gaible
  *
  * The version of the OpenAPI document: 1.0
  * 

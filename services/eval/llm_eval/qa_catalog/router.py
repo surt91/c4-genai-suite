@@ -39,7 +39,7 @@ from llm_eval.qa_catalog.models import (
     DownloadQACatalogResponse,
     QACatalog,
     QACatalogGenerationData,
-    QACatalogGenerationFromC4BucketRequest,
+    QACatalogGenerationFromGaibleBucketRequest,
     QACatalogGenerationResult,
     QACatalogPreview,
     QACatalogUpdateRequest,
@@ -215,15 +215,15 @@ async def generate(
 
 
 @router.post(
-    "/generator/from-c4-bucket",
-    description="Generate QA catalog from files in a C4 bucket",
+    "/generator/from-gaible-bucket",
+    description="Generate QA catalog from files in a Gaible bucket",
     status_code=201,
 )
-async def generate_from_c4_bucket(
+async def generate_from_gaible_bucket(
     db: SessionDep,
-    request: QACatalogGenerationFromC4BucketRequest,
+    request: QACatalogGenerationFromGaibleBucketRequest,
 ) -> QACatalogGenerationResult:
-    """Generate a QA catalog from PDF files stored in a C4 bucket.
+    """Generate a QA catalog from PDF files stored in a Gaible bucket.
 
     This endpoint downloads PDF files from the configured S3/MinIO file store
     (same storage used by REIS) and generates a QA catalog from them.

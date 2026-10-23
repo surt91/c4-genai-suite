@@ -17,7 +17,7 @@ tests:
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-c4-genai-suite-backend
+          value: RELEASE-NAME-gaible-backend
 
   - it: name should use fullnameOverride when provided
     template: deployment-backend.yaml
@@ -44,7 +44,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "ghcr.io/codecentric/c4-genai-suite/backend:v42.69.1"
+          value: "ghcr.io/surt91/gaible/backend:v42.69.1"
 
   - it: should use custom image tag when explicitly overridden
     template: deployment-backend.yaml
@@ -53,7 +53,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "ghcr.io/codecentric/c4-genai-suite/backend:v1.2.3"
+          value: "ghcr.io/surt91/gaible/backend:v1.2.3"
 
   - it: has update strategy Rolling Update by default
     template: deployment-backend.yaml

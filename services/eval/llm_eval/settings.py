@@ -75,8 +75,8 @@ class FileStoreSettings(BaseSettings, prefix="FILE_STORE_"):
     s3_region_name: str | None = Field(default=None)
 
 
-class C4BackendSettings(BaseSettings, prefix="C4_BACKEND_"):
-    """Settings for connecting back to C4 backend for assistant queries."""
+class GaibleBackendSettings(BaseSettings, prefix="GAIBLE_BACKEND_"):
+    """Settings for connecting back to Gaible backend for assistant queries."""
 
     url: str = Field(default="http://localhost:3000/api")
     api_key: str | None = Field(default=None)
@@ -93,7 +93,7 @@ class Settings(BaseSettings):
     deepeval: DeepEvalSettings = DeepEvalSettings()
     ragas: RagasSettings = RagasSettings()
     file_store: FileStoreSettings = FileStoreSettings()
-    c4_backend: C4BackendSettings = C4BackendSettings()
+    gaible_backend: GaibleBackendSettings = GaibleBackendSettings()
 
     file_upload_temp_location: Path = Field(default=DATA_DIR / "uploaded_files")
 

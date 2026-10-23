@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-backend
+  name: {{ include "gaible.fullname" . }}-backend
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: backend
     {{- if .Values.backend.labels }}
     {{- toYaml .Values.backend.labels | nindent 4 }}
@@ -19,12 +19,12 @@ spec:
     {{ toYaml .Values.backend.updateStrategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      {{- include "gaible.commonSelectors" . | nindent 6 }}
       app.kubernetes.io/component: backend
   template:
     metadata:
       labels:
-        {{- include "c4genaisuite.commonLabels" . | nindent 8 }}
+        {{- include "gaible.commonLabels" . | nindent 8 }}
         app.kubernetes.io/component: backend
         {{- if .Values.backend.podLabels }}
         {{- toYaml .Values.backend.podLabels | nindent 8 }}
@@ -135,9 +135,9 @@ spec:
             {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ include "c4genaisuite.fullname" . }}-backend
+                name: {{ include "gaible.fullname" . }}-backend
             - secretRef:
-                name: {{ include "c4genaisuite.fullname" . }}-backend
+                name: {{ include "gaible.fullname" . }}-backend
           volumeMounts:
           {{- if and .Values.backend.ssl.rootCertificateConfigMapName .Values.backend.ssl.rootCertificateConfigMapKey }}
             - mountPath: /etc/ssl/certs/{{ .Values.backend.ssl.rootCertificateConfigMapKey }}

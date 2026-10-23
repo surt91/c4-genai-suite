@@ -2,9 +2,9 @@
 kind: PrometheusRule
 apiVersion: monitoring.coreos.com/v1
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-reis
+  name: {{ include "gaible.fullname" . }}-reis
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: reis
 spec:
   groups:
@@ -18,7 +18,7 @@ spec:
           annotations:
             description: Pod container restarted {{`{{$labels.namespace}}`}}/{{`{{$labels.pod}}`}}/{{`{{$labels.container}}`}}
             summary: REIS Container Restarted
-          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container="{{ include "c4genaisuite.fullname" . }}-reis"}[30m]) > 0
+          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container="{{ include "gaible.fullname" . }}-reis"}[30m]) > 0
           labels:
             severity: warning
 {{- end }}

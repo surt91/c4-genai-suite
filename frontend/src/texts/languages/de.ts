@@ -5,7 +5,7 @@ export const de: typeof en = {
     administration: 'Admin',
     administrator: 'Admin',
     apiKey: 'API-Key',
-    appName: 'c4 GenAI Suite',
+    appName: 'Gaible',
     builtIn: 'System Default',
     back: 'Zurück',
     cancel: 'Abbrechen',
@@ -238,7 +238,7 @@ export const de: typeof en = {
       updatedAt: 'Aktualisiert',
       actions: 'Aktionen',
       // Types
-      typeC4: 'C4 GenAI',
+      typeGaible: 'Gaible',
       typeOpenAI: 'OpenAI',
       typeAzureOpenAI: 'Azure OpenAI',
       // Features
@@ -269,10 +269,10 @@ export const de: typeof en = {
       apiKeyPlaceholder: 'API-Schlüssel eingeben',
       apiKeyRequired: 'API-Schlüssel ist erforderlich',
       apiKeyUnchanged: 'Leer lassen, um den vorhandenen Schlüssel zu behalten',
-      // Fields - C4
-      c4EndpointLabel: 'Endpunkt-URL',
-      c4EndpointPlaceholder: 'https://api.example.com',
-      c4EndpointRequired: 'Endpunkt-URL ist erforderlich',
+      // Fields - Gaible
+      gaibleEndpointLabel: 'Endpunkt-URL',
+      gaibleEndpointPlaceholder: 'https://api.example.com',
+      gaibleEndpointRequired: 'Endpunkt-URL ist erforderlich',
       configurationIdLabel: 'Konfigurations-ID',
       configurationIdPlaceholder: 'Konfigurations-ID eingeben',
       configurationIdRequired: 'Konfigurations-ID ist erforderlich',
@@ -298,7 +298,7 @@ export const de: typeof en = {
       azureEndpointPlaceholder: 'https://my-resource.openai.azure.com',
       azureEndpointRequired: 'Azure-Endpunkt-URL ist erforderlich',
       // Type descriptions
-      c4Description: 'Mit C4 GenAI Suite für verwalteten LLM-Zugriff verbinden',
+      gaibleDescription: 'Mit Gaible für verwalteten LLM-Zugriff verbinden',
       openAiDescription: 'OpenAI API oder kompatible Dienste verwenden',
       azureOpenAiDescription: 'Mit Azure OpenAI Service verbinden',
       // Messages
@@ -723,7 +723,7 @@ export const de: typeof en = {
   login: {
     loginButton: 'Anmelden mit {{provider}}',
     loginHint: 'Melde dich mit deinem Konto an',
-    welcome: 'Willkommen bei der c4 GenAI Suite 👋',
+    welcome: 'Willkommen bei Gaible 👋',
     authError: 'Es ist ein Fehler beim Anmelden aufgetreten. Bitte versuche es später noch einmal.',
     emptyAuthSettings: 'Keine Authentifizierungseinstellungen gefunden',
   },

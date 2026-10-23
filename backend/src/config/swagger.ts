@@ -3,8 +3,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export function configureSwagger(app: INestApplication) {
   const config = new DocumentBuilder() //
-    .setTitle('c4 GenAI Suite')
-    .setDescription('c4 GenAI Suite')
+    .setTitle('Gaible')
+    .setDescription('Gaible')
     .setVersion('1.0')
     .addTag('chat')
     .build();

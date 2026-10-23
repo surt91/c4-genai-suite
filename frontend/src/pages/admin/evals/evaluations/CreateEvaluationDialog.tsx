@@ -29,8 +29,8 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
     testCasesPerQaPair,
     testCases,
     metricIds,
-    c4AssistantId,
-    c4AssistantName,
+    gaibleAssistantId,
+    gaibleAssistantName,
     nextStep,
     previousStep,
     canProceed,
@@ -58,8 +58,8 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
   const handleCreate = () => {
     const dto = {
       name,
-      c4AssistantId: c4AssistantId!,
-      c4AssistantName: c4AssistantName,
+      gaibleAssistantId: gaibleAssistantId!,
+      gaibleAssistantName: gaibleAssistantName,
       metrics: metricIds,
       testCases: mode === 'catalog' ? [] : testCases,
       ...(description ? { description } : {}),

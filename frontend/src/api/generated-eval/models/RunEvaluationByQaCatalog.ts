@@ -3,7 +3,7 @@
 /* eslint-disable */
 /**
  * LLM Eval Service
- * Internal evaluation service for C4 GenAI Suite
+ * Internal evaluation service for Gaible
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -49,13 +49,13 @@ export interface RunEvaluationByQaCatalog {
      * @type {number}
      * @memberof RunEvaluationByQaCatalog
      */
-    c4AssistantId: number;
+    gaibleAssistantId: number;
     /**
      * 
      * @type {string}
      * @memberof RunEvaluationByQaCatalog
      */
-    c4AssistantName?: string | null;
+    gaibleAssistantName?: string | null;
 }
 
 /**
@@ -65,7 +65,7 @@ export function instanceOfRunEvaluationByQaCatalog(value: object): value is RunE
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('catalogId' in value) || value['catalogId'] === undefined) return false;
     if (!('metrics' in value) || value['metrics'] === undefined) return false;
-    if (!('c4AssistantId' in value) || value['c4AssistantId'] === undefined) return false;
+    if (!('gaibleAssistantId' in value) || value['gaibleAssistantId'] === undefined) return false;
     return true;
 }
 
@@ -83,8 +83,8 @@ export function RunEvaluationByQaCatalogFromJSONTyped(json: any, ignoreDiscrimin
         'catalogId': json['catalogId'],
         'metrics': json['metrics'],
         'testCasesPerQaPair': json['testCasesPerQaPair'] == null ? undefined : json['testCasesPerQaPair'],
-        'c4AssistantId': json['c4AssistantId'],
-        'c4AssistantName': json['c4AssistantName'] == null ? undefined : json['c4AssistantName'],
+        'gaibleAssistantId': json['gaibleAssistantId'],
+        'gaibleAssistantName': json['gaibleAssistantName'] == null ? undefined : json['gaibleAssistantName'],
     };
 }
 
@@ -98,8 +98,8 @@ export function RunEvaluationByQaCatalogToJSON(value?: RunEvaluationByQaCatalog 
         'catalogId': value['catalogId'],
         'metrics': value['metrics'],
         'testCasesPerQaPair': value['testCasesPerQaPair'],
-        'c4AssistantId': value['c4AssistantId'],
-        'c4AssistantName': value['c4AssistantName'],
+        'gaibleAssistantId': value['gaibleAssistantId'],
+        'gaibleAssistantName': value['gaibleAssistantName'],
     };
 }
 

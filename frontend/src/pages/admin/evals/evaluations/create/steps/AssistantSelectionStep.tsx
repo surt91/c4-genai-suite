@@ -6,10 +6,10 @@ import { useApi } from 'src/api/state/apiAppClient';
 import { useWizardStore } from '../../state/zustand/wizardState';
 
 export function AssistantSelectionStep() {
-  const { c4AssistantId, setC4Assistant } = useWizardStore();
+  const { gaibleAssistantId, setGaibleAssistant } = useWizardStore();
   const api = useApi();
 
-  // Fetch C4 configurations (assistants)
+  // Fetch Gaible configurations (assistants)
   const {
     data: configurations,
     isLoading,
@@ -43,7 +43,7 @@ export function AssistantSelectionStep() {
           Select Assistant
         </Text>
         <Alert icon={<IconAlertCircle size={16} />} color="red" title="No Assistants Available">
-          No C4 assistants found. Please create at least one assistant (configuration) before creating an evaluation.
+          No Gaible assistants found. Please create at least one assistant (configuration) before creating an evaluation.
         </Alert>
       </Stack>
     );
@@ -55,21 +55,21 @@ export function AssistantSelectionStep() {
         Select Assistant
       </Text>
       <Text size="sm" c="dimmed">
-        Choose the C4 assistant that will be evaluated. The evaluation will send test case questions to this assistant and measure
-        its responses.
+        Choose the Gaible assistant that will be evaluated. The evaluation will send test case questions to this assistant and
+        measure its responses.
       </Text>
 
-      {!c4AssistantId && (
+      {!gaibleAssistantId && (
         <Alert icon={<IconAlertCircle size={16} />} color="blue">
           Select an assistant to proceed.
         </Alert>
       )}
 
       <Radio.Group
-        value={c4AssistantId?.toString() ?? ''}
+        value={gaibleAssistantId?.toString() ?? ''}
         onChange={(value) => {
           const assistant = assistants.find((a) => a.id.toString() === value);
-          setC4Assistant(assistant ? assistant.id : null, assistant?.name ?? null);
+          setGaibleAssistant(assistant ? assistant.id : null, assistant?.name ?? null);
         }}
       >
         <Stack gap="md">
@@ -79,9 +79,9 @@ export function AssistantSelectionStep() {
               padding="md"
               withBorder
               className={`cursor-pointer transition-all ${
-                c4AssistantId === assistant.id ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+                gaibleAssistantId === assistant.id ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'
               }`}
-              onClick={() => setC4Assistant(assistant.id, assistant.name)}
+              onClick={() => setGaibleAssistant(assistant.id, assistant.name)}
             >
               <Group wrap="nowrap" align="flex-start">
                 <Radio value={assistant.id.toString()} />

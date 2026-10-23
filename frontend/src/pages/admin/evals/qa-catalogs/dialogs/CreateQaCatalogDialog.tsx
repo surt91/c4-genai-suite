@@ -13,7 +13,7 @@ import { texts } from 'src/texts';
 
 const ACCEPTED_FILE_TYPES = '.csv,.json,.xlsx';
 
-// Module-level schemas (C4 pattern)
+// Module-level schemas (Gaible pattern)
 const EMPTY_SCHEME = z.object({
   name: z.string().min(1, texts.evals.qaCatalog.catalogNameRequired),
 });

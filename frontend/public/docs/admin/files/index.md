@@ -28,7 +28,7 @@ Hover over bucket entries and click the icon for more options, which will become
 
 The minimum requirements for a bucket are a valid Endpoint URL, a name and a bucket type. We recommend using any name, that will help you remember the purpose of this new bucket later.
 
-Your infrastructure team will be able to let you know the Endpoint to use, if the REI-Server, that comes with c4 was installed during the initial setup of c4. This server should be listed among the kubernetes pods with port 3201, and have a name ending in "-reis" (e.g. `http://YOUR-C4-reis:3201`). **If a bucket with a working Endpoint is setup you can reuse its address for new buckets.**
+Your infrastructure team will be able to let you know the Endpoint to use, if the REI-Server, that comes with Gaible was installed during the initial setup of Gaible. This server should be listed among the kubernetes pods with port 3201, and have a name ending in "-reis" (e.g. `http://YOUR-Gaible-reis:3201`). **If a bucket with a working Endpoint is setup you can reuse its address for new buckets.**
 
 **If your are configuring a bucket of type general, you must upload files as an admin.** Just click the bucket, you want to upload to, and an upload-area, which you can click to select files will appear on the right. You can also drag and drop files into the upload-area.
 

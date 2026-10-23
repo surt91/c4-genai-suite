@@ -12,7 +12,7 @@ The "Dashboard" page offers a comprehensive overview of the system's information
 
 ---
 
-# How To Get Started with c4
+# How To Get Started with Gaible
 
 1. Create and Assistant in the [Assistants](/admin/assistants) menu.
 2. Do not forget adding the model extension (e.g. Azure OpenAI).

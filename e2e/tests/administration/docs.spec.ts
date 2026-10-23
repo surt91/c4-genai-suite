@@ -51,7 +51,7 @@ test('Documentation on Admin page', async ({ page }) => {
 
   await test.step('should have documentation for Dashboard', async () => {
     await page.getByRole('link', { name: 'Dashboard', exact: true }).click();
-    await page.getByRole('heading', { name: 'How To Get Started with C4' }).click();
+    await page.getByRole('heading', { name: 'How To Get Started with Gaible' }).click();
   });
 
   await test.step('should have documentation for Assistants', async () => {

@@ -149,7 +149,7 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
   await test.step('should reply with file content if asked', async () => {
     await selectConfiguration(page, configuration);
     await sendMessage(page, configuration, { message: 'give me the keyword' });
-    await page.waitForSelector(`:has-text("codecentricE2E")`);
+    await page.waitForSelector(`:has-text("gaibleE2E")`);
   });
 
   await test.step('should show sources used for the reply', async () => {
@@ -210,18 +210,18 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
       message:
         'Search the file for the codeword "pudding". Display the content of every search result, regardless whether it contains the codeword.',
     });
-    await page.waitForSelector(`:has-text("c4-test")`);
+    await page.waitForSelector(`:has-text("gaible-test")`);
   });
 
   await test.step('should preview the used sources', async () => {
     await page.getByTestId('sources-section').locator('a').click();
-    await page.waitForSelector(`blockquote:has-text("c4-test")`);
+    await page.waitForSelector(`blockquote:has-text("gaible-test")`);
     await expectA11yCompliant(page);
   });
 
   await test.step('should close the source preview panel', async () => {
     await page.locator('#right').getByRole('button', { name: 'close' }).click();
-    await page.waitForSelector(`blockquote:has-text("c4-test")`, { state: 'detached' });
+    await page.waitForSelector(`blockquote:has-text("gaible-test")`, { state: 'detached' });
   });
 
   await test.step('should deselect all files', async () => {
@@ -268,7 +268,7 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
       message:
         'Please search the user uploaded files for the keyword "pudding". Display the content of every search result, regardless whether it contains the keyword.',
     });
-    await page.waitForSelector(`:has-text("codecentricE2E")`);
-    await page.waitForSelector(`:has-text("c4-test")`);
+    await page.waitForSelector(`:has-text("gaibleE2E")`);
+    await page.waitForSelector(`:has-text("gaible-test")`);
   });
 });

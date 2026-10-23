@@ -65,7 +65,7 @@ Select one of these options, and run it:
 - **Current-E2E**: Debug Currently Open Test File
 
 Some tests use large files stored via `git lfs`. To run these tests, first install `git lfs` on your system via (e.g., `brew install git-lfs` or `apt install git-lfs`).
-Then pull the large files in the c4 repository via `git lfs pull`.
+Then pull the large files in the Gaible repository via `git lfs pull`.
 
 ### On Github
 

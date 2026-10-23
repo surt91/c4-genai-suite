@@ -49,7 +49,15 @@ export interface ExtensionArgumentBase {
   documentationUrl?: string;
 }
 
-export const EXTENSION_STRING_ARGUMENT_FORMATS = ['input', 'textarea', 'password', 'select', 'date', 'email', 'c4-ui'] as const;
+export const EXTENSION_STRING_ARGUMENT_FORMATS = [
+  'input',
+  'textarea',
+  'password',
+  'select',
+  'date',
+  'email',
+  'gaible-ui',
+] as const;
 
 export type ExtensionStringArgumentFormat = (typeof EXTENSION_STRING_ARGUMENT_FORMATS)[number];
 

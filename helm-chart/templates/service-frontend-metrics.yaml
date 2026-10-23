@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-frontend-metrics
+  name: {{ include "gaible.fullname" . }}-frontend-metrics
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: frontend-metrics
 spec:
   type: ClusterIP
@@ -13,6 +13,6 @@ spec:
       port: 2019
       targetPort: admin-api
   selector:
-    {{- include "c4genaisuite.commonSelectors" . | nindent 4 }}
+    {{- include "gaible.commonSelectors" . | nindent 4 }}
     app.kubernetes.io/component: frontend
 {{- end }}

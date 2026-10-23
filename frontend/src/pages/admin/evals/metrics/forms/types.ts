@@ -3,7 +3,7 @@ import type { SingleTurnParams } from 'src/api/generated-eval';
 /**
  * Combined form type that includes all possible fields across metric types.
  * Used for form field components that work with any metric type.
- * Schema is defined at module level in UpsertMetricDialog.tsx (C4 pattern).
+ * Schema is defined at module level in UpsertMetricDialog.tsx (Gaible pattern).
  */
 export interface MetricFormValues {
   // Common fields

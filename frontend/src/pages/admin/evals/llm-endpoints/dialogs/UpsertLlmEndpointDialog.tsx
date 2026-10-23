@@ -23,7 +23,7 @@ import {
   useUpdateLlmEndpoint,
 } from '../hooks/useLlmEndpointMutations';
 
-// Module-level schema constant (C4 pattern)
+// Module-level schema constant (Gaible pattern)
 const SCHEME = z
   .object({
     // Common fields
@@ -117,7 +117,7 @@ type CreateLlmEndpointProps = {
 
 type UpsertLlmEndpointDialogProps = UpdateLlmEndpointProps | CreateLlmEndpointProps;
 
-// Exported wrapper components (C4 pattern)
+// Exported wrapper components (Gaible pattern)
 export const UpdateLlmEndpointDialog = (props: Omit<UpdateLlmEndpointProps, 'type'>): React.ReactElement =>
   UpsertLlmEndpointDialog({ ...props, type: 'update' });
 export const CreateLlmEndpointDialog = (props: Omit<CreateLlmEndpointProps, 'type'>): React.ReactElement =>

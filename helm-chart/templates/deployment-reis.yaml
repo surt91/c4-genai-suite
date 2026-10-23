@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "c4genaisuite.fullname" . }}-rei-s
+  name: {{ include "gaible.fullname" . }}-rei-s
   labels:
-    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    {{- include "gaible.commonLabels" . | nindent 4 }}
     app.kubernetes.io/component: reis
     {{- if .Values.reis.labels }}
     {{- toYaml .Values.reis.labels | nindent 4 }}
@@ -19,12 +19,12 @@ spec:
     {{ toYaml .Values.reis.updateStrategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      {{- include "gaible.commonSelectors" . | nindent 6 }}
       app.kubernetes.io/component: reis
   template:
     metadata:
       labels:
-        {{- include "c4genaisuite.commonLabels" . | nindent 8 }}
+        {{- include "gaible.commonLabels" . | nindent 8 }}
         app.kubernetes.io/component: reis
         {{- if .Values.reis.podLabels }}
         {{- toYaml .Values.reis.podLabels | nindent 8 }}
@@ -145,9 +145,9 @@ spec:
             {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ include "c4genaisuite.fullname" . }}-reis-config
+                name: {{ include "gaible.fullname" . }}-reis-config
             - secretRef:
-                name: {{ include "c4genaisuite.fullname" . }}-reis-secret
+                name: {{ include "gaible.fullname" . }}-reis-secret
           volumeMounts:
           {{- with .Values.reis.extraVolumeMounts }}
           {{- toYaml . | nindent 12 }}

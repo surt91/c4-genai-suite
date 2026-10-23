@@ -18,9 +18,9 @@ class Config(BaseSettings):
     confluence_page_ids_to_import: list[int]
     confluence_token: str
     confluence_url: str
-    c4_base_url: str
-    c4_bucket_id: Annotated[int, Field(gt=0)]
-    c4_token: str
+    gaible_base_url: str
+    gaible_bucket_id: Annotated[int, Field(gt=0)]
+    gaible_token: str
 
 
 config = Config()  # type: ignore[call-arg]

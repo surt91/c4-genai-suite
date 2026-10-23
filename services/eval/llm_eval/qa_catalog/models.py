@@ -87,8 +87,8 @@ class QACatalogGenerationResult(ApiModel):
     catalog_id: str
 
 
-class QACatalogGenerationFromC4BucketRequest(ApiModel):
-    """Request to generate a QA catalog from files in a C4 bucket."""
+class QACatalogGenerationFromGaibleBucketRequest(ApiModel):
+    """Request to generate a QA catalog from files in a Gaible bucket."""
 
     bucket_id: int
     file_ids: list[int]

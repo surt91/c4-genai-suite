@@ -53,7 +53,7 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     lifespan=lifespan,
     title="LLM Eval Service",
-    description="Internal evaluation service for C4 GenAI Suite",
+    description="Internal evaluation service for Gaible",
     version="1.0.0",
 )
 app.add_exception_handler(Exception, unhandled_exception_handler)
@@ -121,7 +121,7 @@ def health() -> Response:
 
 
 # NOTE: No authentication - this is an internal trusted service
-# Authentication is handled by the C4 backend which proxies requests here
+# Authentication is handled by the Gaible backend which proxies requests here
 # User context can optionally be passed via X-User-* headers
 
 app.include_router(eval_router, prefix="/v1")

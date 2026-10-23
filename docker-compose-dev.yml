@@ -1,5 +1,5 @@
 services:
-  c4-frontend:
+  gaible-frontend:
     build:
       context: frontend
       dockerfile: Dockerfile
@@ -10,20 +10,20 @@ services:
     environment:
       VERSION: 1.0.0-dev
     depends_on:
-      c4-backend:
+      gaible-backend:
         condition: service_started
 
-  c4-backend:
+  gaible-backend:
     build:
       context: backend
       dockerfile: Dockerfile
-    hostname: c4-backend
+    hostname: gaible-backend
     environment:
       AUTH_ENABLE_PASSWORD: true
       BASE_URL: http://localhost:3333
       AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
       AUTH_INITIAL_ADMIN_PASSWORD: secret
-      DB_URL: postgres://admin:secret@postgres:5432/cccc
+      DB_URL: postgres://admin:secret@postgres:5432/gaible
       NODE_ENV: production
       SESSION_SECRET: random
       # settings related to oicd
@@ -57,7 +57,7 @@ services:
       EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
       EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
       STORE_TYPE: pgvector
-      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
+      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/gaible
       STORE_PGVECTOR_INDEX_NAME: basisreistest
       FILE_STORE_TYPE: s3
       FILE_STORE_S3_ENDPOINT_URL: http://minio:9000
@@ -109,7 +109,7 @@ services:
       file: ./dev/postgres/docker-compose.yml
       service: postgres
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d cccc" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d gaible" ]
       interval: 1s
       timeout: 1s
       retries: 20
@@ -130,14 +130,14 @@ services:
       retries: 5
 
   oauth:
-    image: ghcr.io/codecentric/c4-genai-suite/dev-helper/oauth-mock:latest
+    image: ghcr.io/surt91/gaible/dev-helper/oauth-mock:latest
     ports:
       - "9999:9999"
 
   mcp-fetch:
     hostname: mcp-fetch
-    image: ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
-    container_name: c4-mcp-fetch-server
+    image: ghcr.io/surt91/gaible/dev-helper/mcp-tool-as-server:latest
+    container_name: gaible-mcp-fetch-server
     environment:
       CONFIG: >
         {
@@ -157,7 +157,7 @@ services:
 
   mcp-tool-servers:
     hostname: mcp-tool-servers
-    image: ghcr.io/codecentric/c4-genai-suite/dev-helper/mcp-tool-as-server:latest
+    image: ghcr.io/surt91/gaible/dev-helper/mcp-tool-as-server:latest
     profiles:
       - no-start
     environment:

@@ -1,6 +1,6 @@
 import { Source } from 'src/domain/chat';
 
-export type C4JsonType = {
+export type GaibleJsonType = {
   kind: string;
   version: string;
   data: {
@@ -31,15 +31,15 @@ export type C4JsonType = {
   };
 };
 
-const getDistinctPages = (regions: C4JsonType['data']['region']): number[] => {
+const getDistinctPages = (regions: GaibleJsonType['data']['region']): number[] => {
   return Array.from(new Set(regions.bounding_boxes?.map((x) => x.page) ?? regions.pages ?? []));
 };
 
-export const convertC4JsonToText = (type: C4JsonType): { type: 'text'; text: string } => {
+export const convertGaibleJsonToText = (type: GaibleJsonType): { type: 'text'; text: string } => {
   return { type: 'text', text: type.data.original ?? type.data.text };
 };
 
-export const convertC4JsonToSource = (type: C4JsonType): Source => {
+export const convertGaibleJsonToSource = (type: GaibleJsonType): Source => {
   const metadata = type.data.metadata;
   return {
     title: type.data.metadata.title ?? type.data.id,

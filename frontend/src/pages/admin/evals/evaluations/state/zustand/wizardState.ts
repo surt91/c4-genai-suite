@@ -26,9 +26,9 @@ interface WizardState {
   // Common fields
   metricIds: string[];
 
-  // C4 Assistant (Configuration) to evaluate
-  c4AssistantId: number | null;
-  c4AssistantName: string | null;
+  // Gaible Assistant (Configuration) to evaluate
+  gaibleAssistantId: number | null;
+  gaibleAssistantName: string | null;
 }
 
 interface WizardActions {
@@ -59,8 +59,8 @@ interface WizardActions {
   addMetricId: (metricId: string) => void;
   removeMetricId: (metricId: string) => void;
 
-  // C4 Assistant
-  setC4Assistant: (id: number | null, name: string | null) => void;
+  // Gaible Assistant
+  setGaibleAssistant: (id: number | null, name: string | null) => void;
 
   // Reset
   reset: () => void;
@@ -80,8 +80,8 @@ const initialState: WizardState = {
   testCasesPerQaPair: 1,
   testCases: [],
   metricIds: [],
-  c4AssistantId: null,
-  c4AssistantName: null,
+  gaibleAssistantId: null,
+  gaibleAssistantName: null,
 };
 
 export const useWizardStore = create<WizardState & WizardActions>()((set, get) => ({
@@ -139,13 +139,13 @@ export const useWizardStore = create<WizardState & WizardActions>()((set, get) =
       metricIds: state.metricIds.filter((id) => id !== metricId),
     })),
 
-  setC4Assistant: (id: number | null, name: string | null) => set({ c4AssistantId: id, c4AssistantName: name }),
+  setGaibleAssistant: (id: number | null, name: string | null) => set({ gaibleAssistantId: id, gaibleAssistantName: name }),
 
   reset: () => set(initialState),
 
   canProceed: () => {
     const state = get();
-    const { currentStep, mode, catalogId, testCases, metricIds, c4AssistantId, name } = state;
+    const { currentStep, mode, catalogId, testCases, metricIds, gaibleAssistantId, name } = state;
 
     switch (currentStep) {
       case 'mode':
@@ -159,7 +159,7 @@ export const useWizardStore = create<WizardState & WizardActions>()((set, get) =
       case 'metrics':
         return metricIds.length > 0;
       case 'assistant':
-        return c4AssistantId !== null;
+        return gaibleAssistantId !== null;
       case 'review':
         return name.trim().length > 0;
       default:

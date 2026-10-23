@@ -10,7 +10,7 @@ As you can find in the root repository's `./package.json`, there are several way
 
 Note that the "extension tests" will be skipped if no `AZURE_OPEN_AI_API_KEY` environment variable is set.
 
-**Run single E2E files** when you are debugging or developing them. While you are in the root of the c4 repository you can run test files (from within the `e2e` directory) as in the examples below. The `--debug` flag allows for the debug mode to run. The `--noAutoKill` flag will keep all dependency servers for the tests running after the tests, such that you can login with another browser after the test to work on your tests. Try using playwright's code generator to append to the end of test files easily with `npx playwright codegen http://localhost:5173/login` and some manual help.
+**Run single E2E files** when you are debugging or developing them. While you are in the root of the Gaible repository you can run test files (from within the `e2e` directory) as in the examples below. The `--debug` flag allows for the debug mode to run. The `--noAutoKill` flag will keep all dependency servers for the tests running after the tests, such that you can login with another browser after the test to work on your tests. Try using playwright's code generator to append to the end of test files easily with `npx playwright codegen http://localhost:5173/login` and some manual help.
 
 Examples:
 ```bash

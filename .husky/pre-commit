@@ -4,7 +4,7 @@ if [ -n "$(git status --porcelain --untracked-files=no services/reis)" ]
 then
   # if we do not find uv, give the User a clean error message
   if ! command -v uv > /dev/null ; then
-    echo "￼ ERROR! Pre commit hook for REI-S can not run! Please install uv. Please refer to the c4 main readme." >&2
+    echo "￼ ERROR! Pre commit hook for REI-S can not run! Please install uv. Please refer to the Gaible main readme." >&2
     exit 1
   fi
 

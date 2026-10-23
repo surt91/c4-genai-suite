@@ -2,7 +2,7 @@
     encode
 
     handle /api/* {
-        reverse_proxy c4-backend:3000 {
+        reverse_proxy gaible-backend:3000 {
             header_up Host {host}
             header_up X-Real-IP {remote}
             header_up X-Forwarded-For {remote}

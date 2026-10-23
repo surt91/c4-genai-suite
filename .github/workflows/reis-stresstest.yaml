@@ -64,7 +64,7 @@ jobs:
             --name pgvector \
             -e POSTGRES_USER="admin" \
             -e POSTGRES_PASSWORD="secret" \
-            -e POSTGRES_DB="cccc" \
+            -e POSTGRES_DB="gaible" \
             pgvector/pgvector:pg16
       - uses: actions/download-artifact@v8
         with:
@@ -83,7 +83,7 @@ jobs:
             -e WORKERS="2" \
             -e BATCH_SIZE="100" \
             -e STORE_TYPE="pgvector" \
-            -e STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@pgvector:5432/cccc" \
+            -e STORE_PGVECTOR_URL="postgresql+psycopg://admin:secret@pgvector:5432/gaible" \
             -e STORE_PGVECTOR_INDEX_NAME="stresstest" \
             -e EMBEDDINGS_TYPE="random-test-embeddings" \
             reis:commit-${{ github.sha }}

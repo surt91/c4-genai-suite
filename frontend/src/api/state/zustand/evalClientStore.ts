@@ -37,7 +37,7 @@ const createEvalClientMiddleware: (navigate: TransientNavigateFn) => Middleware 
  * @description An evalClient provider that can be reused without reinitializing
  * the evalClient. The singleton functionality of Zustand enables us to do so.
  *
- * The eval service is accessed through the C4 backend proxy at /eval
+ * The eval service is accessed through the Gaible backend proxy at /eval
  */
 export const useEvalClientStore = create<EvalClientActions>(() => {
   let evalClient: EvalClient | undefined;
@@ -45,7 +45,7 @@ export const useEvalClientStore = create<EvalClientActions>(() => {
   const initializeEvalClient = (navigate: TransientNavigateFn): EvalClient => {
     if (!evalClient) {
       const basePath = import.meta.env.VITE_SERVER_URL || '';
-      // Eval service is proxied through C4 backend at /eval
+      // Eval service is proxied through Gaible backend at /eval
       const configuration = new Configuration({
         basePath: `${basePath}/api/eval`,
       });
