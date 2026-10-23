@@ -17,7 +17,6 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiExtension, ApiTags } from '@nestjs/swagger';
-import { HealthCheck } from '@nestjs/terminus';
 import { Request } from 'express';
 import * as mime from 'mime-types';
 import { Observable } from 'rxjs';
@@ -68,9 +67,8 @@ export class ApiResponsesController {
     if (model != null) {
       const llm = extensions.find(
         (x) =>
-          (x.spec.type === 'llm' && x.values.deploymentName === model) ||
-          x.values.model === model ||
-          x.values.modelName === model,
+          x.spec.type === 'llm' &&
+          (x.values.deploymentName === model || x.values.model === model || x.values.modelName === model),
       );
       return llm?.spec.name;
     }
@@ -275,7 +273,6 @@ export class ApiResponsesController {
   }
 
   @Post('/responses')
-  @HealthCheck()
   @ApiExtension('x-external', true)
   async createResponse(
     @Body() request: ResponseCreateDto,
@@ -387,7 +384,7 @@ export class ApiResponsesController {
       object: 'file',
       id: String(uploaded.file.id),
       purpose: purpose,
-      filename: file.filename,
+      filename: file.originalname,
       bytes: file.size,
       created_at: Math.round(uploaded.file.uploadedAt.getTime() / 1000),
       status: 'processed',
