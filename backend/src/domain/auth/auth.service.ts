@@ -64,12 +64,20 @@ export class AuthService implements OnModuleInit {
   }
 
   private async setSessionUser(req: Request, user: User | UserEntity | undefined) {
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve, reject) => {
+      const done = (err?: unknown) => (err ? reject(err instanceof Error ? err : new Error(String(err))) : resolve());
       if (!user) {
-        req.session.destroy(resolve);
+        req.session.destroy(done);
       } else {
-        req.session.user = user;
-        req.session.save(resolve);
+        // Issue a new session ID on login so that a session ID known before the login (session fixation)
+        // cannot be used to access the authenticated session.
+        req.session.regenerate((err) => {
+          if (err) {
+            return done(err);
+          }
+          req.session.user = user;
+          req.session.save(done);
+        });
       }
     });
   }

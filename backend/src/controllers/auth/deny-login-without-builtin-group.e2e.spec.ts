@@ -296,7 +296,9 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
       name: 'Existing User',
       userGroupIds: [defaultGroupName], // IdP sends the Default group by name
     };
-    const fakeReq = { session: { save: (cb: () => void) => cb(), user: undefined } } as unknown as Request;
+    const fakeReq = {
+      session: { regenerate: (cb: () => void) => cb(), save: (cb: () => void) => cb(), user: undefined },
+    } as unknown as Request;
 
     await expect(authService.login(fakeUser, fakeReq)).resolves.not.toThrow();
     expect(loginSpy).toHaveBeenCalled();
@@ -325,7 +327,9 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
       name: 'Existing User',
       userGroupIds: [], // IdP sends no groups → DB groups will be cleared
     };
-    const fakeReq = { session: { destroy: (cb: () => void) => cb(), save: (cb: () => void) => cb() } } as unknown as Request;
+    const fakeReq = {
+      session: { destroy: (cb: () => void) => cb(), regenerate: (cb: () => void) => cb(), save: (cb: () => void) => cb() },
+    } as unknown as Request;
 
     await expect(authService.login(fakeUser, fakeReq)).rejects.toThrow(ForbiddenException);
 
