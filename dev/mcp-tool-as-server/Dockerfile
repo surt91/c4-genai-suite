@@ -36,7 +36,8 @@ RUN npm ci --omit=dev
 #
 FROM base AS production
 
-RUN apk add git python3=3.12.12-r0 uv=0.5.31-r0
+RUN apk add --no-cache git python3
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /mcp-server
 
