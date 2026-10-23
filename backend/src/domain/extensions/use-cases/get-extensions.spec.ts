@@ -62,6 +62,28 @@ describe(GetExtensionsHandler.name, () => {
     expect(result.extensions.length).toBe(2);
   });
 
+  it('should skip stored extensions that are not supported anymore', async () => {
+    jest.spyOn(explorer, 'getExtension').mockImplementation((name) =>
+      name === 'test'
+        ? {
+            spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
+            getMiddlewares: () => Promise.resolve([]),
+          }
+        : undefined,
+    );
+
+    jest.spyOn(repository, 'find').mockImplementation(async () => {
+      return Promise.resolve([
+        { name: 'test', enabled: true, values: {} },
+        { name: 'grounding-with-bing-search', enabled: true, values: {} },
+        { name: 'duckduckgo-web-search', enabled: true, values: {} },
+      ] as ExtensionEntity[]);
+    });
+
+    const result = await handler.execute(new GetExtensions(1, true));
+    expect(result.extensions.map((x) => x.spec.name)).toEqual(['test']);
+  });
+
   it('should mask keys by default', async () => {
     const test = jest.fn().mockImplementation(() => {});
 

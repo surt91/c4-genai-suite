@@ -40,8 +40,6 @@
     "@ai-sdk/mistral": "^3.0.76",
     "@ai-sdk/openai": "^3.0.131",
     "@ai-sdk/openai-compatible": "^2.0.87",
-    "@azure/ai-agents": "^1.1.0",
-    "@azure/identity": "^4.14.0",
     "@modelcontextprotocol/sdk": "^1.32.1",
     "@n8n/json-schema-to-zod": "^1.18.0",
     "@nestjs/common": "^11.2.8",

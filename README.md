@@ -42,7 +42,7 @@ Gaible is designed for extensibility. Writing extensions is easy, as is using an
 
 * Model Context Protocol (MCP) servers
 * Custom systemprompt
-* Brave Search and Grounding with Bing Search
+* Brave Search
 * Calculator
 
 
