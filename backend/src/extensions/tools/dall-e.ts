@@ -1,7 +1,8 @@
 import { randomUUID } from 'crypto';
+import { createOpenAI } from '@ai-sdk/openai';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import OpenAI from 'openai';
+import { generateImage, ImageModel } from 'ai';
 import * as z from 'zod';
 import { AuthService } from 'src/domain/auth';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
@@ -70,10 +71,8 @@ export class DallEExtension implements Extension<DallEExtensionConfiguration> {
   }
 
   async test(configuration: DallEExtensionConfiguration) {
-    const client = this.createDallEClient(configuration);
-
-    await client.images.generate({
-      model: configuration.modelName,
+    await generateImage({
+      model: this.createImageModel(configuration),
       prompt: 'test',
     });
   }
@@ -82,8 +81,8 @@ export class DallEExtension implements Extension<DallEExtensionConfiguration> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
         const tool = await context.cache.get(this.spec.name, extension.values, () => {
-          const client = this.createDallEClient(extension.values);
-          return Promise.resolve(new InternalTool(this.authService, client, this.commandBus, this.spec, extension.values));
+          const model = this.createImageModel(extension.values);
+          return Promise.resolve(new InternalTool(this.authService, model, this.commandBus, this.spec, extension.values));
         });
 
         context.tools.push(tool);
@@ -95,10 +94,8 @@ export class DallEExtension implements Extension<DallEExtensionConfiguration> {
     return Promise.resolve([middleware]);
   }
 
-  protected createDallEClient(configuration: DallEExtensionConfiguration) {
-    return new OpenAI({
-      apiKey: configuration.apiKey,
-    });
+  protected createImageModel(configuration: DallEExtensionConfiguration): ImageModel {
+    return createOpenAI({ apiKey: configuration.apiKey }).image(configuration.modelName);
   }
 }
 
@@ -116,7 +113,7 @@ class InternalTool extends NamedStructuredTool {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly client: OpenAI,
+    private readonly model: ImageModel,
     private readonly commandBus: CommandBus,
     spec: ExtensionSpec,
     private readonly configuration: DallEExtensionConfiguration,
@@ -128,30 +125,17 @@ class InternalTool extends NamedStructuredTool {
 
   protected async _call({ input }: z.infer<typeof this.schema>): Promise<string> {
     try {
-      const response = await this.client.images.generate({
-        model: this.configuration.modelName,
+      // the provider requests base64 data (`response_format: b64_json`) for DALL-E models
+      const { image } = await generateImage({
+        model: this.model,
         prompt: input,
         size: this.configuration.size,
-        response_format: 'b64_json',
       });
 
-      const imageData = response?.data?.[0];
-
-      if (!imageData) {
-        throw new Error('No image data received from OpenAI');
-      }
-
       const id = randomUUID();
-      const contentType = response.output_format || 'png';
-      let imageBuffer: Buffer;
-      let fileName;
-
-      if (imageData.b64_json) {
-        imageBuffer = Buffer.from(imageData.b64_json, 'base64');
-        fileName = `${id}.${contentType}`;
-      } else {
-        throw new Error('No valid image data format received from OpenAI');
-      }
+      const contentType = image.mediaType || 'image/png';
+      const imageBuffer = Buffer.from(image.uint8Array);
+      const fileName = `${id}.${contentType.split('/')[1] || 'png'}`;
 
       await this.commandBus.execute(
         new UploadBlob(id, imageBuffer, contentType, fileName, imageBuffer.length, BlobCategory.LLM_IMAGE),

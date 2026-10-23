@@ -1,10 +1,11 @@
+import { AzureOpenAIProvider, createAzure } from '@ai-sdk/azure';
 import { BadRequestException, Logger } from '@nestjs/common';
-import { AzureOpenAI } from 'openai';
+import { experimental_transcribe as transcribe } from 'ai';
 import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe';
 
 export class AzureTranscriptionProvider {
   private readonly logger = new Logger(AzureTranscriptionProvider.name);
-  private readonly client: AzureOpenAI;
+  private readonly model: ReturnType<AzureOpenAIProvider['transcription']>;
 
   constructor(config: TranscribeExtensionConfiguration) {
     if (!config.apiKey) {
@@ -20,29 +21,32 @@ export class AzureTranscriptionProvider {
       throw new BadRequestException('API version is required');
     }
 
-    const endpoint = `https://${config.instanceName}.openai.azure.com/`;
-
-    this.client = new AzureOpenAI({
+    // https://<instance>.openai.azure.com/openai/deployments/<deploymentName>/audio/transcriptions?api-version=<apiVersion>
+    this.model = createAzure({
       apiKey: config.apiKey,
-      endpoint: endpoint,
       apiVersion: config.apiVersion,
-      deployment: config.deploymentName,
-    });
+      resourceName: config.instanceName,
+      useDeploymentBasedUrls: true,
+    }).transcription(config.deploymentName);
   }
 
   async transcribe(audioBuffer: Buffer, fileName: string, mimeType: string): Promise<string> {
     try {
-      // Create a File object from the buffer
-      const audioFile = new File([new Uint8Array(audioBuffer)], fileName, { type: mimeType });
-
-      // Call Azure OpenAI Whisper API
-      const result = await this.client.audio.transcriptions.create({
-        file: audioFile,
-        // Azure OpenAI requires this field because it is a wrapper of OpenAI, but AzureOpenAI needs deployment and instance names.
-        model: '',
+      const model = this.model;
+      const result = await transcribe({
+        // `transcribe` sniffs the media type from the audio bytes and falls back to `audio/wav`, which is wrong
+        // for formats without a known signature (e.g. webm recordings of the browser). The service derives the
+        // format from the file extension, so pass the known MIME type of the upload instead.
+        model: {
+          specificationVersion: model.specificationVersion,
+          provider: model.provider,
+          modelId: model.modelId,
+          doGenerate: (options) => model.doGenerate({ ...options, mediaType: mimeType }),
+        },
+        audio: new Uint8Array(audioBuffer),
       });
 
-      this.logger.log(`Azure transcription successful, text length: ${result.text.length}`);
+      this.logger.log(`Azure transcription successful, file: ${fileName}, text length: ${result.text.length}`);
       return result.text;
     } catch (error) {
       if (error instanceof Error) {

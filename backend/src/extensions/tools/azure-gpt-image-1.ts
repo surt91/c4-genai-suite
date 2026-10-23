@@ -1,4 +1,5 @@
-import { AzureOpenAI } from 'openai';
+import { createAzure } from '@ai-sdk/azure';
+import { ImageModel } from 'ai';
 import { Extension, ExtensionSpec } from '../../domain/extensions';
 import { GPTImage1Extension, GPTImage1ExtensionConfiguration } from './gpt-image-1';
 
@@ -36,13 +37,14 @@ export class AzureGPTImage1Extension extends GPTImage1Extension {
     };
   }
 
-  protected createGptImageClient(configuration: AzureGPTImage1ExtensionConfiguration): AzureOpenAI {
-    return new AzureOpenAI({
+  protected override createImageModel(configuration: AzureGPTImage1ExtensionConfiguration): ImageModel {
+    // https://<instance>.openai.azure.com/openai/deployments/<deploymentName>/images/generations?api-version=<apiVersion>
+    return createAzure({
       apiKey: configuration.apiKey,
       apiVersion: configuration.apiVersion,
-      deployment: configuration.deploymentName,
-      endpoint: `https://${configuration.instanceName}.openai.azure.com/`,
-    });
+      resourceName: configuration.instanceName,
+      useDeploymentBasedUrls: true,
+    }).image(configuration.deploymentName);
   }
 }
 

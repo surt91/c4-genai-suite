@@ -1,4 +1,5 @@
-import { AzureOpenAI } from 'openai';
+import { createAzure } from '@ai-sdk/azure';
+import { ImageModel } from 'ai';
 import { Extension, ExtensionSpec } from 'src/domain/extensions';
 import { DallEExtension, DallEExtensionConfiguration } from './dall-e';
 
@@ -30,13 +31,14 @@ export class AzureDallEExtension extends DallEExtension {
     };
   }
 
-  protected createDallEClient(configuration: AzureDallEExtensionConfiguration): AzureOpenAI {
-    return new AzureOpenAI({
+  protected override createImageModel(configuration: AzureDallEExtensionConfiguration): ImageModel {
+    // https://<instance>.openai.azure.com/openai/deployments/<modelName>/images/generations?api-version=<apiVersion>
+    return createAzure({
       apiKey: configuration.apiKey,
       apiVersion: configuration.apiVersion,
-      deployment: configuration.modelName,
-      endpoint: `https://${configuration.instanceName}.openai.azure.com/`,
-    });
+      resourceName: configuration.instanceName,
+      useDeploymentBasedUrls: true,
+    }).image(configuration.modelName);
   }
 }
 
