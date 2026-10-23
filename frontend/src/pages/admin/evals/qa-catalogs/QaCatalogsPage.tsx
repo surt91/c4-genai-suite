@@ -9,6 +9,7 @@ import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { ConfirmDialog, Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { toast } from 'src/lib/notifications';
+import { totalWithoutCount, useStepBackFromEmptyPage } from 'src/lib/pagination';
 import { texts } from 'src/texts';
 import tableClasses from '../evaluations/components/DataTable.module.css';
 import { QaCatalogStatusChip } from './components/QaCatalogStatusChip';
@@ -39,6 +40,8 @@ export function QaCatalogsPage() {
     queryKey: ['qaCatalogs', page, query],
     queryFn: () => evalApi.qaCatalog.qaCatalogGetAll(query || undefined, page * PAGE_SIZE, PAGE_SIZE),
   });
+  // e.g. after the last item of the last page has been deleted
+  useStepBackFromEmptyPage(page, setPage, isFetched, catalogs?.length ?? 0);
 
   const deleteMutation = useMutation({
     mutationFn: (catalogId: string) => evalApi.qaCatalog.qaCatalogDelete(catalogId),
@@ -183,7 +186,12 @@ export function QaCatalogsPage() {
             </tbody>
           </table>
 
-          <Pagination page={page} pageSize={PAGE_SIZE} total={catalogs?.length ?? 0} onPage={handleChangePage} />
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={totalWithoutCount(page, PAGE_SIZE, catalogs?.length ?? 0)}
+            onPage={handleChangePage}
+          />
         </Card>
       </Page>
 

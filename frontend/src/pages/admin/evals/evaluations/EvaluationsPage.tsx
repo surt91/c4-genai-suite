@@ -3,21 +3,26 @@ import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { GetAllEvaluationResult } from 'src/api/generated-eval';
-import { Page } from 'src/components';
+import { Page, Pagination } from 'src/components';
 import { useDebounce } from 'src/hooks/utils';
+import { totalWithoutCount, useStepBackFromEmptyPage } from 'src/lib/pagination';
 import { texts } from 'src/texts';
 import { CreateEvaluationDialog } from './CreateEvaluationDialog';
 import { EvaluationsTable } from './components/EvaluationsTable';
 import { useEvaluations } from './hooks/useEvaluationQueries';
 
+const PAGE_SIZE = 20;
+
 export function EvaluationsPage() {
   const navigate = useNavigate();
-  const [page, _setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const { data: evaluations = [], isFetching, isFetched } = useEvaluations(page, 20, debouncedSearch || undefined);
+  const { data: evaluations = [], isFetching, isFetched } = useEvaluations(page + 1, PAGE_SIZE, debouncedSearch || undefined);
+  // e.g. after the last item of the last page has been deleted
+  useStepBackFromEmptyPage(page, setPage, isFetched, evaluations.length);
 
   const handleRowClick = (evaluation: GetAllEvaluationResult) => {
     void navigate(`/admin/evals/evaluations/${evaluation.id}`);
@@ -42,13 +47,22 @@ export function EvaluationsPage() {
           placeholder={texts.evals.evaluations.searchPlaceholder}
           leftSection={<IconSearch size={16} />}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setPage(0);
+          }}
           maw="28rem"
         />
       </Box>
 
       <Card shadow="xs" padding={24} radius="md">
         <EvaluationsTable evaluations={evaluations} isFetching={isFetching} isFetched={isFetched} onRowClick={handleRowClick} />
+        <Pagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          total={totalWithoutCount(page, PAGE_SIZE, evaluations.length)}
+          onPage={setPage}
+        />
       </Card>
 
       {showCreateDialog && (

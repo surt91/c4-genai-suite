@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Metric } from 'src/api/generated-eval';
 import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
+import { totalWithoutCount, useStepBackFromEmptyPage } from 'src/lib/pagination';
 import { texts } from 'src/texts';
 import { MetricsTable } from './components/MetricsTable';
 import { DeleteMetricDialog } from './dialogs/DeleteMetricDialog';
@@ -26,6 +27,8 @@ export function MetricsPage() {
   }, []);
 
   const { data: loadedMetrics, isFetching, isFetched, refetch } = useMetrics(page, query);
+  // e.g. after the last item of the last page has been deleted
+  useStepBackFromEmptyPage(page, setPage, isFetched, loadedMetrics?.length ?? 0);
 
   const handleChangePage = useEventCallback((newPage: number) => {
     setPage(newPage);
@@ -96,7 +99,12 @@ export function MetricsPage() {
             isDeleting={metricToDelete?.id}
           />
 
-          <Pagination page={page} pageSize={PAGE_SIZE} total={loadedMetrics?.length ?? 0} onPage={handleChangePage} />
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={totalWithoutCount(page, PAGE_SIZE, loadedMetrics?.length ?? 0)}
+            onPage={handleChangePage}
+          />
         </Card>
       </Page>
 

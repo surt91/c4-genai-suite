@@ -18,6 +18,7 @@ import { useEvalApi } from 'src/api/state/apiEvalClient';
 import { ConfirmDialog, Page, Pagination } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { toast } from 'src/lib/notifications';
+import { totalWithoutCount } from 'src/lib/pagination';
 import { texts } from 'src/texts';
 import { QaCatalogStatusChip } from './components/QaCatalogStatusChip';
 import { QaPairsTable } from './components/QaPairsTable';
@@ -450,7 +451,7 @@ export function QaCatalogDetailPage() {
               <Pagination
                 page={page}
                 pageSize={PAGE_SIZE}
-                total={(pairsData?.length ?? 0) + pendingCounts.additions}
+                total={totalWithoutCount(page, PAGE_SIZE, pairsData?.length ?? 0)}
                 onPage={setPage}
               />
             </>

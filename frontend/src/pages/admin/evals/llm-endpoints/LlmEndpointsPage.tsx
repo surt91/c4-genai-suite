@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import type { LLMEndpoint } from 'src/api/generated-eval';
 import { Page, Pagination, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
+import { totalWithoutCount, useStepBackFromEmptyPage } from 'src/lib/pagination';
 import { texts } from 'src/texts';
 import { LlmEndpointsTable } from './components/LlmEndpointsTable';
 import { DeleteLlmEndpointDialog } from './dialogs/DeleteLlmEndpointDialog';
@@ -23,15 +24,13 @@ export function LlmEndpointsPage() {
   }, []);
 
   const { data: loadedEndpoints, isFetching, isFetched, refetch } = useLlmEndpoints(page, query);
+  // e.g. after the last item of the last page has been deleted
+  useStepBackFromEmptyPage(page, setPage, isFetched, loadedEndpoints?.length ?? 0);
 
   // Data comes directly from React Query - no store sync needed
   const endpoints = loadedEndpoints ?? [];
 
-  // For pagination without total count from API:
-  // If we got PAGE_SIZE items, there might be more pages
-  const hasMorePages = endpoints.length === PAGE_SIZE;
-  // Calculate an effective total for the Pagination component
-  const effectiveTotal = hasMorePages ? (page + 2) * PAGE_SIZE : page * PAGE_SIZE + endpoints.length;
+  const effectiveTotal = totalWithoutCount(page, PAGE_SIZE, endpoints.length);
 
   const handleChangePage = useEventCallback((newPage: number) => {
     setPage(newPage);
