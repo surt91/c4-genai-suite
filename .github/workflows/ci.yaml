@@ -202,7 +202,8 @@ jobs:
           git diff --exit-code .
 
   e2e:
-    runs-on: ubuntu-latest
+    # Playwright's --with-deps does not support the Ubuntu 26 images behind ubuntu-latest yet
+    runs-on: ubuntu-24.04
     env:
       REIS_EMBEDDINGS_TYPE: random-test-embeddings
       NODE_ENV: development
@@ -235,12 +236,14 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: e2e/package-lock.json
-      - working-directory: e2e
-        run: |
-          npm ci
-          npm run lint
-          npx playwright install chromium --with-deps
-          npx playwright test
+      - run: npm ci
+        working-directory: e2e
+      - run: npm run lint
+        working-directory: e2e
+      - run: npx playwright install chromium --with-deps
+        working-directory: e2e
+      - run: npx playwright test
+        working-directory: e2e
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
