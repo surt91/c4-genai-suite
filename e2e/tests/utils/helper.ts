@@ -355,6 +355,8 @@ export async function openChatSettings(page: Page) {
 /** Applies the chat settings and waits until the popover is closed. */
 export async function applyChatSettings(page: Page) {
   const popover = page.getByTestId('chat-settings-popover');
+  // close the dropdowns of the inputs (e.g. a date picker), which may cover the buttons
+  await popover.getByText('Chat settings', { exact: true }).click();
   await popover.getByRole('button', { name: 'Apply', exact: true }).click();
   await expect(popover).toBeHidden();
 }

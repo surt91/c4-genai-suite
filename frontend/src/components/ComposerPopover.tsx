@@ -75,6 +75,9 @@ export function ComposerPopover(props: ComposerPopoverProps) {
       onDismiss={onClose}
       closeOnClickOutside={false}
       position="top-start"
+      // always above the composer: flipping a tall dropdown back and forth would make it jump
+      // and never higher than the space above it
+      middlewares={{ flip: false, shift: true, size: { padding: 8 } }}
       width={width}
       shadow="md"
       radius="md"

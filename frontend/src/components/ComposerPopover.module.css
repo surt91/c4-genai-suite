@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-height: min(70vh, 36rem);
+  max-height: min(calc(100dvh - 14rem), 36rem);
   overflow: auto;
 }
 

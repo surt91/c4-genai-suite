@@ -250,8 +250,9 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
     const modal = page.getByTestId('manage-files-modal');
     const row = modal.getByTestId('manage-files-row').filter({ hasText: 'e2e-test.txt' });
     await row.getByRole('button', { name: 'Rename: e2e-test.txt' }).click();
-    await row.getByRole('textbox').fill('renamed-e2e-test.txt');
-    await row.getByRole('textbox').press('Enter');
+    const input = modal.getByRole('textbox', { name: 'New name of e2e-test.txt' });
+    await input.fill('renamed-e2e-test.txt');
+    await input.press('Enter');
     await expect(modal.getByTestId('manage-files-row').filter({ hasText: 'renamed-e2e-test.txt' })).toHaveCount(1);
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('file-chip').filter({ hasText: 'renamed-e2e-test.txt' })).toBeVisible();
