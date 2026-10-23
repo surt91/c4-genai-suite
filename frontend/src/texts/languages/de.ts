@@ -639,10 +639,6 @@ export const de: typeof en = {
       'Assistentenkonfiguration erfolgreich importiert. Der Assistent ist standardmäßig deaktiviert. Bitte konfigurieren Sie die API-Schlüssel vor der Aktivierung.',
     importConfigurationFailed: 'Importieren der Assistentenkonfiguration fehlgeschlagen',
     importConfigurationInvalidJson: 'Ungültige JSON-Datei. Bitte laden Sie eine gültige Konfigurationsdatei hoch.',
-    executorEndpoint: 'Executor-Endpoint',
-    executorEndpointHints:
-      'Der Executor ist ein spezieller Dienst, der den gesamten Chat-Ablauf steuert und nur die Antwort bereitstellt. Für spezielle Fälle, in denen vollständige Kontrolle über den Chat benötigt wird.',
-    executorHeaders: 'Executor-Header',
     headline: 'Erweiterungen',
     noTools: 'Es sind aktuell keine Tools für diesen Assitenten konfiguriert',
     noOthers: 'Es sind aktuell keine anderen Erweiterungen für diesen Assistenten konfiguriert',

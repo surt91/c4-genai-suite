@@ -638,22 +638,6 @@ export class UpsertConfigurationDto {
   chatFooter?: string;
 
   @ApiProperty({
-    description: 'The optional executor endpoint.',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  executorEndpoint?: string;
-
-  @ApiProperty({
-    description: 'The optional executor headers.',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  executorHeaders?: string;
-
-  @ApiProperty({
     description: 'The allowed user groups.',
     required: false,
     type: [String],
@@ -742,18 +726,6 @@ export class ConfigurationDto {
   chatSuggestions?: ChatSuggestionDto[];
 
   @ApiProperty({
-    description: 'The optional executor endpoint.',
-    required: false,
-  })
-  executorEndpoint?: string;
-
-  @ApiProperty({
-    description: 'The optional executor headers.',
-    required: false,
-  })
-  executorHeaders?: string;
-
-  @ApiProperty({
     description: 'The allowed user groups.',
     required: false,
     type: [String],
@@ -796,8 +768,6 @@ export class ConfigurationDto {
     result.chatFooter = source.chatFooter;
     result.chatSuggestions = source.chatSuggestions;
     result.enabled = source.enabled;
-    result.executorEndpoint = source.executorEndpoint;
-    result.executorHeaders = source.executorHeaders;
     result.name = source.name;
     result.description = source.description;
     result.userGroupIds = source.userGroupIds;
@@ -980,22 +950,6 @@ export class ExportedConfigurationDto {
   @ValidateNested({ each: true })
   @Type(() => ChatSuggestionDto)
   chatSuggestions?: ChatSuggestionDto[];
-
-  @ApiProperty({
-    description: 'The optional executor endpoint.',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  executorEndpoint?: string;
-
-  @ApiProperty({
-    description: 'The optional executor headers.',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  executorHeaders?: string;
 
   @ApiProperty({
     description: 'The allowed user groups.',

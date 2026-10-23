@@ -15,18 +15,7 @@ import { ConfigurationModel } from '../interfaces';
 import { buildConfiguration, buildConfigurationSnapshot } from './utils';
 
 type Values = Partial<
-  Pick<
-    ConfigurationModel,
-    | 'agentName'
-    | 'chatFooter'
-    | 'chatSuggestions'
-    | 'enabled'
-    | 'executorEndpoint'
-    | 'executorHeaders'
-    | 'name'
-    | 'description'
-    | 'userGroupIds'
-  >
+  Pick<ConfigurationModel, 'agentName' | 'chatFooter' | 'chatSuggestions' | 'enabled' | 'name' | 'description' | 'userGroupIds'>
 >;
 
 export class UpdateConfiguration {
@@ -53,17 +42,7 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
 
   async execute(command: UpdateConfiguration): Promise<UpdateConfigurationResponse> {
     const { id, values, performedBy } = command;
-    const {
-      agentName,
-      chatFooter,
-      chatSuggestions,
-      enabled,
-      executorEndpoint,
-      executorHeaders,
-      name,
-      description,
-      userGroupIds,
-    } = values;
+    const { agentName, chatFooter, chatSuggestions, enabled, name, description, userGroupIds } = values;
 
     const entity = await this.configurations.findOne({
       where: { id, status: Not(ConfigurationStatus.DELETED) },
@@ -86,8 +65,6 @@ export class UpdateConfigurationHandler implements ICommandHandler<UpdateConfigu
       chatFooter,
       chatSuggestions,
       status: enabled ? ConfigurationStatus.ENABLED : ConfigurationStatus.DISABLED,
-      executorEndpoint,
-      executorHeaders,
       name,
       description,
     });

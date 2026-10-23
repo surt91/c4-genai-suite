@@ -88,18 +88,6 @@ export interface ExportedConfigurationDto {
      */
     chatSuggestions?: Array<ChatSuggestionDto>;
     /**
-     * The optional executor endpoint.
-     * @type {string}
-     * @memberof ExportedConfigurationDto
-     */
-    executorEndpoint?: string;
-    /**
-     * The optional executor headers.
-     * @type {string}
-     * @memberof ExportedConfigurationDto
-     */
-    executorHeaders?: string;
-    /**
      * The allowed user groups.
      * @type {Array<string>}
      * @memberof ExportedConfigurationDto
@@ -143,8 +131,6 @@ export function ExportedConfigurationDtoFromJSONTyped(json: any, ignoreDiscrimin
         'agentName': json['agentName'] == null ? undefined : json['agentName'],
         'chatFooter': json['chatFooter'] == null ? undefined : json['chatFooter'],
         'chatSuggestions': json['chatSuggestions'] == null ? undefined : ((json['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoFromJSON)),
-        'executorEndpoint': json['executorEndpoint'] == null ? undefined : json['executorEndpoint'],
-        'executorHeaders': json['executorHeaders'] == null ? undefined : json['executorHeaders'],
         'userGroupIds': json['userGroupIds'] == null ? undefined : json['userGroupIds'],
         'extensions': ((json['extensions'] as Array<any>).map(ExportedExtensionDtoFromJSON)),
     };
@@ -165,8 +151,6 @@ export function ExportedConfigurationDtoToJSON(value?: ExportedConfigurationDto 
         'agentName': value['agentName'],
         'chatFooter': value['chatFooter'],
         'chatSuggestions': value['chatSuggestions'] == null ? undefined : ((value['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoToJSON)),
-        'executorEndpoint': value['executorEndpoint'],
-        'executorHeaders': value['executorHeaders'],
         'userGroupIds': value['userGroupIds'],
         'extensions': ((value['extensions'] as Array<any>).map(ExportedExtensionDtoToJSON)),
     };

@@ -143,6 +143,8 @@ Fix: `SameSite=Lax` (keeps the cookie on the top-level OAuth callback redirects)
 Fixed on branch `worktree-agent-a161c03d7715338b1` (one commit per fix, regression test unless noted).
 Counts: 7 × P1, 31 × P2, 25 × P3.
 
+The executor feature (P1-3, P2-14) has since been removed completely (`feat!: remove the executor feature`).
+
 | ID | Status | Commit / reason |
 |----|--------|-----------------|
 | P1-1 | fixed | `0d94c8c` only allow own files when sending a message |

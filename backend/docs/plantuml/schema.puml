@@ -42,8 +42,6 @@ class deployments {
    agentName: text
    chatFooter: text
    chatSuggestions: json
-   executorEndpoint: text
-   executorHeaders: text
    createdAt: timestamp
    updatedAt: timestamp
    id: integer

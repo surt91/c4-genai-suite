@@ -256,8 +256,6 @@ describe(ImportConfiguration.name, () => {
       agentName: 'Test Agent',
       chatFooter: 'Footer',
       chatSuggestions: [{ text: 'Hello', title: 'Hello', subtitle: 'Greeting' }] as ChatSuggestion[],
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: ['group1'],
       extensions: [],
     };
@@ -336,8 +334,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -386,8 +382,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -466,8 +460,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -537,8 +529,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -595,8 +585,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -648,8 +636,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -744,8 +730,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -836,8 +820,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: ['group-1', 'group-2'],
       extensions: [],
     };
@@ -893,8 +875,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: ['group-1'],
       extensions: [],
     };
@@ -952,8 +932,6 @@ describe(ImportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -993,6 +971,51 @@ describe(ImportConfiguration.name, () => {
       expect.objectContaining({
         userGroups: [],
       }),
+    );
+  });
+
+  it('should ignore the executor settings of configurations exported by older versions', async () => {
+    const savedConfiguration: Partial<ConfigurationEntity> = {
+      id: 14,
+      name: 'Legacy Config',
+      description: 'Test',
+      status: ConfigurationStatus.ENABLED,
+      userGroupIds: [],
+      extensions: [],
+    };
+
+    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+      if (entity === ConfigurationEntity) {
+        return Promise.resolve(savedConfiguration);
+      }
+      return Promise.resolve(data);
+    });
+    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+
+    // Exports of older versions contain the removed executor settings.
+    const importData = {
+      name: 'Legacy Config',
+      description: 'Test',
+      enabled: true,
+      executorEndpoint: 'http://executor.internal',
+      executorHeaders: 'Authorization=Bearer secret',
+      extensions: [],
+    } as PortableConfiguration;
+
+    const result = await handler.execute(new ImportConfiguration(importData));
+
+    expect(result.warnings).toEqual([]);
+    expect(queryRunner.manager.save).toHaveBeenCalledWith(
+      ConfigurationEntity,
+      expect.objectContaining({ name: 'Legacy Config', description: 'Test' }),
+    );
+    expect(queryRunner.manager.save).not.toHaveBeenCalledWith(
+      ConfigurationEntity,
+      expect.objectContaining({ executorEndpoint: 'http://executor.internal' }),
+    );
+    expect(queryRunner.manager.save).not.toHaveBeenCalledWith(
+      ConfigurationEntity,
+      expect.objectContaining({ executorHeaders: 'Authorization=Bearer secret' }),
     );
   });
 });

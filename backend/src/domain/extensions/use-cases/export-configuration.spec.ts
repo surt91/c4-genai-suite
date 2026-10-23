@@ -57,8 +57,6 @@ describe(ExportConfiguration.name, () => {
       agentName: 'Test Agent',
       chatFooter: 'Footer',
       chatSuggestions,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: ['group1', 'group2'],
       extensions,
     };
@@ -123,8 +121,6 @@ describe(ExportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: [],
       extensions: [],
     };
@@ -175,8 +171,6 @@ describe(ExportConfiguration.name, () => {
       agentName: undefined,
       chatFooter: undefined,
       chatSuggestions: undefined,
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       userGroupIds: ['admin'],
       extensions,
     };

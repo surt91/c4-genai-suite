@@ -71,8 +71,6 @@ Use the "arrow up" symbol next to the word Assistants at the top of the Assistan
 | Description       | **Required** short description, that will be visible to users in the Assistant selection.
 | Enabled           | If not enabled, an assistant will only be visible on the settings page for configuration. Any conversation held with a disabled Assistant can still be read, but not continued by the user.
 | User Groups       | Restrict the access to the assistant to certain [user groups](/admin/user-groups). Members of the "Admin" group will be able to access an Assistant, even if the "Admin" group is not listed here.
-| Executor Endpoint | An advanced setting: It is used to move the assistant handling to another execution server. (no extensions are used for this)
-| Executor Headers  | An advanced setting: This defines the required headers needed for the execution server.
 | Chat Footer       | Text, that is rendered below the input in the main chat view. Additionally, a text from the [theme settings](/admin/theme) may be displayed next to it.
 | Suggestions       | AI Assistant specific prompt suggestions that will be available when starting a new conversation with the Assistant. Additionally, suggestions from the [theme settings](/admin/theme) may be displayed.
 

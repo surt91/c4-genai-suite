@@ -35,8 +35,6 @@ export interface PortableConfiguration {
   agentName?: string;
   chatFooter?: string;
   chatSuggestions?: ChatSuggestion[];
-  executorEndpoint?: string;
-  executorHeaders?: string;
   userGroupIds?: string[];
   extensions: PortableExtension[];
 }
@@ -84,8 +82,6 @@ export class ExportConfigurationHandler implements IQueryHandler<ExportConfigura
       agentName: configuration.agentName,
       chatFooter: configuration.chatFooter,
       chatSuggestions: configuration.chatSuggestions,
-      executorEndpoint: configuration.executorEndpoint,
-      executorHeaders: configuration.executorHeaders,
       userGroupIds: configuration.userGroupIds,
       extensions,
     };

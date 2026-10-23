@@ -42,27 +42,19 @@ alt tokens left or no token check
     alt prompt not present
         DefaultPromptMiddleware -> DefaultPromptMiddleware: setPrompt(context)
     end
-    DefaultPromptMiddleware -> ExecutorMiddleware: invoke(context)
-    alt executorEndpoint present
-        ExecutorMiddleware -> ExecutorEndpoint: invoke(context)
-        ExecutorEndpoint -> ExecutorMiddleware: return
-        ExecutorMiddleware -> ExecutorMiddleware: sendMessage(context)
+    DefaultPromptMiddleware -> ExecuteMiddleware: invoke(context)
+    alt llm not present or prompt no present
+        ExecuteMiddleware -> ExecuteMiddleware: addError(context)
     else
-        ExecutorMiddleware -> ExecuteMiddleware: invoke(context)
-        alt llm not present or prompt no present
-            ExecuteMiddleware -> ExecuteMiddleware: addError(context)
-        else
-            ExecuteMiddleware -> LangchainAgent: invoke(context)
-            LangchainAgent -> ExecuteMiddleware: stream()
-            loop message in stream
-                ExecuteMiddleware -> ExecuteMiddleware: sendMessage(context)
-            end
-            LangchainAgent -> LangchainAgent: setTokenUsage(context)
-            LangchainAgent -> ExecuteMiddleware: return
+        ExecuteMiddleware -> LangchainAgent: invoke(context)
+        LangchainAgent -> ExecuteMiddleware: stream()
+        loop message in stream
+            ExecuteMiddleware -> ExecuteMiddleware: sendMessage(context)
         end
-            ExecuteMiddleware -> ExecutorMiddleware: return
+        LangchainAgent -> LangchainAgent: setTokenUsage(context)
+        LangchainAgent -> ExecuteMiddleware: return
     end
-    ExecutorMiddleware -> DefaultPromptMiddleware : return
+    ExecuteMiddleware -> DefaultPromptMiddleware : return
     DefaultPromptMiddleware -> ChooseLllMiddleware : return
     alt llm present
         ChooseLllMiddleware -> ChooseLllMiddleware: updateConversation(context)

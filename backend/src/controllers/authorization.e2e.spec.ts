@@ -71,8 +71,6 @@ describe('Authorization', () => {
       name: `Assistant ${randomUUID()}`,
       description: '',
       status: ConfigurationStatus.ENABLED,
-      executorEndpoint: 'http://executor.internal',
-      executorHeaders: 'Authorization=Bearer executor-secret',
     });
 
     bucket = await dataSource.getRepository(BucketEntity).save({
@@ -246,19 +244,12 @@ describe('Authorization', () => {
   });
 
   describe('configuration list', () => {
-    type Items = { items: { id: number; executorHeaders?: string; executorEndpoint?: string }[] };
+    type Items = { items: { id: number }[] };
     const find = (body: unknown) => (body as Items).items.find((x) => x.id === configuration.id)!;
 
-    it('does not contain the executor credentials for regular users', async () => {
+    it('contains the assistant for regular users', async () => {
       const response = await asUser(http().get('/configurations')).expect(200);
       expect(find(response.body)).toBeDefined();
-      expect(find(response.body).executorHeaders).toBeUndefined();
-      expect(find(response.body).executorEndpoint).toBeUndefined();
-    });
-
-    it('contains the executor settings for admins', async () => {
-      const response = await asAdmin(http().get('/configurations')).expect(200);
-      expect(find(response.body).executorHeaders).toBe('Authorization=Bearer executor-secret');
     });
 
     it('treats enabled=false as false', async () => {

@@ -14,18 +14,7 @@ import { ConfigurationModel } from '../interfaces';
 import { buildConfiguration, buildConfigurationSnapshot } from './utils';
 
 type Values = Partial<
-  Pick<
-    ConfigurationModel,
-    | 'agentName'
-    | 'chatFooter'
-    | 'chatSuggestions'
-    | 'enabled'
-    | 'executorEndpoint'
-    | 'executorHeaders'
-    | 'name'
-    | 'description'
-    | 'userGroupIds'
-  >
+  Pick<ConfigurationModel, 'agentName' | 'chatFooter' | 'chatSuggestions' | 'enabled' | 'name' | 'description' | 'userGroupIds'>
 >;
 
 export class CreateConfiguration {
@@ -51,17 +40,7 @@ export class CreateConfigurationHandler implements ICommandHandler<CreateConfigu
 
   async execute(command: CreateConfiguration): Promise<CreateConfigurationResponse> {
     const { values, performedBy } = command;
-    const {
-      agentName,
-      chatFooter,
-      chatSuggestions,
-      enabled,
-      executorEndpoint,
-      executorHeaders,
-      name,
-      description,
-      userGroupIds,
-    } = values;
+    const { agentName, chatFooter, chatSuggestions, enabled, name, description, userGroupIds } = values;
 
     const entity = this.configurations.create();
 
@@ -75,8 +54,6 @@ export class CreateConfigurationHandler implements ICommandHandler<CreateConfigu
       chatFooter,
       chatSuggestions,
       status: enabled ? ConfigurationStatus.ENABLED : ConfigurationStatus.DISABLED,
-      executorEndpoint,
-      executorHeaders,
       name,
       description,
     });

@@ -90,15 +90,7 @@ export class ConfigurationsController {
     const result: GetConfigurationsResponse = await this.queryBus.execute(
       new GetConfigurations(req.user, fetchEnabledWithExtensions, fetchEnabledWithExtensions),
     );
-    const dto = ConfigurationsDto.fromDomain(result.configurations);
-    if (!req.user.userGroupIds?.includes(BUILTIN_USER_GROUP_ADMIN)) {
-      // This is also the assistant list of regular users; the executor headers contain credentials.
-      for (const item of dto.items) {
-        delete item.executorEndpoint;
-        delete item.executorHeaders;
-      }
-    }
-    return dto;
+    return ConfigurationsDto.fromDomain(result.configurations);
   }
 
   @Get(':id')

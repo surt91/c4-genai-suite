@@ -20,10 +20,6 @@ export interface ConfigurationModel {
 
   chatSuggestions?: ChatSuggestion[];
 
-  executorEndpoint?: string;
-
-  executorHeaders?: string;
-
   userGroupIds: string[];
 
   extensions?: ConfiguredExtension<ExtensionConfiguration>[];

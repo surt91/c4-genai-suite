@@ -82,18 +82,6 @@ export interface ConfigurationDto {
      */
     chatSuggestions?: Array<ChatSuggestionDto>;
     /**
-     * The optional executor endpoint.
-     * @type {string}
-     * @memberof ConfigurationDto
-     */
-    executorEndpoint?: string;
-    /**
-     * The optional executor headers.
-     * @type {string}
-     * @memberof ConfigurationDto
-     */
-    executorHeaders?: string;
-    /**
      * The allowed user groups.
      * @type {Array<string>}
      * @memberof ConfigurationDto
@@ -141,8 +129,6 @@ export function ConfigurationDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         'agentName': json['agentName'] == null ? undefined : json['agentName'],
         'chatFooter': json['chatFooter'] == null ? undefined : json['chatFooter'],
         'chatSuggestions': json['chatSuggestions'] == null ? undefined : ((json['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoFromJSON)),
-        'executorEndpoint': json['executorEndpoint'] == null ? undefined : json['executorEndpoint'],
-        'executorHeaders': json['executorHeaders'] == null ? undefined : json['executorHeaders'],
         'userGroupIds': json['userGroupIds'] == null ? undefined : json['userGroupIds'],
         'extensions': json['extensions'] == null ? undefined : ((json['extensions'] as Array<any>).map(ExtensionUserInfoDtoFromJSON)),
         'configurableArguments': json['configurableArguments'] == null ? undefined : ExtensionArgumentObjectSpecDtoFromJSON(json['configurableArguments']),
@@ -162,8 +148,6 @@ export function ConfigurationDtoToJSON(value?: ConfigurationDto | null): any {
         'agentName': value['agentName'],
         'chatFooter': value['chatFooter'],
         'chatSuggestions': value['chatSuggestions'] == null ? undefined : ((value['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoToJSON)),
-        'executorEndpoint': value['executorEndpoint'],
-        'executorHeaders': value['executorHeaders'],
         'userGroupIds': value['userGroupIds'],
         'extensions': value['extensions'] == null ? undefined : ((value['extensions'] as Array<any>).map(ExtensionUserInfoDtoToJSON)),
         'configurableArguments': ExtensionArgumentObjectSpecDtoToJSON(value['configurableArguments']),

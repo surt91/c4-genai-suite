@@ -1,4 +1,4 @@
-import { Button, Flex, Portal, Switch, Textarea, TextInput } from '@mantine/core';
+import { Button, Flex, Portal, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
 import z from 'zod';
@@ -20,8 +20,6 @@ const schema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   enabled: z.boolean(),
-  executorEndpoint: z.string().optional(),
-  executorHeaders: z.string().optional(),
   chatFooter: z.string().optional(),
   userGroupIds: z.array(z.string()).optional(),
   chatSuggestions: z.array(chatSuggestionScheme).max(MAX_SUGGESTIONS).optional(),
@@ -63,8 +61,6 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
       enabled: true,
       chatSuggestions: [],
       userGroupIds: [],
-      executorEndpoint: undefined,
-      executorHeaders: undefined,
       chatFooter: undefined,
     },
     validate: typedZodResolver(schema),
@@ -93,20 +89,6 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
               {...form.getInputProps('enabled', { type: 'checkbox' })}
             />
             <UserGroupTagsInput form={form} />
-            <TextInput
-              classNames={{ input: classes.mono }}
-              label={texts.extensions.executorEndpoint}
-              description={texts.extensions.executorEndpointHints}
-              key={form.key('executorEndpoint')}
-              {...form.getInputProps('executorEndpoint')}
-            />
-            <Textarea
-              classNames={{ input: classes.mono }}
-              label={texts.extensions.executorHeaders}
-              key={form.key('executorHeaders')}
-              {...form.getInputProps('executorHeaders')}
-              resize="vertical"
-            />
             <TextInput
               label={texts.theme.footer}
               description={texts.theme.footerHints}

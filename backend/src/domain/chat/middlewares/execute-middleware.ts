@@ -205,11 +205,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
   }
 
   async execute(context: ChatContext) {
-    const { llm: chosenLlm, configuration, llms } = context;
-
-    if (configuration.executorEndpoint) {
-      return;
-    }
+    const { llm: chosenLlm, llms } = context;
 
     const llm = llms[chosenLlm ?? ''];
 

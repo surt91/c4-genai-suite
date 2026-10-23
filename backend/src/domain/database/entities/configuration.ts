@@ -54,12 +54,6 @@ export class ConfigurationEntity {
   @Column('json', { nullable: true })
   chatSuggestions?: ChatSuggestion[];
 
-  @Column('text', { nullable: true })
-  executorEndpoint?: string;
-
-  @Column('text', { nullable: true })
-  executorHeaders?: string;
-
   @OneToMany(() => ConversationEntity, (conversation) => conversation.configuration, { onDelete: 'SET NULL' })
   conversations!: ConversationEntity[];
 

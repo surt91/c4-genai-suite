@@ -74,7 +74,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       throw new NotFoundException(`Conversation with id '${conversationId}' not found`);
     }
 
-    // The configuration is needed for the executor settings.
+    // The configuration is needed for the access check and the chat context.
     const { configuration }: GetConfigurationResponse = await this.queryBus.execute(
       new GetConfiguration(conversation.configurationId),
     );

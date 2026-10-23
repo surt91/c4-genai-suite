@@ -110,8 +110,6 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     configurationEntity.agentName = data.agentName;
     configurationEntity.chatFooter = data.chatFooter;
     configurationEntity.chatSuggestions = data.chatSuggestions;
-    configurationEntity.executorEndpoint = data.executorEndpoint;
-    configurationEntity.executorHeaders = data.executorHeaders;
     configurationEntity.userGroups = userGroups;
     return configurationEntity;
   }

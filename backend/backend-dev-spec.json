@@ -3615,14 +3615,6 @@
               "$ref": "#/components/schemas/ChatSuggestionDto"
             }
           },
-          "executorEndpoint": {
-            "type": "string",
-            "description": "The optional executor endpoint."
-          },
-          "executorHeaders": {
-            "type": "string",
-            "description": "The optional executor headers."
-          },
           "userGroupIds": {
             "description": "The allowed user groups.",
             "type": "array",
@@ -3683,14 +3675,6 @@
           "chatFooter": {
             "type": "string",
             "description": "The footer text to be shown below the chat."
-          },
-          "executorEndpoint": {
-            "type": "string",
-            "description": "The optional executor endpoint."
-          },
-          "executorHeaders": {
-            "type": "string",
-            "description": "The optional executor headers."
           },
           "userGroupIds": {
             "description": "The allowed user groups.",
@@ -4239,14 +4223,6 @@
             "items": {
               "$ref": "#/components/schemas/ChatSuggestionDto"
             }
-          },
-          "executorEndpoint": {
-            "type": "string",
-            "description": "The optional executor endpoint."
-          },
-          "executorHeaders": {
-            "type": "string",
-            "description": "The optional executor headers."
           },
           "userGroupIds": {
             "description": "The allowed user groups.",

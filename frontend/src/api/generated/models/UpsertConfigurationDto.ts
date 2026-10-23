@@ -58,18 +58,6 @@ export interface UpsertConfigurationDto {
      */
     chatFooter?: string;
     /**
-     * The optional executor endpoint.
-     * @type {string}
-     * @memberof UpsertConfigurationDto
-     */
-    executorEndpoint?: string;
-    /**
-     * The optional executor headers.
-     * @type {string}
-     * @memberof UpsertConfigurationDto
-     */
-    executorHeaders?: string;
-    /**
      * The allowed user groups.
      * @type {Array<string>}
      * @memberof UpsertConfigurationDto
@@ -108,8 +96,6 @@ export function UpsertConfigurationDtoFromJSONTyped(json: any, ignoreDiscriminat
         'enabled': json['enabled'],
         'agentName': json['agentName'] == null ? undefined : json['agentName'],
         'chatFooter': json['chatFooter'] == null ? undefined : json['chatFooter'],
-        'executorEndpoint': json['executorEndpoint'] == null ? undefined : json['executorEndpoint'],
-        'executorHeaders': json['executorHeaders'] == null ? undefined : json['executorHeaders'],
         'userGroupIds': json['userGroupIds'] == null ? undefined : json['userGroupIds'],
         'chatSuggestions': json['chatSuggestions'] == null ? undefined : ((json['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoFromJSON)),
     };
@@ -126,8 +112,6 @@ export function UpsertConfigurationDtoToJSON(value?: UpsertConfigurationDto | nu
         'enabled': value['enabled'],
         'agentName': value['agentName'],
         'chatFooter': value['chatFooter'],
-        'executorEndpoint': value['executorEndpoint'],
-        'executorHeaders': value['executorHeaders'],
         'userGroupIds': value['userGroupIds'],
         'chatSuggestions': value['chatSuggestions'] == null ? undefined : ((value['chatSuggestions'] as Array<any>).map(ChatSuggestionDtoToJSON)),
     };

@@ -54,11 +54,6 @@ There are two types of middleware which are used to process incoming messages
 #### RenderPromptMiddleware
 - replaces the placeholders of the system prompts, see [Templates](#templates)
 
-#### ExecutorMiddleware
-checks executorEndpoint
-- if defined sends request it to the endpoint
-- if not defined calls execute middleware
-
 #### ExecuteMiddleware
 - uses the context to send commands to the langchain agent
 - streams langchain results to the sse socket

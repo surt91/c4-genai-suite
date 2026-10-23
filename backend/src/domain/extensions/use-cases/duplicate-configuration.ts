@@ -51,8 +51,6 @@ export class DuplicateConfigurationHandler implements ICommandHandler<DuplicateC
       chatFooter: configuration.chatFooter,
       chatSuggestions: configuration.chatSuggestions,
       status: configuration.status,
-      executorEndpoint: configuration.executorEndpoint,
-      executorHeaders: configuration.executorHeaders,
       name: getSuffix(configuration.name),
       description: configuration.description,
       userGroupIds: configuration.userGroupIds,

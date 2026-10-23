@@ -22,7 +22,6 @@
     "generate-base": "npx @openapitools/openapi-generator-cli generate -g typescript-fetch --additional-properties=useSingleRequestParameter=false,ensureUniqueParams=false",
     "generate-tools": "node -e \"fs.rmSync('./src/extensions/tools/generated', { recursive: true, force: true })\" && npm run generate-base -- -i ./src/openapi/tools-spec.json -o ./src/extensions/tools/generated",
     "generate-reis": "node -e \"fs.rmSync('./src/domain/files/use-cases/generated', { recursive: true, force: true })\" && npm run generate-base -- -i ../services/reis/reis-dev-spec.json -o ./src/domain/files/use-cases/generated",
-    "generate-executor": "node -e \"fs.rmSync('./src/domain/chat/middlewares/generated', { recursive: true, force: true })\" && npm run generate-base -- -i ./src/openapi/executor-spec.json -o ./src/domain/chat/middlewares/generated",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "migration:run": "npm run typeorm -- -d src/config/typeorm-migration.config.ts migration:run",
     "migration:format": "prettier --write src/migrations/*.ts",
