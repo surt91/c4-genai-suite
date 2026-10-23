@@ -1,6 +1,6 @@
 import { ChatInteractionDtoStatusEnum, MessageDto, SourceDto, StreamUIRequestDto } from 'src/api';
 
-export type ToolCallStatus = 'running' | 'success' | 'error' | 'cancelled';
+type ToolCallStatus = 'running' | 'success' | 'error' | 'cancelled';
 
 export type ToolCallState = {
   // The ID of the tool call (or the name for older answers).

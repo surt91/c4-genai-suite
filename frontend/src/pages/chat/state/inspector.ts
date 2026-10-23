@@ -1,6 +1,6 @@
 import { useInspectorStore } from './zustand/inspectorStore';
 
-export type { InspectorEntry, InspectorHelpEntry, InspectorSourceEntry, InspectorToolEntry } from './zustand/inspectorStore';
+export type { InspectorEntry, InspectorSourceEntry, InspectorToolEntry } from './zustand/inspectorStore';
 
 /** The actions of the inspector (stable references). */
 export const useInspectorActions = () => {

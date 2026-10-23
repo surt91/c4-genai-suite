@@ -23,7 +23,6 @@
     "generate-eval-api": "node -e \"fs.rmSync('./src/api/generated-eval', { recursive: true, force: true })\" && npx @openapitools/openapi-generator-cli generate --generator-key eval && node gen-helper.mjs"
   },
   "dependencies": {
-    "@floating-ui/react-dom": "^2.1.9",
     "@mantine/colors-generator": "9.7.3",
     "@mantine/core": "9.7.3",
     "@mantine/dates": "^9.7.3",

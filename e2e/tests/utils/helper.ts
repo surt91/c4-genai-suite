@@ -709,7 +709,9 @@ export async function expectA11yCompliant(page: Page) {
   // Tooltips are transient: move the mouse away so that hover tooltips disappear (they share the portal node of
   // Mantine with other content).
   await page.mouse.move(0, 0);
-  await expect(page.locator('.mantine-Tooltip-tooltip')).toHaveCount(0, { timeout: 2_000 }).catch(() => {});
+  await expect(page.locator('.mantine-Tooltip-tooltip'))
+    .toHaveCount(0, { timeout: 2_000 })
+    .catch(() => {});
 
   // Exclude open Mantine tooltips from the axe scan: they render into <body> outside any landmark,
   // which violates the "region" rule. Tooltips are transient supplementary content and do not

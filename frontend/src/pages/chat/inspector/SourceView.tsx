@@ -10,7 +10,7 @@ import classes from './Inspector.module.css';
 import { citedPages, sourceName } from './titles';
 
 /** The cited passages of a document, i.e. the chunks the answer is based on. */
-export function SourcePassages({ entry }: { entry: InspectorSourceEntry }) {
+function SourcePassages({ entry }: { entry: InspectorSourceEntry }) {
   const source = entry.sources[entry.index];
   const { data, isPending, isError, refetch } = useDocumentContent(
     entry.conversationId,

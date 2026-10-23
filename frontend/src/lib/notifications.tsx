@@ -4,9 +4,9 @@ import { IconAlertTriangle, IconCheck, IconInfoCircle, IconX } from '@tabler/ico
 import { ReactNode } from 'react';
 import { texts } from 'src/texts';
 
-export type NotificationType = 'info' | 'success' | 'warning' | 'error';
+type NotificationType = 'info' | 'success' | 'warning' | 'error';
 
-export interface NotificationAction {
+interface NotificationAction {
   // The label of the button, e.g. "Undo".
   label: string;
   onClick: () => void;
@@ -76,10 +76,6 @@ export function notify(message: ReactNode, options: NotifyOptions = {}) {
   });
 
   return id;
-}
-
-export function hideNotification(id: string) {
-  notifications.hide(id);
 }
 
 type ToastFn = ((message: ReactNode, options?: { type?: NotificationType }) => string) & {

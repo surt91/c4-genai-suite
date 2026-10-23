@@ -15,7 +15,7 @@ const documentOptions = {
 };
 
 /** A document referenced by an answer. */
-export type DocumentSource = {
+type DocumentSource = {
   conversationId: number;
   messageId: number;
   documentUri: string;

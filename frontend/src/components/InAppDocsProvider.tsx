@@ -12,7 +12,7 @@ import classes from './InAppDocsProvider.module.css';
  * A page that shows the documentation itself, e.g. the chat shows it in its inspector (the one side panel of the chat).
  * When a host is registered, the provider does not render its own panel.
  */
-export type DocsHost = {
+type DocsHost = {
   toggle: () => void;
   isOpen: boolean;
 };

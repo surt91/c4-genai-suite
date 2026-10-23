@@ -18,7 +18,7 @@ export type InspectorToolEntry = {
   toolId: string;
 };
 
-export type InspectorHelpEntry = { type: 'help' };
+type InspectorHelpEntry = { type: 'help' };
 
 export type InspectorEntry = InspectorSourceEntry | InspectorToolEntry | InspectorHelpEntry;
 
