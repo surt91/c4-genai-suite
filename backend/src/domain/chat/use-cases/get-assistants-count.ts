@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AssistantsCount, MessageEntity, MessageRepository } from '../../database';
-import { GroupBy } from '../statistics';
+import { AssistantsCount, MessageEntity, MessageRepository } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
 
 export class GetAssistantsCount {
   constructor(

@@ -24,12 +24,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { configureCookies, configureSession } from '../../config';
-import { AuthService, GithubAuthGuard, GoogleAuthGuard, MicrosoftAuthGuard, OAuthAuthGuard } from '../../domain/auth';
-import { BUILTIN_USER_GROUP_ADMIN, BUILTIN_USER_GROUP_DEFAULT, UserEntity, UserGroupEntity } from '../../domain/database';
+import { AppModule } from '../../app.module.js';
+import { configureCookies, configureSession } from '../../config/index.js';
+import { AuthService, GithubAuthGuard, GoogleAuthGuard, MicrosoftAuthGuard, OAuthAuthGuard } from '../../domain/auth/index.js';
+import {
+  BUILTIN_USER_GROUP_ADMIN,
+  BUILTIN_USER_GROUP_DEFAULT,
+  UserEntity,
+  UserGroupEntity,
+} from '../../domain/database/index.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -288,7 +293,7 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
     const { id, email, defaultGroupName } = await seedExistingUser(dataSource);
 
     const authService = app.get(AuthService);
-    const loginSpy = jest.spyOn(authService, 'login');
+    const loginSpy = vi.spyOn(authService, 'login');
 
     const fakeUser = {
       id, // must match the DB record so saveAndReloadUser does an UPDATE, not an INSERT
@@ -308,7 +313,7 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
     const saved = await userRepo.findOne({ where: { email }, relations: ['userGroups'] });
     expect(saved?.userGroups.map((g) => g.name)).toContain(defaultGroupName);
 
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   // -------------------------------------------------------------------------

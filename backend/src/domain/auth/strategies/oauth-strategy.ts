@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
-import { InternalError } from 'src/lib';
-import { AuthService } from '../auth.service';
-import { withStore } from './strategy-helper';
+import { InternalError } from '../../../lib/index.js';
+import { AuthService } from '../auth.service.js';
+import { withStore } from './strategy-helper.js';
 
 type Profile = {
   sub: string;

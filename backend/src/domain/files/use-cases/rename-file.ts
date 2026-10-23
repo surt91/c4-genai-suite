@@ -1,10 +1,10 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FileEntity, FileRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { UploadedFile } from '../interfaces';
-import { buildFile } from './utils';
+import { FileEntity, FileRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { UploadedFile } from '../interfaces.js';
+import { buildFile } from './utils.js';
 
 /** Renames a personal file of the user. Only the shown name changes, the indexed content stays the same. */
 export class RenameFile {

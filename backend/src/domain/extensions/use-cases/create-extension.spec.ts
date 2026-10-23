@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
-import { AuditLogService } from 'src/domain/audit-log';
-import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database';
-import { ExplorerService } from '../services';
-import { CreateExtension, CreateExtensionHandler } from './create-extension';
+import { AuditLogService } from '../../audit-log/index.js';
+import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { Extension, ExtensionStringArgument } from '../index.js';
+import { ExplorerService } from '../services/index.js';
+import { CreateExtension, CreateExtensionHandler } from './create-extension.js';
 
 const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
@@ -17,25 +17,25 @@ describe(CreateExtension.name, () => {
 
   beforeEach(() => {
     explorer = {
-      getExtension: jest.fn(),
+      getExtension: vi.fn(),
     } as unknown as ExplorerService;
     repository = {
-      findOneBy: jest.fn(),
-      create: jest.fn(),
-      save: jest.fn(),
+      findOneBy: vi.fn(),
+      create: vi.fn(),
+      save: vi.fn(),
     } as unknown as ExtensionRepository;
     configRepository = {
-      findOneBy: jest.fn().mockResolvedValue({ id: 1, name: 'Test Config' }),
+      findOneBy: vi.fn().mockResolvedValue({ id: 1, name: 'Test Config' }),
     } as unknown as ConfigurationRepository;
     auditLogService = {
-      createAuditLog: jest.fn(),
+      createAuditLog: vi.fn(),
     } as unknown as AuditLogService;
 
     handler = new CreateExtensionHandler(explorer, repository, configRepository, auditLogService);
   });
 
   it('should throw bad request when extension does not exist', async () => {
-    jest.spyOn(explorer, 'getExtension').mockImplementation(() => undefined);
+    vi.spyOn(explorer, 'getExtension').mockImplementation(() => undefined);
 
     try {
       const result = await handler.execute(
@@ -56,9 +56,9 @@ describe(CreateExtension.name, () => {
   });
 
   it('should create extension with valid values', async () => {
-    jest.spyOn(repository, 'create').mockReturnValue({} as ExtensionEntity);
-    jest.spyOn(repository, 'save').mockImplementation((v) => Promise.resolve(v as ExtensionEntity));
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(repository, 'create').mockReturnValue({} as ExtensionEntity);
+    vi.spyOn(repository, 'save').mockImplementation((v) => Promise.resolve(v as ExtensionEntity));
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return { spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' } } as Extension;
     });
 
@@ -82,14 +82,14 @@ describe(CreateExtension.name, () => {
   it('should succeed and mask values', async () => {
     let saveArg: DeepPartial<ExtensionEntity> | undefined;
 
-    jest.spyOn(repository, 'create').mockReturnValue({} as ExtensionEntity);
-    jest.spyOn(repository, 'save').mockImplementation((v) => {
+    vi.spyOn(repository, 'create').mockReturnValue({} as ExtensionEntity);
+    vi.spyOn(repository, 'save').mockImplementation((v) => {
       saveArg = structuredClone(v);
       return Promise.resolve({ ...saveArg, id: 1 } as ExtensionEntity);
     });
-    const test = jest.fn().mockImplementation(() => {});
+    const test = vi.fn().mockImplementation(() => {});
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,

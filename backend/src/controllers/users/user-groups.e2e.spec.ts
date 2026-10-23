@@ -1,13 +1,13 @@
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { UserEntity, UserGroupEntity } from '../../domain/database';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { UserGroupDto, UserGroupsDto } from './dtos';
-import { UserGroupsController } from './user-groups.controller';
+import { AppModule } from '../../app.module.js';
+import { UserEntity, UserGroupEntity } from '../../domain/database/index.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
+import { UserGroupDto, UserGroupsDto } from './dtos/index.js';
+import { UserGroupsController } from './user-groups.controller.js';
 
 describe('User Group', () => {
   let controller: UserGroupsController;

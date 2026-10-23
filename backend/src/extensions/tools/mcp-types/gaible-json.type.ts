@@ -1,4 +1,4 @@
-import { Source } from 'src/domain/chat';
+import { Source } from '../../../domain/chat/index.js';
 
 export type GaibleJsonType = {
   kind: string;

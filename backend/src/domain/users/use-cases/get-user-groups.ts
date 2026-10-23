@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
-import { UserGroup } from '../interfaces';
-import { buildUserGroup } from './utils';
+import { UserGroupEntity, UserGroupRepository } from '../../database/index.js';
+import { UserGroup } from '../interfaces.js';
+import { buildUserGroup } from './utils.js';
 
 export class GetUserGroups {
   constructor() {}

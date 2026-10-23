@@ -2,10 +2,10 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'typeorm';
-import { User } from 'src/domain/users';
-import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from '../../database';
-import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
-import { Conversation } from '../interfaces';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { Conversation } from '../interfaces.js';
 
 export class DuplicateConversationResponse {
   constructor(public readonly conversation: Conversation) {}

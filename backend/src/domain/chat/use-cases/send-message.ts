@@ -3,21 +3,21 @@ import { ForbiddenException, forwardRef, Inject, NotFoundException } from '@nest
 import { Logger } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { Observable, ReplaySubject } from 'rxjs';
+import { I18nService } from '../../../localization/i18n.service.js';
 import {
   ConfigurationUserValuesModel,
   ExtensionConfiguration,
   GetExtensions,
   GetExtensionsResponse,
-} from 'src/domain/extensions';
-import { GetConfiguration, GetConfigurationResponse, hasUserGroupAccess } from 'src/domain/extensions/use-cases';
-import { User } from 'src/domain/users/interfaces';
-import { I18nService } from '../../../localization/i18n.service';
+} from '../../extensions/index.js';
 import {
   GetConfigurationUserValues,
   GetConfigurationUserValuesResponse,
-} from '../../extensions/use-cases/get-configuration-user-values';
-import { GetFiles, GetFilesResponse, UploadedFile } from '../../files';
-import { ChatCacheImpl } from '../cache';
+} from '../../extensions/use-cases/get-configuration-user-values.js';
+import { GetConfiguration, GetConfigurationResponse, hasUserGroupAccess } from '../../extensions/use-cases/index.js';
+import { GetFiles, GetFilesResponse, UploadedFile } from '../../files/index.js';
+import { User } from '../../users/interfaces.js';
+import { ChatCacheImpl } from '../cache.js';
 import {
   CHAT_MIDDLEWARES_TOKEN,
   ChatContext,
@@ -26,9 +26,9 @@ import {
   Conversation,
   GetContext,
   StreamEvent,
-} from '../interfaces';
-import { ConversationRunsService } from '../services/conversation-runs';
-import { GetConversation, GetConversationResponse } from './get-conversation';
+} from '../interfaces.js';
+import { ConversationRunsService } from '../services/conversation-runs.js';
+import { GetConversation, GetConversationResponse } from './get-conversation.js';
 
 export class SendMessage {
   constructor(

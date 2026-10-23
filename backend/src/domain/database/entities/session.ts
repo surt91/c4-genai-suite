@@ -1,7 +1,7 @@
 import { SessionData } from 'express-session';
 import { Column, Entity, Index, ManyToOne, PrimaryColumn, Repository } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { UserEntity } from './user';
+import { schema } from '../typeorm.helper.js';
+import { UserEntity } from './user.js';
 
 export type SessionRepository = Repository<SessionEntity>;
 

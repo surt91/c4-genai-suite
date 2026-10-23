@@ -1,8 +1,8 @@
 import { generateText } from 'ai';
-import { ChatContext, NamedStructuredTool } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionEntity } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
+import { ChatContext, NamedStructuredTool } from '../../domain/chat/index.js';
+import { Extension, ExtensionConfiguration, ExtensionEntity } from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 type ExtensionConstructor = new (i18n: I18nService) => Extension;
 

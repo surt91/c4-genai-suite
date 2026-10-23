@@ -1,11 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationEntity, ConversationRepository } from 'src/domain/database';
-import { GetConfigurations, GetConfigurationsResponse } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { assignDefined, InternalError } from 'src/lib';
-import { Conversation } from '../interfaces';
+import { assignDefined, InternalError } from '../../../lib/index.js';
+import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { GetConfigurations, GetConfigurationsResponse } from '../../extensions/index.js';
+import { User } from '../../users/index.js';
+import { Conversation } from '../interfaces.js';
 
 type Values = Partial<Pick<Conversation, 'context' | 'extensionUserArguments' | 'configurationId' | 'llm' | 'name'>>;
 

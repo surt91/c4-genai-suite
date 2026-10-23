@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from 'src/domain/users';
-import { ConversationEntity, ConversationRepository } from '../../database';
-import { DeleteConversationsHandler } from './delete-conversations';
+import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { DeleteConversationsHandler } from './delete-conversations.js';
 
 describe('DeleteConversationsHandler', () => {
   let handler: DeleteConversationsHandler;
@@ -15,7 +15,7 @@ describe('DeleteConversationsHandler', () => {
         {
           provide: getRepositoryToken(ConversationEntity),
           useValue: {
-            delete: jest.fn(),
+            delete: vi.fn(),
           },
         },
       ],
@@ -27,14 +27,14 @@ describe('DeleteConversationsHandler', () => {
 
   it('should delete conversations by userId', async () => {
     const userId = '1';
-    jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 1, raw: '' });
+    vi.spyOn(repository, 'delete').mockResolvedValue({ affected: 1, raw: '' });
 
     await handler.execute({ user: { id: userId } as User });
     expect(repository.delete).toHaveBeenCalledWith({ userId });
   });
 
   it('should not delete conversations without userId', async () => {
-    jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 1, raw: '' });
+    vi.spyOn(repository, 'delete').mockResolvedValue({ affected: 1, raw: '' });
 
     await handler.execute({ user: {} as User });
     expect(repository.delete).not.toHaveBeenCalled();

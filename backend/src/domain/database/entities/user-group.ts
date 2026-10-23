@@ -9,9 +9,9 @@ import {
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { ConfigurationEntity } from './configuration';
-import { UserEntity } from './user';
+import { schema } from '../typeorm.helper.js';
+import { ConfigurationEntity } from './configuration.js';
+import { UserEntity } from './user.js';
 
 export type UserGroupRepository = Repository<UserGroupEntity>;
 

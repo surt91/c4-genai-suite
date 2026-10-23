@@ -1,4 +1,4 @@
-import { ConversationRunsService } from './conversation-runs';
+import { ConversationRunsService } from './conversation-runs.js';
 
 function deferred() {
   let resolve!: () => void;

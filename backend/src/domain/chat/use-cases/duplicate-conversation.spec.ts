@@ -1,4 +1,4 @@
-import { generateNameForDuplicate } from './duplicate-conversation';
+import { generateNameForDuplicate } from './duplicate-conversation.js';
 
 describe('DuplicateConversationsHandler', () => {
   it('should generate duplicated name: first duplication', () => {

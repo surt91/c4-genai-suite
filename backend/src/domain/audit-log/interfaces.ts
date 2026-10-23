@@ -1,4 +1,4 @@
-import { AuditAction, AuditEntityType } from '../database';
+import { AuditAction, AuditEntityType } from '../database/index.js';
 
 export interface PerformedBy {
   id: string;

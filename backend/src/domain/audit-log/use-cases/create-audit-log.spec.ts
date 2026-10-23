@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuditLogEntity } from 'src/domain/database';
-import { AuditLogService } from './create-audit-log';
+import { AuditLogEntity } from '../../database/index.js';
+import { AuditLogService } from './create-audit-log.js';
 
 describe('AuditLogService', () => {
   let service: AuditLogService;
@@ -15,8 +15,8 @@ describe('AuditLogService', () => {
         {
           provide: getRepositoryToken(AuditLogEntity),
           useValue: {
-            create: jest.fn(),
-            save: jest.fn(),
+            create: vi.fn(),
+            save: vi.fn(),
           },
         },
       ],
@@ -39,8 +39,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'configuration' as const,
@@ -77,8 +77,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'extension' as const,
@@ -107,8 +107,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'bucket' as const,
@@ -143,8 +143,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'userGroup' as const,
@@ -173,8 +173,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'settings' as const,
@@ -207,8 +207,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'user' as const,
@@ -256,8 +256,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'configuration' as const,
@@ -292,8 +292,8 @@ describe('AuditLogService', () => {
         createdAt: new Date(),
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
+      vi.spyOn(repository, 'create').mockReturnValue(mockEntity);
+      vi.spyOn(repository, 'save').mockResolvedValue(mockEntity);
 
       const params = {
         entityType: 'extension' as const,

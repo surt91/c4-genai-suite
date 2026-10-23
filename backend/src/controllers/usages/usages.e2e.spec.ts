@@ -3,10 +3,10 @@ import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { startOfDay, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from 'date-fns';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
-import { GroupBy } from 'src/domain/chat/statistics';
-import { AppModule } from '../../app.module';
+import { AppModule } from '../../app.module.js';
+import { GroupBy } from '../../domain/chat/statistics.js';
 import {
   ConfigurationEntity,
   ConfigurationStatus,
@@ -16,10 +16,10 @@ import {
   UsageEntity,
   UsageRepository,
   UserEntity,
-} from '../../domain/database';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { AssistantsCountsDto, UsagesDto, UsersCountsDto } from './dtos';
-import { UsagesController } from './usages.controller';
+} from '../../domain/database/index.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
+import { AssistantsCountsDto, UsagesDto, UsersCountsDto } from './dtos/index.js';
+import { UsagesController } from './usages.controller.js';
 
 describe('Usages', () => {
   let controller: UsagesController;

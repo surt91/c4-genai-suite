@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
-import { getStartDate, GroupBy } from '../../chat/statistics';
-import { MessageEntity } from '../entities';
-import { AssistantsCount } from '../interfaces';
-import { dateTrunc, interval, schema } from '../typeorm.helper';
+import { getStartDate, GroupBy } from '../../chat/statistics.js';
+import { MessageEntity } from '../entities/index.js';
+import { AssistantsCount } from '../interfaces.js';
+import { dateTrunc, interval, schema } from '../typeorm.helper.js';
 
 export interface MessagesCount {
   total: number;

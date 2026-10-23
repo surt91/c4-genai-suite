@@ -27,6 +27,7 @@ $ npm run start:dev
 
 Migrations are used to keep the database in sync with the entities.
 Whenever a change is made to the entities a migration file should be created.
+The commands (except `migration:create`) build the backend first and run TypeORM on the compiled `dist/`.
 
 ```bash
 # create empty migration file with name <migration>

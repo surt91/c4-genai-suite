@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { addDays, addMonths, startOfDay, startOfMonth, startOfWeek } from 'date-fns';
-import { MessageEntity, MessageRepository, MessagesCount } from '../../database';
-import { GroupBy } from '../statistics';
-import { GetMessagesCount, GetMessagesCountHandler } from './get-messages-count';
+import { MessageEntity, MessageRepository, MessagesCount } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
+import { GetMessagesCount, GetMessagesCountHandler } from './get-messages-count.js';
 
 describe('Get Messages Count', () => {
   let handler: GetMessagesCountHandler;
@@ -16,7 +16,7 @@ describe('Get Messages Count', () => {
         {
           provide: getRepositoryToken(MessageEntity),
           useValue: {
-            getMessageCount: jest.fn(),
+            getMessageCount: vi.fn(),
           },
         },
       ],
@@ -26,7 +26,7 @@ describe('Get Messages Count', () => {
   });
 
   it('should return empty array if no messages', async () => {
-    jest.spyOn(repository, 'getMessageCount').mockResolvedValue([]);
+    vi.spyOn(repository, 'getMessageCount').mockResolvedValue([]);
     const result = await handler.execute(new GetMessagesCount(undefined, GroupBy.Day));
 
     expect(result.requests.length).toBe(0);
@@ -40,7 +40,7 @@ describe('Get Messages Count', () => {
       createMessagesCount(date, 3),
     ];
 
-    jest.spyOn(repository, 'getMessageCount').mockResolvedValue(messages);
+    vi.spyOn(repository, 'getMessageCount').mockResolvedValue(messages);
 
     const result = await handler.execute(new GetMessagesCount(undefined, GroupBy.Day));
 
@@ -67,7 +67,7 @@ describe('Get Messages Count', () => {
       createMessagesCount(getMondayOfThisWeek(), 10),
     ];
 
-    jest.spyOn(repository, 'getMessageCount').mockResolvedValue(messages);
+    vi.spyOn(repository, 'getMessageCount').mockResolvedValue(messages);
 
     const result = await handler.execute(new GetMessagesCount(undefined, GroupBy.Week));
 
@@ -96,7 +96,7 @@ describe('Get Messages Count', () => {
       createMessagesCount(startOfMonth(new Date()), 10),
     ];
 
-    jest.spyOn(repository, 'getMessageCount').mockResolvedValue(messages);
+    vi.spyOn(repository, 'getMessageCount').mockResolvedValue(messages);
 
     const result = await handler.execute(new GetMessagesCount(getDayOfMonth(-11, 1), GroupBy.Month));
 

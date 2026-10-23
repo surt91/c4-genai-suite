@@ -1,9 +1,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
-import { buildUserGroup, buildUserGroupSnapshot } from './utils';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { UserGroupEntity, UserGroupRepository } from '../../database/index.js';
+import { buildUserGroup, buildUserGroupSnapshot } from './utils.js';
 
 export class DeleteUserGroup {
   constructor(

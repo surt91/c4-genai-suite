@@ -1,11 +1,11 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { assignDefined } from '../../../lib';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
-import { ConfiguredExtension, ExtensionConfiguration } from '../interfaces';
-import { ExplorerService } from '../services';
-import { buildExtension, maskKeyValues, unmaskExtensionValues } from './utils';
+import { assignDefined } from '../../../lib/index.js';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ConfiguredExtension, ExtensionConfiguration } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { buildExtension, maskKeyValues, unmaskExtensionValues } from './utils.js';
 
 export class RebuildExtension {
   constructor(

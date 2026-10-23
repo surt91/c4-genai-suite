@@ -1,8 +1,8 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Repository, Unique } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { ConversationEntity } from './conversation';
-import { FileEntity } from './file';
-import { MessageEntity } from './message';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Repository, Unique } from 'typeorm';
+import { schema } from '../typeorm.helper.js';
+import { ConversationEntity } from './conversation.js';
+import { FileEntity } from './file.js';
+import { MessageEntity } from './message.js';
 
 export type ConversationFileRepository = Repository<ConversationFileEntity>;
 
@@ -17,21 +17,21 @@ export class ConversationFileEntity {
 
   @ManyToOne(() => ConversationEntity, (conversation) => conversation.files, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'conversationId' })
-  conversation!: ConversationEntity;
+  conversation!: Relation<ConversationEntity>;
 
   @Column({ nullable: false })
   conversationId!: number;
 
   @ManyToOne(() => FileEntity, (user) => user.conversations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'fileId' })
-  file!: FileEntity;
+  file!: Relation<FileEntity>;
 
   @Column({ nullable: false })
   fileId!: number;
 
   @ManyToOne(() => MessageEntity, (message) => message.files, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'messageId' })
-  message?: MessageEntity;
+  message?: Relation<MessageEntity>;
 
   @Column({ nullable: true })
   messageId?: number;

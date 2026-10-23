@@ -2,12 +2,12 @@ import * as http from 'http';
 import { AddressInfo, Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { UserEntity } from '../../domain/database';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { ConversationDto, MessagesDto } from './dtos';
+import { AppModule } from '../../app.module.js';
+import { UserEntity } from '../../domain/database/index.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
+import { ConversationDto, MessagesDto } from './dtos/index.js';
 
 /**
  * A minimal OpenAI compatible LLM that streams one word every 50ms ("slow") or answers immediately.

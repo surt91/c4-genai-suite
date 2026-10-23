@@ -1,8 +1,9 @@
 import { Controller, Get, ParseEnumPipe, Query, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { GroupBy } from 'src/domain/chat/statistics';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { GetMessagesCount, GetMessagesCountResponse, GetUsersCount, GetUsersCountResponse } from '../../domain/chat/index.js';
+import { GroupBy } from '../../domain/chat/statistics.js';
 import {
   GetAssistantsCount,
   GetAssistantsCountResponse,
@@ -10,11 +11,10 @@ import {
   GetRatingsResponse,
   GetUsage,
   GetUsageResponse,
-} from 'src/domain/chat/use-cases';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
-import { GetMessagesCount, GetMessagesCountResponse, GetUsersCount, GetUsersCountResponse } from '../../domain/chat';
-import { ParseDatePipe } from '../shared';
-import { AssistantsCountsDto, MessagesCountsDto, RatingsDto, UsagesDto, UsersCountsDto } from './dtos';
+} from '../../domain/chat/use-cases/index.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
+import { ParseDatePipe } from '../shared.js';
+import { AssistantsCountsDto, MessagesCountsDto, RatingsDto, UsagesDto, UsersCountsDto } from './dtos/index.js';
 
 @Controller('usages')
 @ApiTags('usages')

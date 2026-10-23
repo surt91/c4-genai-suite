@@ -1,12 +1,12 @@
-import { I18nService } from '../../localization/i18n.service';
-import { NvidiaModelExtension } from './nvidia';
-import { OpenAICompatibleModelExtension } from './open-ai-compatible';
+import { I18nService } from '../../localization/i18n.service.js';
+import { NvidiaModelExtension } from './nvidia.js';
+import { OpenAICompatibleModelExtension } from './open-ai-compatible.js';
 
 describe('reasoning effort of OpenAI compatible models', () => {
   let requestBody: Record<string, unknown>;
 
   beforeEach(() => {
-    jest.spyOn(globalThis, 'fetch').mockImplementation((_, init) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation((_, init) => {
       requestBody = JSON.parse(init?.body as string) as Record<string, unknown>;
       return Promise.resolve(
         new Response(
@@ -23,7 +23,7 @@ describe('reasoning effort of OpenAI compatible models', () => {
     });
   });
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   const i18n = { t: (key: string) => key } as unknown as I18nService;
   const configuration = { apiKey: 'key', baseUrl: 'http://llm.internal/v1', modelName: 'm', effort: 'high' };
@@ -38,7 +38,7 @@ describe('reasoning effort of OpenAI compatible models', () => {
   });
 
   it('replaces every empty tool call content for nvidia', async () => {
-    const fetchMock = jest.fn().mockResolvedValue(new Response());
+    const fetchMock = vi.fn().mockResolvedValue(new Response());
     const repair = new NvidiaModelExtension(i18n).repairToolCall(fetchMock);
 
     await repair('http://x', { body: '[{"content":"","a":1},{"content":"","b":2}]' });

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { z } from 'zod';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from 'src/domain/database';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database/index.js';
 import {
   ConfigurationModel,
   ConfiguredExtension,
@@ -9,8 +9,8 @@ import {
   ExtensionConfiguration,
   ExtensionObjectArgument,
   ExtensionSpec,
-} from '../interfaces';
-import { ExplorerService } from '../services';
+} from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
 
 type DynamicZodType<T extends z.ZodTypeAny> = T | z.ZodDefault<T>;
 

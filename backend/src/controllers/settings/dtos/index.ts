@@ -1,8 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { ChatSuggestionDto, SiteLinkDto } from 'src/controllers/shared';
-import { Settings } from 'src/domain/settings';
+import { Settings } from '../../../domain/settings/index.js';
+import { ChatSuggestionDto, SiteLinkDto } from '../../shared.js';
 
 @ApiExtraModels(ChatSuggestionDto)
 export class SettingsDto {

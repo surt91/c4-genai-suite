@@ -1,8 +1,8 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BucketEntity, BucketRepository } from '../../database';
-import { buildClient } from './utils';
+import { BucketEntity, BucketRepository } from '../../database/index.js';
+import { buildClient } from './utils.js';
 
 export class GetDocumentContent {
   constructor(

@@ -1,11 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { BucketEntity, BucketRepository } from 'src/domain/database';
-import { assignDefined } from 'src/lib';
-import { Bucket } from '../interfaces';
-import { buildBucket, buildBucketSnapshot } from './utils';
+import { assignDefined } from '../../../lib/index.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { BucketEntity, BucketRepository } from '../../database/index.js';
+import { Bucket } from '../interfaces.js';
+import { buildBucket, buildBucketSnapshot } from './utils.js';
 
 type Values = Partial<
   Pick<Bucket, 'allowedFileNameExtensions' | 'endpoint' | 'headers' | 'perUserQuota' | 'name' | 'indexName' | 'fileSizeLimits'>

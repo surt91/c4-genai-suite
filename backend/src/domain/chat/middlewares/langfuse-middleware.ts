@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { getLangfuseConfig } from 'src/metrics/langfuse';
-import { ExecuteMiddleware } from './execute-middleware';
+import { getLangfuseConfig } from '../../../metrics/langfuse.js';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../index.js';
+import { ExecuteMiddleware } from './execute-middleware.js';
 
 @Injectable()
 export class LangfuseMiddleware implements ChatMiddleware {

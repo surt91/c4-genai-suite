@@ -2,11 +2,11 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
-import { assignDefined, hashApiKey, isNull } from 'src/lib';
-import { User } from '../interfaces';
-import { buildUser, buildUserSnapshot } from './utils';
+import { assignDefined, hashApiKey, isNull } from '../../../lib/index.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { UserEntity, UserGroupEntity, UserRepository } from '../../database/index.js';
+import { User } from '../interfaces.js';
+import { buildUser, buildUserSnapshot } from './utils.js';
 
 type Values = Partial<Pick<User, 'apiKey' | 'name' | 'email' | 'userGroupIds'> & { password: string; currentPassword?: string }>;
 

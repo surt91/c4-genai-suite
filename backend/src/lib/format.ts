@@ -1,6 +1,6 @@
 import { Format, TransformableInfo } from 'logform';
 import * as winston from 'winston';
-import { is } from './types';
+import { is } from './types.js';
 
 export function prettyFormat(): Format {
   return {

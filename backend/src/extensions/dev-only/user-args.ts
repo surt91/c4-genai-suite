@@ -6,10 +6,10 @@ import {
   ExtensionUserArgumentValues,
   GetContext,
   NamedStructuredTool,
-} from 'src/domain/chat';
-import { Extension, ExtensionArgument, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
+} from '../../domain/chat/index.js';
+import { Extension, ExtensionArgument, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class UserArgsExtension implements Extension {

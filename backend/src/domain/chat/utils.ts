@@ -1,4 +1,4 @@
-import { NormalizedMessageContents } from './interfaces';
+import { NormalizedMessageContents } from './interfaces.js';
 
 export function normalizedMessageContent(source: string): NormalizedMessageContents {
   const result: NormalizedMessageContents = [];

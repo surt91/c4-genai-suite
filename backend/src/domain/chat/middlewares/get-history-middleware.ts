@@ -2,14 +2,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { onErrorResumeNextWith } from 'rxjs';
 import { In } from 'typeorm';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
 import {
   ConversationEntity,
   ConversationRepository,
   ExtensionSource,
   MessageEntity,
   MessageRepository,
-} from 'src/domain/database';
-import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
+} from '../../database/index.js';
 import {
   AIMessage,
   BaseMessage,
@@ -21,7 +21,7 @@ import {
   HumanMessage,
   MessagesHistory,
   Source,
-} from '../interfaces';
+} from '../interfaces.js';
 
 @Injectable()
 export class GetHistoryMiddleware implements ChatMiddleware {

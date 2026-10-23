@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationEntity, ConversationRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
+import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
 
 export class DeleteConversations {
   constructor(public readonly user: User) {}

@@ -1,9 +1,9 @@
 import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/domain/users';
-import { ExtensionSource, MessageEntity, MessageRepository } from '../../database';
-import { GetExtension, GetExtensionResponse } from '../../extensions';
+import { ExtensionSource, MessageEntity, MessageRepository } from '../../database/index.js';
+import { GetExtension, GetExtensionResponse } from '../../extensions/index.js';
+import { User } from '../../users/index.js';
 
 export class GetDocumentContent {
   constructor(

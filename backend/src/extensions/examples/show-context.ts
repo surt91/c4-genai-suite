@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
-import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from '../../domain/chat/index.js';
+import { Extension, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class ContextExtension implements Extension {

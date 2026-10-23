@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addMonths, startOfMonth } from 'date-fns';
 import { And, LessThan, MoreThanOrEqual } from 'typeorm';
+import { I18nService } from '../../../localization/i18n.service.js';
 import {
   BUILTIN_USER_GROUP_ADMIN,
   BUILTIN_USER_GROUP_DEFAULT,
@@ -9,10 +10,9 @@ import {
   UsageRepository,
   UserGroupEntity,
   UserGroupRepository,
-} from 'src/domain/database';
-import { I18nService } from '../../../localization/i18n.service';
-import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
-import { ExceptionMiddleware } from './exception-middleware';
+} from '../../database/index.js';
+import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
+import { ExceptionMiddleware } from './exception-middleware.js';
 
 /** Usage rows with this counter are token counts (see StoreUsageMiddleware); other counters are e.g. ratings. */
 const TOKEN_USAGE_COUNTER = 'token_usage';

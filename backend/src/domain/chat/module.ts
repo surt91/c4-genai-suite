@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuditLogModule } from '../audit-log/module.js';
+import { ConversationFileEntity } from '../database/entities/conversation-file.js';
 import {
   BucketEntity,
   ConfigurationEntity,
@@ -13,12 +15,10 @@ import {
   UsageEntity,
   UsageRepository,
   UserGroupEntity,
-} from 'src/domain/database';
-import { AuditLogModule } from '../audit-log/module';
-import { ConversationFileEntity } from '../database/entities/conversation-file';
-import { registerRepositoryForEntity } from '../database/typeorm.helper';
-import { ChatCacheImpl } from './cache';
-import { CHAT_MIDDLEWARES_TOKEN, ChatMiddleware } from './interfaces';
+} from '../database/index.js';
+import { registerRepositoryForEntity } from '../database/typeorm.helper.js';
+import { ChatCacheImpl } from './cache.js';
+import { CHAT_MIDDLEWARES_TOKEN, ChatMiddleware } from './interfaces.js';
 import {
   CheckUsageMiddleware,
   ChooseLllMiddleware,
@@ -33,9 +33,9 @@ import {
   StorageUsageMiddleware,
   SummarizeHistoryMiddleware,
   UIMiddleware,
-} from './middlewares';
-import { CallbackService } from './services/callback-service';
-import { ConversationRunsService } from './services/conversation-runs';
+} from './middlewares/index.js';
+import { CallbackService } from './services/callback-service.js';
+import { ConversationRunsService } from './services/conversation-runs.js';
 import {
   DeleteConversationHandler,
   DeleteConversationsHandler,
@@ -55,7 +55,7 @@ import {
   SendMessageHandler,
   StartConversationHandler,
   UpdateConversationHandler,
-} from './use-cases';
+} from './use-cases/index.js';
 
 @Module({
   imports: [

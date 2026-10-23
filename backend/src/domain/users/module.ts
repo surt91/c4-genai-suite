@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditLogModule } from 'src/domain/audit-log';
-import { UserEntity, UserGroupEntity } from 'src/domain/database';
+import { AuditLogModule } from '../audit-log/index.js';
+import { UserEntity, UserGroupEntity } from '../database/index.js';
 import {
   CreateUserGroupHandler,
   CreateUserHandler,
@@ -13,7 +13,7 @@ import {
   GetUsersHandler,
   UpdateUserGroupHandler,
   UpdateUserHandler,
-} from './use-cases';
+} from './use-cases/index.js';
 
 @Module({
   imports: [AuditLogModule, CqrsModule, TypeOrmModule.forFeature([UserEntity, UserGroupEntity])],

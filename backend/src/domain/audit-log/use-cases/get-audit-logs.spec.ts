@@ -1,22 +1,23 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { AuditLogEntity } from 'src/domain/database';
-import { GetAuditLogs, GetAuditLogsHandler } from './get-audit-logs';
+import type { Mocked } from 'vitest';
+import { AuditLogEntity } from '../../database/index.js';
+import { GetAuditLogs, GetAuditLogsHandler } from './get-audit-logs.js';
 
 describe('GetAuditLogsHandler', () => {
   let handler: GetAuditLogsHandler;
   let _repository: Repository<AuditLogEntity>;
-  let queryBuilder: jest.Mocked<SelectQueryBuilder<AuditLogEntity>>;
+  let queryBuilder: Mocked<SelectQueryBuilder<AuditLogEntity>>;
 
   beforeEach(async () => {
     queryBuilder = {
-      andWhere: jest.fn().mockReturnThis(),
-      orderBy: jest.fn().mockReturnThis(),
-      skip: jest.fn().mockReturnThis(),
-      take: jest.fn().mockReturnThis(),
-      getManyAndCount: jest.fn(),
-    } as unknown as jest.Mocked<SelectQueryBuilder<AuditLogEntity>>;
+      andWhere: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      skip: vi.fn().mockReturnThis(),
+      take: vi.fn().mockReturnThis(),
+      getManyAndCount: vi.fn(),
+    } as unknown as Mocked<SelectQueryBuilder<AuditLogEntity>>;
 
     const module = await Test.createTestingModule({
       providers: [
@@ -24,7 +25,7 @@ describe('GetAuditLogsHandler', () => {
         {
           provide: getRepositoryToken(AuditLogEntity),
           useValue: {
-            createQueryBuilder: jest.fn(() => queryBuilder),
+            createQueryBuilder: vi.fn(() => queryBuilder),
           },
         },
       ],

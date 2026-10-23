@@ -1,2 +1,2 @@
-export { TranscriptionModule } from './module';
-export * from './use-cases';
+export { TranscriptionModule } from './module.js';
+export * from './use-cases/index.js';

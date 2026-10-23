@@ -1,5 +1,5 @@
-import { AuthService } from '../auth.service';
-import { GithubStrategy } from './github-strategy';
+import { AuthService } from '../auth.service.js';
+import { GithubStrategy } from './github-strategy.js';
 
 describe(GithubStrategy.name, () => {
   it('requests the scope that allows reading the (private) e-mail addresses', () => {

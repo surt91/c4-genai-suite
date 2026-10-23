@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
-import { getStartDate, GroupBy } from '../../chat/statistics';
-import { UsageEntity } from '../entities';
-import { dateTrunc, interval, schema } from '../typeorm.helper';
+import { getStartDate, GroupBy } from '../../chat/statistics.js';
+import { UsageEntity } from '../entities/index.js';
+import { dateTrunc, interval, schema } from '../typeorm.helper.js';
 
 export interface UsagesCount {
   date: Date;

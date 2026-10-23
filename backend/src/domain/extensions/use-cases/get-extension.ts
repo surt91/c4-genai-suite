@@ -1,9 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExtensionEntity, ExtensionRepository } from 'src/domain/database';
-import { ConfiguredExtension } from '../interfaces';
-import { ExplorerService } from '../services';
-import { buildExtension } from './utils';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ConfiguredExtension } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { buildExtension } from './utils.js';
 
 export class GetExtension {
   constructor(public readonly filter: { id?: number } | { externalId?: string }) {}

@@ -1,4 +1,4 @@
-import { renderTemplate } from './template';
+import { renderTemplate } from './template.js';
 
 describe('renderTemplate', () => {
   it('replaces variables with and without whitespace', () => {

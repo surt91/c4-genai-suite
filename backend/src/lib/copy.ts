@@ -1,4 +1,4 @@
-import { isUndefined } from './types';
+import { isUndefined } from './types.js';
 
 export function assignDefined<T extends object>(target: T, source: Partial<T>): T {
   const record = target as Record<string, any>;

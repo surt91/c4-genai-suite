@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { fetchWithDebugLogging } from './log-requests';
+import { fetchWithDebugLogging } from './log-requests.js';
 
 describe('fetchWithDebugLogging', () => {
   beforeEach(() => {
@@ -8,7 +8,7 @@ describe('fetchWithDebugLogging', () => {
 
   afterEach(() => {
     delete process.env.DEBUG_MODEL_REQUESTS;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('does not wait for streamed responses and handles non-JSON bodies', async () => {
@@ -19,8 +19,8 @@ describe('fetchWithDebugLogging', () => {
         close = () => controller.close();
       },
     });
-    jest.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(stream, { headers: { 'content-type': 'text/event-stream' } }));
-    const log = jest.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(stream, { headers: { 'content-type': 'text/event-stream' } }));
+    const log = vi.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined);
 
     // resolves although the stream is still open
     const response = await fetchWithDebugLogging('test')('https://llm.example/v1?key=secret', {

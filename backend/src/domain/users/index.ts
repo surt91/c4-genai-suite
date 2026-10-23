@@ -1,2 +1,2 @@
-export * from './interfaces';
-export * from './use-cases';
+export * from './interfaces.js';
+export * from './use-cases/index.js';

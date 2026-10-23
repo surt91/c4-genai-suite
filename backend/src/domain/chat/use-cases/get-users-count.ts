@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationEntity, ConversationRepository, UsagesCount } from '../../database';
-import { GroupBy } from '../statistics';
+import { ConversationEntity, ConversationRepository, UsagesCount } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
 
 export class GetUsersCount {
   constructor(

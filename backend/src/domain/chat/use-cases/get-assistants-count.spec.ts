@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { startOfDay, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from 'date-fns';
-import { AssistantsCount, MessageEntity, MessageRepository } from '../../database';
-import { GroupBy } from '../statistics';
-import { GetAssistantsCount, GetAssistantsCountHandler } from './get-assistants-count';
+import { AssistantsCount, MessageEntity, MessageRepository } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
+import { GetAssistantsCount, GetAssistantsCountHandler } from './get-assistants-count.js';
 
 describe('Get Assistants Count', () => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   let messageRepository: MessageRepository;
   let handler: GetAssistantsCountHandler;
   const repositoryToken = getRepositoryToken(MessageEntity);
 
   beforeAll(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetAssistantsCountHandler,
@@ -36,7 +36,7 @@ describe('Get Assistants Count', () => {
       { date: subDays(date, 1), total: 10, byAssistant: { Support: 6, Sales: 4 } },
       { date, total: 12, byAssistant: { Support: 5, Sales: 7 } },
     ];
-    jest.spyOn(messageRepository, 'getAssistantsCount').mockResolvedValueOnce(payload);
+    vi.spyOn(messageRepository, 'getAssistantsCount').mockResolvedValueOnce(payload);
 
     const result = await handler.execute(new GetAssistantsCount(undefined, GroupBy.Day));
 
@@ -51,7 +51,7 @@ describe('Get Assistants Count', () => {
       { date: lastWeek, total: 8, byAssistant: { Support: 8 } },
       { date: currentWeek, total: 3, byAssistant: { Sales: 3 } },
     ];
-    jest.spyOn(messageRepository, 'getAssistantsCount').mockResolvedValue(payload);
+    vi.spyOn(messageRepository, 'getAssistantsCount').mockResolvedValue(payload);
 
     const result = await handler.execute(new GetAssistantsCount(lastWeek, GroupBy.Week));
 
@@ -67,7 +67,7 @@ describe('Get Assistants Count', () => {
       { date: lastMonth, total: 2, byAssistant: { Support: 2 } },
       { date: currentMonth, total: 9, byAssistant: { Sales: 9 } },
     ];
-    jest.spyOn(messageRepository, 'getAssistantsCount').mockResolvedValue(payload);
+    vi.spyOn(messageRepository, 'getAssistantsCount').mockResolvedValue(payload);
 
     const result = await handler.execute(new GetAssistantsCount(lastMonth, GroupBy.Month));
 

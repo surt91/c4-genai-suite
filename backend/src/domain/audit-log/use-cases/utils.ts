@@ -1,5 +1,5 @@
-import { AuditLogEntity } from 'src/domain/database';
-import { AuditLog } from '../interfaces';
+import { AuditLogEntity } from '../../database/index.js';
+import { AuditLog } from '../interfaces.js';
 
 export function buildAuditLog(entity: AuditLogEntity): AuditLog {
   return {

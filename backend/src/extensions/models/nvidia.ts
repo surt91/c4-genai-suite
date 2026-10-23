@@ -1,11 +1,11 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { CallSettings, generateText } from 'ai';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { fetchWithDebugLogging } from 'src/lib/log-requests';
-import { I18nService } from '../../localization/i18n.service';
-import { wrapWithReasoningTagName } from './model-tools';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../../domain/chat/index.js';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { fetchWithDebugLogging } from '../../lib/log-requests.js';
+import { I18nService } from '../../localization/i18n.service.js';
+import { wrapWithReasoningTagName } from './model-tools.js';
 
 type Fetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 

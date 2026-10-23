@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
-import { UpdateConversation } from '../use-cases/update-conversation';
-import { ExecuteMiddleware } from './execute-middleware';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
+import { UpdateConversation } from '../use-cases/update-conversation.js';
+import { ExecuteMiddleware } from './execute-middleware.js';
 
 @Injectable()
 export class ChooseLllMiddleware implements ChatMiddleware {

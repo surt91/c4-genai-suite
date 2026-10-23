@@ -12,13 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { FileType } from './FileType';
+import { mapValues } from '../runtime.js';
+import type { FileType } from './FileType.js';
 import {
     FileTypeFromJSON,
     FileTypeFromJSONTyped,
     FileTypeToJSON,
-} from './FileType';
+} from './FileType.js';
 
 /**
  * 

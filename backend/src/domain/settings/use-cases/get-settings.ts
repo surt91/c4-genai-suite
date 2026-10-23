@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SettingEntity, SettingRepository } from 'src/domain/database';
-import { Settings } from '../interfaces';
-import { buildSettings } from './utils';
+import { SettingEntity, SettingRepository } from '../../database/index.js';
+import { Settings } from '../interfaces.js';
+import { buildSettings } from './utils.js';
 
 export class GetSettings {}
 

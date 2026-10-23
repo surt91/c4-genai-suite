@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogEntity, AuditLogRepository } from 'src/domain/database';
-import { AuditLog } from '../interfaces';
-import { buildAuditLog } from './utils';
+import { AuditLogEntity, AuditLogRepository } from '../../database/index.js';
+import { AuditLog } from '../interfaces.js';
+import { buildAuditLog } from './utils.js';
 
 export class GetAuditLogById {
   constructor(public readonly id: number) {}

@@ -1,11 +1,16 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not } from 'typeorm';
-import { BUILTIN_USER_GROUP_ADMIN, ConfigurationEntity, ConfigurationRepository, ConfigurationStatus } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { ConfigurationModel } from '../interfaces';
-import { ExplorerService } from '../services';
-import { buildConfiguration } from './utils';
+import {
+  BUILTIN_USER_GROUP_ADMIN,
+  ConfigurationEntity,
+  ConfigurationRepository,
+  ConfigurationStatus,
+} from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { ConfigurationModel } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { buildConfiguration } from './utils.js';
 
 /** Admins can use every configuration, other users those without user groups or with one of their groups. */
 export function hasUserGroupAccess(user: Pick<User, 'userGroupIds'>, configurationUserGroupIds: string[] | undefined) {

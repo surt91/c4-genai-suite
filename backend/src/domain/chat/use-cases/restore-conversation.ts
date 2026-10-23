@@ -1,9 +1,9 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationEntity, ConversationRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { CONVERSATION_RESTORE_PERIOD_MS } from './delete-conversation';
+import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { CONVERSATION_RESTORE_PERIOD_MS } from './delete-conversation.js';
 
 export class RestoreConversation {
   constructor(

@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MessageEntity, MessageRepository, MessagesCount } from '../../database';
-import { GroupBy } from '../statistics';
+import { MessageEntity, MessageRepository, MessagesCount } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
 
 export class GetMessagesCount {
   constructor(

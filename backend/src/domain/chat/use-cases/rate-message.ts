@@ -9,9 +9,9 @@ import {
   trackUsage,
   UsageEntity,
   UsageRepository,
-} from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { MessageRating } from '../interfaces';
+} from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { MessageRating } from '../interfaces.js';
 
 export class RateMessage {
   constructor(

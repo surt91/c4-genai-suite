@@ -1,9 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/domain/users';
-import { BucketEntity, BucketRepository, FileEntity, FileRepository } from '../../database';
-import { buildClient } from './utils';
+import { BucketEntity, BucketRepository, FileEntity, FileRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { buildClient } from './utils.js';
 
 export class GetDocumentPdf {
   constructor(

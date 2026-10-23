@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BucketEntity, BucketRepository } from 'src/domain/database';
-import { Bucket } from '../interfaces';
-import { buildBucket } from './utils';
+import { BucketEntity, BucketRepository } from '../../database/index.js';
+import { Bucket } from '../interfaces.js';
+import { buildBucket } from './utils.js';
 
 export class GetBuckets {
   constructor() {}

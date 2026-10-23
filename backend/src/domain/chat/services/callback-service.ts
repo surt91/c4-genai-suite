@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { ChatUICallbackResult, FormActionType } from '../interfaces';
+import { ChatUICallbackResult, FormActionType } from '../interfaces.js';
 
 export type CallbackResult<T> = { id: string; result: Promise<T> };
 

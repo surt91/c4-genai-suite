@@ -2,10 +2,10 @@ import { NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Source } from 'src/domain/chat';
-import { User } from 'src/domain/users';
-import { MessageEntity, MessageRepository } from '../../database';
-import { GetDocumentContent, GetDocumentContentHandler, GetDocumentContentResponse } from './get-document-content';
+import { MessageEntity, MessageRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { Source } from '../index.js';
+import { GetDocumentContent, GetDocumentContentHandler, GetDocumentContentResponse } from './get-document-content.js';
 
 describe('Get Document Content', () => {
   let messageRepository: MessageRepository;
@@ -19,7 +19,7 @@ describe('Get Document Content', () => {
   };
 
   beforeAll(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -27,7 +27,7 @@ describe('Get Document Content', () => {
         {
           provide: getRepositoryToken(MessageEntity),
           useValue: {
-            findOne: jest.fn(),
+            findOne: vi.fn(),
           },
         },
         {
@@ -56,7 +56,7 @@ describe('Get Document Content', () => {
       },
     } as MessageEntity;
 
-    jest.spyOn(messageRepository, 'findOne').mockResolvedValueOnce(mockMessage);
+    vi.spyOn(messageRepository, 'findOne').mockResolvedValueOnce(mockMessage);
 
     const command = new GetDocumentContent(mockUser, conversationId, messageId, documentUri);
     const result = await handler.execute(command);
@@ -67,7 +67,7 @@ describe('Get Document Content', () => {
     const conversationId = 1;
     const messageId = 1;
     const documentUri = 's5q://foo.bar';
-    jest.spyOn(messageRepository, 'findOne').mockResolvedValueOnce(null);
+    vi.spyOn(messageRepository, 'findOne').mockResolvedValueOnce(null);
     const command = new GetDocumentContent(mockUser, conversationId, messageId, documentUri);
     await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
   });
@@ -84,7 +84,7 @@ describe('Get Document Content', () => {
       ] as Source[],
     } as MessageEntity;
 
-    jest.spyOn(messageRepository, 'findOne').mockResolvedValueOnce(mockMessage);
+    vi.spyOn(messageRepository, 'findOne').mockResolvedValueOnce(mockMessage);
 
     const command = new GetDocumentContent(mockUser, conversationId, messageId, documentUri);
     await expect(handler.execute(command)).rejects.toThrow(NotFoundException);

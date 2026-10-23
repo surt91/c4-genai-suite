@@ -1,11 +1,11 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { Message, MessageType } from '../interfaces';
-import { ConversationRunsService } from '../services/conversation-runs';
-import { normalizedMessageContent } from '../utils';
+import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { Message, MessageType } from '../interfaces.js';
+import { ConversationRunsService } from '../services/conversation-runs.js';
+import { normalizedMessageContent } from '../utils.js';
 
 export class GetHistory {
   constructor(

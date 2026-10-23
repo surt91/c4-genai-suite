@@ -2,10 +2,10 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JsonContains } from 'typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
-import { ResponseError } from './generated';
-import { buildBucket, buildBucketSnapshot, buildClient } from './utils';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ResponseError } from './generated/index.js';
+import { buildBucket, buildBucketSnapshot, buildClient } from './utils.js';
 
 export class DeleteBucket {
   constructor(

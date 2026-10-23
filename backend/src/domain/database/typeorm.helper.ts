@@ -1,8 +1,9 @@
 import { BadRequestException, Provider } from '@nestjs/common';
 import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
-import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 import { DataSource, EntityManager, EntityTarget, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
-import { GroupBy } from '../chat/statistics';
+import { GroupBy } from '../chat/statistics.js';
+
+type EntityClassOrSchema = Parameters<typeof getRepositoryToken>[0];
 
 type RepositoryConstructorType<T extends ObjectLiteral> = new (
   target: EntityTarget<T>,

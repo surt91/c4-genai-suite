@@ -1,13 +1,14 @@
 import { InternalServerErrorException } from '@nestjs/common';
-import { BlobRepository, BucketRepository, FileRepository } from 'src/domain/database';
-import { I18nService } from '../../../localization/i18n.service';
-import { ConversationFileRepository } from '../../database/entities/conversation-file';
-import { getRelevantLimit, UploadFile, UploadFileHandler } from './upload-file';
-import { buildClient } from './utils';
+import type { Mock } from 'vitest';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { BlobRepository, BucketRepository, FileRepository } from '../../database/index.js';
+import { getRelevantLimit, UploadFile, UploadFileHandler } from './upload-file.js';
+import { buildClient } from './utils.js';
 
-jest.mock('./utils', () => ({
-  ...jest.requireActual<object>('./utils'),
-  buildClient: jest.fn(),
+vi.mock('./utils.js', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  buildClient: vi.fn(),
 }));
 
 describe('Upload File', () => {
@@ -32,29 +33,29 @@ describe('Upload File', () => {
 
   describe(UploadFileHandler.name, () => {
     const bucket = { id: 1, type: 'general', indexName: 'custom-index', endpoint: 'http://reis.internal' };
-    let api: Record<string, jest.Mock>;
-    let files: Record<string, jest.Mock>;
+    let api: Record<string, Mock>;
+    let files: Record<string, Mock>;
 
     function createHandler() {
       api = {
-        getFileTypes: jest.fn().mockResolvedValue({ items: [{ fileNameExtension: '.pdf' }] }),
-        uploadFile: jest.fn().mockResolvedValue({}),
-        processFile: jest.fn().mockResolvedValue({}),
-        deleteFile: jest.fn().mockResolvedValue({}),
+        getFileTypes: vi.fn().mockResolvedValue({ items: [{ fileNameExtension: '.pdf' }] }),
+        uploadFile: vi.fn().mockResolvedValue({}),
+        processFile: vi.fn().mockResolvedValue({}),
+        deleteFile: vi.fn().mockResolvedValue({}),
       };
-      (buildClient as jest.Mock).mockReturnValue(api);
+      (buildClient as Mock).mockReturnValue(api);
       files = {
-        create: jest.fn(() => ({})),
-        findOneBy: jest.fn().mockResolvedValue({ id: 7, bucketId: 1 }),
-        save: jest.fn((entity: object) => Promise.resolve({ id: 7, ...entity })),
-        update: jest.fn().mockResolvedValue({}),
-        delete: jest.fn().mockResolvedValue({}),
+        create: vi.fn(() => ({})),
+        findOneBy: vi.fn().mockResolvedValue({ id: 7, bucketId: 1 }),
+        save: vi.fn((entity: object) => Promise.resolve({ id: 7, ...entity })),
+        update: vi.fn().mockResolvedValue({}),
+        delete: vi.fn().mockResolvedValue({}),
       };
-      const blob = { delete: jest.fn().mockResolvedValue({}), save: jest.fn().mockResolvedValue({}) };
+      const blob = { delete: vi.fn().mockResolvedValue({}), save: vi.fn().mockResolvedValue({}) };
       return new UploadFileHandler(
-        { findOneBy: jest.fn().mockResolvedValue(bucket) } as unknown as BucketRepository,
+        { findOneBy: vi.fn().mockResolvedValue(bucket) } as unknown as BucketRepository,
         files as unknown as FileRepository,
-        { save: jest.fn() } as unknown as ConversationFileRepository,
+        { save: vi.fn() } as unknown as ConversationFileRepository,
         blob as unknown as BlobRepository,
         { t: (key: string) => key } as unknown as I18nService,
       );

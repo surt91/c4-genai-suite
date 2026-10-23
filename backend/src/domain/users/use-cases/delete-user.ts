@@ -1,9 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { UserEntity, UserRepository } from 'src/domain/database';
-import { buildUser, buildUserSnapshot } from './utils';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { UserEntity, UserRepository } from '../../database/index.js';
+import { buildUser, buildUserSnapshot } from './utils.js';
 
 export class DeleteUser {
   constructor(

@@ -1,9 +1,9 @@
 import { CallSettings, InferSchema, LanguageModel, Schema } from 'ai';
 import { Subject } from 'rxjs';
 import * as z from 'zod';
-import { ConfigurationModel, ExtensionArgument } from '../extensions';
-import { UploadedFile } from '../files';
-import { User } from '../users';
+import { ConfigurationModel, ExtensionArgument } from '../extensions/index.js';
+import { UploadedFile } from '../files/index.js';
+import { User } from '../users/index.js';
 
 // Chat errors are exposed to the user.
 export class ChatError extends Error {

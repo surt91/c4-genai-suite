@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-microsoft';
-import { User } from 'src/domain/users';
-import { AuthService } from '../auth.service';
-import { withStore } from './strategy-helper';
+import { User } from '../../users/index.js';
+import { AuthService } from '../auth.service.js';
+import { withStore } from './strategy-helper.js';
 
 type Profile = {
   id: string;

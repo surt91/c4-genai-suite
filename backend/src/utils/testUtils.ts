@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import { TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User } from 'src/domain/users/interfaces';
-import { LocalStrategy, RoleGuard } from '../domain/auth';
+import { LocalStrategy, RoleGuard } from '../domain/auth/index.js';
+import { User } from '../domain/users/interfaces.js';
 
 export async function initAppWithDataBaseAndValidUser(
   dataSource: DataSource,
@@ -18,8 +18,8 @@ export async function initAppWithDataBaseAndValidUser(
   const localStrategy = app.get<LocalStrategy>(LocalStrategy);
   const roleGuard = app.get<RoleGuard>(RoleGuard);
 
-  const validateMock = jest.spyOn(localStrategy, 'validate');
-  const roleGuardMock = jest.spyOn(roleGuard, 'canActivate');
+  const validateMock = vi.spyOn(localStrategy, 'validate');
+  const roleGuardMock = vi.spyOn(roleGuard, 'canActivate');
   const mockUser: User = {
     id: '1',
     userGroupIds: ['1'],

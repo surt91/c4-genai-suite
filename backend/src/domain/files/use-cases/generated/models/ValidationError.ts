@@ -12,13 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { ValidationErrorLocInner } from './ValidationErrorLocInner';
+import { mapValues } from '../runtime.js';
+import type { ValidationErrorLocInner } from './ValidationErrorLocInner.js';
 import {
     ValidationErrorLocInnerFromJSON,
     ValidationErrorLocInnerFromJSONTyped,
     ValidationErrorLocInnerToJSON,
-} from './ValidationErrorLocInner';
+} from './ValidationErrorLocInner.js';
 
 /**
  * 

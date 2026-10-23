@@ -1,20 +1,21 @@
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { LocalStrategy } from '../../domain/auth';
-import { FormActionType } from '../../domain/chat';
-import { CallbackService } from '../../domain/chat/services/callback-service';
-import { User } from '../../domain/users';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
+import type { MockInstance } from 'vitest';
+import { AppModule } from '../../app.module.js';
+import { LocalStrategy } from '../../domain/auth/index.js';
+import { FormActionType } from '../../domain/chat/index.js';
+import { CallbackService } from '../../domain/chat/services/callback-service.js';
+import { User } from '../../domain/users/index.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 
 describe('Confirm form requests', () => {
   let app: INestApplication<Server>;
   let dataSource: DataSource;
   let callbacks: CallbackService;
-  let validate: jest.SpyInstance;
+  let validate: MockInstance;
 
   const user: User = { id: '1', userGroupIds: ['1'], name: 'Test User', email: 'stuff@stuff.com' };
   const otherUser: User = { id: '2', userGroupIds: ['1'], name: 'Other User', email: 'other@stuff.com' };
@@ -28,7 +29,7 @@ describe('Confirm form requests', () => {
     dataSource = initialized.dataSource;
     app = initialized.app;
     callbacks = app.get(CallbackService);
-    validate = jest.spyOn(app.get(LocalStrategy), 'validate');
+    validate = vi.spyOn(app.get(LocalStrategy), 'validate');
   });
 
   afterEach(() => {

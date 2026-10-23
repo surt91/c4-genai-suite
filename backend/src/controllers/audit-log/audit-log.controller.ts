@@ -1,10 +1,10 @@
 import { Controller, Get, NotFoundException, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { GetAuditLogById, GetAuditLogByIdResponse, GetAuditLogs, GetAuditLogsResponse } from 'src/domain/audit-log';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { AuditEntityType, BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
-import { AuditLogDetailDto, AuditLogsDto } from './dtos';
+import { GetAuditLogById, GetAuditLogByIdResponse, GetAuditLogs, GetAuditLogsResponse } from '../../domain/audit-log/index.js';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { AuditEntityType, BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
+import { AuditLogDetailDto, AuditLogsDto } from './dtos/index.js';
 
 @Controller('audit-logs')
 @ApiTags('audit-logs')

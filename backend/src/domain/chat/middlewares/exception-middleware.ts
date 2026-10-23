@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { is } from 'src/lib';
-import { I18nService } from '../../../localization/i18n.service';
-import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
-import { isContentFilterError } from './error/content-filter.error';
-import { isContextLengthExceededError } from './error/context-length-exceeded.error';
-import { isFailedToolUseError } from './error/failed-tool-use.error';
-import { isStringAboveMaxLengthError } from './error/string-above-max-length.error';
+import { is } from '../../../lib/index.js';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { ChatContext, ChatError, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
+import { isContentFilterError } from './error/content-filter.error.js';
+import { isContextLengthExceededError } from './error/context-length-exceeded.error.js';
+import { isFailedToolUseError } from './error/failed-tool-use.error.js';
+import { isStringAboveMaxLengthError } from './error/string-above-max-length.error.js';
 
 @Injectable()
 export class ExceptionMiddleware implements ChatMiddleware {

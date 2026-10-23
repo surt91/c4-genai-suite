@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In } from 'typeorm';
-import { BlobCategory, BlobEntity, BlobRepository } from 'src/domain/database';
+import { BlobCategory, BlobEntity, BlobRepository } from '../../database/index.js';
 
 export class GetBlob {
   constructor(public readonly id: string) {}

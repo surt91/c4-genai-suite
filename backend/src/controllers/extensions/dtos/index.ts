@@ -13,7 +13,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ChatSuggestionDto } from 'src/controllers/shared';
 import {
   ConfigurationModel,
   ConfigurationUserValuesModel,
@@ -35,8 +34,9 @@ import {
   ExtensionStringArgumentFormat,
   ExtensionType,
   GetBucketAvailabilityResponse,
-} from 'src/domain/extensions';
-import { ConfiguredExtension } from 'src/domain/extensions';
+} from '../../../domain/extensions/index.js';
+import { ConfiguredExtension } from '../../../domain/extensions/index.js';
+import { ChatSuggestionDto } from '../../shared.js';
 
 export class ExtensionArgumentSpecDto {
   @ApiProperty({

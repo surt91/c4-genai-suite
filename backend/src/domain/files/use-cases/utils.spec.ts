@@ -1,5 +1,5 @@
-import { Bucket } from '../interfaces';
-import { buildBucketSnapshot } from './utils';
+import { Bucket } from '../interfaces.js';
+import { buildBucketSnapshot } from './utils.js';
 
 function makeBucket(overrides: Partial<Bucket> = {}): Bucket {
   return {

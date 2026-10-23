@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ModulesContainer } from '@nestjs/core';
-import { Extension, EXTENSION_METADATA } from '../interfaces';
+import { Extension, EXTENSION_METADATA } from '../interfaces.js';
 
 @Injectable()
 export class ExplorerService {

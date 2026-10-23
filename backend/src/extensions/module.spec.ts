@@ -1,5 +1,5 @@
-import { UserArgsExtension } from './dev-only/user-args';
-import { ExtensionLibraryModule } from './module';
+import { UserArgsExtension } from './dev-only/user-args.js';
+import { ExtensionLibraryModule } from './module.js';
 
 describe(ExtensionLibraryModule.name, () => {
   const nodeEnv = process.env.NODE_ENV;

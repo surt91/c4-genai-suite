@@ -12,19 +12,19 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { DocumentDto } from './DocumentDto';
+import { mapValues } from '../runtime.js';
+import type { DocumentDto } from './DocumentDto.js';
 import {
     DocumentDtoFromJSON,
     DocumentDtoFromJSONTyped,
     DocumentDtoToJSON,
-} from './DocumentDto';
-import type { ChunkDto } from './ChunkDto';
+} from './DocumentDto.js';
+import type { ChunkDto } from './ChunkDto.js';
 import {
     ChunkDtoFromJSON,
     ChunkDtoFromJSONTyped,
     ChunkDtoToJSON,
-} from './ChunkDto';
+} from './ChunkDto.js';
 
 /**
  * 

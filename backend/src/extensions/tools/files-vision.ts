@@ -2,11 +2,17 @@ import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { generateText } from 'ai';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedDynamicStructuredTool } from 'src/domain/chat';
-import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { GetFiles, GetFilesResponse, matchExtension } from '../../domain/files';
-import { I18nService } from '../../localization/i18n.service';
+import {
+  ChatContext,
+  ChatMiddleware,
+  ChatNextDelegate,
+  GetContext,
+  NamedDynamicStructuredTool,
+} from '../../domain/chat/index.js';
+import { Extension, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { GetFiles, GetFilesResponse, matchExtension } from '../../domain/files/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 export type FilesVisionExtensionConfiguration = { fileNameExtensions: string[]; maxFiles: number };
 

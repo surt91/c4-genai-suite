@@ -2,13 +2,19 @@ import { forwardRef, Inject, Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
-import { BucketEntity, BucketRepository, FileEntity, FileRepository } from 'src/domain/database';
-import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { Bucket, GetDocumentContent, GetDocumentContentResponse, SearchFiles, SearchFilesResponse } from 'src/domain/files';
-import { GetDocumentPdf, GetDocumentPdfResponse } from 'src/domain/files/use-cases/get-document-pdf';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from '../../domain/chat/index.js';
+import { BucketEntity, BucketRepository, FileEntity, FileRepository } from '../../domain/database/index.js';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import {
+  Bucket,
+  GetDocumentContent,
+  GetDocumentContentResponse,
+  SearchFiles,
+  SearchFilesResponse,
+} from '../../domain/files/index.js';
+import { GetDocumentPdf, GetDocumentPdfResponse } from '../../domain/files/use-cases/get-document-pdf.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class FilesExtension<

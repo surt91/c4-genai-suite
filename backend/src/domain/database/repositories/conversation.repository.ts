@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
-import { getStartDate, GroupBy } from 'src/domain/chat/statistics';
-import { ConversationEntity } from '../entities';
-import { UsagesCount } from '../interfaces';
-import { dateTrunc, interval, schema } from '../typeorm.helper';
+import { getStartDate, GroupBy } from '../../chat/statistics.js';
+import { ConversationEntity } from '../entities/index.js';
+import { UsagesCount } from '../interfaces.js';
+import { dateTrunc, interval, schema } from '../typeorm.helper.js';
 
 export class ConversationRepository extends Repository<ConversationEntity> {
   async getUsersCountByPeriod(since: Date | undefined, groupBy: GroupBy): Promise<UsagesCount[]> {

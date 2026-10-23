@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { FileType } from '../interfaces';
-import { buildClient } from './utils';
+import { FileType } from '../interfaces.js';
+import { buildClient } from './utils.js';
 
 export class GetFileTypes {
   constructor(

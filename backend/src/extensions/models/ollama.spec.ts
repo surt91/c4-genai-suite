@@ -1,11 +1,11 @@
-import { modelExtensionTestSuite } from './model-test.base';
-import { OllamaModelExtension } from './ollama';
+import { modelExtensionTestSuite } from './model-test.base.js';
+import { OllamaModelExtension } from './ollama.js';
 
-jest.mock('ollama-ai-provider-v2', () => ({
-  createOllama: jest.fn(() => () => 'mocked model'),
+vi.mock('ollama-ai-provider-v2', () => ({
+  createOllama: vi.fn(() => () => 'mocked model'),
 }));
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {

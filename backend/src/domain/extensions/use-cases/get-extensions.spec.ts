@@ -1,7 +1,7 @@
-import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
-import { ExplorerService } from '../services';
-import { GetExtensions, GetExtensionsHandler } from './get-extensions';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { Extension, ExtensionStringArgument } from '../index.js';
+import { ExplorerService } from '../services/index.js';
+import { GetExtensions, GetExtensionsHandler } from './get-extensions.js';
 
 describe(GetExtensionsHandler.name, () => {
   let handler: GetExtensionsHandler;
@@ -10,26 +10,26 @@ describe(GetExtensionsHandler.name, () => {
 
   beforeEach(() => {
     explorer = {
-      getExtension: jest.fn(),
+      getExtension: vi.fn(),
     } as unknown as ExplorerService;
     repository = {
-      find: jest.fn(),
+      find: vi.fn(),
     } as unknown as ExtensionRepository;
 
     handler = new GetExtensionsHandler(explorer, repository);
   });
 
   it('should return enabled extensions by default', async () => {
-    const test = jest.fn().mockImplementation(() => {});
+    const test = vi.fn().mockImplementation(() => {});
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: { logo: '', name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test,
       } as unknown as Extension;
     });
 
-    jest.spyOn(repository, 'find').mockImplementation(async () => {
+    vi.spyOn(repository, 'find').mockImplementation(async () => {
       return Promise.resolve([
         { name: 'test', enabled: true, values: {} },
         { name: 'test', enabled: false, values: {} },
@@ -41,9 +41,9 @@ describe(GetExtensionsHandler.name, () => {
   });
 
   it('should return disabled extensions when selected', async () => {
-    const test = jest.fn().mockImplementation(() => {});
+    const test = vi.fn().mockImplementation(() => {});
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test,
@@ -51,7 +51,7 @@ describe(GetExtensionsHandler.name, () => {
       };
     });
 
-    jest.spyOn(repository, 'find').mockImplementation(async () => {
+    vi.spyOn(repository, 'find').mockImplementation(async () => {
       return Promise.resolve([
         { name: 'test', enabled: true, values: {} },
         { name: 'test', enabled: false, values: {} },
@@ -63,7 +63,7 @@ describe(GetExtensionsHandler.name, () => {
   });
 
   it('should skip stored extensions that are not supported anymore', async () => {
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) =>
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) =>
       name === 'test'
         ? {
             spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
@@ -72,7 +72,7 @@ describe(GetExtensionsHandler.name, () => {
         : undefined,
     );
 
-    jest.spyOn(repository, 'find').mockImplementation(async () => {
+    vi.spyOn(repository, 'find').mockImplementation(async () => {
       return Promise.resolve([
         { name: 'test', enabled: true, values: {} },
         { name: 'grounding-with-bing-search', enabled: true, values: {} },
@@ -85,9 +85,9 @@ describe(GetExtensionsHandler.name, () => {
   });
 
   it('should mask keys by default', async () => {
-    const test = jest.fn().mockImplementation(() => {});
+    const test = vi.fn().mockImplementation(() => {});
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,
@@ -111,7 +111,7 @@ describe(GetExtensionsHandler.name, () => {
       };
     });
 
-    jest.spyOn(repository, 'find').mockImplementation(() => {
+    vi.spyOn(repository, 'find').mockImplementation(() => {
       return Promise.resolve([{ name: 'test', values: { foo: 'abc', bar: 'secure' } as Record<string, any> } as ExtensionEntity]);
     });
 
@@ -123,8 +123,8 @@ describe(GetExtensionsHandler.name, () => {
   });
 
   it('should not mask keys when masking is disabled', async () => {
-    const test = jest.fn().mockImplementation(() => {});
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    const test = vi.fn().mockImplementation(() => {});
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,
@@ -148,7 +148,7 @@ describe(GetExtensionsHandler.name, () => {
       };
     });
 
-    jest.spyOn(repository, 'find').mockImplementation(() => {
+    vi.spyOn(repository, 'find').mockImplementation(() => {
       return Promise.resolve([{ name: 'test', values: { foo: 'abc', bar: 'secure' } as Record<string, any> } as ExtensionEntity]);
     });
 

@@ -1,12 +1,12 @@
 import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { generateText } from 'ai';
-import { I18nService } from '../../../localization/i18n.service';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
-import { GetConversation, GetConversationResponse } from '../use-cases';
-import { UpdateConversation } from '../use-cases';
-import { normalizedMessageContent } from '../utils';
-import { ExecuteMiddleware } from './execute-middleware';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
+import { GetConversation, GetConversationResponse } from '../use-cases/index.js';
+import { UpdateConversation } from '../use-cases/index.js';
+import { normalizedMessageContent } from '../utils.js';
+import { ExecuteMiddleware } from './execute-middleware.js';
 
 @Injectable()
 export class SummarizeHistoryMiddleware implements ChatMiddleware {

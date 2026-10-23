@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { DeepPartial, FindOptionsWhere, In } from 'typeorm';
-import { hashApiKey } from 'src/lib';
+import { hashApiKey } from '../../lib/index.js';
 import {
   BUILTIN_USER_GROUP_ADMIN,
   BUILTIN_USER_GROUP_DEFAULT,
@@ -13,9 +13,9 @@ import {
   UserGroupEntity,
   UserGroupRepository,
   UserRepository,
-} from '../database';
-import { User } from '../users';
-import { AuthConfig } from './interfaces';
+} from '../database/index.js';
+import { User } from '../users/index.js';
+import { AuthConfig } from './interfaces.js';
 
 @Injectable()
 export class AuthService implements OnModuleInit {

@@ -1,5 +1,5 @@
 import { Column, Entity, Index, PrimaryColumn, Repository } from 'typeorm';
-import { schema } from '../typeorm.helper';
+import { schema } from '../typeorm.helper.js';
 
 export type CacheRepository = Repository<CacheEntity>;
 

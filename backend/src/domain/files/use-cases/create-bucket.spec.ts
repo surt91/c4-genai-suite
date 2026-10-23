@@ -1,9 +1,9 @@
 import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AuditLogService } from 'src/domain/audit-log';
-import { BucketEntity, BucketRepository } from '../../database';
-import { CreateBucket, CreateBucketHandler, CreateBucketResponse } from './create-bucket';
+import { AuditLogService } from '../../audit-log/index.js';
+import { BucketEntity, BucketRepository } from '../../database/index.js';
+import { CreateBucket, CreateBucketHandler, CreateBucketResponse } from './create-bucket.js';
 
 const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
@@ -12,7 +12,7 @@ describe('Create Bucket', () => {
   let handler: CreateBucketHandler;
 
   beforeAll(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -20,15 +20,15 @@ describe('Create Bucket', () => {
         {
           provide: getRepositoryToken(BucketEntity),
           useValue: {
-            findOneBy: jest.fn(),
-            create: jest.fn(),
-            save: jest.fn(),
+            findOneBy: vi.fn(),
+            create: vi.fn(),
+            save: vi.fn(),
           },
         },
         {
           provide: AuditLogService,
           useValue: {
-            createAuditLog: jest.fn(),
+            createAuditLog: vi.fn(),
           },
         },
       ],
@@ -38,9 +38,9 @@ describe('Create Bucket', () => {
     bucketRepository = module.get<BucketRepository>(getRepositoryToken(BucketEntity));
   });
   it('should create a new user bucket', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(null);
-    jest.spyOn(bucketRepository, 'create').mockReturnValueOnce({} as BucketEntity);
-    jest.spyOn(bucketRepository, 'save').mockResolvedValueOnce({
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(null);
+    vi.spyOn(bucketRepository, 'create').mockReturnValueOnce({} as BucketEntity);
+    vi.spyOn(bucketRepository, 'save').mockResolvedValueOnce({
       id: 1,
       name: 'bucket-user',
       type: 'user',
@@ -67,7 +67,7 @@ describe('Create Bucket', () => {
     expect(response.bucket.type).toBe('user');
   });
   it('should fail to create a new user bucket if one already exists', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1 } as BucketEntity);
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1 } as BucketEntity);
     const command = new CreateBucket(
       {
         name: 'bucket-user',
@@ -83,8 +83,8 @@ describe('Create Bucket', () => {
     await expect(handler.execute(command)).rejects.toThrow(HttpException);
   });
   it('should create a new general bucket', async () => {
-    jest.spyOn(bucketRepository, 'create').mockReturnValueOnce({} as BucketEntity);
-    jest.spyOn(bucketRepository, 'save').mockResolvedValueOnce({
+    vi.spyOn(bucketRepository, 'create').mockReturnValueOnce({} as BucketEntity);
+    vi.spyOn(bucketRepository, 'save').mockResolvedValueOnce({
       id: 1,
       name: 'bucket-general',
       type: 'general',
@@ -110,8 +110,8 @@ describe('Create Bucket', () => {
     expect(response.bucket.type).toBe('general');
   });
   it('should create a new conversation bucket', async () => {
-    jest.spyOn(bucketRepository, 'create').mockReturnValueOnce({} as BucketEntity);
-    jest.spyOn(bucketRepository, 'save').mockResolvedValueOnce({
+    vi.spyOn(bucketRepository, 'create').mockReturnValueOnce({} as BucketEntity);
+    vi.spyOn(bucketRepository, 'save').mockResolvedValueOnce({
       id: 1,
       name: 'bucket-conversation',
       type: 'conversation',
@@ -138,7 +138,7 @@ describe('Create Bucket', () => {
     expect(response.bucket.type).toBe('conversation');
   });
   it('should fail to create a new conversation bucket if one already exists', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1, type: 'conversation' } as BucketEntity);
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1, type: 'conversation' } as BucketEntity);
     const command = new CreateBucket(
       {
         name: 'bucket-conversation',

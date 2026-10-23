@@ -1,11 +1,12 @@
 import { LanguageModelV3StreamPart } from '@ai-sdk/provider';
 import { MockLanguageModelV3 } from 'ai/test';
 import { ReplaySubject } from 'rxjs';
+import type { Mocked } from 'vitest';
 import * as z from 'zod';
-import { I18nService } from '../../../localization/i18n.service';
-import { MetricsService } from '../../../metrics/metrics.service';
-import { ChatContext, MessagesHistory, NamedDynamicStructuredTool, StreamEvent } from '../interfaces';
-import { ExecuteMiddleware, untilAborted } from './execute-middleware';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { MetricsService } from '../../../metrics/metrics.service.js';
+import { ChatContext, MessagesHistory, NamedDynamicStructuredTool, StreamEvent } from '../interfaces.js';
+import { ExecuteMiddleware, untilAborted } from './execute-middleware.js';
 
 const usage = (total: number) => ({
   inputTokens: { total: total / 2, noCache: undefined, cacheRead: undefined, cacheWrite: undefined },
@@ -37,9 +38,9 @@ function createContext(model: MockLanguageModelV3, tools: NamedDynamicStructured
   const abort = new AbortController();
   const result = new ReplaySubject<StreamEvent>();
   const history = {
-    getMessages: jest.fn().mockResolvedValue([]),
-    addAIMessage: jest.fn().mockResolvedValue(undefined),
-  } as unknown as jest.Mocked<MessagesHistory>;
+    getMessages: vi.fn().mockResolvedValue([]),
+    addAIMessage: vi.fn().mockResolvedValue(undefined),
+  } as unknown as Mocked<MessagesHistory>;
 
   const context = {
     abort,
@@ -59,7 +60,7 @@ function createContext(model: MockLanguageModelV3, tools: NamedDynamicStructured
 
 describe(ExecuteMiddleware.name, () => {
   const i18n = { t: (key: string) => key } as unknown as I18nService;
-  const metrics = { chats: { inc: jest.fn() }, prompts: { inc: jest.fn() } } as unknown as MetricsService;
+  const metrics = { chats: { inc: vi.fn() }, prompts: { inc: vi.fn() } } as unknown as MetricsService;
   const middleware = new ExecuteMiddleware(i18n, metrics);
 
   it('stores the complete answer', async () => {

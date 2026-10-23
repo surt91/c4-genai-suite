@@ -1,20 +1,20 @@
 import { Server } from 'net';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserEntity } from '../../domain/database';
-import { schema } from '../../domain/database/typeorm.helper';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { TranscriptionController } from './transcription.controller';
+import { AppModule } from '../../app.module.js';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserEntity } from '../../domain/database/index.js';
+import { schema } from '../../domain/database/typeorm.helper.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
+import { TranscriptionController } from './transcription.controller.js';
 
 // Mock the Azure provider
-jest.mock('../../domain/transcription/providers/azure-provider', () => {
+vi.mock('../../domain/transcription/providers/azure-provider.js', () => {
   return {
-    AzureTranscriptionProvider: jest.fn().mockImplementation(() => {
+    AzureTranscriptionProvider: vi.fn().mockImplementation(function () {
       return {
-        transcribe: jest.fn().mockResolvedValue('This is a mocked transcription result'),
+        transcribe: vi.fn().mockResolvedValue('This is a mocked transcription result'),
       };
     }),
   };

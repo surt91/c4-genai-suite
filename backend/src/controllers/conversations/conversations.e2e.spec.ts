@@ -1,9 +1,11 @@
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
-import { AppModule } from '../../app.module';
+import type { Mock } from 'vitest';
+import { AppModule } from '../../app.module.js';
+import { ConversationFileEntity } from '../../domain/database/entities/conversation-file.js';
 import {
   BucketEntity,
   ConfigurationEntity,
@@ -13,16 +15,15 @@ import {
   FileUploadStatus,
   MessageEntity,
   UserEntity,
-} from '../../domain/database';
-import { ConversationFileEntity } from '../../domain/database/entities/conversation-file';
-import { schema } from '../../domain/database/typeorm.helper';
-import { buildClient } from '../../domain/files/use-cases/utils';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { ConversationsController } from './conversations.controller';
-import { ConversationDto } from './dtos';
+} from '../../domain/database/index.js';
+import { schema } from '../../domain/database/typeorm.helper.js';
+import { buildClient } from '../../domain/files/use-cases/utils.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
+import { ConversationsController } from './conversations.controller.js';
+import { ConversationDto } from './dtos/index.js';
 
-jest.mock('../../domain/files/use-cases/utils', () => ({
-  buildClient: jest.fn(),
+vi.mock('../../domain/files/use-cases/utils.js', () => ({
+  buildClient: vi.fn(),
 }));
 
 describe('Conversations', () => {
@@ -46,8 +47,8 @@ describe('Conversations', () => {
     const conversation = await seedTestData(dataSource);
     conversationId = conversation.id;
 
-    (buildClient as jest.Mock).mockImplementation(() => ({
-      duplicateEmbeddings: jest.fn().mockResolvedValue({}),
+    (buildClient as Mock).mockImplementation(() => ({
+      duplicateEmbeddings: vi.fn().mockResolvedValue({}),
     }));
   });
 

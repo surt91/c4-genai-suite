@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AuditLog } from 'src/domain/audit-log';
-import { AuditAction, AuditEntityType } from 'src/domain/database';
+import { AuditLog } from '../../../domain/audit-log/index.js';
+import { AuditAction, AuditEntityType } from '../../../domain/database/index.js';
 
 export class AuditLogDto {
   @ApiProperty({

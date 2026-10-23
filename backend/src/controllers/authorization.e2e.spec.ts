@@ -7,10 +7,10 @@ import { ForbiddenException, INestApplication } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../app.module';
-import { SendMessage } from '../domain/chat';
+import { AppModule } from '../app.module.js';
+import { SendMessage } from '../domain/chat/index.js';
 import {
   BlobCategory,
   BlobEntity,
@@ -25,10 +25,10 @@ import {
   FileUploadStatus,
   UserEntity,
   UserGroupEntity,
-} from '../domain/database';
-import { User } from '../domain/users';
-import { buildUser } from '../domain/users/use-cases/utils';
-import { hashApiKey } from '../lib';
+} from '../domain/database/index.js';
+import { User } from '../domain/users/index.js';
+import { buildUser } from '../domain/users/use-cases/utils.js';
+import { hashApiKey } from '../lib/index.js';
 
 const ADMIN_KEY = `admin-${randomUUID()}`;
 const USER_KEY = `user-${randomUUID()}`;

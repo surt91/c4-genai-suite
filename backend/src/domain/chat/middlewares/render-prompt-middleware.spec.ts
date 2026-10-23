@@ -1,5 +1,5 @@
-import { ChatContext } from 'src/domain/chat';
-import { RenderPromptMiddleware } from './render-prompt-middleware';
+import { ChatContext } from '../index.js';
+import { RenderPromptMiddleware } from './render-prompt-middleware.js';
 
 describe('RenderPromptMiddleware', () => {
   it('replaces all template variables in systemMessages', async () => {

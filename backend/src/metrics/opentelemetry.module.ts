@@ -1,7 +1,7 @@
 import { Module, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { getLangfuseConfig, LangfuseSpanExporter } from './langfuse';
+import { getLangfuseConfig, LangfuseSpanExporter } from './langfuse.js';
 
 @Module({
   imports: [ConfigModule],

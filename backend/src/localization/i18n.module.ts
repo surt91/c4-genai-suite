@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { Global, Module } from '@nestjs/common';
 import { AcceptLanguageResolver, I18nJsonLoader, I18nModule as NestI18nModule, QueryResolver } from 'nestjs-i18n';
-import { I18nService } from './i18n.service';
+import { I18nService } from './i18n.service.js';
 
 @Global()
 @Module({
@@ -10,7 +10,7 @@ import { I18nService } from './i18n.service';
       fallbackLanguage: 'en',
       loader: I18nJsonLoader,
       loaderOptions: {
-        path: join(__dirname, '/i18n/'),
+        path: join(import.meta.dirname, '/i18n/'),
         watch: true,
       },
       resolvers: [new QueryResolver(['lang']), AcceptLanguageResolver],

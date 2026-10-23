@@ -1,9 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Raw } from 'typeorm';
-import { UserEntity, UserRepository } from 'src/domain/database';
-import { User } from '../interfaces';
-import { buildUser } from './utils';
+import { UserEntity, UserRepository } from '../../database/index.js';
+import { User } from '../interfaces.js';
+import { buildUser } from './utils.js';
 
 export class GetUsers {
   constructor(

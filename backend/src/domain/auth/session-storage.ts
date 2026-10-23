@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SessionData, Store } from 'express-session';
-import { SessionEntity, SessionRepository } from '../database';
-import { buildUser } from '../users/use-cases/utils';
+import { SessionEntity, SessionRepository } from '../database/index.js';
+import { buildUser } from '../users/use-cases/utils.js';
 
 function isExpired(value: SessionData) {
   const expires = value.cookie?.expires;

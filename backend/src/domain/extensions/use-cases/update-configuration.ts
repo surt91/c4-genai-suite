@@ -2,17 +2,17 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not } from 'typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
+import { assignDefined } from '../../../lib/index.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
 import {
   ConfigurationEntity,
   ConfigurationRepository,
   ConfigurationStatus,
   UserGroupEntity,
   UserGroupRepository,
-} from 'src/domain/database';
-import { assignDefined } from 'src/lib';
-import { ConfigurationModel } from '../interfaces';
-import { buildConfiguration, buildConfigurationSnapshot } from './utils';
+} from '../../database/index.js';
+import { ConfigurationModel } from '../interfaces.js';
+import { buildConfiguration, buildConfigurationSnapshot } from './utils.js';
 
 type Values = Partial<
   Pick<ConfigurationModel, 'agentName' | 'chatFooter' | 'chatSuggestions' | 'enabled' | 'name' | 'description' | 'userGroupIds'>

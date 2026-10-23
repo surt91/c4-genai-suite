@@ -6,15 +6,16 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { BlobEntity } from './blob';
-import { BucketEntity } from './bucket';
-import { ConversationFileEntity } from './conversation-file';
-import { ExtensionEntity } from './extension';
-import { UserEntity } from './user';
+import { schema } from '../typeorm.helper.js';
+import { BlobEntity } from './blob.js';
+import { BucketEntity } from './bucket.js';
+import { ConversationFileEntity } from './conversation-file.js';
+import { ExtensionEntity } from './extension.js';
+import { UserEntity } from './user.js';
 
 export type FileRepository = Repository<FileEntity>;
 
@@ -50,13 +51,13 @@ export class FileEntity {
   userId?: string;
 
   @ManyToOne(() => BucketEntity, { onDelete: 'CASCADE' })
-  bucket?: BucketEntity;
+  bucket?: Relation<BucketEntity>;
 
   @Column({ nullable: true })
   bucketId?: number;
 
   @ManyToOne(() => ExtensionEntity, { onDelete: 'SET NULL' })
-  extension?: ExtensionEntity;
+  extension?: Relation<ExtensionEntity>;
 
   @Column({ nullable: true })
   extensionId?: number;

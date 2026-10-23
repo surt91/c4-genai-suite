@@ -1,11 +1,11 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
-import { assignDefined } from 'src/lib';
-import { ConfiguredExtension, ExtensionConfiguration, ExtensionObjectArgument } from '../interfaces';
-import { ExplorerService } from '../services';
+import { assignDefined } from '../../../lib/index.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ConfiguredExtension, ExtensionConfiguration, ExtensionObjectArgument } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
 import {
   buildExtension,
   buildExtensionSnapshot,
@@ -13,7 +13,7 @@ import {
   maskKeyValues,
   unmaskExtensionValues,
   validateConfiguration,
-} from './utils';
+} from './utils.js';
 
 type Values = Partial<{
   enabled: boolean;

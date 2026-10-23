@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -6,36 +5,37 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { AuditLogController } from './controllers/audit-log/audit-log.controller';
-import { AuthController } from './controllers/auth/auth.controller';
-import { BlobsController } from './controllers/blobs/blobs.controller';
-import { ConversationsController } from './controllers/conversations/conversations.controller';
-import { EvalController } from './controllers/eval/eval.controller';
-import { ConfigurationsController } from './controllers/extensions/configurations.controller';
-import { ExtensionsController } from './controllers/extensions/extensions.controller';
-import { FilesController } from './controllers/files/files.controller';
-import { UserFilesController } from './controllers/files/user-files.controller';
-import { HealthController } from './controllers/health/health.controller';
-import { ApiResponsesController } from './controllers/responses/api.responses.controller';
-import { SettingsController } from './controllers/settings/settings.controller';
-import { TranscriptionController } from './controllers/transcription/transcription.controller';
-import { UsagesController } from './controllers/usages/usages.controller';
-import { UserGroupsController } from './controllers/users/user-groups.controller';
-import { UsersController } from './controllers/users/users.controller';
-import { AuditLogModule } from './domain/audit-log';
-import { AuthModule } from './domain/auth/module';
-import { ChatModule } from './domain/chat';
-import { UserEntity } from './domain/database';
-import { initSchemaIfNotExistsAndMoveMigrations, schema } from './domain/database/typeorm.helper';
-import { ExtensionModule } from './domain/extensions';
-import { FilesModule } from './domain/files';
-import { SettingsModule } from './domain/settings';
-import { TranscriptionModule } from './domain/transcription';
-import { UsersModule } from './domain/users/module';
-import { ExtensionLibraryModule } from './extensions';
-import { I18nModule } from './localization/i18n.module';
-import { OpenTelemetryModule } from './metrics/opentelemetry.module';
-import { PrometheusModule } from './metrics/prometheus.module';
+import { AuditLogController } from './controllers/audit-log/audit-log.controller.js';
+import { AuthController } from './controllers/auth/auth.controller.js';
+import { BlobsController } from './controllers/blobs/blobs.controller.js';
+import { ConversationsController } from './controllers/conversations/conversations.controller.js';
+import { EvalController } from './controllers/eval/eval.controller.js';
+import { ConfigurationsController } from './controllers/extensions/configurations.controller.js';
+import { ExtensionsController } from './controllers/extensions/extensions.controller.js';
+import { FilesController } from './controllers/files/files.controller.js';
+import { UserFilesController } from './controllers/files/user-files.controller.js';
+import { HealthController } from './controllers/health/health.controller.js';
+import { ApiResponsesController } from './controllers/responses/api.responses.controller.js';
+import { SettingsController } from './controllers/settings/settings.controller.js';
+import { TranscriptionController } from './controllers/transcription/transcription.controller.js';
+import { UsagesController } from './controllers/usages/usages.controller.js';
+import { UserGroupsController } from './controllers/users/user-groups.controller.js';
+import { UsersController } from './controllers/users/users.controller.js';
+import { AuditLogModule } from './domain/audit-log/index.js';
+import { AuthModule } from './domain/auth/module.js';
+import { ChatModule } from './domain/chat/index.js';
+import { UserEntity } from './domain/database/index.js';
+import { entities, migrations } from './domain/database/typeorm-sources.js';
+import { initSchemaIfNotExistsAndMoveMigrations, schema } from './domain/database/typeorm.helper.js';
+import { ExtensionModule } from './domain/extensions/index.js';
+import { FilesModule } from './domain/files/index.js';
+import { SettingsModule } from './domain/settings/index.js';
+import { TranscriptionModule } from './domain/transcription/index.js';
+import { UsersModule } from './domain/users/module.js';
+import { ExtensionLibraryModule } from './extensions/index.js';
+import { I18nModule } from './localization/i18n.module.js';
+import { OpenTelemetryModule } from './metrics/opentelemetry.module.js';
+import { PrometheusModule } from './metrics/prometheus.module.js';
 
 @Module({
   imports: [
@@ -76,8 +76,8 @@ import { PrometheusModule } from './metrics/prometheus.module';
           retryDelay: config.get('GAIBLE_DB_RETRY_DELAY', 100),
           synchronize: false,
           migrationsRun: true,
-          entities: [path.join(__dirname, 'domain', 'database', 'entities', '*{.ts,.js}')],
-          migrations: [path.join(__dirname, 'migrations', '*{.ts,.js}')],
+          entities,
+          migrations,
           schema,
         };
       },

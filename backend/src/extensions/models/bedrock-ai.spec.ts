@@ -1,11 +1,11 @@
-import { BedrockModelExtension } from './bedrock-ai';
-import { modelExtensionTestSuite } from './model-test.base';
+import { BedrockModelExtension } from './bedrock-ai.js';
+import { modelExtensionTestSuite } from './model-test.base.js';
 
-jest.mock('@ai-sdk/amazon-bedrock', () => ({
-  createAmazonBedrock: jest.fn(() => () => 'mocked model'),
+vi.mock('@ai-sdk/amazon-bedrock', () => ({
+  createAmazonBedrock: vi.fn(() => () => 'mocked model'),
 }));
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {

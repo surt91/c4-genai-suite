@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Bucket } from '../interfaces';
-import { buildClient } from './utils';
+import { Bucket } from '../interfaces.js';
+import { buildClient } from './utils.js';
 
 export class TestBucket {
   constructor(

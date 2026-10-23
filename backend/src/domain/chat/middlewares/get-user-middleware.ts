@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
-import { GetUser, GetUserResponse } from 'src/domain/users';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
+import { GetUser, GetUserResponse } from '../../users/index.js';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
 
 @Injectable()
 export class GetUserMiddleware implements ChatMiddleware {

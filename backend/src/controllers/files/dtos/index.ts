@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDefined, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Bucket, FileType, UploadedFile } from 'src/domain/files';
-import { BucketType, FileSizeLimits, FileUploadStatus } from '../../../domain/database';
+import { BucketType, FileSizeLimits, FileUploadStatus } from '../../../domain/database/index.js';
+import { Bucket, FileType, UploadedFile } from '../../../domain/files/index.js';
 
 export class FileDto {
   @ApiProperty({

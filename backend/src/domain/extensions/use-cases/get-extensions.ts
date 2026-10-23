@@ -1,9 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExtensionEntity, ExtensionRepository } from 'src/domain/database';
-import { ConfiguredExtension } from '../interfaces';
-import { ExplorerService } from '../services/explorer-service';
-import { buildExtension, maskKeyValues } from './utils';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ConfiguredExtension } from '../interfaces.js';
+import { ExplorerService } from '../services/explorer-service.js';
+import { buildExtension, maskKeyValues } from './utils.js';
 
 export class GetExtensions {
   constructor(

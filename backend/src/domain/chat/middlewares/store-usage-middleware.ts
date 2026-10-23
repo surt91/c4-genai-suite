@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { trackUsage, UsageEntity, UsageRepository } from 'src/domain/database';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
+import { trackUsage, UsageEntity, UsageRepository } from '../../database/index.js';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
 
 @Injectable()
 export class StorageUsageMiddleware implements ChatMiddleware {

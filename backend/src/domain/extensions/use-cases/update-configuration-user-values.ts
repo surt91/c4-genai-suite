@@ -1,9 +1,9 @@
 import { ICommandHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExtensionArgumentObjectSpecDto } from '../../../controllers/extensions/dtos';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
-import { ConfigurationUserEntity, ConfigurationUserRepository } from '../../database/entities/configuration-user';
-import { unmaskExtensionValues, validateObjectArgument } from './utils';
+import { ExtensionArgumentObjectSpecDto } from '../../../controllers/extensions/dtos/index.js';
+import { ConfigurationUserEntity, ConfigurationUserRepository } from '../../database/entities/configuration-user.js';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { unmaskExtensionValues, validateObjectArgument } from './utils.js';
 
 export class UpdateConfigurationUserValues {
   constructor(

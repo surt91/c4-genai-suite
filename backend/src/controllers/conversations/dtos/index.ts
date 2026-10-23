@@ -1,6 +1,5 @@
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { IsBoolean, IsDefined, IsEnum, IsIn, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
-import { MessageContentDto, MessageContentImageUrlDto, MessageContentTextDto, SourceDto } from 'src/controllers/shared';
 import {
   ChatInteractionKind,
   ChatInteractionStatus,
@@ -15,7 +14,10 @@ import {
   MessageType,
   NormalizedMessageContents,
   StreamEvent,
-} from 'src/domain/chat';
+} from '../../../domain/chat/index.js';
+import { ExtensionArgumentObjectSpecDto } from '../../extensions/dtos/index.js';
+import { FileDto } from '../../files/dtos/index.js';
+import { MessageContentDto, MessageContentImageUrlDto, MessageContentTextDto, SourceDto } from '../../shared.js';
 
 const CHAT_INTERACTION_KINDS = ['form', 'url', 'tool_error'];
 const CHAT_INTERACTION_STATUSES = [
@@ -29,9 +31,6 @@ const CHAT_INTERACTION_STATUSES = [
   'blocked',
   'error',
 ];
-import { ExtensionArgumentObjectSpecDto } from '../../extensions/dtos';
-import { FileDto } from '../../files/dtos';
-
 export class ChatUICallbackResultDto {
   @ApiProperty({
     description: 'The action taken in the form.',

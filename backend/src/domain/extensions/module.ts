@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditLogModule } from 'src/domain/audit-log';
-import { BucketEntity, ConfigurationEntity, ConversationEntity, ExtensionEntity, UserGroupEntity } from 'src/domain/database';
-import { ConfigurationUserEntity } from '../database/entities/configuration-user';
-import { ExplorerService } from './services';
+import { AuditLogModule } from '../audit-log/index.js';
+import { ConfigurationUserEntity } from '../database/entities/configuration-user.js';
+import { BucketEntity, ConfigurationEntity, ConversationEntity, ExtensionEntity, UserGroupEntity } from '../database/index.js';
+import { ExplorerService } from './services/index.js';
+import { GetConfigurationUserValuesHandler } from './use-cases/get-configuration-user-values.js';
 import {
   CreateConfigurationHandler,
   CreateExtensionHandler,
@@ -23,9 +24,8 @@ import {
   TestExtensionHandler,
   UpdateConfigurationHandler,
   UpdateExtensionHandler,
-} from './use-cases';
-import { GetConfigurationUserValuesHandler } from './use-cases/get-configuration-user-values';
-import { UpdateConfigurationUserValuesHandler } from './use-cases/update-configuration-user-values';
+} from './use-cases/index.js';
+import { UpdateConfigurationUserValuesHandler } from './use-cases/update-configuration-user-values.js';
 
 @Module({
   imports: [

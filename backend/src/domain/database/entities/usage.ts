@@ -1,6 +1,6 @@
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { UsageRepository } from '../repositories/usage.repository';
-import { schema } from '../typeorm.helper';
+import { UsageRepository } from '../repositories/usage.repository.js';
+import { schema } from '../typeorm.helper.js';
 
 @Entity({ name: 'usages', schema })
 // Used by analytics: getRatingCount/getUsageCount filter by counter type and date range

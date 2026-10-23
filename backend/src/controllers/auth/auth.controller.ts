@@ -1,10 +1,10 @@
 import { Body, Controller, ForbiddenException, Get, Logger, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { GithubAuthGuard, GoogleAuthGuard, LocalAuthGuard, MicrosoftAuthGuard, OAuthAuthGuard } from 'src/domain/auth';
-import { AuthService } from 'src/domain/auth/auth.service';
-import { isString } from 'src/lib';
-import { AuthSettingsDto, LoginDto, ProfileDto } from './dtos';
+import { AuthService } from '../../domain/auth/auth.service.js';
+import { GithubAuthGuard, GoogleAuthGuard, LocalAuthGuard, MicrosoftAuthGuard, OAuthAuthGuard } from '../../domain/auth/index.js';
+import { isString } from '../../lib/index.js';
+import { AuthSettingsDto, LoginDto, ProfileDto } from './dtos/index.js';
 
 /**
  * Only same-origin absolute paths are allowed. `//host` and `/\host` are protocol-relative URLs that browsers

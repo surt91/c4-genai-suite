@@ -1,8 +1,15 @@
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool, Source } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
+import {
+  ChatContext,
+  ChatMiddleware,
+  ChatNextDelegate,
+  GetContext,
+  NamedStructuredTool,
+  Source,
+} from '../../domain/chat/index.js';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class BraveWebSearchExtension implements Extension<BraveWebSearchExtensionConfiguration> {

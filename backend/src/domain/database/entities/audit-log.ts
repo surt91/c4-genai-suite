@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Repository } from 'typeorm';
-import { schema } from '../typeorm.helper';
+import { schema } from '../typeorm.helper.js';
 
 export type AuditLogRepository = Repository<AuditLogEntity>;
 

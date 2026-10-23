@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { I18nContext, I18nService as NestI18nService } from 'nestjs-i18n';
-import { IfAnyOrNever, Path, PathValue } from 'nestjs-i18n/dist/types';
+import { Path, PathValue } from 'nestjs-i18n';
+
+type IfAnyOrNever<T, Y, N> = 0 extends 1 & T ? Y : [T] extends [never] ? Y : N;
 
 @Injectable()
 export class I18nService<K = Record<string, unknown>> {

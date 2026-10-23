@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { renderTemplate } from 'src/lib';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
-import { ExecuteMiddleware } from './execute-middleware';
+import { renderTemplate } from '../../../lib/index.js';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
+import { ExecuteMiddleware } from './execute-middleware.js';
 
 @Injectable()
 export class RenderPromptMiddleware implements ChatMiddleware {

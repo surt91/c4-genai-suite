@@ -1,4 +1,4 @@
-import { buildSessionCookieOptions } from './cookies';
+import { buildSessionCookieOptions } from './cookies.js';
 
 describe('buildSessionCookieOptions', () => {
   it('uses SameSite=Lax and Secure for https deployments (no cross-site POSTs with the session)', () => {

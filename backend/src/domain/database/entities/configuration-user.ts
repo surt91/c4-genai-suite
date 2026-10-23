@@ -1,7 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Repository, Unique } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { ConfigurationEntity } from './configuration';
-import { UserEntity } from './user';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Repository, Unique } from 'typeorm';
+import { schema } from '../typeorm.helper.js';
+import { ConfigurationEntity } from './configuration.js';
+import { UserEntity } from './user.js';
 
 export type ConfigurationValues = { [id: string]: Record<string, any> };
 
@@ -15,11 +15,11 @@ export class ConfigurationUserEntity {
 
   @ManyToOne(() => ConfigurationEntity, (config) => config.users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'configurationId' })
-  configuration!: ConfigurationEntity;
+  configuration!: Relation<ConfigurationEntity>;
 
   @ManyToOne(() => UserEntity, (user) => user.configurations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user!: UserEntity;
+  user!: Relation<UserEntity>;
 
   @Column({ default: false })
   isDefault!: boolean;

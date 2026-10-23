@@ -1,7 +1,7 @@
-import { ChatContext } from 'src/domain/chat/interfaces';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
-import { SummaryPromptExtension } from './summary';
+import { ChatContext } from '../../domain/chat/interfaces.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
+import { SummaryPromptExtension } from './summary.js';
 
 describe(SummaryPromptExtension.name, () => {
   it('passes the configured history size to the summarization', async () => {

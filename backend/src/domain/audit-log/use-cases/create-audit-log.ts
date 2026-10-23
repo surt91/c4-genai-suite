@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditAction, AuditEntityType, AuditLogEntity, AuditLogRepository } from 'src/domain/database';
+import { AuditAction, AuditEntityType, AuditLogEntity, AuditLogRepository } from '../../database/index.js';
 
 export interface CreateAuditLogParams {
   entityType: AuditEntityType;

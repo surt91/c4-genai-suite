@@ -1,6 +1,6 @@
-import * as path from 'path';
 import { DataSource } from 'typeorm';
-import { initSchemaIfNotExistsAndMoveMigrations, schema } from '../domain/database/typeorm.helper';
+import { entities, migrations } from '../domain/database/typeorm-sources.js';
+import { initSchemaIfNotExistsAndMoveMigrations, schema } from '../domain/database/typeorm.helper.js';
 
 try {
   process.loadEnvFile();
@@ -13,8 +13,8 @@ const url = process.env.DB_URL as string;
 const migrationDataSource = new DataSource({
   type: 'postgres',
   url,
-  entities: [path.join(__dirname, '..', 'domain', 'database', 'entities', '*{.ts,.js}')],
-  migrations: [path.join(__dirname, '..', 'migrations', '*{.ts,.js}')],
+  entities,
+  migrations,
   logging: true,
   schema,
 });

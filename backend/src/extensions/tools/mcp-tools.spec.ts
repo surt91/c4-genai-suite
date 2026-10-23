@@ -1,9 +1,9 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { asSchema, JSONSchema7 } from 'ai';
-import { ChatContext } from 'src/domain/chat/interfaces';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
-import { MCPToolsExtension, toLlmInputSchema } from './mcp-tools';
+import { ChatContext } from '../../domain/chat/interfaces.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
+import { MCPToolsExtension, toLlmInputSchema } from './mcp-tools.js';
 
 describe('toLlmInputSchema', () => {
   const inputSchema: JSONSchema7 = {
@@ -52,15 +52,15 @@ describe('toLlmInputSchema', () => {
 describe('MCPToolsExtension client lifecycle', () => {
   const values = { serverName: 'test', endpoint: 'http://mcp.internal/sse', schema: { echo: { enabled: true } } };
   const sut = new MCPToolsExtension({ t: (key: string) => key, language: 'en' } as unknown as I18nService);
-  const context = () => ({ tools: [], user: { id: 'u' }, context: {}, result: { next: jest.fn() } }) as unknown as ChatContext;
+  const context = () => ({ tools: [], user: { id: 'u' }, context: {}, result: { next: vi.fn() } }) as unknown as ChatContext;
 
   beforeEach(() => {
-    jest.spyOn(Client.prototype, 'connect').mockResolvedValue(undefined);
-    jest.spyOn(Client.prototype, 'request').mockResolvedValue({ tools: [{ name: 'echo', inputSchema: { type: 'object' } }] });
-    jest.spyOn(Client.prototype, 'close').mockResolvedValue(undefined);
+    vi.spyOn(Client.prototype, 'connect').mockResolvedValue(undefined);
+    vi.spyOn(Client.prototype, 'request').mockResolvedValue({ tools: [{ name: 'echo', inputSchema: { type: 'object' } }] });
+    vi.spyOn(Client.prototype, 'close').mockResolvedValue(undefined);
   });
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   it('closes the client after the chat request, also when it fails', async () => {
     const [middleware] = await sut.getMiddlewares({} as User, { externalId: 'mcp_1', values } as never);
@@ -86,9 +86,9 @@ describe('MCPToolsExtension client lifecycle', () => {
   });
 
   it('continues the chat without the tools when the server is not reachable', async () => {
-    jest.spyOn(Client.prototype, 'connect').mockRejectedValue(new Error('ECONNREFUSED'));
+    vi.spyOn(Client.prototype, 'connect').mockRejectedValue(new Error('ECONNREFUSED'));
     const [middleware] = await sut.getMiddlewares({} as User, { externalId: 'mcp_1', values } as never);
-    const next = jest.fn().mockResolvedValue(true);
+    const next = vi.fn().mockResolvedValue(true);
 
     const ctx = context();
     await middleware.invoke(ctx, () => ctx, next);
@@ -103,7 +103,7 @@ describe('MCPToolsExtension client lifecycle', () => {
   });
 
   it('closes the client when listing the tools fails', async () => {
-    jest.spyOn(Client.prototype, 'request').mockRejectedValue(new Error('boom'));
+    vi.spyOn(Client.prototype, 'request').mockRejectedValue(new Error('boom'));
     await expect(sut.test(values as never)).rejects.toThrow('boom');
     expect(Client.prototype.close).toHaveBeenCalledTimes(1);
   });

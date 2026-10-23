@@ -1,5 +1,5 @@
 import { validateHeaderValue } from 'http';
-import { attachmentContentDisposition } from './content-disposition';
+import { attachmentContentDisposition } from './content-disposition.js';
 
 describe('attachmentContentDisposition', () => {
   it.each(['Bericht – 2026.pdf', '报告.pdf', 'emoji 🎉.pdf', 'a "quoted" name.pdf'])('is a valid header for %s', (name) => {

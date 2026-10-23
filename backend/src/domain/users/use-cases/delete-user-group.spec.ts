@@ -2,9 +2,9 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
-import { AuditLogService } from 'src/domain/audit-log';
-import { UserGroupEntity, UserGroupRepository } from '../../database';
-import { DeleteUserGroup, DeleteUserGroupHandler } from './delete-user-group';
+import { AuditLogService } from '../../audit-log/index.js';
+import { UserGroupEntity, UserGroupRepository } from '../../database/index.js';
+import { DeleteUserGroup, DeleteUserGroupHandler } from './delete-user-group.js';
 
 const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
@@ -13,7 +13,7 @@ describe('DeleteUserGroup', () => {
   let userGroupRepository: Pick<UserGroupRepository, 'findOne' | 'delete'>;
 
   beforeAll(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -21,14 +21,14 @@ describe('DeleteUserGroup', () => {
         {
           provide: getRepositoryToken(UserGroupEntity),
           useValue: {
-            findOne: jest.fn(),
-            delete: jest.fn(),
+            findOne: vi.fn(),
+            delete: vi.fn(),
           },
         },
         {
           provide: AuditLogService,
           useValue: {
-            createAuditLog: jest.fn(),
+            createAuditLog: vi.fn(),
           },
         },
       ],
@@ -48,16 +48,18 @@ describe('DeleteUserGroup', () => {
     const userGroupId = crypto.randomUUID();
     const userId = crypto.randomUUID();
     const user = { id: userId, name: 'user1' };
-    jest.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId, users: [user] } as UserGroupEntity);
+    vi.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId, users: [user] } as UserGroupEntity);
     const command = new DeleteUserGroup(userGroupId, mockPerformedBy);
     await expect(handler.execute(command)).rejects.toThrow('Cannot delete a user group with existing users.');
   });
   it('should throw BadRequestException if user group is builtin', async () => {
     const userGroupId = crypto.randomUUID();
 
-    jest
-      .spyOn(userGroupRepository, 'findOne')
-      .mockResolvedValueOnce({ id: userGroupId, isAdmin: true, isBuiltIn: true } as UserGroupEntity);
+    vi.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({
+      id: userGroupId,
+      isAdmin: true,
+      isBuiltIn: true,
+    } as UserGroupEntity);
     const command = new DeleteUserGroup(userGroupId, mockPerformedBy);
 
     await expect(handler.execute(command)).rejects.toThrow('Cannot delete builtin user group.');
@@ -65,8 +67,8 @@ describe('DeleteUserGroup', () => {
   it('should delete user group', async () => {
     const userGroupId = crypto.randomUUID();
 
-    jest.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId } as UserGroupEntity);
-    jest.spyOn(userGroupRepository, 'delete').mockResolvedValueOnce({ affected: 1, raw: {} as DeleteResult });
+    vi.spyOn(userGroupRepository, 'findOne').mockResolvedValueOnce({ id: userGroupId } as UserGroupEntity);
+    vi.spyOn(userGroupRepository, 'delete').mockResolvedValueOnce({ affected: 1, raw: {} as DeleteResult });
 
     const command = new DeleteUserGroup(userGroupId, mockPerformedBy);
     await handler.execute(command);

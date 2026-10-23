@@ -1,4 +1,4 @@
-import { parseHeaders } from './headers';
+import { parseHeaders } from './headers.js';
 
 describe('parseHeaders', () => {
   it('parses one header per line and keeps "=" in values', () => {

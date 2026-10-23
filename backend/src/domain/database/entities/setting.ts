@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from 'typeorm';
-import { ChatSuggestion, SiteLink } from 'src/domain/shared';
-import { schema } from '../typeorm.helper';
+import { ChatSuggestion, SiteLink } from '../../shared.js';
+import { schema } from '../typeorm.helper.js';
 
 export type SettingRepository = Repository<SettingEntity>;
 

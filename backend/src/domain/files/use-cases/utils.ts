@@ -1,9 +1,9 @@
 import { Agent, RequestInfo, RequestInit, fetch as undiciFetch } from 'undici';
-import { BlobCategory, BucketEntity, FileEntity } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { parseHeaders } from 'src/lib';
-import { Bucket, UploadedFile } from '../interfaces';
-import { Configuration, FilesApi, HTTPHeaders } from './generated';
+import { parseHeaders } from '../../../lib/index.js';
+import { BlobCategory, BucketEntity, FileEntity } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { Bucket, UploadedFile } from '../interfaces.js';
+import { Configuration, FilesApi, HTTPHeaders } from './generated/index.js';
 
 export function buildBucket(source: BucketEntity): Bucket {
   return source;

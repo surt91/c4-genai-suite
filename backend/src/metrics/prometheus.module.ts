@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { PrometheusModule as PrometheusModuleBase } from '@willsoto/nestjs-prometheus';
-import { CounterProviders } from './metrics.service';
-import { MetricsService } from './metrics.service';
+import { CounterProviders } from './metrics.service.js';
+import { MetricsService } from './metrics.service.js';
 
 @Global()
 @Module({})

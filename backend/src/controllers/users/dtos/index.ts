@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsDefined, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
-import { User, UserGroup } from 'src/domain/users';
+import { User, UserGroup } from '../../../domain/users/index.js';
 
 export class UpsertUserDto {
   @ApiProperty({

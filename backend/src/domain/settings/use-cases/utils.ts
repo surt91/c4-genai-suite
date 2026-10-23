@@ -1,5 +1,5 @@
-import { SettingEntity } from 'src/domain/database';
-import { Settings } from '../interfaces';
+import { SettingEntity } from '../../database/index.js';
+import { Settings } from '../interfaces.js';
 
 export function buildSettings(source: SettingEntity): Settings {
   // eslint-disable-next-line prefer-const

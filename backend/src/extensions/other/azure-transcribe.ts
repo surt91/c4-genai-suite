@@ -1,7 +1,7 @@
-import { ChatMiddleware } from '../../domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionSpec } from '../../domain/extensions';
-import { User } from '../../domain/users';
-import { I18nService } from '../../localization/i18n.service';
+import { ChatMiddleware } from '../../domain/chat/index.js';
+import { Extension, ExtensionConfiguration, ExtensionSpec } from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class AzureTranscribeExtension implements Extension<TranscribeExtensionConfiguration> {

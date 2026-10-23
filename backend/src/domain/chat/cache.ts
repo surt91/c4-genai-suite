@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { is } from 'src/lib';
-import { ChatCache } from './interfaces';
+import { is } from '../../lib/index.js';
+import { ChatCache } from './interfaces.js';
 
 type TTLValue<V> = {
   value: V;

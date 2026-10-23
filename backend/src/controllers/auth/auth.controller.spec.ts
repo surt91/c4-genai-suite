@@ -1,4 +1,4 @@
-import { isSafeRedirectPath } from './auth.controller';
+import { isSafeRedirectPath } from './auth.controller.js';
 
 describe('isSafeRedirectPath', () => {
   it.each(['/', '/chat/1', '/admin/users?page=2', '/a//b'])('accepts the same-origin path %s', (path) => {

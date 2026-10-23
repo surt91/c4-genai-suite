@@ -1,6 +1,6 @@
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { prettyFormat, prettyJson } from 'src/lib';
+import { prettyFormat, prettyJson } from '../lib/index.js';
 
 export function configureLogger() {
   return WinstonModule.createLogger({

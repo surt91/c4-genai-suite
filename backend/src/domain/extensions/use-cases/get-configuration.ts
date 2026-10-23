@@ -2,9 +2,9 @@ import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not } from 'typeorm';
-import { ConfigurationEntity, ConfigurationRepository, ConfigurationStatus } from 'src/domain/database';
-import { ConfigurationModel } from '../interfaces';
-import { buildConfiguration } from './utils';
+import { ConfigurationEntity, ConfigurationRepository, ConfigurationStatus } from '../../database/index.js';
+import { ConfigurationModel } from '../interfaces.js';
+import { buildConfiguration } from './utils.js';
 
 export class GetConfiguration {
   constructor(public readonly id: number) {}

@@ -12,19 +12,19 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { SourceDto } from './SourceDto';
+import { mapValues } from '../runtime.js';
+import type { SourceDto } from './SourceDto.js';
 import {
     SourceDtoFromJSON,
     SourceDtoFromJSONTyped,
     SourceDtoToJSON,
-} from './SourceDto';
-import type { ResultDocument } from './ResultDocument';
+} from './SourceDto.js';
+import type { ResultDocument } from './ResultDocument.js';
 import {
     ResultDocumentFromJSON,
     ResultDocumentFromJSONTyped,
     ResultDocumentToJSON,
-} from './ResultDocument';
+} from './ResultDocument.js';
 
 /**
  * 

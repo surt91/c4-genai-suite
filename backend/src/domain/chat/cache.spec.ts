@@ -1,4 +1,4 @@
-import { ChatCacheImpl } from './cache';
+import { ChatCacheImpl } from './cache.js';
 
 describe(ChatCacheImpl.name, () => {
   it('distinguishes values that differ only in nested objects', async () => {

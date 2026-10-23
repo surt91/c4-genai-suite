@@ -1,7 +1,7 @@
 import { createAzure } from '@ai-sdk/azure';
 import { ImageModel } from 'ai';
-import { Extension, ExtensionSpec } from '../../domain/extensions';
-import { GPTImage1Extension, GPTImage1ExtensionConfiguration } from './gpt-image-1';
+import { Extension, ExtensionSpec } from '../../domain/extensions/index.js';
+import { GPTImage1Extension, GPTImage1ExtensionConfiguration } from './gpt-image-1.js';
 
 @Extension()
 export class AzureGPTImage1Extension extends GPTImage1Extension {

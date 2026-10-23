@@ -7,13 +7,14 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { ConfigurationEntity } from './configuration';
-import { ConversationFileEntity } from './conversation-file';
-import { MessageEntity } from './message';
-import { UserEntity } from './user';
+import { schema } from '../typeorm.helper.js';
+import { ConfigurationEntity } from './configuration.js';
+import { ConversationFileEntity } from './conversation-file.js';
+import { MessageEntity } from './message.js';
+import { UserEntity } from './user.js';
 
 export type ConversationContext = Record<string, string>;
 
@@ -43,13 +44,13 @@ export class ConversationEntity {
   rating?: ConversationRating;
 
   @ManyToOne(() => ConfigurationEntity, (configuration) => configuration.conversations, { onDelete: 'SET NULL' })
-  configuration!: ConfigurationEntity;
+  configuration!: Relation<ConfigurationEntity>;
 
   @Column()
   configurationId!: number;
 
   @ManyToOne(() => UserEntity, (user) => user.conversations, { onDelete: 'CASCADE' })
-  user!: UserEntity;
+  user!: Relation<UserEntity>;
 
   @Column()
   userId!: string;

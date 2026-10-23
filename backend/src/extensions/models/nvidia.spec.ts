@@ -1,11 +1,11 @@
-import { modelExtensionTestSuite } from './model-test.base';
-import { NvidiaModelExtension } from './nvidia';
+import { modelExtensionTestSuite } from './model-test.base.js';
+import { NvidiaModelExtension } from './nvidia.js';
 
-jest.mock('@ai-sdk/openai-compatible', () => ({
-  createOpenAICompatible: jest.fn(() => () => 'mocked model'),
+vi.mock('@ai-sdk/openai-compatible', () => ({
+  createOpenAICompatible: vi.fn(() => () => 'mocked model'),
 }));
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {

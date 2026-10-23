@@ -2,9 +2,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
-import { configureCookies, configureLogger, configureSession, configureSwagger } from './config';
-import { PrometheusModule } from './metrics/prometheus.module';
+import { AppModule } from './app.module.js';
+import { configureCookies, configureLogger, configureSession, configureSwagger } from './config/index.js';
+import { PrometheusModule } from './metrics/prometheus.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger: configureLogger() });

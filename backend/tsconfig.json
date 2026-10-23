@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": false,
     "incremental": true,
-    "module": "commonjs",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": true,
     "outDir": "./dist",
@@ -17,6 +17,8 @@
     "sourceMap": true,
     "strictBindCallApply": false,
     "strictNullChecks": true,
-    "target": "ES2021"
+    "target": "ES2023",
+    "useDefineForClassFields": false,
+    "types": ["node", "multer", "vitest/globals"]
   }
 }

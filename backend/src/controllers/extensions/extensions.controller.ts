@@ -1,10 +1,10 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
-import { RebuildExtension, RebuildExtensionResponse, TestExtension } from 'src/domain/extensions/use-cases';
-import { ExtensionDto, TestExtensionDto } from './dtos';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
+import { RebuildExtension, RebuildExtensionResponse, TestExtension } from '../../domain/extensions/use-cases/index.js';
+import { ExtensionDto, TestExtensionDto } from './dtos/index.js';
 
 @Controller('extensions')
 @ApiTags('extensions')

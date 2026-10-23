@@ -1,6 +1,6 @@
-import { ChatMiddleware, ExtensionUserArgumentValues } from '../chat';
-import { ChatSuggestion } from '../shared';
-import { User } from '../users';
+import { ChatMiddleware, ExtensionUserArgumentValues } from '../chat/index.js';
+import { ChatSuggestion } from '../shared.js';
+import { User } from '../users/index.js';
 import 'reflect-metadata';
 
 export type ExtensionConfiguration = Record<string, any>;

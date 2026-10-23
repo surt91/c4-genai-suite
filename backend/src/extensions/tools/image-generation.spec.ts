@@ -1,11 +1,12 @@
 import { CommandBus } from '@nestjs/cqrs';
-import { AuthService } from 'src/domain/auth';
-import { ChatContext, NamedStructuredTool } from 'src/domain/chat';
-import { UploadBlob } from 'src/domain/settings';
-import { User } from 'src/domain/users';
-import { I18nService } from '../../localization/i18n.service';
-import { AzureGPTImage1Extension } from './azure-gpt-image-1';
-import { GPTImage1Extension } from './gpt-image-1';
+import type { Mock, MockInstance } from 'vitest';
+import { AuthService } from '../../domain/auth/index.js';
+import { ChatContext, NamedStructuredTool } from '../../domain/chat/index.js';
+import { UploadBlob } from '../../domain/settings/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
+import { AzureGPTImage1Extension } from './azure-gpt-image-1.js';
+import { GPTImage1Extension } from './gpt-image-1.js';
 
 // 1x1 transparent PNG
 const PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -13,12 +14,12 @@ const PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk
 describe('image generation tools', () => {
   const authService = { config: { baseUrl: 'https://gaible.example' } } as unknown as AuthService;
   const i18n = { t: (key: string) => key } as unknown as I18nService;
-  let commandBus: { execute: jest.Mock };
-  let fetchMock: jest.SpyInstance;
+  let commandBus: { execute: Mock };
+  let fetchMock: MockInstance;
 
   beforeEach(() => {
-    commandBus = { execute: jest.fn().mockResolvedValue(undefined) };
-    fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(() =>
+    commandBus = { execute: vi.fn().mockResolvedValue(undefined) };
+    fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
       Promise.resolve(
         new Response(JSON.stringify({ created: 1, data: [{ b64_json: PNG_BASE64 }] }), {
           headers: { 'content-type': 'application/json' },

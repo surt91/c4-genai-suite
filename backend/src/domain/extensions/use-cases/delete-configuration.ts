@@ -1,11 +1,11 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource, IsNull, Not } from 'typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { ConfigurationEntity, ConfigurationStatus, ConversationEntity } from 'src/domain/database';
-import { assignDefined } from 'src/lib';
-import { I18nService } from 'src/localization/i18n.service';
-import { buildConfiguration, buildConfigurationSnapshot } from './utils';
+import { assignDefined } from '../../../lib/index.js';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { ConfigurationEntity, ConfigurationStatus, ConversationEntity } from '../../database/index.js';
+import { buildConfiguration, buildConfigurationSnapshot } from './utils.js';
 
 export class DeleteConfiguration {
   constructor(

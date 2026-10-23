@@ -4,9 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { isString } from 'class-validator';
 import { Request } from 'express';
 import { Strategy } from 'passport-custom';
-import { UserEntity, UserRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { hashApiKey, isArray } from 'src/lib';
+import { hashApiKey, isArray } from '../../../lib/index.js';
+import { UserEntity, UserRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {

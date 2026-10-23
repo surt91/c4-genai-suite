@@ -3,30 +3,30 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { BUILTIN_USER_GROUP_DEFAULT, UserEntity, UserGroupEntity } from '../database';
-import { AuthService } from './auth.service';
+import { BUILTIN_USER_GROUP_DEFAULT, UserEntity, UserGroupEntity } from '../database/index.js';
+import { AuthService } from './auth.service.js';
 
 describe('AuthService', () => {
   function createMockUserRepository() {
     return {
-      findOne: jest.fn().mockResolvedValue(null),
-      save: jest.fn().mockResolvedValue({}),
-      create: jest.fn().mockImplementation((data: Record<string, unknown>) => data),
-      createQueryBuilder: jest.fn().mockReturnValue({
-        leftJoin: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        getCount: jest.fn().mockResolvedValue(0),
+      findOne: vi.fn().mockResolvedValue(null),
+      save: vi.fn().mockResolvedValue({}),
+      create: vi.fn().mockImplementation((data: Record<string, unknown>) => data),
+      createQueryBuilder: vi.fn().mockReturnValue({
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        getCount: vi.fn().mockResolvedValue(0),
       }),
-      count: jest.fn().mockResolvedValue(0),
+      count: vi.fn().mockResolvedValue(0),
     };
   }
 
   function createMockUserGroupRepository() {
     return {
-      count: jest.fn().mockResolvedValue(1), // skip setupUserGroups
-      save: jest.fn().mockResolvedValue({}),
-      findOneBy: jest.fn().mockResolvedValue({ id: BUILTIN_USER_GROUP_DEFAULT, name: 'Default' }),
-      findBy: jest.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(1), // skip setupUserGroups
+      save: vi.fn().mockResolvedValue({}),
+      findOneBy: vi.fn().mockResolvedValue({ id: BUILTIN_USER_GROUP_DEFAULT, name: 'Default' }),
+      findBy: vi.fn().mockResolvedValue([]),
     };
   }
 
@@ -58,8 +58,8 @@ describe('AuthService', () => {
     const mockUserGroupRepo = createMockUserGroupRepository();
 
     const configService = {
-      get: jest.fn((key: string, defaultValue?: string) => config[key] ?? defaultValue),
-      getOrThrow: jest.fn((key: string) => {
+      get: vi.fn((key: string, defaultValue?: string) => config[key] ?? defaultValue),
+      getOrThrow: vi.fn((key: string) => {
         if (config[key] === undefined) throw new Error(`Missing config: ${key}`);
         return config[key];
       }),
@@ -83,14 +83,14 @@ describe('AuthService', () => {
   }
 
   describe('Microsoft login', () => {
-    afterEach(() => jest.restoreAllMocks());
+    afterEach(() => vi.restoreAllMocks());
 
     it.each([
       [undefined, true],
       ['common', true],
       ['0b5c0e4c-1111-2222-3333-444455556666', false],
     ])('warns about tenant %p: %p', async (tenant, warns) => {
-      const warn = jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
+      const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
       await buildModule({ AUTH_MICROSOFT_CLIENTID: 'id', AUTH_MICROSOFT_CLIENTSECRET: 'secret', AUTH_MICROSOFT_TENANT: tenant });
 
       expect(warn.mock.calls.some(([message]) => String(message).includes('AUTH_MICROSOFT_TENANT'))).toBe(warns);

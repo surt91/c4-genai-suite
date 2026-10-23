@@ -1,1 +1,1 @@
-export * from './azure-provider';
+export * from './azure-provider.js';

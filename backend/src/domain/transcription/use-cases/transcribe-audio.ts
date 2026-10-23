@@ -1,9 +1,9 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
-import { User } from 'src/domain/users';
-import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe';
-import { GetExtension, GetExtensionResponse } from '../../extensions';
-import { AzureTranscriptionProvider } from '../providers';
+import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe.js';
+import { GetExtension, GetExtensionResponse } from '../../extensions/index.js';
+import { User } from '../../users/index.js';
+import { AzureTranscriptionProvider } from '../providers/index.js';
 
 export interface TranscribeAudioParams {
   user: User;

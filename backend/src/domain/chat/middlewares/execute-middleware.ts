@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateText, stepCountIs, streamText, tool, ToolSet } from 'ai';
-import { I18nService } from '../../../localization/i18n.service';
-import { MetricsService } from '../../../metrics/metrics.service';
-import { ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { MetricsService } from '../../../metrics/metrics.service.js';
+import { ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces.js';
 
 // this is the general structure of how AI SDK wraps errors
 type GenericAIError = { error: unknown };

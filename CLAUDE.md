@@ -6,7 +6,7 @@ the only allowed reference is the copyright line in `LICENSE`.
 ## Layout
 
 - `frontend/` – React + Vite + Mantine, vitest (`npm test`)
-- `backend/` – NestJS + TypeORM (Postgres), jest (`npm test`, DB tests need `DB_URL` or Docker)
+- `backend/` – NestJS + TypeORM (Postgres), ESM, vitest (`npm test`, DB tests need `DB_URL` or Docker)
 - `services/reis/` – Python/FastAPI RAG server (uv, pytest, ruff, ty)
 - `services/eval/` – Python LLM evaluation service (uv, pytest, ruff, alembic)
 - `services/confluence-importer/` – Python importer (uv, pytest, ruff, mypy)

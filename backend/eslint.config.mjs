@@ -33,7 +33,7 @@ export default defineConfig([globalIgnores(["**/generated/**", "**/database/inte
     languageOptions: {
         globals: {
             ...globals.node,
-            ...globals.jest,
+            ...globals.vitest,
         },
 
         parser: tsParser,
@@ -49,12 +49,6 @@ export default defineConfig([globalIgnores(["**/generated/**", "**/database/inte
     rules: {
         "import/order": ["error", {
             pathGroupsExcludedImportTypes: ["builtin"],
-
-            pathGroups: [{
-                pattern: "src/**",
-                group: "external",
-                position: "after",
-            }],
 
             alphabetize: {
                 order: "asc",
@@ -81,7 +75,7 @@ export default defineConfig([globalIgnores(["**/generated/**", "**/database/inte
 }, {
     files: ["**/*.spec.ts", "**/*.test.ts"],
     rules: {
-        // Jest mock objects (e.g. jest.fn()) are not real class methods, so
+        // Mock objects (e.g. vi.fn()) are not real class methods, so
         // `unbound-method` produces false positives when asserting on them via
         // `expect(repo.method).toHaveBeenCalled()`. Disable in test files.
         "@typescript-eslint/unbound-method": "off",

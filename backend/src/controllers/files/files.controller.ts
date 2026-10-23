@@ -27,8 +27,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
 import {
   CreateBucket,
   CreateBucketResponse,
@@ -45,10 +45,10 @@ import {
   UpdateBucketResponse,
   UploadFile,
   UploadFileResponse,
-} from 'src/domain/files';
-import { GetFileTypes, GetFileTypesResponse } from '../../domain/files/use-cases/get-file-types';
-import { BucketDto, BucketsDto, FileDto, FilesDto, FileTypesDto, TestBucketDto, UpsertBucketDto } from './dtos';
-import { keepAlive } from './keep-alive';
+} from '../../domain/files/index.js';
+import { GetFileTypes, GetFileTypesResponse } from '../../domain/files/use-cases/get-file-types.js';
+import { BucketDto, BucketsDto, FileDto, FilesDto, FileTypesDto, TestBucketDto, UpsertBucketDto } from './dtos/index.js';
+import { keepAlive } from './keep-alive.js';
 
 @Controller('buckets')
 @ApiTags('files')

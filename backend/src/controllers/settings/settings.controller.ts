@@ -20,8 +20,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { BlobCategory, BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { BlobCategory, BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
 import {
   DeleteBlob,
   GetBlob,
@@ -31,8 +31,8 @@ import {
   UpdateSettings,
   UpdateSettingsResponse,
   UploadBlob,
-} from 'src/domain/settings';
-import { SettingsDto } from './dtos';
+} from '../../domain/settings/index.js';
+import { SettingsDto } from './dtos/index.js';
 
 enum ImageTypeEnum {
   LOGO = 'logo',

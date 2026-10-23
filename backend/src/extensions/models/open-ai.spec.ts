@@ -1,13 +1,13 @@
-import { modelExtensionTestSuite } from './model-test.base';
-import { OpenAIModelExtension } from './open-ai';
+import { modelExtensionTestSuite } from './model-test.base.js';
+import { OpenAIModelExtension } from './open-ai.js';
 
-jest.mock('@ai-sdk/openai', () => ({
-  createOpenAI: jest.fn(() => ({
-    responses: jest.fn(() => () => 'mocked model'),
+vi.mock('@ai-sdk/openai', () => ({
+  createOpenAI: vi.fn(() => ({
+    responses: vi.fn(() => () => 'mocked model'),
   })),
 }));
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {

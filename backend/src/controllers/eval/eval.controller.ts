@@ -4,10 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { ApiExcludeEndpoint, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { RequestInit, fetch as undiciFetch } from 'undici';
-import { LocalAuthGuard, RoleGuard } from 'src/domain/auth';
-import { Role } from 'src/domain/auth/role.decorator';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
-import { EvalServiceStatusDto } from './dtos';
+import { LocalAuthGuard, RoleGuard } from '../../domain/auth/index.js';
+import { Role } from '../../domain/auth/role.decorator.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
+import { EvalServiceStatusDto } from './dtos/index.js';
 
 /**
  * Authenticated controller for eval service requests.

@@ -13,13 +13,13 @@
  */
 
 
-import * as runtime from '../runtime';
+import * as runtime from '../runtime.js';
 import type {
   FileProcessResult,
   FileResult,
   FileTypesResult,
   HTTPValidationError,
-} from '../models/index';
+} from '../models/index.js';
 import {
     FileProcessResultFromJSON,
     FileProcessResultToJSON,
@@ -29,7 +29,7 @@ import {
     FileTypesResultToJSON,
     HTTPValidationErrorFromJSON,
     HTTPValidationErrorToJSON,
-} from '../models/index';
+} from '../models/index.js';
 
 export interface DeleteFileRequest {
     fileId: string;

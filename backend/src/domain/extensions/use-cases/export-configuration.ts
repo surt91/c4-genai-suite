@@ -2,11 +2,11 @@ import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ConfigurationEntity } from '../../database';
-import { ChatSuggestion } from '../../shared';
-import { ExtensionObjectArgument } from '../interfaces';
-import { ExplorerService } from '../services';
-import { buildConfiguration, maskKeyValues } from './utils';
+import { ConfigurationEntity } from '../../database/index.js';
+import { ChatSuggestion } from '../../shared.js';
+import { ExtensionObjectArgument } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { buildConfiguration, maskKeyValues } from './utils.js';
 
 export class ExportConfiguration {
   constructor(public readonly id: number) {}

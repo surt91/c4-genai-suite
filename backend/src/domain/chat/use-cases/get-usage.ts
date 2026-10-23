@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsageEntity, UsageRepository } from 'src/domain/database';
-import { GroupBy } from '../statistics';
+import { UsageEntity, UsageRepository } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
 
 export class GetUsage {
   constructor(

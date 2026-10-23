@@ -1,11 +1,12 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
-import { User } from 'src/domain/users';
-import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe';
-import { AzureTranscriptionProvider } from '../providers';
-import { TranscribeAudio, TranscribeAudioHandler } from './transcribe-audio';
+import type { Mock } from 'vitest';
+import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe.js';
+import { User } from '../../users/index.js';
+import { AzureTranscriptionProvider } from '../providers/index.js';
+import { TranscribeAudio, TranscribeAudioHandler } from './transcribe-audio.js';
 
-jest.mock('../providers/azure-provider');
+vi.mock('../providers/azure-provider.js');
 
 describe('Transcribe Audio', () => {
   let handler: TranscribeAudioHandler;
@@ -31,12 +32,12 @@ describe('Transcribe Audio', () => {
 
   beforeEach(() => {
     queryBus = {
-      execute: jest.fn(),
+      execute: vi.fn(),
     } as unknown as QueryBus;
 
     handler = new TranscribeAudioHandler(queryBus);
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('execute', () => {
@@ -51,12 +52,12 @@ describe('Transcribe Audio', () => {
           values: mockConfig,
         },
       };
-      const executeSpy = jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      const executeSpy = vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
-      const mockTranscribe = jest.fn().mockResolvedValue(mockTranscription);
-      (AzureTranscriptionProvider as jest.Mock).mockImplementation(() => ({
-        transcribe: mockTranscribe,
-      }));
+      const mockTranscribe = vi.fn().mockResolvedValue(mockTranscription);
+      (AzureTranscriptionProvider as Mock).mockImplementation(function () {
+        return { transcribe: mockTranscribe };
+      });
 
       const command = new TranscribeAudio({
         user: mockUser,
@@ -83,7 +84,7 @@ describe('Transcribe Audio', () => {
           values: mockConfig,
         },
       };
-      jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
       const command = new TranscribeAudio({
         user: mockUser,
@@ -106,7 +107,7 @@ describe('Transcribe Audio', () => {
           values: mockConfig,
         },
       };
-      jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
       const largeBuffer = Buffer.alloc(26 * 1024 * 1024); // 26MB
 
@@ -131,7 +132,7 @@ describe('Transcribe Audio', () => {
           values: mockConfig,
         },
       };
-      jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
       const command = new TranscribeAudio({
         user: mockUser,
@@ -154,13 +155,13 @@ describe('Transcribe Audio', () => {
           values: mockConfig,
         },
       };
-      jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
       const mockError = new Error('Azure API error');
-      const mockTranscribe = jest.fn().mockRejectedValue(mockError);
-      (AzureTranscriptionProvider as jest.Mock).mockImplementation(() => ({
-        transcribe: mockTranscribe,
-      }));
+      const mockTranscribe = vi.fn().mockRejectedValue(mockError);
+      (AzureTranscriptionProvider as Mock).mockImplementation(function () {
+        return { transcribe: mockTranscribe };
+      });
 
       const command = new TranscribeAudio({
         user: mockUser,
@@ -185,12 +186,12 @@ describe('Transcribe Audio', () => {
           values: mockConfig,
         },
       };
-      jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
-      const mockTranscribe = jest.fn().mockResolvedValue('transcription');
-      (AzureTranscriptionProvider as jest.Mock).mockImplementation(() => ({
-        transcribe: mockTranscribe,
-      }));
+      const mockTranscribe = vi.fn().mockResolvedValue('transcription');
+      (AzureTranscriptionProvider as Mock).mockImplementation(function () {
+        return { transcribe: mockTranscribe };
+      });
 
       for (const mimeType of validMimeTypes) {
         const command = new TranscribeAudio({
@@ -217,12 +218,12 @@ describe('Transcribe Audio', () => {
           values: configWithCustomApiVersion,
         },
       };
-      jest.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
+      vi.spyOn(queryBus, 'execute').mockResolvedValue(mockExtensionResponse);
 
-      const mockTranscribe = jest.fn().mockResolvedValue(mockTranscription);
-      (AzureTranscriptionProvider as jest.Mock).mockImplementation(() => ({
-        transcribe: mockTranscribe,
-      }));
+      const mockTranscribe = vi.fn().mockResolvedValue(mockTranscription);
+      (AzureTranscriptionProvider as Mock).mockImplementation(function () {
+        return { transcribe: mockTranscribe };
+      });
 
       const command = new TranscribeAudio({
         user: mockUser,

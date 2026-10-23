@@ -2,6 +2,9 @@ import { randomUUID } from 'crypto';
 import { BadRequestException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { assignDefined } from '../../../lib/index.js';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
 import {
   BlobCategory,
   BlobEntity,
@@ -12,14 +15,11 @@ import {
   FileRepository,
   FileSizeLimits,
   FileUploadStatus,
-} from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { assignDefined } from 'src/lib';
-import { I18nService } from '../../../localization/i18n.service';
-import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
-import { UploadedFile } from '../interfaces';
-import { ResponseError } from './generated';
-import { buildClient, buildFile, getBucketId } from './utils';
+} from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { UploadedFile } from '../interfaces.js';
+import { ResponseError } from './generated/index.js';
+import { buildClient, buildFile, getBucketId } from './utils.js';
 
 export interface UploadFileParams {
   user?: User;

@@ -1,20 +1,20 @@
 import { ReplaySubject } from 'rxjs';
-import { ConversationRepository, MessageRepository } from 'src/domain/database';
-import { ConversationFileRepository } from '../../database/entities/conversation-file';
-import { ChatContext, StreamEvent } from '../interfaces';
-import { GetHistoryMiddleware } from './get-history-middleware';
+import { ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { ConversationRepository, MessageRepository } from '../../database/index.js';
+import { ChatContext, StreamEvent } from '../interfaces.js';
+import { GetHistoryMiddleware } from './get-history-middleware.js';
 
 describe(GetHistoryMiddleware.name, () => {
   it('only edits messages of the own conversation', async () => {
     const messages = {
-      findOneBy: jest.fn().mockResolvedValue(null),
-      findOne: jest.fn().mockResolvedValue(null),
-      getMessageThread: jest.fn().mockResolvedValue([]),
-      save: jest.fn((x: object) => Promise.resolve({ id: 100, conversationId: 1, ...x })),
+      findOneBy: vi.fn().mockResolvedValue(null),
+      findOne: vi.fn().mockResolvedValue(null),
+      getMessageThread: vi.fn().mockResolvedValue([]),
+      save: vi.fn((x: object) => Promise.resolve({ id: 100, conversationId: 1, ...x })),
     };
     const conversations = {
-      findOneByOrFail: jest.fn().mockResolvedValue({ id: 1 }),
-      save: jest.fn().mockResolvedValue({}),
+      findOneByOrFail: vi.fn().mockResolvedValue({ id: 1 }),
+      save: vi.fn().mockResolvedValue({}),
     };
     const sut = new GetHistoryMiddleware(
       messages as unknown as MessageRepository,

@@ -1,18 +1,18 @@
 import { ReplaySubject } from 'rxjs';
-import { ChatContext, ChatInteraction, FormActionType, StreamEvent } from '../interfaces';
-import { CallbackService } from '../services/callback-service';
-import { UIMiddleware, validateUrl, withoutSecrets } from './ui-middleware';
+import { ChatContext, ChatInteraction, FormActionType, StreamEvent } from '../interfaces.js';
+import { CallbackService } from '../services/callback-service.js';
+import { UIMiddleware, validateUrl, withoutSecrets } from './ui-middleware.js';
 
 describe(UIMiddleware.name, () => {
   let callbacks: CallbackService;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     callbacks = new CallbackService();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   let interactions: Map<string, ChatInteraction>;
@@ -85,7 +85,7 @@ describe(UIMiddleware.name, () => {
     const context = await createContext();
 
     const result = context.ui.form('Are you sure?', schema);
-    jest.advanceTimersByTime(5 * 60 * 1000 + 1000);
+    vi.advanceTimersByTime(5 * 60 * 1000 + 1000);
 
     await expect(result).resolves.toEqual({ action: FormActionType.CANCEL });
   });
@@ -134,7 +134,7 @@ describe(UIMiddleware.name, () => {
     context.result.subscribe((event) => events.push(event));
 
     const result = context.ui.form('Are you sure?', schema);
-    jest.advanceTimersByTime(5 * 60 * 1000 + 1000);
+    vi.advanceTimersByTime(5 * 60 * 1000 + 1000);
     await result;
 
     expect(events.find((x) => x.type === 'ui_update')).toMatchObject({ update: { status: 'expired' } });

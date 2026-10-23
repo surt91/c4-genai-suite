@@ -1,4 +1,3 @@
-import { Extension } from 'src/domain/extensions';
 import {
   BucketEntity,
   BucketRepository,
@@ -6,9 +5,10 @@ import {
   ConfigurationEntity,
   ExtensionEntity,
   ExtensionRepository,
-} from '../../database';
-import { ExplorerService } from '../services';
-import { GetBucketAvailability, GetBucketAvailabilityHandler } from './get-bucket-availability';
+} from '../../database/index.js';
+import { Extension } from '../index.js';
+import { ExplorerService } from '../services/index.js';
+import { GetBucketAvailability, GetBucketAvailabilityHandler } from './get-bucket-availability.js';
 
 describe('Get Bucket Availability By Type', () => {
   let extensionRepository: ExtensionRepository;
@@ -18,21 +18,21 @@ describe('Get Bucket Availability By Type', () => {
 
   beforeEach(() => {
     explorer = {
-      getExtension: jest.fn(),
+      getExtension: vi.fn(),
     } as unknown as ExplorerService;
     bucketRepository = {
-      findOneBy: jest.fn(),
-      create: jest.fn(),
-      save: jest.fn(),
+      findOneBy: vi.fn(),
+      create: vi.fn(),
+      save: vi.fn(),
     } as unknown as BucketRepository;
     extensionRepository = {
-      findOneBy: jest.fn(),
-      findBy: jest.fn(),
-      create: jest.fn(),
-      save: jest.fn(),
+      findOneBy: vi.fn(),
+      findBy: vi.fn(),
+      create: vi.fn(),
+      save: vi.fn(),
     } as unknown as ExtensionRepository;
     handler = new GetBucketAvailabilityHandler(explorer, extensionRepository, bucketRepository);
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return { spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' } } as Extension;
     });
   });
@@ -46,15 +46,15 @@ describe('Get Bucket Availability By Type', () => {
     expect(response.extensions.length).toBe(0);
   });
   it('should return false if no user bucket with extension files is found', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(createBucketEntityByType('user'));
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(createBucketEntityByType('user'));
 
     const response = await handler.execute(new GetBucketAvailability(1, 'user'));
     expect(response.extensions.length).toBe(0);
   });
   it('should return true if user bucket with extension files is found', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(createBucketEntityByType('user'));
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(createBucketEntityByType('user'));
 
-    jest.spyOn(extensionRepository, 'findBy').mockResolvedValueOnce([createExtensionEntity('files-42')]);
+    vi.spyOn(extensionRepository, 'findBy').mockResolvedValueOnce([createExtensionEntity('files-42')]);
 
     const response = await handler.execute(new GetBucketAvailability(1, 'user'));
 
@@ -62,17 +62,17 @@ describe('Get Bucket Availability By Type', () => {
     expect(response.extensions[0].extensionId).toBe(1);
   });
   it('should return false if conversation is requested and not found', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(null);
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(null);
 
-    jest.spyOn(extensionRepository, 'findBy').mockResolvedValueOnce([createExtensionEntity('files-42')]);
+    vi.spyOn(extensionRepository, 'findBy').mockResolvedValueOnce([createExtensionEntity('files-42')]);
 
     const response = await handler.execute(new GetBucketAvailability(1, 'conversation'));
 
     expect(response.extensions.length).toBe(0);
   });
   it('should return true if conversation bucket with files extension is found', async () => {
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(createBucketEntityByType('conversation'));
-    jest.spyOn(extensionRepository, 'findBy').mockResolvedValueOnce([createExtensionEntity('files-conversation')]);
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce(createBucketEntityByType('conversation'));
+    vi.spyOn(extensionRepository, 'findBy').mockResolvedValueOnce([createExtensionEntity('files-conversation')]);
 
     const response = await handler.execute(new GetBucketAvailability(1, 'conversation'));
 

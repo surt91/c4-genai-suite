@@ -45,7 +45,7 @@ The `.env.example` files contain working defaults for this setup.
 | e2e        | `npx playwright test`                                  | running stack (see below)    |
 
 The Postgres/S3 tests use the Compose services (`docker compose up -d postgres s3`); the backend takes the server from
-`DB_URL` (environment or `backend/.env`) and creates one database per jest worker.
+`DB_URL` (environment or `backend/.env`) and creates one database per vitest worker.
 No test requires credentials for external services; LLMs are replaced by a mock server.
 
 ### E2E tests

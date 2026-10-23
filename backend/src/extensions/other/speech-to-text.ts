@@ -1,6 +1,6 @@
-import { ChatMiddleware } from 'src/domain/chat';
-import { Extension, ExtensionSpec } from 'src/domain/extensions';
-import { I18nService } from '../../localization/i18n.service';
+import { ChatMiddleware } from '../../domain/chat/index.js';
+import { Extension, ExtensionSpec } from '../../domain/extensions/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class SpeechToTextExtension implements Extension {

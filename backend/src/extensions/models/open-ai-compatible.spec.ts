@@ -1,11 +1,11 @@
-import { modelExtensionTestSuite } from './model-test.base';
-import { OpenAICompatibleModelExtension } from './open-ai-compatible';
+import { modelExtensionTestSuite } from './model-test.base.js';
+import { OpenAICompatibleModelExtension } from './open-ai-compatible.js';
 
-jest.mock('@ai-sdk/openai-compatible', () => ({
-  createOpenAICompatible: jest.fn(() => () => 'mocked model'),
+vi.mock('@ai-sdk/openai-compatible', () => ({
+  createOpenAICompatible: vi.fn(() => () => 'mocked model'),
 }));
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {

@@ -13,9 +13,9 @@ import { CommandBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { LocalAuthGuard } from 'src/domain/auth';
-import { TranscribeAudio, TranscribeAudioResponse } from 'src/domain/transcription';
-import { TranscriptionDto } from './dtos';
+import { LocalAuthGuard } from '../../domain/auth/index.js';
+import { TranscribeAudio, TranscribeAudioResponse } from '../../domain/transcription/index.js';
+import { TranscriptionDto } from './dtos/index.js';
 
 @Controller('transcription')
 @ApiTags('transcription')

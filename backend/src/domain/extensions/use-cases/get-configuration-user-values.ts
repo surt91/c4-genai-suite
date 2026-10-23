@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConfigurationUserEntity, ConfigurationUserRepository } from '../../database/entities/configuration-user';
-import { ConfigurationUserValuesModel } from '../interfaces';
+import { ConfigurationUserEntity, ConfigurationUserRepository } from '../../database/entities/configuration-user.js';
+import { ConfigurationUserValuesModel } from '../interfaces.js';
 
 export class GetConfigurationUserValues {
   constructor(

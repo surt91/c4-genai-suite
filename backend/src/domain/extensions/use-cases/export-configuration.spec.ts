@@ -1,13 +1,14 @@
 import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
-import { ChatSuggestion } from '../../shared';
-import { ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
-import { ExplorerService } from '../services';
-import { ExportConfiguration, ExportConfigurationHandler } from './export-configuration';
+import type { Mock } from 'vitest';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database/index.js';
+import { ChatSuggestion } from '../../shared.js';
+import { ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { ExportConfiguration, ExportConfigurationHandler } from './export-configuration.js';
 
 interface MockConfigurationRepository {
-  findOne: jest.Mock;
+  findOne: Mock;
 }
 
 describe(ExportConfiguration.name, () => {
@@ -17,18 +18,18 @@ describe(ExportConfiguration.name, () => {
 
   beforeEach(() => {
     explorer = {
-      getExtension: jest.fn(),
+      getExtension: vi.fn(),
     } as unknown as ExplorerService;
 
     repository = {
-      findOne: jest.fn(),
+      findOne: vi.fn(),
     };
 
     handler = new ExportConfigurationHandler(repository as unknown as Repository<ConfigurationEntity>, explorer);
   });
 
   it('should throw NotFoundException when configuration does not exist', async () => {
-    jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+    vi.spyOn(repository, 'findOne').mockResolvedValue(null);
 
     await expect(handler.execute(new ExportConfiguration(999))).rejects.toThrow(NotFoundException);
     await expect(handler.execute(new ExportConfiguration(999))).rejects.toThrow('Configuration with id 999 not found');
@@ -61,8 +62,8 @@ describe(ExportConfiguration.name, () => {
       extensions,
     };
 
-    jest.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,
@@ -125,7 +126,7 @@ describe(ExportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
+    vi.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
 
     const result = await handler.execute(new ExportConfiguration(2));
 
@@ -175,8 +176,8 @@ describe(ExportConfiguration.name, () => {
       extensions,
     };
 
-    jest.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(repository, 'findOne').mockResolvedValue(configurationEntity);
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,

@@ -20,22 +20,28 @@ import { ApiExtension, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import * as mime from 'mime-types';
 import { Observable } from 'rxjs';
-import { LocalAuthGuard } from '../../domain/auth';
-import { SendMessage, SendMessageResponse, StartConversation, StartConversationResponse, StreamEvent } from '../../domain/chat';
+import { LocalAuthGuard } from '../../domain/auth/index.js';
+import {
+  SendMessage,
+  SendMessageResponse,
+  StartConversation,
+  StartConversationResponse,
+  StreamEvent,
+} from '../../domain/chat/index.js';
 import {
   GetConfiguration,
   GetConfigurationResponse,
   GetExtensions,
   GetExtensionsResponse,
   hasUserGroupAccess,
-} from '../../domain/extensions';
-import { GetFiles, GetFilesResponse, UploadFile, UploadFileResponse } from '../../domain/files';
-import { UploadedFile as UploadedFileInternal } from '../../domain/files/interfaces';
-import { User } from '../../domain/users';
-import { FilesExtensionConfiguration } from '../../extensions/tools/files';
-import { FilesVisionExtensionConfiguration } from '../../extensions/tools/files-vision';
-import { WholeFilesExtensionConfiguration } from '../../extensions/tools/whole-files-conversation';
-import { FilePurpose, ResponseCreateDto, ResponseDto } from './dtos';
+} from '../../domain/extensions/index.js';
+import { GetFiles, GetFilesResponse, UploadFile, UploadFileResponse } from '../../domain/files/index.js';
+import { UploadedFile as UploadedFileInternal } from '../../domain/files/interfaces.js';
+import { User } from '../../domain/users/index.js';
+import { FilesVisionExtensionConfiguration } from '../../extensions/tools/files-vision.js';
+import { FilesExtensionConfiguration } from '../../extensions/tools/files.js';
+import { WholeFilesExtensionConfiguration } from '../../extensions/tools/whole-files-conversation.js';
+import { FilePurpose, ResponseCreateDto, ResponseDto } from './dtos/index.js';
 
 @Controller('public/assistants/:assistantId')
 @ApiTags('responses')

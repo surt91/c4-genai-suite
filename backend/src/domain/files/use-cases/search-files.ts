@@ -3,12 +3,12 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { Source } from 'src/domain/chat';
-import { BucketEntity, BucketRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { SearchResult } from '../interfaces';
-import { ResponseError } from './generated';
-import { buildClient } from './utils';
+import { Source } from '../../chat/index.js';
+import { BucketEntity, BucketRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { SearchResult } from '../interfaces.js';
+import { ResponseError } from './generated/index.js';
+import { buildClient } from './utils.js';
 
 export class SearchFiles {
   constructor(

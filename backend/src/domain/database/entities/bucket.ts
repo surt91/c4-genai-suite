@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { FileEntity } from './file';
+import { schema } from '../typeorm.helper.js';
+import { FileEntity } from './file.js';
 
 export type BucketRepository = Repository<BucketEntity>;
 

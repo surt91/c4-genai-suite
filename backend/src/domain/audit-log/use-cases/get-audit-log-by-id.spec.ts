@@ -1,22 +1,23 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { AuditLogEntity } from 'src/domain/database';
-import { GetAuditLogById, GetAuditLogByIdHandler } from './get-audit-log-by-id';
+import type { Mocked } from 'vitest';
+import { AuditLogEntity } from '../../database/index.js';
+import { GetAuditLogById, GetAuditLogByIdHandler } from './get-audit-log-by-id.js';
 
 describe('GetAuditLogByIdHandler', () => {
   let handler: GetAuditLogByIdHandler;
   let repository: Repository<AuditLogEntity>;
-  let queryBuilder: jest.Mocked<SelectQueryBuilder<AuditLogEntity>>;
+  let queryBuilder: Mocked<SelectQueryBuilder<AuditLogEntity>>;
 
   beforeEach(async () => {
     queryBuilder = {
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      orderBy: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      getOne: jest.fn(),
-    } as unknown as jest.Mocked<SelectQueryBuilder<AuditLogEntity>>;
+      where: vi.fn().mockReturnThis(),
+      andWhere: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      getOne: vi.fn(),
+    } as unknown as Mocked<SelectQueryBuilder<AuditLogEntity>>;
 
     const module = await Test.createTestingModule({
       providers: [
@@ -24,8 +25,8 @@ describe('GetAuditLogByIdHandler', () => {
         {
           provide: getRepositoryToken(AuditLogEntity),
           useValue: {
-            findOneBy: jest.fn(),
-            createQueryBuilder: jest.fn(() => queryBuilder),
+            findOneBy: vi.fn(),
+            createQueryBuilder: vi.fn(() => queryBuilder),
           },
         },
       ],
@@ -59,7 +60,7 @@ describe('GetAuditLogByIdHandler', () => {
         createdAt: new Date('2026-01-01'),
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
       queryBuilder.getOne.mockResolvedValue(previousEntity);
 
       const query = new GetAuditLogById(2);
@@ -79,7 +80,7 @@ describe('GetAuditLogByIdHandler', () => {
     });
 
     it('should return null when audit log not found', async () => {
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(null);
 
       const query = new GetAuditLogById(999);
       const result = await handler.execute(query);
@@ -100,7 +101,7 @@ describe('GetAuditLogByIdHandler', () => {
         createdAt: new Date('2026-01-01'),
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(firstEntity);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(firstEntity);
       queryBuilder.getOne.mockResolvedValue(null);
 
       const query = new GetAuditLogById(1);
@@ -122,7 +123,7 @@ describe('GetAuditLogByIdHandler', () => {
         createdAt: new Date('2026-01-15T10:00:00Z'),
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
       queryBuilder.getOne.mockResolvedValue(null);
 
       const query = new GetAuditLogById(3);
@@ -164,7 +165,7 @@ describe('GetAuditLogByIdHandler', () => {
         createdAt: new Date('2026-01-10'),
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
       queryBuilder.getOne.mockResolvedValue(mostRecentPreviousEntity);
 
       const query = new GetAuditLogById(5);
@@ -187,7 +188,7 @@ describe('GetAuditLogByIdHandler', () => {
         createdAt: new Date('2026-02-01T12:30:00Z'),
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(entity);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(entity);
       queryBuilder.getOne.mockResolvedValue(null);
 
       const query = new GetAuditLogById(10);
@@ -217,7 +218,7 @@ describe('GetAuditLogByIdHandler', () => {
         createdAt: new Date('2026-02-05'),
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(entity);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(entity);
       queryBuilder.getOne.mockResolvedValue(null);
 
       const query = new GetAuditLogById(11);

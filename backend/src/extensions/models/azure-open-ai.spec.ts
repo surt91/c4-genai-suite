@@ -1,14 +1,14 @@
-import { AzureOpenAIModelExtension } from './azure-open-ai';
-import { modelExtensionTestSuite } from './model-test.base';
+import { AzureOpenAIModelExtension } from './azure-open-ai.js';
+import { modelExtensionTestSuite } from './model-test.base.js';
 
-jest.mock('@ai-sdk/azure', () => ({
-  createAzure: jest.fn(() => ({
-    responses: jest.fn(() => () => 'mocked model'),
+vi.mock('@ai-sdk/azure', () => ({
+  createAzure: vi.fn(() => ({
+    responses: vi.fn(() => () => 'mocked model'),
   })),
 }));
 
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {

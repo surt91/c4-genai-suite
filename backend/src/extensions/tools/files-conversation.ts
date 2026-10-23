@@ -2,12 +2,12 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { In } from 'typeorm';
 import { z } from 'zod';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
-import { Extension, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { FileEntity } from '../../domain/database';
-import { Bucket, SearchFiles, SearchFilesResponse } from '../../domain/files';
-import { FilesExtension, FilesExtensionConfiguration } from './files';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from '../../domain/chat/index.js';
+import { FileEntity } from '../../domain/database/index.js';
+import { Extension, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { Bucket, SearchFiles, SearchFilesResponse } from '../../domain/files/index.js';
+import { User } from '../../domain/users/index.js';
+import { FilesExtension, FilesExtensionConfiguration } from './files.js';
 
 @Extension()
 export class FilesConversationExtension extends FilesExtension<FilesConversationExtensionConfiguration> {

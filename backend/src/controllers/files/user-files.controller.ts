@@ -29,7 +29,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { LocalAuthGuard } from 'src/domain/auth';
+import { LocalAuthGuard } from '../../domain/auth/index.js';
+import { GetConversation, GetConversationResponse } from '../../domain/chat/index.js';
+import { GetExtension, GetExtensionResponse } from '../../domain/extensions/index.js';
 import {
   DeleteFile,
   GetFiles,
@@ -38,12 +40,10 @@ import {
   RenameFileResponse,
   UploadFile,
   UploadFileResponse,
-} from 'src/domain/files';
-import { GetConversation, GetConversationResponse } from '../../domain/chat';
-import { GetExtension, GetExtensionResponse } from '../../domain/extensions';
-import { I18nService } from '../../localization/i18n.service';
-import { FileDto, FilesDto, RenameFileDto } from './dtos';
-import { keepAlive } from './keep-alive';
+} from '../../domain/files/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
+import { FileDto, FilesDto, RenameFileDto } from './dtos/index.js';
+import { keepAlive } from './keep-alive.js';
 
 /** Files without bucket are stored in the database (base64), so they are limited to 20 MB. */
 const MAX_FILE_SIZE_WITHOUT_BUCKET = 20 * 1024 * 1024;

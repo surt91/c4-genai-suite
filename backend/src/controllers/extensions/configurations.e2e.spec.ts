@@ -1,12 +1,12 @@
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
-import { ConfigurationsController } from './configurations.controller';
-import { BucketAvailabilityDto } from './dtos';
+import { AppModule } from '../../app.module.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
+import { ConfigurationsController } from './configurations.controller.js';
+import { BucketAvailabilityDto } from './dtos/index.js';
 
 describe('Configurations', () => {
   let app: INestApplication<Server>;

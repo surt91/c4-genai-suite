@@ -1,11 +1,11 @@
 import { ForbiddenException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FileEntity, FileRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { isNumber } from 'src/lib';
-import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
-import { buildClient } from './utils';
+import { isNumber } from '../../../lib/index.js';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { FileEntity, FileRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { buildClient } from './utils.js';
 
 export class DeleteFile {
   constructor(

@@ -4,11 +4,11 @@ import { AddressInfo } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../app.module';
-import { BUILTIN_USER_GROUP_ADMIN, UserEntity, UserGroupEntity } from '../domain/database';
-import { hashApiKey } from '../lib';
+import { AppModule } from '../app.module.js';
+import { BUILTIN_USER_GROUP_ADMIN, UserEntity, UserGroupEntity } from '../domain/database/index.js';
+import { hashApiKey } from '../lib/index.js';
 
 const ADMIN_KEY = `admin-${randomUUID()}`;
 

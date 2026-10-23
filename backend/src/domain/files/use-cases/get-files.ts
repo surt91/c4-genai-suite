@@ -2,11 +2,11 @@ import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, FindOptionsWhere, In, Raw } from 'typeorm';
-import { BucketEntity, BucketRepository, BucketType, FileEntity, FileRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
-import { UploadedFile } from '../interfaces';
-import { buildFile } from './utils';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { BucketEntity, BucketRepository, BucketType, FileEntity, FileRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { UploadedFile } from '../interfaces.js';
+import { buildFile } from './utils.js';
 
 function isBucketType(bucketIdOrType: number | BucketType): bucketIdOrType is BucketType {
   return typeof bucketIdOrType === 'string';

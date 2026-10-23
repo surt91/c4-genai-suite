@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
-import { ExecuteMiddleware } from './execute-middleware';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces.js';
+import { ExecuteMiddleware } from './execute-middleware.js';
 
 @Injectable()
 export class DefaultPromptMiddleware implements ChatMiddleware {

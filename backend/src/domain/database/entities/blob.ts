@@ -1,7 +1,7 @@
-import { Column, Entity, Index, ManyToOne, PrimaryColumn, Repository } from 'typeorm';
-import { schema } from '../typeorm.helper';
-import { FileEntity } from './file';
-import { UserEntity } from './user';
+import { Column, Entity, Index, ManyToOne, PrimaryColumn, Relation, Repository } from 'typeorm';
+import { schema } from '../typeorm.helper.js';
+import { FileEntity } from './file.js';
+import { UserEntity } from './user.js';
 
 export type BlobRepository = Repository<BlobEntity>;
 
@@ -34,7 +34,7 @@ export class BlobEntity {
   category!: BlobCategory;
 
   @ManyToOne(() => FileEntity, { onDelete: 'CASCADE' })
-  file?: FileEntity;
+  file?: Relation<FileEntity>;
 
   @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'CASCADE' })
   user!: UserEntity | null;

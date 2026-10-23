@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { differenceInDays, startOfDay, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from 'date-fns';
-import { ConversationEntity, ConversationRepository, UsagesCount } from '../../database';
-import { GroupBy } from '../statistics';
-import { GetUsersCount, GetUsersCountHandler } from './get-users-count';
+import { ConversationEntity, ConversationRepository, UsagesCount } from '../../database/index.js';
+import { GroupBy } from '../statistics.js';
+import { GetUsersCount, GetUsersCountHandler } from './get-users-count.js';
 
 describe('Get Users Count', () => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   let conversationRepository: ConversationRepository;
   let handler: GetUsersCountHandler;
   const repositoryToken = getRepositoryToken(ConversationEntity);
 
   beforeAll(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetUsersCountHandler,
@@ -31,7 +31,7 @@ describe('Get Users Count', () => {
   });
   it('should return entries with some total values', async () => {
     const date = startOfDay(new Date());
-    jest.spyOn(conversationRepository, 'getUsersCountByPeriod').mockResolvedValueOnce([
+    vi.spyOn(conversationRepository, 'getUsersCountByPeriod').mockResolvedValueOnce([
       { date: subDays(date, 1), total: 69 },
       { date: date, total: 42 },
     ]);
@@ -49,7 +49,7 @@ describe('Get Users Count', () => {
       { date: lastWeek, total: 10 },
       { date: currentWeek, total: 42 },
     ];
-    jest.spyOn(conversationRepository, 'getUsersCountByPeriod').mockResolvedValue(users);
+    vi.spyOn(conversationRepository, 'getUsersCountByPeriod').mockResolvedValue(users);
 
     const result = await handler.execute(new GetUsersCount(lastWeek, GroupBy.Week));
 
@@ -67,7 +67,7 @@ describe('Get Users Count', () => {
       { date: lastMonth, total: 50 },
       { date: currentMonth, total: 100 },
     ];
-    jest.spyOn(conversationRepository, 'getUsersCountByPeriod').mockResolvedValue(users);
+    vi.spyOn(conversationRepository, 'getUsersCountByPeriod').mockResolvedValue(users);
     const since = startOfMonth(subDays(new Date(), daysAgo));
     const result = await handler.execute(new GetUsersCount(since, GroupBy.Month));
 

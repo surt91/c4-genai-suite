@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BlobCategory, BlobEntity, BlobRepository } from 'src/domain/database';
+import { BlobCategory, BlobEntity, BlobRepository } from '../../database/index.js';
 
 export class UploadBlob {
   constructor(

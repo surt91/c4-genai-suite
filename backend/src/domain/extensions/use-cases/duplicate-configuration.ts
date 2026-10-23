@@ -2,16 +2,16 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not } from 'typeorm';
-import { assignDefined } from '../../../lib';
+import { assignDefined } from '../../../lib/index.js';
 import {
   ConfigurationEntity,
   ConfigurationRepository,
   ConfigurationStatus,
   ExtensionEntity,
   ExtensionRepository,
-} from '../../database';
-import { ConfigurationModel } from '../interfaces';
-import { buildConfiguration } from './utils';
+} from '../../database/index.js';
+import { ConfigurationModel } from '../interfaces.js';
+import { buildConfiguration } from './utils.js';
 
 export class DuplicateConfiguration {
   constructor(public readonly id: number) {}

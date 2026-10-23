@@ -3,12 +3,12 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { MockAgent, MockPool, setGlobalDispatcher } from 'undici';
-import { AppModule } from 'src/app.module';
-import { LocalStrategy, RoleGuard } from 'src/domain/auth';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { AppModule } from '../../app.module.js';
+import { LocalStrategy, RoleGuard } from '../../domain/auth/index.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
 
 const EVAL_SERVICE_URL = 'http://localhost:3202';
 
@@ -64,28 +64,28 @@ describe('EvalController (e2e)', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('Authentication & Authorization', () => {
     it('should deny unauthenticated requests (401)', async () => {
       // When no valid session exists, LocalAuthGuard rejects the request
       // We simulate this by having validate return null/undefined
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(null);
 
       await request(app.getHttpServer()).get('/api/eval/catalogs').expect(HttpStatus.UNAUTHORIZED);
     });
 
     it('should deny non-admin requests (403)', async () => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockNonAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(false);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockNonAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(false);
 
       await request(app.getHttpServer()).get('/api/eval/catalogs').expect(HttpStatus.FORBIDDEN);
     });
 
     it('should allow admin requests', async () => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
 
       mockPool
         .intercept({ path: '/catalogs', method: 'GET' })
@@ -97,8 +97,8 @@ describe('EvalController (e2e)', () => {
 
   describe('HTTP Methods Forwarding', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should proxy GET requests', async () => {
@@ -146,8 +146,8 @@ describe('EvalController (e2e)', () => {
 
   describe('Headers Forwarding', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should forward user headers (X-User-Id, X-User-Name, X-User-Email)', async () => {
@@ -204,8 +204,8 @@ describe('EvalController (e2e)', () => {
 
   describe('Query String Handling', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should forward query parameters', async () => {
@@ -230,8 +230,8 @@ describe('EvalController (e2e)', () => {
 
   describe('Path Forwarding', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should strip /api/eval prefix and forward correct path', async () => {
@@ -253,8 +253,8 @@ describe('EvalController (e2e)', () => {
 
   describe('Response Forwarding', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should forward response status codes', async () => {
@@ -302,13 +302,13 @@ describe('EvalController (e2e)', () => {
 
   describe('Eval Service Status', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should return available: true when EVAL_SERVICE_ENABLED is true', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      jest.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
+      vi.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
         if (key === 'EVAL_SERVICE_ENABLED') return 'true';
         return defaultValue;
       }) as any);
@@ -320,7 +320,7 @@ describe('EvalController (e2e)', () => {
 
     it('should return available: false when EVAL_SERVICE_ENABLED is false', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      jest.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
+      vi.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
         if (key === 'EVAL_SERVICE_ENABLED') return 'false';
         return defaultValue;
       }) as any);
@@ -332,7 +332,7 @@ describe('EvalController (e2e)', () => {
 
     it('should return available: false when EVAL_SERVICE_ENABLED is not set (default)', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      jest.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
+      vi.spyOn(configService, 'get').mockImplementation(((key: string, defaultValue?: string) => {
         if (key === 'EVAL_SERVICE_ENABLED') return defaultValue; // returns 'false' default
         return defaultValue;
       }) as any);
@@ -343,14 +343,14 @@ describe('EvalController (e2e)', () => {
     });
 
     it('should deny unauthenticated requests to status endpoint (401)', async () => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(null);
 
       await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.UNAUTHORIZED);
     });
 
     it('should deny non-admin requests to status endpoint (403)', async () => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockNonAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(false);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockNonAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(false);
 
       await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.FORBIDDEN);
     });
@@ -358,8 +358,8 @@ describe('EvalController (e2e)', () => {
 
   describe('Error Handling', () => {
     beforeEach(() => {
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
-      jest.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
+      vi.spyOn(localStrategy, 'validate').mockResolvedValue(mockAdminUser);
+      vi.spyOn(roleGuard, 'canActivate').mockReturnValue(true);
     });
 
     it('should return 502 when eval service is unavailable', async () => {

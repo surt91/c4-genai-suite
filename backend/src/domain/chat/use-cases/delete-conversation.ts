@@ -2,8 +2,8 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan } from 'typeorm';
-import { ConversationEntity, ConversationRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
+import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
 
 /** How long a deleted conversation can be restored (the UI offers "Undo" for a few seconds). */
 export const CONVERSATION_RESTORE_PERIOD_MS = 5 * 60 * 1000;

@@ -1,12 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { FindManyOptions, FindOptionsWhere } from 'typeorm';
-import { FindOperator } from 'typeorm/find-options/FindOperator';
-import { User } from 'src/domain/users';
-import { BucketEntity, BucketRepository, FileEntity, FileRepository } from '../../database';
-import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
-import { GetFiles, GetFilesHandler, GetFilesResponse } from './get-files';
+import { FindManyOptions, FindOperator, FindOptionsWhere } from 'typeorm';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { BucketEntity, BucketRepository, FileEntity, FileRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { GetFiles, GetFilesHandler, GetFilesResponse } from './get-files.js';
 
 describe('Get Files', () => {
   let bucketRepository: BucketRepository;
@@ -49,7 +48,7 @@ describe('Get Files', () => {
   };
 
   beforeAll(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -57,20 +56,20 @@ describe('Get Files', () => {
         {
           provide: getRepositoryToken(BucketEntity),
           useValue: {
-            findOneBy: jest.fn(),
+            findOneBy: vi.fn(),
           },
         },
         {
           provide: getRepositoryToken(FileEntity),
           useValue: {
-            find: jest.fn(),
-            count: jest.fn(),
+            find: vi.fn(),
+            count: vi.fn(),
           },
         },
         {
           provide: getRepositoryToken(ConversationFileEntity),
           useValue: {
-            findBy: jest.fn(),
+            findBy: vi.fn(),
           },
         },
       ],
@@ -88,12 +87,10 @@ describe('Get Files', () => {
       { id: 3, userId: mockUser.id, bucketId: 2 },
     ] as FileEntity[];
 
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
-    jest.spyOn(conversationFileRepository, 'findBy').mockImplementation(() => Promise.resolve([]));
-    jest
-      .spyOn(bucketRepository, 'findOneBy')
-      .mockImplementation(() => Promise.resolve({ id: 1, type: 'general' } as BucketEntity));
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(conversationFileRepository, 'findBy').mockImplementation(() => Promise.resolve([]));
+    vi.spyOn(bucketRepository, 'findOneBy').mockImplementation(() => Promise.resolve({ id: 1, type: 'general' } as BucketEntity));
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 1, page: 0, pageSize: 10 });
 
     const response = await handler.execute(command);
@@ -112,16 +109,16 @@ describe('Get Files', () => {
       { id: 4, userId: mockUser.id, bucketId: 2, conversations: [{ conversationId: 1, fileId: 4 }] },
     ] as FileEntity[];
 
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
-    jest.spyOn(conversationFileRepository, 'findBy').mockImplementation((query) => {
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(conversationFileRepository, 'findBy').mockImplementation((query) => {
       const conversationId = (query as FindOptionsWhere<ConversationFileEntity>).conversationId;
       const result = files.filter((x) => x.conversations.find((y) => y.conversationId === conversationId));
       return Promise.resolve(result.flatMap((x) => x.conversations));
     });
-    jest
-      .spyOn(bucketRepository, 'findOneBy')
-      .mockImplementation(() => Promise.resolve({ id: 1, type: 'conversation' } as BucketEntity));
+    vi.spyOn(bucketRepository, 'findOneBy').mockImplementation(() =>
+      Promise.resolve({ id: 1, type: 'conversation' } as BucketEntity),
+    );
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 1, page: 0, pageSize: 10 });
 
     const response = await handler.execute(command);
@@ -142,12 +139,12 @@ describe('Get Files', () => {
       { id: 4, userId: mockUser.id, bucketId: 2, conversations: [{ conversationId: 1, fileId: 4 }] },
     ] as FileEntity[];
 
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
-    jest
-      .spyOn(bucketRepository, 'findOneBy')
-      .mockImplementation(() => Promise.resolve({ id: 1, type: 'conversation' } as BucketEntity));
-    jest.spyOn(conversationFileRepository, 'findBy').mockImplementation((query) => {
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(bucketRepository, 'findOneBy').mockImplementation(() =>
+      Promise.resolve({ id: 1, type: 'conversation' } as BucketEntity),
+    );
+    vi.spyOn(conversationFileRepository, 'findBy').mockImplementation((query) => {
       const conversationId = (query as FindOptionsWhere<ConversationFileEntity>).conversationId;
       const result = files.filter((x) => x.conversations.find((y) => y.conversationId === conversationId));
       return Promise.resolve(result.flatMap((x) => x.conversations));
@@ -170,9 +167,9 @@ describe('Get Files', () => {
       { id: 2, userId: mockUserDifferent.id, bucketId: 1 },
     ] as FileEntity[];
 
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
-    jest.spyOn(bucketRepository, 'findOneBy').mockImplementation(() => Promise.resolve({ id: 1, type: 'user' } as BucketEntity));
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(bucketRepository, 'findOneBy').mockImplementation(() => Promise.resolve({ id: 1, type: 'user' } as BucketEntity));
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 1, page: 0, pageSize: 10 });
 
     const response = await handler.execute(command);
@@ -189,9 +186,9 @@ describe('Get Files', () => {
       { id: 1, userId: mockUser.id, bucketId: 1 },
       { id: 2, userId: mockUserDifferent.id, bucketId: 1 },
     ] as FileEntity[];
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
-    jest.spyOn(bucketRepository, 'findOneBy').mockImplementation(() => Promise.resolve(null));
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(bucketRepository, 'findOneBy').mockImplementation(() => Promise.resolve(null));
 
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 'user', page: 0, pageSize: 10 });
 
@@ -203,8 +200,8 @@ describe('Get Files', () => {
       { id: 1, userId: mockUser.id, bucketId: 1 },
       { id: 2, userId: mockUserDifferent.id, bucketId: 1 },
     ] as FileEntity[];
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
 
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 'conversation', page: 0, pageSize: 10 });
 
@@ -216,8 +213,8 @@ describe('Get Files', () => {
       { id: 1, userId: mockUser.id, bucketId: 1 },
       { id: 2, userId: mockUserDifferent.id, bucketId: 1 },
     ] as FileEntity[];
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
 
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 'general', page: 0, pageSize: 10 });
 
@@ -231,9 +228,9 @@ describe('Get Files', () => {
       { id: 3, userId: mockUser.id, bucketId: 2 },
     ] as FileEntity[];
 
-    jest.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
-    jest.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
-    jest.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1, type: 'user' } as BucketEntity);
+    vi.spyOn(fileRepository, 'count').mockImplementation((query) => countFiles(query, files));
+    vi.spyOn(fileRepository, 'find').mockImplementation((query) => findFiles(query, files));
+    vi.spyOn(bucketRepository, 'findOneBy').mockResolvedValueOnce({ id: 1, type: 'user' } as BucketEntity);
 
     const command = new GetFiles({ user: mockUser, bucketIdOrType: 'user', page: 0, pageSize: 10 });
     const response = await handler.execute(command);

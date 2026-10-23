@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditLogModule } from 'src/domain/audit-log';
-import { BlobEntity, BucketEntity, ExtensionEntity, FileEntity } from 'src/domain/database';
-import { ConversationFileEntity } from '../database/entities/conversation-file';
+import { AuditLogModule } from '../audit-log/index.js';
+import { ConversationFileEntity } from '../database/entities/conversation-file.js';
+import { BlobEntity, BucketEntity, ExtensionEntity, FileEntity } from '../database/index.js';
 import {
   CreateBucketHandler,
   DeleteBucketHandler,
@@ -19,7 +19,7 @@ import {
   TestBucketHandler,
   UpdateBucketHandler,
   UploadFileHandler,
-} from './use-cases';
+} from './use-cases/index.js';
 
 @Module({
   imports: [

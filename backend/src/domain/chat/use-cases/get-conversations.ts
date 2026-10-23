@@ -1,9 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, IsNull, Not } from 'typeorm';
-import { ConversationEntity, ConversationRepository } from 'src/domain/database';
-import { User } from 'src/domain/users';
-import { Conversation } from '../interfaces';
+import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { User } from '../../users/index.js';
+import { Conversation } from '../interfaces.js';
 
 export class GetConversations {
   constructor(

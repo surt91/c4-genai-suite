@@ -1,11 +1,11 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
-import { assignWithUndefined } from 'src/lib';
-import { UserGroup } from '../interfaces';
-import { buildUserGroup, buildUserGroupSnapshot } from './utils';
+import { assignWithUndefined } from '../../../lib/index.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { UserGroupEntity, UserGroupRepository } from '../../database/index.js';
+import { UserGroup } from '../interfaces.js';
+import { buildUserGroup, buildUserGroupSnapshot } from './utils.js';
 
 type Values = Pick<UserGroup, 'monthlyTokens' | 'monthlyUserTokens' | 'name'>;
 

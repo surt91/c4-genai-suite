@@ -1,6 +1,6 @@
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetExtensionsResponse } from '../../domain/extensions';
-import { ApiResponsesController } from './api.responses.controller';
+import { GetExtensionsResponse } from '../../domain/extensions/index.js';
+import { ApiResponsesController } from './api.responses.controller.js';
 
 describe(ApiResponsesController.name, () => {
   it('selects the model only from LLM extensions', () => {

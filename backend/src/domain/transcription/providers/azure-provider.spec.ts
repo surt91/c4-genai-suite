@@ -1,11 +1,12 @@
-import { AzureTranscriptionProvider } from './azure-provider';
+import type { MockInstance } from 'vitest';
+import { AzureTranscriptionProvider } from './azure-provider.js';
 
 describe('AzureTranscriptionProvider', () => {
   const config = { apiKey: 'key', instanceName: 'my-instance', deploymentName: 'whisper', apiVersion: '2024-06-01' };
-  let fetchMock: jest.SpyInstance;
+  let fetchMock: MockInstance;
 
   beforeEach(() => {
-    fetchMock = jest
+    fetchMock = vi
       .spyOn(globalThis, 'fetch')
       .mockImplementation(() =>
         Promise.resolve(

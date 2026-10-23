@@ -1,6 +1,6 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { Source } from 'src/domain/chat';
-import { convertGaibleJsonToSource, convertGaibleJsonToText, GaibleJsonType } from './gaible-json.type';
+import { Source } from '../../../domain/chat/index.js';
+import { convertGaibleJsonToSource, convertGaibleJsonToText, GaibleJsonType } from './gaible-json.type.js';
 
 export type MCPText = { type: 'text'; text: string };
 export type TransformedResponse = { content: MCPText[]; sources: Source[] };

@@ -5,12 +5,13 @@ import {
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
-import { ExtensionObjectArgument } from 'src/domain/extensions';
-import { schema } from '../typeorm.helper';
-import { ConfigurationEntity } from './configuration';
+import type { ExtensionObjectArgument } from '../../extensions/index.js';
+import { schema } from '../typeorm.helper.js';
+import { ConfigurationEntity } from './configuration.js';
 
 export type ExtensionRepository = Repository<ExtensionEntity>;
 
@@ -48,7 +49,7 @@ export class ExtensionEntity {
   configurableArguments?: ExtensionObjectArgument;
 
   @ManyToOne(() => ConfigurationEntity, (configuration) => configuration.extensions, { onDelete: 'CASCADE' })
-  configuration!: ConfigurationEntity;
+  configuration!: Relation<ConfigurationEntity>;
 
   @Column()
   configurationId!: number;

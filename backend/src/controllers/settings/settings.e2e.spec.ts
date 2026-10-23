@@ -1,12 +1,12 @@
 import { Server } from 'net';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { initAppWithDataBaseAndValidUser, logo } from '../../utils/testUtils';
-import { SettingsDto } from './dtos';
-import { SettingsController } from './settings.controller';
+import { AppModule } from '../../app.module.js';
+import { initAppWithDataBaseAndValidUser, logo } from '../../utils/testUtils.js';
+import { SettingsDto } from './dtos/index.js';
+import { SettingsController } from './settings.controller.js';
 
 describe('Settings', () => {
   let controller: SettingsController;

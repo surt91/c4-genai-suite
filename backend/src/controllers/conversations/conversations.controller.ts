@@ -27,7 +27,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { LocalAuthGuard } from 'src/domain/auth';
+import { LocalAuthGuard } from '../../domain/auth/index.js';
 import {
   CallbackService,
   DeleteConversation,
@@ -50,9 +50,9 @@ import {
   StartConversationResponse,
   UpdateConversation,
   UpdateConversationResponse,
-} from 'src/domain/chat';
-import { GetDocument, GetDocumentResponse } from 'src/domain/chat/use-cases/get-document';
-import { attachmentContentDisposition } from 'src/lib';
+} from '../../domain/chat/index.js';
+import { GetDocument, GetDocumentResponse } from '../../domain/chat/use-cases/get-document.js';
+import { attachmentContentDisposition } from '../../lib/index.js';
 import {
   ChatUICallbackResultDto,
   ConversationDto,
@@ -63,7 +63,7 @@ import {
   SendMessageDto,
   StreamEventHolderDto,
   UpdateConversationDto,
-} from './dtos';
+} from './dtos/index.js';
 
 @Controller('conversations')
 @ApiTags('conversation')

@@ -1,5 +1,5 @@
-import { ConfigurationModel } from '../interfaces';
-import { buildConfigurationSnapshot } from './utils';
+import { ConfigurationModel } from '../interfaces.js';
+import { buildConfigurationSnapshot } from './utils.js';
 
 function makeConfiguration(overrides: Partial<ConfigurationModel> = {}): ConfigurationModel {
   return {

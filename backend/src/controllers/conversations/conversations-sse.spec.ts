@@ -3,10 +3,10 @@ import { AddressInfo } from 'net';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 import { ReplaySubject } from 'rxjs';
-import { SendMessageResponse } from 'src/domain/chat';
-import { StreamEvent } from 'src/domain/chat/interfaces';
-import { CallbackService } from 'src/domain/chat/services/callback-service';
-import { ConversationsController } from './conversations.controller';
+import { SendMessageResponse } from '../../domain/chat/index.js';
+import { StreamEvent } from '../../domain/chat/interfaces.js';
+import { CallbackService } from '../../domain/chat/services/callback-service.js';
+import { ConversationsController } from './conversations.controller.js';
 
 describe('ConversationsController SSE', () => {
   let server: http.Server;

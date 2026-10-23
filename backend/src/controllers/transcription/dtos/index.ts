@@ -1,1 +1,1 @@
-export * from './transcription.dto';
+export * from './transcription.dto.js';

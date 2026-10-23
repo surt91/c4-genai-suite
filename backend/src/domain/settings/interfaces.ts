@@ -1,4 +1,4 @@
-import { ChatSuggestion, SiteLink } from '../shared';
+import { ChatSuggestion, SiteLink } from '../shared.js';
 
 export interface Settings {
   // Language that the app will use

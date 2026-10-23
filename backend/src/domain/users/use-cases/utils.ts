@@ -1,5 +1,5 @@
-import { UserEntity, UserGroupEntity } from 'src/domain/database';
-import { User, UserGroup } from '../interfaces';
+import { UserEntity, UserGroupEntity } from '../../database/index.js';
+import { User, UserGroup } from '../interfaces.js';
 
 export function buildUser(source: UserEntity): User {
   const { apiKey, passwordHash, ...other } = source;

@@ -1,10 +1,10 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from 'src/domain/database';
-import { ExplorerService } from '../services';
-import { buildExtension, buildExtensionSnapshot, maskKeyValues } from './utils';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { ConfigurationEntity, ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ExplorerService } from '../services/index.js';
+import { buildExtension, buildExtensionSnapshot, maskKeyValues } from './utils.js';
 
 export class DeleteExtension {
   constructor(

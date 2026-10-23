@@ -1,29 +1,30 @@
 import { BadRequestException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { I18nService } from 'src/localization/i18n.service';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
-import { ChatSuggestion } from '../../shared';
-import { ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
-import { ExplorerService } from '../services';
-import { PortableConfiguration } from './export-configuration';
-import { ImportConfiguration, ImportConfigurationHandler } from './import-configuration';
+import type { Mock } from 'vitest';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database/index.js';
+import { ChatSuggestion } from '../../shared.js';
+import { ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { PortableConfiguration } from './export-configuration.js';
+import { ImportConfiguration, ImportConfigurationHandler } from './import-configuration.js';
 
 interface MockQueryRunner {
-  connect: jest.Mock;
-  startTransaction: jest.Mock;
-  commitTransaction: jest.Mock;
-  rollbackTransaction: jest.Mock;
-  release: jest.Mock;
+  connect: Mock;
+  startTransaction: Mock;
+  commitTransaction: Mock;
+  rollbackTransaction: Mock;
+  release: Mock;
   manager: {
-    save: jest.Mock;
-    findBy: jest.Mock;
+    save: Mock;
+    findBy: Mock;
   };
 }
 
 interface MockDataSource {
-  createQueryRunner: jest.Mock;
+  createQueryRunner: Mock;
   manager: {
-    findOne: jest.Mock;
+    findOne: Mock;
   };
 }
 
@@ -33,14 +34,14 @@ describe(ImportConfiguration.name, () => {
   let queryRunner: MockQueryRunner;
   let explorer: ExplorerService;
   let i18n: I18nService;
-  let i18nTranslate: jest.Mock;
+  let i18nTranslate: Mock;
 
   beforeEach(() => {
     explorer = {
-      getExtension: jest.fn(),
+      getExtension: vi.fn(),
     } as unknown as ExplorerService;
 
-    i18nTranslate = jest.fn((key: string, args?: Record<string, string>) => {
+    i18nTranslate = vi.fn((key: string, args?: Record<string, string>) => {
       let result = key;
       if (args) {
         Object.entries(args).forEach(([k, v]) => {
@@ -55,21 +56,21 @@ describe(ImportConfiguration.name, () => {
     } as unknown as I18nService;
 
     queryRunner = {
-      connect: jest.fn().mockResolvedValue(undefined),
-      startTransaction: jest.fn().mockResolvedValue(undefined),
-      commitTransaction: jest.fn().mockResolvedValue(undefined),
-      rollbackTransaction: jest.fn().mockResolvedValue(undefined),
-      release: jest.fn().mockResolvedValue(undefined),
+      connect: vi.fn().mockResolvedValue(undefined),
+      startTransaction: vi.fn().mockResolvedValue(undefined),
+      commitTransaction: vi.fn().mockResolvedValue(undefined),
+      rollbackTransaction: vi.fn().mockResolvedValue(undefined),
+      release: vi.fn().mockResolvedValue(undefined),
       manager: {
-        save: jest.fn(),
-        findBy: jest.fn().mockResolvedValue([]),
+        save: vi.fn(),
+        findBy: vi.fn().mockResolvedValue([]),
       },
     };
 
     dataSource = {
-      createQueryRunner: jest.fn().mockReturnValue(queryRunner),
+      createQueryRunner: vi.fn().mockReturnValue(queryRunner),
       manager: {
-        findOne: jest.fn(),
+        findOne: vi.fn(),
       },
     };
 
@@ -77,7 +78,7 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should throw BadRequestException when extension is not available', async () => {
-    jest.spyOn(explorer, 'getExtension').mockReturnValue(undefined);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue(undefined);
 
     const importData: PortableConfiguration = {
       name: 'Test Config',
@@ -100,7 +101,7 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should throw BadRequestException when multiple extensions are not available', async () => {
-    jest.spyOn(explorer, 'getExtension').mockReturnValue(undefined);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue(undefined);
 
     const importData: PortableConfiguration = {
       name: 'Test Config',
@@ -127,7 +128,7 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should throw BadRequestException when extension configuration has missing required field', async () => {
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test-extension',
         arguments: {
@@ -164,7 +165,7 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should throw BadRequestException when extension configuration has invalid data type', async () => {
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test-extension',
         arguments: {
@@ -204,7 +205,7 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should throw BadRequestException when extension configuration violates constraints', async () => {
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test-extension',
         arguments: {
@@ -260,14 +261,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    vi.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [
         {
@@ -279,7 +280,7 @@ describe(ImportConfiguration.name, () => {
       ],
     });
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,
@@ -338,14 +339,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -387,7 +388,7 @@ describe(ImportConfiguration.name, () => {
     };
 
     let savedExtensions: ExtensionEntity[] = [];
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
@@ -397,12 +398,12 @@ describe(ImportConfiguration.name, () => {
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [],
     });
 
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test-ext',
         arguments: {},
@@ -465,7 +466,7 @@ describe(ImportConfiguration.name, () => {
     };
 
     let savedExtensions: ExtensionEntity[] = [];
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
@@ -475,7 +476,7 @@ describe(ImportConfiguration.name, () => {
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [
         {
@@ -488,7 +489,7 @@ describe(ImportConfiguration.name, () => {
       ],
     });
 
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test-extension',
         arguments: {},
@@ -533,14 +534,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -589,14 +590,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -641,7 +642,7 @@ describe(ImportConfiguration.name, () => {
     };
 
     let savedExtensions: ExtensionEntity[] = [];
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
@@ -651,12 +652,12 @@ describe(ImportConfiguration.name, () => {
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue({
       ...savedConfiguration,
       extensions: [],
     });
 
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test-extension',
         arguments: {
@@ -734,14 +735,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -778,7 +779,7 @@ describe(ImportConfiguration.name, () => {
   });
 
   it('should throw BadRequestException when none of the specified user groups exist', async () => {
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -790,7 +791,7 @@ describe(ImportConfiguration.name, () => {
     });
 
     // No user groups found
-    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue([]);
+    vi.spyOn(queryRunner.manager, 'findBy').mockResolvedValue([]);
 
     const importData: PortableConfiguration = {
       name: 'Config with invalid groups',
@@ -824,15 +825,15 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    vi.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -880,15 +881,15 @@ describe(ImportConfiguration.name, () => {
     };
 
     // Only one of two groups found
-    jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    vi.spyOn(queryRunner.manager, 'findBy').mockResolvedValue(mockUserGroups);
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -936,14 +937,14 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
-    jest.spyOn(explorer, 'getExtension').mockReturnValue({
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(explorer, 'getExtension').mockReturnValue({
       spec: {
         name: 'test',
         arguments: {},
@@ -984,13 +985,13 @@ describe(ImportConfiguration.name, () => {
       extensions: [],
     };
 
-    jest.spyOn(queryRunner.manager, 'save').mockImplementation((entity, data) => {
+    queryRunner.manager.save.mockImplementation((entity, data) => {
       if (entity === ConfigurationEntity) {
         return Promise.resolve(savedConfiguration);
       }
       return Promise.resolve(data);
     });
-    jest.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
+    vi.spyOn(dataSource.manager, 'findOne').mockResolvedValue(savedConfiguration);
 
     // Exports of older versions contain the removed executor settings.
     const importData = {

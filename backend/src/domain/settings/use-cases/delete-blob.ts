@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BlobEntity, BlobRepository } from 'src/domain/database';
+import { BlobEntity, BlobRepository } from '../../database/index.js';
 
 export class DeleteBlob {
   constructor(readonly id: string) {}

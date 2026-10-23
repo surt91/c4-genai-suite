@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import * as process from 'node:process';
 import { parseEnv } from 'node:util';
 import { Logger } from '@nestjs/common';
-import { Client } from 'pg';
+import pg from 'pg';
+import type { TestProject } from 'vitest/node';
 
 const logger = new Logger();
 
@@ -13,16 +14,16 @@ const logger = new Logger();
  * The server is taken from `DB_URL` (environment, or else `backend/.env`), e.g. the compose postgres
  * (`docker compose up -d postgres`) or a postgres service container in CI.
  *
- * Every jest worker gets its own freshly (re)created database `<db>_test_<workerId>` (see
- * jest.setup-db.e2e.ts), so the suites can run in parallel and never see data of a previous run.
+ * Every vitest worker gets its own freshly (re)created database `<db>_test_<poolId>` (see
+ * vitest.setup-db.e2e.ts), so the suites can run in parallel and never see data of a previous run.
  * The role in `DB_URL` therefore needs the CREATEDB privilege.
  */
 const readDbUrlFromEnvFile = (): string | undefined => {
-  const envFile = join(__dirname, '.env');
+  const envFile = join(import.meta.dirname, '.env');
   return existsSync(envFile) ? parseEnv(readFileSync(envFile, 'utf8')).DB_URL : undefined;
 };
 
-const init = async (globalConfig: { maxWorkers: number }) => {
+const init = async (project: TestProject) => {
   process.env.TZ = 'UTC';
 
   const baseUrl = process.env.DB_URL || readDbUrlFromEnvFile();
@@ -33,13 +34,13 @@ const init = async (globalConfig: { maxWorkers: number }) => {
     );
   }
   logger.log('using database server from DB_URL');
-  process.env.GAIBLE_TEST_DB_BASE_URL = baseUrl;
+  project.provide('testDbBaseUrl', baseUrl);
   const baseName = new URL(baseUrl).pathname.slice(1) || 'postgres';
 
-  const client = new Client({ connectionString: baseUrl });
+  const client = new pg.Client({ connectionString: baseUrl });
   await client.connect();
   try {
-    const workers = Math.max(1, globalConfig.maxWorkers);
+    const workers = Math.max(1, project.globalConfig.maxWorkers);
     for (let worker = 1; worker <= workers; worker++) {
       const name = `${baseName}_test_${worker}`;
       await client.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);
@@ -49,5 +50,11 @@ const init = async (globalConfig: { maxWorkers: number }) => {
     await client.end();
   }
 };
+
+declare module 'vitest' {
+  export interface ProvidedContext {
+    testDbBaseUrl: string;
+  }
+}
 
 export default init;

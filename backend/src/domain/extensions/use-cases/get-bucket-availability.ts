@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isArray } from 'src/lib';
-import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from '../../database';
-import { ExplorerService } from '../services';
+import { isArray } from '../../../lib/index.js';
+import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { ExplorerService } from '../services/index.js';
 
 export class GetBucketAvailability {
   constructor(

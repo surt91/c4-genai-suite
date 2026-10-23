@@ -1,7 +1,7 @@
-import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
-import { ExplorerService } from '../services';
-import { RebuildExtension, RebuildExtensionHandler } from './rebuild-extension';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { Extension, ExtensionStringArgument } from '../index.js';
+import { ExplorerService } from '../services/index.js';
+import { RebuildExtension, RebuildExtensionHandler } from './rebuild-extension.js';
 
 describe(RebuildExtension.name, () => {
   const extension: Extension = {
@@ -22,8 +22,8 @@ describe(RebuildExtension.name, () => {
   function createHandler(stored: Partial<ExtensionEntity>) {
     const explorer = { getExtension: () => extension } as unknown as ExplorerService;
     const repository = {
-      findOneBy: jest.fn().mockResolvedValue(stored),
-      create: jest.fn((x: object) => x),
+      findOneBy: vi.fn().mockResolvedValue(stored),
+      create: vi.fn((x: object) => x),
     } as unknown as ExtensionRepository;
     return new RebuildExtensionHandler(explorer, repository);
   }

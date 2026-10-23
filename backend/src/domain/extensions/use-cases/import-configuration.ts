@@ -1,12 +1,12 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource, In, QueryRunner } from 'typeorm';
-import { I18nService } from 'src/localization/i18n.service';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity } from '../../database';
-import { ConfigurationModel } from '../interfaces';
-import { ExplorerService } from '../services';
-import { PortableConfiguration, PortableExtension } from './export-configuration';
-import { buildConfiguration, validateConfiguration } from './utils';
+import { I18nService } from '../../../localization/i18n.service.js';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserGroupEntity } from '../../database/index.js';
+import { ConfigurationModel } from '../interfaces.js';
+import { ExplorerService } from '../services/index.js';
+import { PortableConfiguration, PortableExtension } from './export-configuration.js';
+import { buildConfiguration, validateConfiguration } from './utils.js';
 
 export class ImportConfiguration {
   constructor(public readonly data: PortableConfiguration) {}

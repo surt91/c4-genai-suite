@@ -23,7 +23,7 @@ import {
   FormActionType,
   GetContext,
   NamedDynamicStructuredTool,
-} from 'src/domain/chat';
+} from '../../domain/chat/index.js';
 import {
   Extension,
   ExtensionArgument,
@@ -31,11 +31,11 @@ import {
   ExtensionObjectArgument,
   ExtensionSpec,
   ExtensionStringArgument,
-} from 'src/domain/extensions';
-import { User } from 'src/domain/users';
-import { parseHeaders, renderTemplate } from 'src/lib';
-import { I18nService } from '../../localization/i18n.service';
-import { transformMCPToolResponse } from './mcp-types/transformer';
+} from '../../domain/extensions/index.js';
+import { User } from '../../domain/users/index.js';
+import { parseHeaders, renderTemplate } from '../../lib/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
+import { transformMCPToolResponse } from './mcp-types/transformer.js';
 
 /**
  * Input schema of a tool for the LLM: only the attributes that are configured to be defined by the LLM are exposed. The

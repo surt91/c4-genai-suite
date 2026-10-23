@@ -7,13 +7,14 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { ChatInteraction, Source } from 'src/domain/chat';
-import { schema } from '../typeorm.helper';
-import { ConfigurationEntity } from './configuration';
-import { ConversationEntity } from './conversation';
-import { ConversationFileEntity } from './conversation-file';
+import { ChatInteraction, Source } from '../../chat/index.js';
+import { schema } from '../typeorm.helper.js';
+import { ConfigurationEntity } from './configuration.js';
+import { ConversationFileEntity } from './conversation-file.js';
+import { ConversationEntity } from './conversation.js';
 
 export type ExtensionSource = Source & { extensionExternalId: string };
 
@@ -56,7 +57,7 @@ export class MessageEntity {
 
   @ManyToOne(() => ConfigurationEntity)
   @JoinColumn({ name: 'configurationId' })
-  configuration!: ConfigurationEntity;
+  configuration!: Relation<ConfigurationEntity>;
 
   @Column('simple-json', { nullable: true })
   debug?: any;
@@ -65,13 +66,13 @@ export class MessageEntity {
   sources?: ExtensionSource[];
 
   @ManyToOne(() => ConversationEntity, (conversation) => conversation.messages, { onDelete: 'CASCADE' })
-  conversation!: ConversationEntity;
+  conversation!: Relation<ConversationEntity>;
 
   @Column({ nullable: true })
   parentId?: number;
 
   @ManyToOne(() => MessageEntity, (message) => message.children, { onDelete: 'CASCADE', nullable: true })
-  parent?: MessageEntity;
+  parent?: Relation<MessageEntity>;
 
   @OneToMany(() => MessageEntity, (message) => message.parent, { onDelete: 'CASCADE', cascade: true })
   children!: MessageEntity[];

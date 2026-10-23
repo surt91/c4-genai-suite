@@ -15,8 +15,8 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
 import {
   ConfiguredExtension,
   CreateConfiguration,
@@ -42,14 +42,14 @@ import {
   UpdateConfigurationResponse,
   UpdateExtension,
   UpdateExtensionResponse,
-} from 'src/domain/extensions';
-import { ExplorerService } from 'src/domain/extensions/services';
+} from '../../domain/extensions/index.js';
+import { ExplorerService } from '../../domain/extensions/services/index.js';
 import {
   GetConfigurationUserValues,
   GetConfigurationUserValuesResponse,
-} from 'src/domain/extensions/use-cases/get-configuration-user-values';
-import { DuplicateConfigurationResponse } from '../../domain/extensions/use-cases';
-import { UpdateConfigurationUserValues } from '../../domain/extensions/use-cases/update-configuration-user-values';
+} from '../../domain/extensions/use-cases/get-configuration-user-values.js';
+import { DuplicateConfigurationResponse } from '../../domain/extensions/use-cases/index.js';
+import { UpdateConfigurationUserValues } from '../../domain/extensions/use-cases/update-configuration-user-values.js';
 import {
   BucketAvailabilityDto,
   ConfigurationDto,
@@ -63,7 +63,7 @@ import {
   ImportConfigurationResponseDto,
   UpdateExtensionDto,
   UpsertConfigurationDto,
-} from './dtos';
+} from './dtos/index.js';
 
 @Controller('configurations')
 @ApiTags('extensions')

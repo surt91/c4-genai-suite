@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ExtensionEntity, ExtensionRepository } from '../../database';
-import { ExplorerService } from '../services';
-import { TestExtension, TestExtensionHandler } from './test-extension';
+import { ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { Extension, ExtensionStringArgument } from '../index.js';
+import { ExplorerService } from '../services/index.js';
+import { TestExtension, TestExtensionHandler } from './test-extension.js';
 
 describe(TestExtension.name, () => {
   let handler: TestExtensionHandler;
@@ -11,17 +11,17 @@ describe(TestExtension.name, () => {
 
   beforeEach(() => {
     explorer = {
-      getExtension: jest.fn(),
+      getExtension: vi.fn(),
     } as unknown as ExplorerService;
     repository = {
-      findOneBy: jest.fn(),
+      findOneBy: vi.fn(),
     } as unknown as ExtensionRepository;
 
     handler = new TestExtensionHandler(explorer, repository);
   });
 
   it('should throw not found when extension does not exist', async () => {
-    jest.spyOn(explorer, 'getExtension').mockImplementation(() => undefined);
+    vi.spyOn(explorer, 'getExtension').mockImplementation(() => undefined);
 
     try {
       const result = await handler.execute(new TestExtension('unknown', {}));
@@ -32,7 +32,7 @@ describe(TestExtension.name, () => {
   });
 
   it('should throw bad request when extension test method does not exist', async () => {
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return { spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' } } as Extension;
     });
 
@@ -45,7 +45,7 @@ describe(TestExtension.name, () => {
   });
 
   it('should throw not found when extension entity does not exist', async () => {
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test: async () => {},
@@ -53,7 +53,7 @@ describe(TestExtension.name, () => {
       };
     });
 
-    jest.spyOn(repository, 'findOneBy').mockImplementation(() => Promise.resolve(null));
+    vi.spyOn(repository, 'findOneBy').mockImplementation(() => Promise.resolve(null));
 
     try {
       const result = await handler.execute(new TestExtension('unknown', {}, 1));
@@ -64,9 +64,9 @@ describe(TestExtension.name, () => {
   });
 
   it('should succeed when extension, test method and extension entity exist', async () => {
-    const test = jest.fn().mockImplementation(() => {});
+    const test = vi.fn().mockImplementation(() => {});
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test,
@@ -74,7 +74,7 @@ describe(TestExtension.name, () => {
       };
     });
 
-    jest.spyOn(repository, 'findOneBy').mockImplementation(async () => {
+    vi.spyOn(repository, 'findOneBy').mockImplementation(async () => {
       return Promise.resolve({ name: 'unknown' } as ExtensionEntity);
     });
 
@@ -83,9 +83,9 @@ describe(TestExtension.name, () => {
   });
 
   it('should succeed and remove masked values', async () => {
-    const test = jest.fn().mockImplementation(() => {});
+    const test = vi.fn().mockImplementation(() => {});
 
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => {
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => {
       return {
         spec: {
           name,
@@ -109,7 +109,7 @@ describe(TestExtension.name, () => {
       };
     });
 
-    jest.spyOn(repository, 'findOneBy').mockImplementation(async () => {
+    vi.spyOn(repository, 'findOneBy').mockImplementation(async () => {
       return Promise.resolve({ name: 'unknown' } as ExtensionEntity);
     });
 
@@ -131,15 +131,16 @@ describe(TestExtension.name, () => {
   });
 
   it('should not use the stored values of an extension of another type', async () => {
-    const test = jest.fn();
-    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => ({
+    const test = vi.fn();
+    vi.spyOn(explorer, 'getExtension').mockImplementation((name) => ({
       spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
       test,
       getMiddlewares: () => Promise.resolve([]),
     }));
-    jest
-      .spyOn(repository, 'findOneBy')
-      .mockResolvedValue({ name: 'other', values: { apiKey: 'secret' } } as unknown as ExtensionEntity);
+    vi.spyOn(repository, 'findOneBy').mockResolvedValue({
+      name: 'other',
+      values: { apiKey: 'secret' },
+    } as unknown as ExtensionEntity);
 
     await expect(handler.execute(new TestExtension('open-ai', { endpoint: 'http://attacker' }, 1))).rejects.toMatchObject({
       status: HttpStatus.NOT_FOUND,

@@ -11,12 +11,12 @@ import {
   Repository,
   UpdateDateColumn,
 } from 'typeorm';
-import { ChatSuggestion } from 'src/domain/shared';
-import { schema } from '../typeorm.helper';
-import { ConfigurationUserEntity } from './configuration-user';
-import { ConversationEntity } from './conversation';
-import { ExtensionEntity } from './extension';
-import { UserGroupEntity } from './user-group';
+import { ChatSuggestion } from '../../shared.js';
+import { schema } from '../typeorm.helper.js';
+import { ConfigurationUserEntity } from './configuration-user.js';
+import { ConversationEntity } from './conversation.js';
+import { ExtensionEntity } from './extension.js';
+import { UserGroupEntity } from './user-group.js';
 
 export type ConfigurationRepository = Repository<ConfigurationEntity>;
 

@@ -2,11 +2,11 @@ import { randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
-import { assignDefined, hashApiKey } from 'src/lib';
-import { User } from '../interfaces';
-import { buildUser, buildUserSnapshot } from './utils';
+import { assignDefined, hashApiKey } from '../../../lib/index.js';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { UserEntity, UserGroupEntity, UserRepository } from '../../database/index.js';
+import { User } from '../interfaces.js';
+import { buildUser, buildUserSnapshot } from './utils.js';
 
 type Values = Pick<User, 'apiKey' | 'email' | 'name' | 'userGroupIds'> & { password?: string };
 

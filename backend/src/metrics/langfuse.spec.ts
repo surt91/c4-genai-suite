@@ -2,7 +2,7 @@ import { createServer, IncomingHttpHeaders, Server } from 'http';
 import { AddressInfo } from 'net';
 import { ConfigService } from '@nestjs/config';
 import { SimpleSpanProcessor, TracerProvider } from '@opentelemetry/sdk-trace';
-import { getLangfuseConfig, LangfuseSpanExporter } from './langfuse';
+import { getLangfuseConfig, LangfuseSpanExporter } from './langfuse.js';
 
 interface ReceivedRequest {
   url?: string;

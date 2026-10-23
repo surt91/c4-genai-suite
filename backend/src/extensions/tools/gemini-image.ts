@@ -4,13 +4,13 @@ import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { generateText } from 'ai';
 import { z } from 'zod';
-import { AuthService } from 'src/domain/auth';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
-import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
-import { UploadBlob } from 'src/domain/settings';
-import { User } from 'src/domain/users';
-import { BlobCategory } from '../../domain/database';
-import { I18nService } from '../../localization/i18n.service';
+import { AuthService } from '../../domain/auth/index.js';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from '../../domain/chat/index.js';
+import { BlobCategory } from '../../domain/database/index.js';
+import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
+import { UploadBlob } from '../../domain/settings/index.js';
+import { User } from '../../domain/users/index.js';
+import { I18nService } from '../../localization/i18n.service.js';
 
 @Extension()
 export class GeminiImageExtension implements Extension<GeminiImageExtensionConfiguration> {

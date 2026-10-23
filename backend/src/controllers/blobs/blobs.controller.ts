@@ -1,8 +1,8 @@
 import { Controller, Get, Header, NotFoundException, Param, StreamableFile, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard } from 'src/domain/auth';
-import { GetBlob, GetBlobResponse } from 'src/domain/settings';
+import { LocalAuthGuard } from '../../domain/auth/index.js';
+import { GetBlob, GetBlobResponse } from '../../domain/settings/index.js';
 
 @Controller('blobs')
 @ApiTags('blobs')

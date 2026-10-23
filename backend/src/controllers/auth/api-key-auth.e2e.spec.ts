@@ -3,10 +3,10 @@ import { Server } from 'net';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { BUILTIN_USER_GROUP_ADMIN, UserEntity, UserGroupEntity } from '../../domain/database';
+import { AppModule } from '../../app.module.js';
+import { BUILTIN_USER_GROUP_ADMIN, UserEntity, UserGroupEntity } from '../../domain/database/index.js';
 
 const ADMIN_API_KEY = 'admin-secret-key-12345';
 const USER_API_KEY = 'user-secret-key-67890';

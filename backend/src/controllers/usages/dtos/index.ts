@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Rating, Usage } from 'src/domain/chat/use-cases';
+import { Rating, Usage } from '../../../domain/chat/use-cases/index.js';
 
-import { AssistantsCount, MessagesCount, UsagesCount } from '../../../domain/database';
+import { AssistantsCount, MessagesCount, UsagesCount } from '../../../domain/database/index.js';
 
 export class UsageDto {
   @ApiProperty({

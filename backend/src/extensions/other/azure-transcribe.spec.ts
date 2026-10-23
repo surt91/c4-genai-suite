@@ -1,5 +1,5 @@
-import { I18nService } from '../../localization/i18n.service';
-import { AzureTranscribeExtension } from './azure-transcribe';
+import { I18nService } from '../../localization/i18n.service.js';
+import { AzureTranscribeExtension } from './azure-transcribe.js';
 
 describe('AzureTranscribeExtension', () => {
   let extension: AzureTranscribeExtension;

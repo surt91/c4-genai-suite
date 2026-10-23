@@ -2,8 +2,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from 
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { LocalAuthGuard, Role, RoleGuard } from 'src/domain/auth';
-import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
+import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
+import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
 import {
   CreateUserGroup,
   CreateUserGroupResponse,
@@ -12,8 +12,8 @@ import {
   GetUserGroupsResponse,
   UpdateUserGroup,
   UpdateUserGroupResponse,
-} from 'src/domain/users';
-import { UpsertUserGroupDto, UserGroupDto, UserGroupsDto } from './dtos';
+} from '../../domain/users/index.js';
+import { UpsertUserGroupDto, UserGroupDto, UserGroupsDto } from './dtos/index.js';
 
 @Controller('user-groups')
 @ApiTags('users')

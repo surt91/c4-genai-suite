@@ -1,5 +1,5 @@
-export * from './interfaces';
-export * from './module';
+export * from './interfaces.js';
+export * from './module.js';
 export {
   CreateConfiguration,
   CreateConfigurationResponse,
@@ -28,4 +28,4 @@ export {
   UpdateConfigurationResponse,
   UpdateExtension,
   UpdateExtensionResponse,
-} from './use-cases';
+} from './use-cases/index.js';

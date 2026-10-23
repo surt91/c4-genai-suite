@@ -1,6 +1,6 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
-import { AuditLogService } from '../../audit-log/use-cases/create-audit-log';
-import { ExtensionArgument } from '../../extensions';
+import { AuditLogService } from '../../audit-log/use-cases/create-audit-log.js';
+import { ExtensionArgument } from '../../extensions/index.js';
 import {
   ChatContext,
   ChatInteraction,
@@ -15,8 +15,8 @@ import {
   ChatUIUrlCompletion,
   FormActionType,
   GetContext,
-} from '../interfaces';
-import { CallbackService } from '../services/callback-service';
+} from '../interfaces.js';
+import { CallbackService } from '../services/callback-service.js';
 
 // Logins at other services take longer than answering a form.
 export const URL_TIMEOUT = Number(process.env.CHAT_URL_TIMEOUT_MS) || 10 * 60 * 1000;

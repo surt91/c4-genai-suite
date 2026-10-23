@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
-import { SettingEntity, SettingRepository } from 'src/domain/database';
-import { Settings } from '../interfaces';
-import { buildSettings, buildSettingsSnapshot } from './utils';
+import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
+import { SettingEntity, SettingRepository } from '../../database/index.js';
+import { Settings } from '../interfaces.js';
+import { buildSettings, buildSettingsSnapshot } from './utils.js';
 
 export class UpdateSettings {
   constructor(

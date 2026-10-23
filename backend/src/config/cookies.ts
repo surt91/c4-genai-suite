@@ -1,7 +1,7 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
-import { AuthConfig, AuthService, SessionStorage } from 'src/domain/auth';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import { AuthConfig, AuthService, SessionStorage } from '../domain/auth/index.js';
 
 const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';

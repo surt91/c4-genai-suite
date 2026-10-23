@@ -1,9 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
-import { AuditLogService } from 'src/domain/audit-log';
-import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
-import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database';
-import { ExplorerService } from '../services';
-import { DeleteExtension, DeleteExtensionHandler } from './delete-extension';
+import { AuditLogService } from '../../audit-log/index.js';
+import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
+import { Extension, ExtensionStringArgument } from '../index.js';
+import { ExplorerService } from '../services/index.js';
+import { DeleteExtension, DeleteExtensionHandler } from './delete-extension.js';
 
 const mockPerformedBy = { id: 'test-user', name: 'Test User' };
 
@@ -54,39 +54,39 @@ describe(DeleteExtension.name, () => {
   let auditLogService: AuditLogService;
 
   beforeEach(() => {
-    explorer = { getExtension: jest.fn() } as unknown as ExplorerService;
+    explorer = { getExtension: vi.fn() } as unknown as ExplorerService;
     extensionRepository = {
-      findOneBy: jest.fn(),
-      delete: jest.fn(),
+      findOneBy: vi.fn(),
+      delete: vi.fn(),
     } as unknown as ExtensionRepository;
     configurationRepository = {
-      findOneBy: jest.fn().mockResolvedValue({ id: 1, name: 'My Config' }),
+      findOneBy: vi.fn().mockResolvedValue({ id: 1, name: 'My Config' }),
     } as unknown as ConfigurationRepository;
     auditLogService = {
-      createAuditLog: jest.fn().mockResolvedValue({}),
+      createAuditLog: vi.fn().mockResolvedValue({}),
     } as unknown as AuditLogService;
 
     handler = new DeleteExtensionHandler(extensionRepository, configurationRepository, explorer, auditLogService);
   });
 
   it('should throw NotFoundException when extension does not exist', async () => {
-    jest.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(null);
-    jest.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 0, raw: [] });
+    vi.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(null);
+    vi.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 0, raw: [] });
 
     await expect(handler.execute(new DeleteExtension(99, mockPerformedBy))).rejects.toThrow(NotFoundException);
   });
 
   describe('audit log snapshot masking', () => {
     it('masks password-type argument values in the delete snapshot', async () => {
-      jest.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(makeExtensionEntity());
-      jest.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
-      jest.spyOn(explorer, 'getExtension').mockReturnValue(makeExtensionWithPassword());
+      vi.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(makeExtensionEntity());
+      vi.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
+      vi.spyOn(explorer, 'getExtension').mockReturnValue(makeExtensionWithPassword());
 
       await handler.execute(new DeleteExtension(7, mockPerformedBy));
 
       // Access the captured call argument via the typed mock to inspect snapshot values.
       // snapshot is Record<string, any> per CreateAuditLogParams — cast to known shape.
-      const params = jest.mocked(auditLogService.createAuditLog).mock.calls[0][0];
+      const params = vi.mocked(auditLogService.createAuditLog).mock.calls[0][0];
       const values = params.snapshot['values'] as Record<string, string>;
 
       // Password field must be masked; non-password field must remain unchanged.
@@ -95,24 +95,24 @@ describe(DeleteExtension.name, () => {
     });
 
     it('does not persist the raw credential in the audit log snapshot on delete', async () => {
-      jest.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(makeExtensionEntity());
-      jest.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
-      jest.spyOn(explorer, 'getExtension').mockReturnValue(makeExtensionWithPassword());
+      vi.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(makeExtensionEntity());
+      vi.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
+      vi.spyOn(explorer, 'getExtension').mockReturnValue(makeExtensionWithPassword());
 
       await handler.execute(new DeleteExtension(7, mockPerformedBy));
 
       // Raw secret must never appear under the stored values — confirmed by
       // checking that the masked value is stored instead (see sibling test).
-      const params = jest.mocked(auditLogService.createAuditLog).mock.calls[0][0];
+      const params = vi.mocked(auditLogService.createAuditLog).mock.calls[0][0];
       const values = params.snapshot['values'] as Record<string, string>;
 
       expect(values['apiKey']).not.toBe('super-secret');
     });
 
     it('records the correct action and entityId in the audit log', async () => {
-      jest.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(makeExtensionEntity());
-      jest.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
-      jest.spyOn(explorer, 'getExtension').mockReturnValue(makeExtensionWithPassword());
+      vi.spyOn(extensionRepository, 'findOneBy').mockResolvedValue(makeExtensionEntity());
+      vi.spyOn(extensionRepository, 'delete').mockResolvedValue({ affected: 1, raw: [] });
+      vi.spyOn(explorer, 'getExtension').mockReturnValue(makeExtensionWithPassword());
 
       await handler.execute(new DeleteExtension(7, mockPerformedBy));
 

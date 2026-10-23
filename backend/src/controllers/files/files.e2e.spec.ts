@@ -1,22 +1,28 @@
 import { Server } from 'net';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
-import { AppModule } from '../../app.module';
-import { ConfigurationEntity, ConfigurationStatus, ConversationEntity, MessageEntity, UserEntity } from '../../domain/database';
-import { UserGroupEntity } from '../../domain/database/entities/user-group';
-import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils';
+import { AppModule } from '../../app.module.js';
+import { UserGroupEntity } from '../../domain/database/entities/user-group.js';
+import {
+  ConfigurationEntity,
+  ConfigurationStatus,
+  ConversationEntity,
+  MessageEntity,
+  UserEntity,
+} from '../../domain/database/index.js';
+import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 
-jest.mock('../../domain/files/use-cases/generated/apis', () => {
+vi.mock('../../domain/files/use-cases/generated/apis/index.js', () => {
   return {
-    FilesApi: jest.fn().mockImplementation(() => {
+    FilesApi: vi.fn().mockImplementation(function () {
       return {
-        uploadFile: jest.fn(),
-        getFileTypes: jest.fn(() => {
+        uploadFile: vi.fn(),
+        getFileTypes: vi.fn(() => {
           return { items: [{ fileNameExtension: 'txt' }] };
         }),
-        deleteFile: jest.fn(),
+        deleteFile: vi.fn(),
       };
     }),
   };

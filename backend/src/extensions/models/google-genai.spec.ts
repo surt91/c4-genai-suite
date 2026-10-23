@@ -1,11 +1,11 @@
-import { GoogleGenAIModelExtension } from './google-genai';
-import { modelExtensionTestSuite } from './model-test.base';
+import { GoogleGenAIModelExtension } from './google-genai.js';
+import { modelExtensionTestSuite } from './model-test.base.js';
 
-jest.mock('@ai-sdk/google', () => ({
-  createGoogleGenerativeAI: jest.fn(() => () => 'mocked model'),
+vi.mock('@ai-sdk/google', () => ({
+  createGoogleGenerativeAI: vi.fn(() => () => 'mocked model'),
 }));
-jest.mock('ai', () => ({
-  generateText: jest.fn(() => () => 'test output'),
+vi.mock('ai', () => ({
+  generateText: vi.fn(() => () => 'test output'),
 }));
 
 const mockConfig = {
