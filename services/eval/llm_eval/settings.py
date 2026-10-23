@@ -52,20 +52,13 @@ class CelerySettings(BaseSettings, prefix="CELERY_"):
 
 
 class EvaluationSettings(BaseSettings, prefix="EVALUATION_"):
-    max_retries: int = Field(default=10)
     run_async: bool = Field(default=True)
     show_indicator: bool = Field(default=True)
     parallel_test_cases: int = Field(default=1)
-    parallel_generation_limit: int = Field(default=5)
 
 
 class DeepEvalSettings(BaseSettings, prefix="DEEPEVAL_"):
     max_retries: int = Field(default=10)
-
-
-class RagasSettings(BaseSettings, prefix="RAGAS_"):
-    parallel_generation_limit: int = Field(default=5)
-    embeddings: dict[str, Any] = Field(default_factory=dict)
 
 
 class FileStoreSettings(BaseSettings, prefix="FILE_STORE_"):
@@ -93,7 +86,6 @@ class Settings(BaseSettings):
     evaluation: EvaluationSettings = EvaluationSettings()
 
     deepeval: DeepEvalSettings = DeepEvalSettings()
-    ragas: RagasSettings = RagasSettings()
     file_store: FileStoreSettings = FileStoreSettings()
     gaible_backend: GaibleBackendSettings = GaibleBackendSettings()
 
@@ -106,7 +98,6 @@ class Settings(BaseSettings):
     pg_host: str = Field(default="localhost")
     pg_db: str = Field(default="postgres")
     pg_port: int = Field(default=5432)
-    pg_schema: str = Field(default="llm_eval")
 
     @property
     def connection_string(self) -> str:

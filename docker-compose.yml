@@ -169,7 +169,6 @@ services:
       PG_PASSWORD: secret
       PG_DB: gaible
       PG_PORT: 5432
-      PG_SCHEMA: llm_eval
       CELERY_BROKER_HOST: rabbitmq
       CELERY_BROKER_USER: rabbit
       CELERY_BROKER_PASSWORD: rabbit
