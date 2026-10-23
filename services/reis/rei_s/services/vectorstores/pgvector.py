@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from langchain_core.embeddings.embeddings import Embeddings
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 
 from rei_s import logger
 from rei_s.config import Config
@@ -13,8 +13,9 @@ from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFi
 
 lock = Lock()
 
-# Cache for vector store instances to prevent creating multiple connections
-_vector_store_cache: Dict[str, PGVector] = {}
+# Cache for vector store instances (per url and collection) and engines (per url) to reuse connections
+_vector_store_cache: Dict[tuple[str, str], PGVector] = {}
+_engine_cache: Dict[str, Engine] = {}
 
 
 class PGVectorStoreAdapter(VectorStoreAdapter):
@@ -25,14 +26,10 @@ class PGVectorStoreAdapter(VectorStoreAdapter):
         if config.store_pgvector_url is None:
             raise ValueError("The env variable `STORE_PGVECTOR_URL` is missing.")
 
-        collection_name = index_name
-        if collection_name is None:
-            collection_name = config.store_pgvector_index_name
-        if collection_name is None:
-            collection_name = "index"
+        collection_name = index_name if index_name is not None else config.store_pgvector_index_name
 
-        # Create a cache key based on connection URL and collection name
-        cache_key = f"{config.store_pgvector_url}:{collection_name}"
+        url = config.store_pgvector_url.get_secret_value()
+        cache_key = (url, collection_name)
 
         # In the python version the table name is hardcoded in langchain to `langchain_pg_collection`
         # https://github.com/langchain-ai/langchain/discussions/17223
@@ -42,12 +39,11 @@ class PGVectorStoreAdapter(VectorStoreAdapter):
         with lock:
             # Check if we already have a vector store instance for this configuration
             if cache_key not in _vector_store_cache:
-                engine = create_engine(
-                    config.store_pgvector_url.get_secret_value(),
-                    pool_size=5,
-                    max_overflow=10,
-                    pool_recycle=3600,
-                )
+                # all collections share one connection pool, otherwise every index would hold its own connections
+                engine = _engine_cache.get(url)
+                if engine is None:
+                    engine = create_engine(url, pool_size=5, max_overflow=10, pool_recycle=3600)
+                    _engine_cache[url] = engine
 
                 pg_vector_store = PGVector(
                     embeddings,

@@ -164,6 +164,26 @@ def test_get_documents_content(file_uploader: FileUploaderFixture, client: TestC
     assert content_document == [file_content]
 
 
+def test_reupload_replaces_chunks(file_uploader: FileUploaderFixture, client: TestClient) -> None:
+    file_uploader(bucket=1, file_id=1)
+    _filename, content = file_uploader(bucket=1, file_id=1)
+
+    response = client.get("/files", params={"query": "test", "bucket": "1", "take": "10", "indexName": INDEX_NAME})
+    assert response.status_code == 200
+
+    assert [file["content"] for file in response.json()["files"]] == [content]
+
+
+def test_collections_share_the_engine() -> None:
+    embeddings = RandomEmbeddings(size=8)
+    config = get_config_override()
+    store = PGVectorStoreAdapter.create(config, embeddings, INDEX_NAME)
+    other = PGVectorStoreAdapter.create(config, embeddings, OTHER_INDEX_NAME)
+
+    assert store.vector_store is not other.vector_store
+    assert store.vector_store._engine is other.vector_store._engine
+
+
 def test_get_files_other_bucket(file_uploader: FileUploaderFixture, client: TestClient) -> None:
     _filename, _input_content = file_uploader(bucket=1, file_id=1)
 
