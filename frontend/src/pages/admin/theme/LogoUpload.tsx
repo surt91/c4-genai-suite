@@ -117,6 +117,8 @@ function LogoInput({
       type="file"
       value={!previewLogo ? '' : undefined}
       data-testid="logo-upload-input"
+      // the logo is shown as an image
+      accept="image/*"
       className={classes.fileInput}
       onChange={(event) => onChange(event.target.files?.[0])}
       aria-label={texts.accessibility.uploadLogoFile}
