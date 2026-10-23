@@ -29,7 +29,7 @@ def get_embeddings(config: Config) -> Embeddings:
         # (there were problems with vLLM)
         # this is ensured by the config validation, the following lines are there to help the ty typechecker
         if config.embeddings_openai_compatible_model_name is None:
-            raise ValueError("The env variable `EMBEDDINGS_OPENAI_MODEL_NAME` is missing.")
+            raise ValueError("The env variable `EMBEDDINGS_OPENAI_COMPATIBLE_MODEL_NAME` is missing.")
 
         return OpenAIEmbeddings(
             openai_api_key=config.embeddings_openai_compatible_api_key,  # ty: ignore[unknown-argument]
@@ -84,11 +84,11 @@ def get_embeddings(config: Config) -> Embeddings:
         )
     elif config.embeddings_type.lower() == "nvidia":
         if config.embeddings_nvidia_api_key is None:
-            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_MODEL` is missing.")
+            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_API_KEY` is missing.")
         if config.embeddings_nvidia_base_url is None:
             raise ValueError("The env variable `EMBEDDINGS_NVIDIA_BASE_URL` is missing.")
         if config.embeddings_nvidia_model is None:
-            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_API_KEY` is missing.")
+            raise ValueError("The env variable `EMBEDDINGS_NVIDIA_MODEL` is missing.")
 
         return NVIDIAEmbeddings(
             model=config.embeddings_nvidia_model,

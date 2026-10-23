@@ -58,7 +58,7 @@ def check_valid_s3_bucket_name(bucket_name: str | None) -> None:
     if not re.match(r"^[a-z0-9]([a-z0-9\.-]*[a-z0-9])?$", bucket_name):
         raise ValueError(
             "FILE_STORE_S3_BUCKET_NAME must only contain lowercase letters, numbers, dots, and hyphens "
-            "and start with and start with a letter or number"
+            "and start and end with a letter or number"
         )
 
     if ".." in bucket_name or ".-" in bucket_name or "-." in bucket_name:
@@ -169,7 +169,7 @@ class Config(BaseSettings):
             needed_for_filesystem = {
                 "FILE_STORE_FILESYSTEM_BASEPATH": self.file_store_filesystem_basepath,
             }
-            check_required_arguments(needed_for_filesystem, "FILE_STORE_TYPE", "filesystemsearch")
+            check_required_arguments(needed_for_filesystem, "FILE_STORE_TYPE", "filesystem")
 
         return self
 
@@ -210,19 +210,19 @@ class Config(BaseSettings):
             check_required_arguments(needed_for_bedrock, "EMBEDDINGS_TYPE", "bedrock")
 
         if self.embeddings_type == "ollama":
-            needed_for_azure_open_ai = {
+            needed_for_ollama = {
                 "EMBEDDINGS_OLLAMA_ENDPOINT": self.embeddings_ollama_endpoint,
                 "EMBEDDINGS_OLLAMA_MODEL_NAME": self.embeddings_ollama_model_name,
             }
-            check_required_arguments(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "ollama")
+            check_required_arguments(needed_for_ollama, "EMBEDDINGS_TYPE", "ollama")
 
         if self.embeddings_type == "nvidia":
-            needed_for_azure_open_ai = {
+            needed_for_nvidia = {
                 "EMBEDDINGS_NVIDIA_MODEL": self.embeddings_nvidia_model,
                 "EMBEDDINGS_NVIDIA_BASE_URL": self.embeddings_nvidia_base_url,
                 "EMBEDDINGS_NVIDIA_API_KEY": self.embeddings_nvidia_api_key,
             }
-            check_required_arguments(needed_for_azure_open_ai, "EMBEDDINGS_TYPE", "nvidia")
+            check_required_arguments(needed_for_nvidia, "EMBEDDINGS_TYPE", "nvidia")
 
         return self
 
