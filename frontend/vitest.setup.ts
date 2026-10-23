@@ -39,6 +39,14 @@ beforeAll(() => {
   }
 
   window.ResizeObserver = ResizeObserver;
+
+  // used by Mantine's autosize textarea, not implemented by jsdom
+  if (!document.fonts) {
+    Object.defineProperty(document, 'fonts', {
+      value: { addEventListener: vi.fn(), removeEventListener: vi.fn() },
+      configurable: true,
+    });
+  }
 });
 
 afterEach(() => {
