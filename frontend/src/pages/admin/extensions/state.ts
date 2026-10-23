@@ -7,14 +7,17 @@ interface ExtensionsState {
 
   // The extensions.
   extensions: ExtensionDto[];
+
+  // The configuration (assistant) of the extensions.
+  configurationId?: number;
 }
 
 type ExtensionsActions = {
   // Adds or sets an extension.
   setExtension: (extension: ExtensionDto) => void;
 
-  // Sets all extensions.
-  setExtensions: (source: ExtensionDto[], specs: ExtensionSpecDto[]) => void;
+  // Sets all extensions of a configuration.
+  setExtensions: (source: ExtensionDto[], specs: ExtensionSpecDto[], configurationId: number) => void;
 
   // Remove an extension.
   removeExtension: (id: number) => void;
@@ -59,7 +62,7 @@ const useExtensionsStore_ = create<ExtensionsState & ExtensionsActions>()((set) 
       return { extensions };
     });
   },
-  setExtensions: (source: ExtensionDto[], specs: ExtensionSpecDto[]) => {
+  setExtensions: (source: ExtensionDto[], specs: ExtensionSpecDto[], configurationId: number) => {
     const extensions: ExtensionDto[] = [];
 
     for (const extension of source) {
@@ -70,7 +73,7 @@ const useExtensionsStore_ = create<ExtensionsState & ExtensionsActions>()((set) 
       }
     }
 
-    return set({ extensions, specs });
+    return set({ extensions, specs, configurationId });
   },
   removeExtension: (id: number) => {
     return set((state) => ({ extensions: state.extensions.filter((x) => x.id !== id) }));

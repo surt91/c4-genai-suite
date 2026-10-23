@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Route, Routes } from 'react-router-dom';
 import { ConfigurationDto, ExportedConfigurationDto, useApi } from 'src/api';
 import { Icon, Page } from 'src/components';
+import { RemountOnParam } from 'src/components/RemountOnParam';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
 import { toast } from 'src/lib/notifications';
@@ -181,7 +182,14 @@ export function ConfigurationPage() {
       }
     >
       <Routes>
-        <Route path=":id" element={<ExtensionsPage />} />
+        <Route
+          path=":id"
+          element={
+            <RemountOnParam param="id">
+              <ExtensionsPage />
+            </RemountOnParam>
+          }
+        />
         <Route path="" element={<EmptyPage />} />
       </Routes>
 

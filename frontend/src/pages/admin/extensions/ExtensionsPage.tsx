@@ -19,6 +19,8 @@ import { useConfigurationStore, useExtensionsStore } from './state';
 
 const EMPTY_BUCKETS: BucketDto[] = [];
 
+const NO_EXTENSIONS: ExtensionDto[] = [];
+
 export function ExtensionsPage() {
   const api = useApi();
 
@@ -28,7 +30,10 @@ export function ExtensionsPage() {
   const configurationId = +configurationParam.id!;
   const [toCreate, setToCreate] = useState<boolean>();
   const [toUpdate, setToUpdate] = useState<ExtensionDto | null>();
-  const { extensions, specs, removeExtension, setExtension, setExtensions } = useExtensionsStore();
+  const extensionsStore = useExtensionsStore();
+  const { specs, removeExtension, setExtension, setExtensions } = extensionsStore;
+  // the store may still contain the extensions of the previously shown assistant
+  const extensions = extensionsStore.configurationId === configurationId ? extensionsStore.extensions : NO_EXTENSIONS;
 
   const navigate = useTransientNavigate();
   const [toUpdateConfiguration, setToUpdateConfiguration] = useState<boolean>();
@@ -93,9 +98,9 @@ export function ExtensionsPage() {
 
   useEffect(() => {
     if (loadedExtensions) {
-      setExtensions(loadedExtensions.configured, loadedExtensions.specs);
+      setExtensions(loadedExtensions.configured, loadedExtensions.specs, configurationId);
     }
-  }, [loadedExtensions, setExtensions]);
+  }, [loadedExtensions, setExtensions, configurationId]);
 
   const deleting = useMutation({
     mutationFn: (extension: ExtensionDto) => {
