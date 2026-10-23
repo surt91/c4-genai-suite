@@ -377,7 +377,7 @@ describe(ImportConfiguration.name, () => {
     expect(savedEntity.status).toBe(ConfigurationStatus.DISABLED);
   });
 
-  it('should create extensions with correct externalId', async () => {
+  it('should leave the externalId to the database (unique per extension)', async () => {
     const savedConfiguration: Partial<ConfigurationEntity> = {
       id: 5,
       name: 'Test Config',
@@ -430,12 +430,19 @@ describe(ImportConfiguration.name, () => {
           enabled: true,
           values: {},
         },
+        {
+          name: 'test-ext',
+          enabled: true,
+          values: {},
+        },
       ],
     };
 
     const result = await handler.execute(new ImportConfiguration(importData));
 
-    expect(savedExtensions[0].externalId).toBe('5-test-ext');
+    expect(savedExtensions).toHaveLength(2);
+    // the trigger `set_external_id` generates `<name>_<id>` for NULL values
+    expect(savedExtensions.map((x) => x.externalId)).toEqual([undefined, undefined]);
     expect(result.warnings).toEqual([]);
   });
 

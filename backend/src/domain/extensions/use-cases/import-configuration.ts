@@ -98,7 +98,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
     extensionEntity.values = { ...ext.values };
     extensionEntity.configurableArguments = ext.configurableArguments;
     extensionEntity.configurationId = savedConfiguration.id;
-    extensionEntity.externalId = `${savedConfiguration.id}-${ext.name}`;
+    // externalId is left empty: the database trigger generates a unique `<name>_<id>`.
     return extensionEntity;
   }
 
