@@ -245,46 +245,6 @@ export class FilesController {
     });
   }
 
-  @Put(':id/files/:fileId')
-  @ApiOperation({ operationId: 'putFile', description: 'Updates a file.' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiOkResponse({ type: FileDto })
-  @Role(BUILTIN_USER_GROUP_ADMIN)
-  @UseGuards(RoleGuard)
-  async putFile(
-    @Param('id', ParseIntPipe) bucketId: number,
-    @Param('fileId', ParseIntPipe) fileId: number,
-    @Res() res: Response,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    const command = new UploadFile({
-      fileIdToUpdate: fileId,
-      buffer: file.buffer,
-      mimeType: file.mimetype,
-      fileName: file.originalname,
-      fileSize: file.size,
-      bucketId: bucketId,
-      embedType: 'vector',
-    });
-
-    await keepAlive(res, async () => {
-      const result: UploadFileResponse = await this.commandBus.execute(command);
-      return FileDto.fromDomain(result.file);
-    });
-  }
-
   @Delete(':id/files/:fileId')
   @ApiOperation({ operationId: 'deleteFile', description: 'Deletes a file.' })
   @ApiParam({

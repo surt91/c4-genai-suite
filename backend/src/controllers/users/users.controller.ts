@@ -1,17 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -21,8 +8,6 @@ import {
   CreateUser,
   CreateUserResponse,
   DeleteUser,
-  GetUser,
-  GetUserResponse,
   GetUsers,
   GetUsersResponse,
   UpdateUser,
@@ -69,26 +54,6 @@ export class UsersController {
     const result: GetUsersResponse = await this.queryBus.execute(new GetUsers(page || 0, pageSize || 20, query));
 
     return UsersDto.fromDomain(result.users, result.total);
-  }
-
-  @Get(':id')
-  @ApiOperation({ operationId: 'getUser', description: 'Get the user.' })
-  @ApiParam({
-    name: 'id',
-    description: 'The ID of the user.',
-    required: true,
-  })
-  @ApiOkResponse({ type: UserDto })
-  @Role(BUILTIN_USER_GROUP_ADMIN)
-  @UseGuards(RoleGuard)
-  async getUser(@Param('id') id: string) {
-    const result: GetUserResponse = await this.queryBus.execute(new GetUser(id));
-
-    if (!result.user) {
-      throw new NotFoundException();
-    }
-
-    return UserDto.fromDomain(result.user);
   }
 
   @Post('')

@@ -62,12 +62,6 @@ describe('Upload File', () => {
 
     const params = { buffer: Buffer.from('x'), mimeType: 'application/pdf', fileName: 'a.pdf', fileSize: 1, bucketId: 1 };
 
-    it('deletes the previous version from the index of the bucket when a file is replaced', async () => {
-      await createHandler().execute(new UploadFile({ ...params, embedType: 'vector', fileIdToUpdate: 7 }));
-
-      expect(api.deleteFile).toHaveBeenCalledWith('7', 'custom-index');
-    });
-
     it('removes the uploaded chunks again when the upload fails afterwards', async () => {
       const handler = createHandler();
       api.processFile.mockRejectedValue(new Error('conversion failed'));

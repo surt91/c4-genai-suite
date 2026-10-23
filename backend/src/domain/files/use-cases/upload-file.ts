@@ -18,11 +18,10 @@ import { assignDefined } from 'src/lib';
 import { I18nService } from '../../../localization/i18n.service';
 import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file';
 import { UploadedFile } from '../interfaces';
-import { FilesApi, ResponseError } from './generated';
+import { ResponseError } from './generated';
 import { buildClient, buildFile, getBucketId } from './utils';
 
 export interface UploadFileParams {
-  fileIdToUpdate?: number;
   user?: User;
   buffer: Buffer;
   mimeType: string;
@@ -170,22 +169,6 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
     return { api, bucket };
   }
 
-  private async initFile(api: FilesApi, bucket: BucketEntity, params: UploadFileParams) {
-    const { fileIdToUpdate, bucketId } = params;
-
-    if (fileIdToUpdate) {
-      const existingFile = await this.files.findOneBy({ id: fileIdToUpdate, bucketId });
-      if (!existingFile) {
-        throw new NotFoundException(`File with id ${fileIdToUpdate} not found in bucket ${bucketId}`);
-      }
-
-      await api.deleteFile(existingFile.id.toString(), bucket.indexName);
-      return existingFile;
-    }
-
-    return this.files.create();
-  }
-
   async execute({ params }: UploadFile): Promise<UploadFileResponse> {
     const { buffer, mimeType, fileName, fileSize, user, conversationId, bucketId, embedType } = params;
 
@@ -195,7 +178,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
 
     const { api, bucket } = await this.validateBucketAndFile(params);
 
-    const entity = await this.initFile(api, bucket, params);
+    const entity = this.files.create();
 
     // Assign the object manually to avoid updating unexpected values.
     assignDefined(entity, {

@@ -144,25 +144,6 @@ describe('Files', () => {
       expect(files.items[1].fileName).toBe(file2.fileName);
     });
 
-    it('should update file', async () => {
-      const bucket = await createBucket();
-      const { id: fileId } = await uploadFile(bucket.id);
-
-      const fileContent = 'New content';
-      const buffer = Buffer.from(fileContent, 'utf8');
-      const fileName = 'testfile2.txt';
-
-      const response = await request(app.getHttpServer())
-        .put(`/buckets/${bucket.id}/files/${fileId}`)
-        .set('Content-Type', 'multipart/form-data')
-        .attach('file', buffer, fileName)
-        .expect(200);
-      const body = response.body as { id: number; fileName: string };
-
-      expect(body.id).toBe(fileId);
-      expect(body.fileName).toBe(fileName);
-    });
-
     it('should delete file', async () => {
       const bucket = await createBucket();
       const { id: fileId } = await uploadFile(bucket.id);

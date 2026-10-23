@@ -49,10 +49,6 @@ export interface DeleteUserGroupRequest {
     id: string;
 }
 
-export interface GetUserRequest {
-    id: string;
-}
-
 export interface GetUsersRequest {
     page?: number;
     pageSize?: number;
@@ -152,41 +148,6 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async deleteUserGroup(id: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteUserGroupRaw({ id: id }, initOverrides);
-    }
-
-    /**
-     * Get the user.
-     * 
-     */
-    async getUserRaw(requestParameters: GetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDto>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling getUser().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/users/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserDtoFromJSON(jsonValue));
-    }
-
-    /**
-     * Get the user.
-     * 
-     */
-    async getUser(id: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDto> {
-        const response = await this.getUserRaw({ id: id }, initOverrides);
-        return await response.value();
     }
 
     /**
