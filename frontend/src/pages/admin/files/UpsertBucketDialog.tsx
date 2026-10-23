@@ -107,7 +107,8 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
   const debounceFn = useMemo(() => debounce(handleDebounceFn, 500), []);
 
   function handleDebounceFn(key: string, newValue: string) {
-    setConnection({ endpoint, headers, [key]: newValue });
+    // the debounced function is created once, it must not use the values of the first render
+    setConnection((previous) => ({ ...previous, [key]: newValue }));
     form.setFieldValue('allowedFileNameExtensions', []);
   }
 
