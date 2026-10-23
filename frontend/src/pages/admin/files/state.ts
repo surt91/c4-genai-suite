@@ -5,11 +5,14 @@ interface FilesState {
   // The files.
   files: FileDto[];
 
+  // The bucket of the files.
+  bucketId?: number;
+
   // Adds or sets an file.
   setFile: (file: FileDto) => void;
 
-  // Sets all files.
-  setFiles: (source: FileDto[]) => void;
+  // Sets all files of a bucket.
+  setFiles: (source: FileDto[], bucketId: number) => void;
 
   // Remove an file.
   removeFile: (id: number) => void;
@@ -46,8 +49,8 @@ const useFilesStore_ = create<FilesState>()((set) => ({
       return { files };
     });
   },
-  setFiles: (files: FileDto[]) => {
-    return set({ files });
+  setFiles: (files: FileDto[], bucketId: number) => {
+    return set({ files, bucketId });
   },
   removeFile: (id: number) => {
     return set((state) => ({ files: state.files.filter((x) => x.id !== id) }));

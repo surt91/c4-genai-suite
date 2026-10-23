@@ -25,13 +25,18 @@ import { UpsertBucketDialog } from './UpsertBucketDialog';
 import { useDeletingBucket, useDeletingFile, useUploadingFile } from './hooks';
 import { useBucketstore, useFilesStore } from './state';
 
+const NO_FILES: FileDto[] = [];
+
 export function FilesPage() {
   const api = useApi();
 
   const bucketParam = useParams<'id'>();
   const bucketId = +bucketParam.id!;
   const [uploading, setUploading] = useState<File[]>([]);
-  const { files, removeFile, setFile, setFiles } = useFilesStore();
+  const filesStore = useFilesStore();
+  const { removeFile, setFile, setFiles } = filesStore;
+  // the store may still contain the files of the previously shown bucket
+  const files = filesStore.bucketId === bucketId ? filesStore.files : NO_FILES;
 
   const navigate = useTransientNavigate();
   const [toUpdate, setToUpdate] = useState<boolean>();
@@ -78,9 +83,9 @@ export function FilesPage() {
 
   useEffect(() => {
     if (loadedFiles) {
-      setFiles(loadedFiles.items);
+      setFiles(loadedFiles.items, bucketId);
     }
-  }, [loadedFiles, setFiles]);
+  }, [loadedFiles, setFiles, bucketId]);
 
   const upload = useUploadingFile({
     bucketId,
@@ -177,6 +182,8 @@ export function FilesPage() {
     },
     globalFilterFn: 'includesString',
     onGlobalFilterChange: setGlobalFilter,
+    // the selection must stay with the file, not with the row index
+    getRowId: (file) => String(file.id),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(), //client-side filtering

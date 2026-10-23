@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { BucketDto, useApi } from 'src/api';
 import { Page } from 'src/components';
+import { RemountOnParam } from 'src/components/RemountOnParam';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { texts } from 'src/texts';
 import { Bucket } from './Bucket';
@@ -75,7 +76,14 @@ export function BucketsPage() {
       }
     >
       <Routes>
-        <Route path=":id" element={<FilesPage />} />
+        <Route
+          path=":id"
+          element={
+            <RemountOnParam param="id">
+              <FilesPage />
+            </RemountOnParam>
+          }
+        />
         <Route path="" element={<EmptyPage />} />
       </Routes>
 
