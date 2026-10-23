@@ -42,7 +42,8 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, UpdateUser
 
     if (password) {
       if (currentPassword) {
-        const isValid = await bcrypt.compare(currentPassword, entity.passwordHash!);
+        // Users of an auth provider have no password: 400 instead of a bcrypt error (500).
+        const isValid = !!entity.passwordHash && (await bcrypt.compare(currentPassword, entity.passwordHash));
         if (!isValid) {
           throw new BadRequestException('The current password does not match');
         }

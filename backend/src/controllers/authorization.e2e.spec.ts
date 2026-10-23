@@ -155,6 +155,10 @@ describe('Authorization', () => {
     });
   });
 
+  it('rejects a password change of a user without password with 400', async () => {
+    await asUser(http().put('/users/me/password').send({ password: 'new-password', currentPassword: 'guess' })).expect(400);
+  });
+
   describe('user file uploads', () => {
     const createExtension = (name: string, values: Record<string, unknown>) =>
       dataSource.getRepository(ExtensionEntity).save({ name, enabled: true, values, configurationId: configuration.id });
