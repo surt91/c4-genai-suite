@@ -1,4 +1,3 @@
-import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { Observable, ReplaySubject } from 'rxjs';
 import {
   AuditLogsApi,
@@ -17,6 +16,7 @@ import {
 } from 'src/api/generated';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
+import { fetchEventStream } from './sse';
 import { useAppClientStore } from './zustand/appClientStore';
 
 export function useApi() {
@@ -77,35 +77,22 @@ class StreamApi {
     const method = messageId ? 'PUT' : 'POST';
 
     const observable = new Observable<StreamEventDto>((subscriber) => {
-      fetchEventSource(path, {
+      fetchEventStream(path, {
         method: method,
         body: JSON.stringify(message),
-        openWhenHidden: true,
         credentials: 'include',
         headers: {
           'Accept-Language': i18next.language,
           'Content-Type': 'application/json',
         },
-        onmessage(msg) {
+        onMessage(msg) {
           const data = JSON.parse(msg.data) as StreamEventDto;
           subscriber.next(data);
         },
-        onerror(err) {
-          try {
-            subscriber.error(err);
-          } finally {
-            subscriber.complete();
-          }
-
-          throw err;
-        },
-        onclose() {
-          subscriber.complete();
-        },
-      }).catch((err) => {
-        subscriber.error(err);
-        subscriber.complete();
-      });
+      }).then(
+        () => subscriber.complete(),
+        (err) => subscriber.error(err),
+      );
     });
     observable.subscribe(replaySubject);
     return replaySubject;
