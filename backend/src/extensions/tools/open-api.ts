@@ -190,7 +190,8 @@ class InternalTool extends NamedStructuredTool {
       confirmed,
       context: this.context.context,
       input,
-      tool: this.name,
+      // The tool server knows the tool by the name it listed, not by the internal (prefixed) name.
+      tool: this.tool.name,
       user: {
         id,
         name,

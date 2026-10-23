@@ -51,7 +51,7 @@ describe(OpenApiExtension.name, () => {
     // ... but the tool of the second request runs with the second user.
     await bobContext.tools[0].execute({});
     expect(ToolsApi.prototype.executeTool).toHaveBeenCalledWith(
-      expect.objectContaining({ user: { id: 'bob', name: 'Bob', email: 'bob@example.com' } }),
+      expect.objectContaining({ tool: 'lookup', user: { id: 'bob', name: 'Bob', email: 'bob@example.com' } }),
     );
   });
 });
