@@ -22,6 +22,12 @@ def test_get_files_fail(client: TestClient) -> None:
     assert response.status_code == 422
 
 
+@pytest.mark.parametrize("take", ["0", "-1"])
+def test_get_files_invalid_take(client: TestClient, take: str) -> None:
+    response = client.get("/files", params={"query": "test", "take": take})
+    assert response.status_code == 422
+
+
 def test_get_documents_content_without_parameters(client: TestClient) -> None:
     response = client.get("/documents/content")
     assert response.status_code == 422

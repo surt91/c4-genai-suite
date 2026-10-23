@@ -53,6 +53,7 @@
             "required": true,
             "schema": {
               "type": "integer",
+              "exclusiveMinimum": 0,
               "description": "The number of results to return",
               "title": "Take"
             },

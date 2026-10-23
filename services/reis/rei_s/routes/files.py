@@ -68,7 +68,7 @@ async def get_file_types(config: Annotated[Config, Depends(get_config)]) -> File
 def get_files(
     config: Annotated[Config, Depends(get_config)],
     query: Annotated[str, Query(description="The query from the internal tool")],
-    take: Annotated[int, Query(description="The number of results to return")],
+    take: Annotated[int, Query(description="The number of results to return", gt=0)],
     bucket: Annotated[Optional[str], Query(description="The ID of the bucket")] = None,
     index_name: Annotated[
         Optional[str], Query(description="The name of the index", alias="indexName"), AfterValidator(check_index_name)
