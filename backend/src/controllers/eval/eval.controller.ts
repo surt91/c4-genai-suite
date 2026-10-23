@@ -1,8 +1,9 @@
+import { Readable } from 'stream';
 import { All, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiExcludeEndpoint, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { fetch as undiciFetch } from 'undici';
+import { RequestInit, fetch as undiciFetch } from 'undici';
 import { LocalAuthGuard, RoleGuard } from 'src/domain/auth';
 import { Role } from 'src/domain/auth/role.decorator';
 import { BUILTIN_USER_GROUP_ADMIN } from 'src/domain/database';
@@ -17,6 +18,31 @@ import { EvalServiceStatusDto } from './dtos';
  * Guards execute BEFORE the controller method, ensuring req.user is populated.
  * The controller method then forwards authenticated requests to the eval service.
  */
+const NOT_FORWARDED_RESPONSE_HEADERS = ['connection', 'keep-alive', 'transfer-encoding', 'content-length', 'content-encoding'];
+
+/**
+ * JSON and url-encoded bodies were already consumed by the body parsers and are serialized again in their own format;
+ * any other body (e.g. multipart file uploads) is still unread and streamed through unchanged.
+ */
+export function buildProxyBody(req: Request): Pick<RequestInit, 'body' | 'duplex'> {
+  if (['GET', 'HEAD'].includes(req.method)) {
+    return {};
+  }
+
+  const contentType = req.headers['content-type'] ?? '';
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    return { body: new URLSearchParams(req.body as Record<string, string>).toString() };
+  }
+  if (contentType.includes('json')) {
+    return { body: JSON.stringify(req.body ?? {}) };
+  }
+  if (!contentType) {
+    return {};
+  }
+
+  return { body: Readable.toWeb(req) as ReadableStream, duplex: 'half' };
+}
+
 @Controller('eval')
 @UseGuards(LocalAuthGuard, RoleGuard)
 @Role(BUILTIN_USER_GROUP_ADMIN)
@@ -71,9 +97,9 @@ export class EvalController {
     // Remove /api/eval prefix from path for forwarding
     const targetPath = req.path.replace(/^\/api\/eval/, '');
 
-    // Build query string
-    const queryString =
-      Object.keys(req.query).length > 0 ? '?' + new URLSearchParams(req.query as Record<string, string>).toString() : '';
+    // Forward the query string verbatim (re-encoding `req.query` would merge repeated parameters).
+    const queryIndex = req.originalUrl.indexOf('?');
+    const queryString = queryIndex >= 0 ? req.originalUrl.substring(queryIndex) : '';
 
     const targetUrl = `${evalServiceUrl}${targetPath}${queryString}`;
 
@@ -92,33 +118,22 @@ export class EvalController {
         headers['Content-Type'] = req.headers['content-type'];
       }
 
-      // Prepare request body
-      let body: string | undefined;
-      if (!['GET', 'HEAD'].includes(req.method)) {
-        if (req.body) {
-          // Body is already parsed by body-parser middleware
-          body = JSON.stringify(req.body);
-          // Ensure content-type is set for JSON
-          if (!headers['Content-Type']) {
-            headers['Content-Type'] = 'application/json';
-          }
-        }
-      }
-
-      // Forward request to eval service
       const response = await undiciFetch(targetUrl, {
         method: req.method,
         headers,
-        body,
+        ...buildProxyBody(req),
       });
 
       // Get response body
       const buffer = await response.arrayBuffer();
       const responseBody = Buffer.from(buffer);
 
-      // Forward response headers
+      // Forward response headers, except hop-by-hop headers and those describing the original encoding
+      // (fetch already decoded the body, `res.send` sets the length).
       response.headers.forEach((value, key) => {
-        res.setHeader(key, value);
+        if (!NOT_FORWARDED_RESPONSE_HEADERS.includes(key.toLowerCase())) {
+          res.setHeader(key, value);
+        }
       });
 
       // Forward status and body
