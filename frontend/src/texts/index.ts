@@ -622,7 +622,6 @@ function load() {
         other: translate('chat.rating.other'),
       },
       updateRating: {
-        ratingHint: translate('chat.updateRating.ratingHint'),
         ratingSubmitted: translate('chat.updateRating.ratingSubmitted'),
         thanksForYourValuableFeedback: translate('chat.updateRating.thanksForYourValuableFeedback'),
         changeResponse: translate('chat.updateRating.changeResponse'),
@@ -716,10 +715,10 @@ function load() {
       assistants: translate('dashboard.assistants'),
       users: translate('dashboard.users'),
       filterInterval: {
-        day: translate('dashboard.users.filterInterval.day'),
-        week: translate('dashboard.users.filterInterval.week'),
-        month: translate('dashboard.users.filterInterval.month'),
-        total: translate('dashboard.users.filterInterval.total'),
+        day: translate('dashboard.filterInterval.day'),
+        week: translate('dashboard.filterInterval.week'),
+        month: translate('dashboard.filterInterval.month'),
+        total: translate('dashboard.filterInterval.total'),
       },
     },
     extensions: {

@@ -43,7 +43,7 @@ export function ConversationPage(props: ConversationPageProps) {
   const { theme } = useTheme();
   const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([chat.id], [messages]);
 
-  const isNewConversation = messages.length === 0 && !!history;
+  const isNewConversation = messages.length === 0;
 
   const agentName = useMemo(() => {
     return assistant?.agentName || theme.agentName || texts.chat.sourceAI;
