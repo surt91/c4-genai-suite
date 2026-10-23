@@ -60,9 +60,6 @@ export class MessageEntity {
   @Column('json', { nullable: true })
   sources?: ExtensionSource[];
 
-  @Column('json', { nullable: true })
-  sourcesOriginal?: Record<string, any>[];
-
   @ManyToOne(() => ConversationEntity, (conversation) => conversation.messages, { onDelete: 'CASCADE' })
   conversation!: ConversationEntity;
 
