@@ -26,7 +26,6 @@
       "prompt": "Prompt",
       "historySize": "History Size",
       "headers": "Headers",
-      "name": "Name",
       "date": "Date",
       "string": "String",
       "multiSelect": "Multi Select",
@@ -46,7 +45,6 @@
       "presencePenaltyHint": "Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
       "frequencyPenaltyHint": "Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
       "maxOutputTokensHint": "The maximum number of tokens to generate in the completion. Also known as max_tokens.",
-      "topPHint": "Tokens are selected from the most probable to the least probable until the sum of their probabilities equals the Top-p value.\nExample: If tokens A, B, and C have probabilities of 0.3, 0.2, and 0.1, and the Top-p value is 0.5, then the model will choose either A or B as the next token (using temperature).",
       "parallelToolCalls": "Parallel tool calls",
       "disableStreaming": "Disable Streaming",
       "disableStreamingHint": "When enabled, uses a single request instead of streaming. Useful for providers that do not support streaming."
@@ -55,18 +53,6 @@
       "title": "Azure OpenAI",
       "description": "Open AI LLM integration",
       "topPHint": "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.We generally recommend altering this or temperature but not both."
-    },
-    "azure-o": {
-      "title": "Azure OpenAI Reasoning",
-      "description": "Open AI LLM integration for reasoning Models"
-    },
-    "langfuse": {
-      "title": "Langfuse",
-      "description": "Langfuse integration",
-      "baseUrl": "Base url",
-      "baseUrlHint": "Base url of langfuse (if self-hosted)",
-      "secretKey": "Secret key",
-      "publicKey": "Public key"
     },
     "mistral": {
       "title": "Mistral",
@@ -89,20 +75,12 @@
       "title": "Nvidia NIM",
       "description": "Nvidia NIM LLM integration"
     },
-    "vertexai": {
-      "title": "VertexAI",
-      "description": "Vertex AI LLM integration"
-    },
     "customPrompt": {
       "title": "Prompt",
       "description": "Uses a free prompt text as system message.",
       "templateDescription": "The text may contain certain placeholders (`{{{{name}}}}`, no other template syntax) that are replaced at runtime. Available placeholders:\n\n* `{{{{date}}}}`: today's date\n* `{{{{timestamp}}}}`: current date and time\n* `{{{{llm_name}}}}`: model name\n* `{{{{llm_provider}}}}`: model provider\n* `{{{{user}}}}`: username or email\n* `{{{{assistant}}}}`: assistant name\n* `{{{{assistant_description}}}}`: assistant description",
       "replaceDefaultTitle": "Replace default systemprompt",
       "replaceDefaultDescription": "When enabled, the custom prompt replaces the default systemprompt entirely. When disabled (default), the custom prompt extends the default systemprompt."
-    },
-    "hubPrompt": {
-      "title": "Hub Prompt",
-      "description": "Uses a prompt from the free langchain hub."
     },
     "summaryPrompt": {
       "title": "Summary Prompt",
@@ -117,7 +95,6 @@
       "vectorColumnHint": "Name of the vector column/field. Defaults to: text_vector",
       "selectHint": "Fields to select. Comma separated.",
       "instructionsHint": "A description of the tool including instructions for the model on how to use it.",
-      "topKHint": "The number of results to return. Defaults to 10.",
       "endpointHint": "The endpoint. https://<deployment>.search.windows.net"
     },
     "bing": {
@@ -173,11 +150,7 @@
     },
     "whole-files": {
       "title": "Complete Files",
-      "description": "Adds the complete content of files uploaded via the paperclip to a conversation to the LLM context.",
-      "endpointHint": "Endpoint of REIS as URL.",
-      "fileContentHint": "Content of the uploaded files.",
-      "fileSizeLimit": "File size limit in MB",
-      "fileSizeLimitHint": "Files larger than this will be rejected before uploading."
+      "description": "Adds the complete content of files uploaded via the paperclip to a conversation to the LLM context."
     },
     "openapi": {
       "title": "Open API",
@@ -197,15 +170,11 @@
       "title": "Search Files in Chat",
       "description": "Enables the LLM to search files uploaded via the paperclip to a conversation.",
       "bucket": "Bucket",
-      "bucketHint": "Bucket to use for files",
-      "storeInBucket": "Persist files",
-      "storeInBucketHint": "Persist the files in bucket",
       "maxFiles": "Max. Files",
       "maxFilesHint": "Maximum number of files to upload in a conversation",
       "showSources": "Show sources",
       "showSourcesHint": "Show sources of the files",
-      "vectorize": "Index contents",
-      "vectorizeHint": "Enables a semantic search on the contents of the files"
+      "vectorize": "Index contents"
     },
     "filesVision": {
       "title": "Files Vision",
@@ -225,9 +194,7 @@
       "description": "Amazon Bedrock LLM Integration",
       "region": "Region",
       "accessKeyId": "Access Key ID",
-      "secretAccessKey": "Secret Access Key",
-      "topP": "Top-p",
-      "topPHint": "Tokens are selected from the most probable to the least probable until the sum of their probabilities equals the Top-p value.\nExample: If tokens A, B, and C have probabilities of 0.3, 0.2, and 0.1, and the Top-p value is 0.5, then the model will choose either A or B as the next token (using temperature)."
+      "secretAccessKey": "Secret Access Key"
     },
     "mcpTools": {
       "title": "MCP Tools",
@@ -249,14 +216,6 @@
       "valueHint": "Value that is used during tool call. Text may contain placeholders like `{{{{value}}}}` (the value defined by the LLM or user), `{{{{language}}}}`, `{{{{conversationId}}}}` or `{{{{user.email}}}}`.",
       "errorToolCall": "An error occurred during the tool call '{tool}'"
     },
-    "always42": {
-      "title": "DEV: Add 42",
-      "description": "Always adds 42 to the sum of two numbers"
-    },
-    "confirm": {
-      "title": "DEV: Confirm",
-      "description": "Asks for confirmation"
-    },
     "context": {
       "title": "DEV: Contexts",
       "description": "Shows the current context"
@@ -264,10 +223,6 @@
     "userArgs": {
       "title": "DEV: User Args",
       "description": "Shows the current user args"
-    },
-    "simpleInput": {
-      "title": "DEV: Simple Input",
-      "description": "Asks for input from the user"
     },
     "gpt-image-1": {
       "title": "GPT-Image-1",
@@ -294,14 +249,10 @@
     "errorTokenLimitUserGroup": "The monthly token limit of your user group has been reached.",
     "errorTokenLimitUser": "Your monthly token limit has been reached.",
     "errorMissingLLM": "No llm has been configured yet. Please configure an extension",
-    "errorMissingPrompt": "No prompt has been configured yet. Please configure an extension",
     "noSummary": "No Summary"
   },
   "configuration": {
     "warningMissingUserGroups": "Some user groups not found during import of \"{name}\". Missing: {missingIds}. Proceeding with available groups.",
     "warningVersionMismatch": "Importing configuration \"{name}\" from version {version}, but current version is {currentVersion}. Proceeding with import, but compatibility issues may occur."
-  },
-  "conversation": {
-    "copySuffix": "COPY"
   }
 }

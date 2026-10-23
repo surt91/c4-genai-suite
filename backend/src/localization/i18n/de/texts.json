@@ -26,7 +26,6 @@
       "prompt": "Prompt",
       "historySize": "Verlaufslänge",
       "headers": "Header",
-      "name": "Name",
       "date": "Datum",
       "string": "String",
       "multiSelect": "Mehrfachauswahl",
@@ -46,7 +45,6 @@
       "presencePenaltyHint": "Positive Werte bestrafen neue Tokens basierend darauf, ob sie bisher im Text vorkommen, und erhöhen die Wahrscheinlichkeit, dass das Modell über neue Themen spricht.",
       "frequencyPenaltyHint": "Positive Werte bestrafen neue Tokens basierend auf ihrer bisherigen Häufigkeit im Text und verringern die Wahrscheinlichkeit, dass das Modell dieselbe Zeile wörtlich wiederholt.",
       "maxOutputTokensHint": "Die maximale Anzahl von Tokens, die im Antworttext generiert werden sollen. Ebenfalls bekannt als max_tokens.",
-      "topPHint": "Tokens werden von den wahrscheinlichsten bis zu den unwahrscheinlichsten ausgewählt, bis die Summe ihrer Wahrscheinlichkeiten dem Top-p-Wert entspricht.\nBeispielsweise, wenn die Tokens A, B und C eine Wahrscheinlichkeit von 0,3, 0,2 und 0,1 haben und der Top-p-Wert 0,5 beträgt, dann wählt das Modell entweder A oder B als nächstes Token aus (unter Verwendung der Temperatur).",
       "parallelToolCalls": "Parallele Toolausführung",
       "disableStreaming": "Streaming deaktivieren",
       "disableStreamingHint": "Wenn aktiviert, wird eine einzelne Anfrage anstelle von Streaming verwendet. Nützlich für Anbieter, die kein Streaming unterstützen."
@@ -55,18 +53,6 @@
       "title": "Azure OpenAI",
       "description": "OpenAI LLM-Integration",
       "topPHint": "Eine Alternative zum Sampling mit Temperature ist das sogenannte Nucleus Sampling, bei dem das Modell nur die Ergebnisse der Tokens mit Top_p probability mass berücksichtigt. Ein Wert von 0,1 bedeutet also, dass nur die Tokens in Betracht gezogen werden, die zusammen die obersten 10 % der probability mass ausmachen. Wir empfehlen in der Regel, entweder diesen Wert oder Temperature anzupassen – jedoch nicht beide gleichzeitig."
-    },
-    "azure-o": {
-      "title": "Azure OpenAI Reasoning",
-      "description": "OpenAI LLM-Integration für Reasoning-Modelle"
-    },
-    "langfuse": {
-      "title": "Langfuse",
-      "description": "Langfuse-Integration",
-      "baseUrl": "Base url",
-      "baseUrlHint": "Basis-URL von Langfuse (wenn self-hosted)",
-      "secretKey": "Secret key",
-      "publicKey": "Public key"
     },
     "mistral": {
       "title": "Mistral",
@@ -89,20 +75,12 @@
       "title": "Nvidia NIM",
       "description": "Nvidia NIM LLM-Integration"
     },
-    "vertexai": {
-      "title": "VertexAI",
-      "description": "Vertex AI LLM-Integration"
-    },
     "customPrompt": {
       "title": "Prompt",
       "description": "Verwendet einen freien Text als Systemnachricht.",
       "templateDescription": "Der Text kann bestimmte Platzhalter (`{{{{name}}}}`, keine weitere Template-Syntax) enthalten, die zur Laufzeit ersetzt werden. Verfügbare Platzhalter:\n\n* `{{{{date}}}}`: Tagesdatum\n* `{{{{timestamp}}}}`: Aktuelles Datum und Uhrzeit\n* `{{{{llm_name}}}}`: Name des Modells\n* `{{{{llm_provider}}}}`: Betreiber des Modells\n* `{{{{user}}}}`: Username oder Email\n* `{{{{assistant}}}}`: Name des Assistenten\n* `{{{{assistant_description}}}}`: Beschreibung des Assistenten",
       "replaceDefaultTitle": "Standard-Systemprompt ersetzen",
       "replaceDefaultDescription": "Wenn aktiviert, ersetzt der benutzerdefinierte Prompt den Standard-Systemprompt vollständig. Wenn deaktiviert (Standard), erweitert der benutzerdefinierte Prompt den Standard-Systemprompt."
-    },
-    "hubPrompt": {
-      "title": "Hub Prompt",
-      "description": "Verwendet einen Prompt aus dem freien LangChain Hub."
     },
     "summaryPrompt": {
       "title": "Summary Prompt",
@@ -117,7 +95,6 @@
       "vectorColumnHint": "Name der Vektor-Spalte/Feld. Standard: text_vector",
       "selectHint": "Auszuwählende Felder. Komma-separiert.",
       "instructionsHint": "Eine Beschreibung des Tools einschließlich Anweisungen für das Modell zur Nutzung.",
-      "topKHint": "Die Anzahl der zurückzugebenden Ergebnisse. Standard: 10.",
       "endpointHint": "Der Endpunkt. https://<deployment>.search.windows.net"
     },
     "bing": {
@@ -173,11 +150,7 @@
     },
     "whole-files": {
       "title": "Vollständige Dateien",
-      "description": "Fügt den vollständigen Inhalt der in einem Chat über die Büroklammer hochgeladenen Dateien dem LLM-Kontext hinzu.",
-      "endpointHint": "Endpunkt des REIS als URL.",
-      "fileContentHint": "Inhalt der hochgeladenen Dateien.",
-      "fileSizeLimit": "Maximale Dateigröße in MB",
-      "fileSizeLimitHint": "Größere Dateien werden vor dem Upload abgelehnt."
+      "description": "Fügt den vollständigen Inhalt der in einem Chat über die Büroklammer hochgeladenen Dateien dem LLM-Kontext hinzu."
     },
     "openapi": {
       "title": "Open API",
@@ -197,15 +170,11 @@
       "title": "Suche in Dateien im Chat",
       "description": "Ermöglicht dem LLM, Dateien zu durchsuchen, die in einem Chat über die Büroklammer hochgeladen wurden.",
       "bucket": "Bucket",
-      "bucketHint": "Bucket welches für die Dateien genutzt wird",
-      "storeInBucket": "Dateien persistieren",
-      "storeInBucketHint": "Persistiert die Dateien im Bucket",
       "maxFiles": "Max. Dateien",
       "maxFilesHint": "Maximale Anzahl von Dateien im Chat",
       "showSources": "Quellen anzeigen",
       "showSourcesHint": "Zeigt die Quellen der Dateien an",
-      "vectorize": "Inhalte indizieren",
-      "vectorizeHint": "Ermöglicht eine semantische Suche auf den Inhalten der Dateien"
+      "vectorize": "Inhalte indizieren"
     },
     "filesVision": {
       "title": "Bilder im Chat",
@@ -225,9 +194,7 @@
       "description": "Integration des Amazon Bedrock LLM",
       "region": "Region",
       "accessKeyId": "Access Key ID",
-      "secretAccessKey": "Secret Access Key",
-      "topP": "Top-p",
-      "topPHint": "Tokens werden von den wahrscheinlichsten bis zu den unwahrscheinlichsten ausgewählt, bis die Summe ihrer Wahrscheinlichkeiten dem Top-p-Wert entspricht.\nBeispiel: Wenn die Tokens A, B und C Wahrscheinlichkeiten von 0,3, 0,2 und 0,1 haben und der Top-p-Wert 0,5 beträgt, dann wählt das Modell entweder A oder B als nächstes Token aus (unter Verwendung der Temperatur)."
+      "secretAccessKey": "Secret Access Key"
     },
     "mcpTools": {
       "title": "MCP Tools",
@@ -249,14 +216,6 @@
       "valueHint": "Wert, der beim Toolaufruf verwendet wird. Text kann Platzhalter wie `{{{{value}}}}` (der vom LLM oder Benutzer definierte Wert), `{{{{language}}}}`, `{{{{conversationId}}}}` oder `{{{{user.email}}}}` enthalten.",
       "errorToolCall": "Es ist ein Fehler aufgetreten beim Aufruf des Tools '{tool}'"
     },
-    "always42": {
-      "title": "DEV: Add 42",
-      "description": "Addiert immer 42 zur Summe von zwei Zahlen"
-    },
-    "confirm": {
-      "title": "DEV: Confirm",
-      "description": "Fragt nach Bestätigung"
-    },
     "context": {
       "title": "DEV: Contexts",
       "description": "Zeigt den aktuellen Kontext"
@@ -264,10 +223,6 @@
     "userArgs": {
       "title": "DEV: User Args",
       "description": "Zeigt die aktuellen Benutzerargumente"
-    },
-    "simpleInput": {
-      "title": "DEV: Simple Input",
-      "description": "Fragt nach einer Eingabe vom Benutzer"
     },
     "gpt-image-1": {
       "title": "GPT-Image-1",
@@ -294,14 +249,10 @@
     "errorTokenLimitUserGroup": "Das monatliche Token-Limit Ihrer Benutzergruppe ist erreicht.",
     "errorTokenLimitUser": "Ihr monatliches Token-Limit ist erreicht.",
     "errorMissingLLM": "Kein LLM wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
-    "errorMissingPrompt": "Kein Prompt wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
     "noSummary": "Keine Zusammenfassung"
   },
   "configuration": {
     "warningMissingUserGroups": "Einige Benutzergruppen wurden beim Import von \"{name}\" nicht gefunden. Fehlend: {missingIds}. Der Import wird mit den verfügbaren Gruppen fortgesetzt.",
     "warningVersionMismatch": "Die Konfiguration \"{name}\" wurde mit Version {version} exportiert, die aktuelle Version ist jedoch {currentVersion}. Der Import wird fortgesetzt, es können jedoch Kompatibilitätsprobleme auftreten."
-  },
-  "conversation": {
-    "copySuffix": "KOPIE"
   }
 }
