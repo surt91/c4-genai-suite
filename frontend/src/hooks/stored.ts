@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { useLocalStorage } from '@mantine/hooks';
+import { useCallback, useState } from 'react';
 
 export function useSidebarState(key: string): [boolean, (value: boolean) => void] {
   const [state, setState] = useState(() => {
@@ -17,21 +18,11 @@ export function useSidebarState(key: string): [boolean, (value: boolean) => void
   return [state, update];
 }
 
-export function usePersistentState<T>(key: string, initialValue: T): [T, Dispatch<SetStateAction<T>>] {
-  const [state, setState] = useState<T>(() => {
-    const storedValue = localStorage.getItem(key);
-    try {
-      return storedValue ? (JSON.parse(storedValue) as T) : initialValue;
-    } catch (_err) {
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    if (state) {
-      localStorage.setItem(key, JSON.stringify(state));
-    }
-  }, [key, state]);
-
+/**
+ * A value stored in the local storage (as JSON). All components using the same key share the value: an update in one of
+ * them is seen by the others (and by other tabs).
+ */
+export function usePersistentState<T>(key: string, initialValue: T): [T, (value: T | ((previous: T) => T)) => void] {
+  const [state, setState] = useLocalStorage<T>({ key, defaultValue: initialValue, getInitialValueInEffect: false });
   return [state, setState];
 }
