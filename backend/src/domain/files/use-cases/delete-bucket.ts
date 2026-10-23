@@ -54,7 +54,7 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
     const files = await bucket.files;
     for (const file of files) {
       try {
-        await api.deleteFile(file.id.toString());
+        await api.deleteFile(file.id.toString(), bucket.indexName);
       } catch (error) {
         if ((error as ResponseError)?.response.status === 404) {
           // if the file is not found, we can ignore the error trying to delete it

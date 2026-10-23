@@ -170,7 +170,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
     return { api, bucket };
   }
 
-  private async initFile(api: FilesApi, params: UploadFileParams) {
+  private async initFile(api: FilesApi, bucket: BucketEntity, params: UploadFileParams) {
     const { fileIdToUpdate, bucketId } = params;
 
     if (fileIdToUpdate) {
@@ -179,7 +179,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
         throw new NotFoundException(`File with id ${fileIdToUpdate} not found in bucket ${bucketId}`);
       }
 
-      await api.deleteFile(existingFile.id.toString());
+      await api.deleteFile(existingFile.id.toString(), bucket.indexName);
       return existingFile;
     }
 
@@ -195,7 +195,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
 
     const { api, bucket } = await this.validateBucketAndFile(params);
 
-    const entity = await this.initFile(api, params);
+    const entity = await this.initFile(api, bucket, params);
 
     // Assign the object manually to avoid updating unexpected values.
     assignDefined(entity, {
@@ -212,6 +212,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
     const blob = new File([new Uint8Array(buffer)], fileName, { type: mimeType });
 
     let result: UploadedFile | undefined;
+    let uploadedToVectorStore = false;
 
     try {
       const created = await this.files.save(entity);
@@ -222,6 +223,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
         await api.uploadFile(encodeURIComponent(fileName), mimeType, bucketPath, created.id.toString(), bucket.indexName, {
           body: blob,
         });
+        uploadedToVectorStore = true;
         await this.files.update({ id: entity.id }, { uploadStatus: FileUploadStatus.Successful });
       }
 
@@ -251,6 +253,12 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       return new UploadFileResponse(result);
     } catch (err) {
       if (result?.id) {
+        if (uploadedToVectorStore) {
+          // Otherwise the chunks would stay in the vector store without a file that references (and deletes) them.
+          await api.deleteFile(result.id.toString(), bucket.indexName).catch((deleteError) => {
+            this.logger.error('Failed to delete the partially uploaded file from the RAG server.', deleteError);
+          });
+        }
         await this.files.delete({ id: result.id });
       }
 
