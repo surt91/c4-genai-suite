@@ -25,27 +25,14 @@ languages = {
     ".rs": Language.RUST,
     ".rst": Language.RST,
     ".scala": Language.SCALA,
-    ".swift": Language.SCALA,
+    ".swift": Language.SWIFT,
 }
 
 
 class CodeProvider(AbstractFormatProvider):
     name = "code"
 
-    file_name_extensions = [
-        ".cpp",
-        ".go",
-        ".java",
-        ".js",
-        ".php",
-        ".proto",
-        ".py",
-        ".rb",
-        ".rs",
-        ".rst",
-        ".scala",
-        ".swift",
-    ]
+    file_name_extensions = list(languages)
 
     def __init__(self, chunk_size: int = 4000, chunk_overlap: int = 200, **_kwargs: Any) -> None:
         super().__init__()
@@ -65,12 +52,8 @@ class CodeProvider(AbstractFormatProvider):
         )
 
     def get_language(self, file: SourceFile) -> Language | None:
-        language = None
-        for ext in self.file_name_extensions:
-            if file.file_name.endswith(ext):
-                language = languages[ext]
-                break
-        return language
+        # case insensitive, like `supports`
+        return languages.get("." + file.ext().lower())
 
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None

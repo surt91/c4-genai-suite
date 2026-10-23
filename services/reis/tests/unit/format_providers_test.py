@@ -1,6 +1,7 @@
 from itertools import combinations
 from pathlib import Path
 
+from langchain_text_splitters import Language
 import pypdf
 import pytest
 
@@ -216,6 +217,18 @@ def test_code_provider() -> None:
         pdf = code.convert_file_to_pdf(source_file)
         assert_pdf_contains_text(pdf, expected)
         assert pdf.id == source_file.id
+
+
+@pytest.mark.parametrize(
+    "file_name,language",
+    [("SCRIPT.PY", Language.PYTHON), ("main.swift", Language.SWIFT), ("Main.Java", Language.JAVA)],
+)
+def test_code_provider_language(file_name: str, language: Language) -> None:
+    with temp_file(buffer=b"x = 1", file_name=file_name) as source_file:
+        code = CodeProvider()
+        assert code.supports(source_file)
+        assert code.get_language(source_file) == language
+        assert code.process_file(source_file)[0].page_content == "x = 1"
 
 
 def test_json_provider() -> None:
