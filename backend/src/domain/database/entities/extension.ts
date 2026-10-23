@@ -47,7 +47,7 @@ export class ExtensionEntity {
   @Column('simple-json', { nullable: true })
   configurableArguments?: ExtensionObjectArgument;
 
-  @ManyToOne(() => ConfigurationEntity, (configuration) => configuration.conversations, { onDelete: 'CASCADE' })
+  @ManyToOne(() => ConfigurationEntity, (configuration) => configuration.extensions, { onDelete: 'CASCADE' })
   configuration!: ConfigurationEntity;
 
   @Column()

@@ -63,7 +63,7 @@ export class ConfigurationEntity {
   @OneToMany(() => ConversationEntity, (conversation) => conversation.configuration, { onDelete: 'SET NULL' })
   conversations!: ConversationEntity[];
 
-  @OneToMany(() => ExtensionEntity, (conversation) => conversation.configuration, { cascade: ['insert', 'update', 'remove'] })
+  @OneToMany(() => ExtensionEntity, (extension) => extension.configuration, { cascade: ['insert', 'update', 'remove'] })
   extensions!: ExtensionEntity[];
 
   @ManyToMany(() => UserGroupEntity, (userGroup) => userGroup.configurations)

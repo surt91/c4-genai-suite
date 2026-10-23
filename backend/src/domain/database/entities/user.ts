@@ -35,7 +35,7 @@ export class UserEntity {
   @Column({ nullable: true })
   passwordHash?: string;
 
-  @OneToMany(() => ConversationEntity, (conversation) => conversation.configuration, { onDelete: 'CASCADE' })
+  @OneToMany(() => ConversationEntity, (conversation) => conversation.user, { onDelete: 'CASCADE' })
   conversations!: ConversationEntity[];
 
   @OneToMany(() => FileEntity, (file) => file.user, { onDelete: 'CASCADE' })
