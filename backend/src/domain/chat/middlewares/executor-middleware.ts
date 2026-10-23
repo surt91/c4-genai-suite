@@ -31,7 +31,7 @@ export class ExecutorMiddleware implements ChatMiddleware {
     const api = buildClient(configuration);
 
     const request = await this.buildRequest(user, input, context);
-    const response = await api.answer(request);
+    const response = await api.answer(request, { signal: context.abort.signal });
 
     if (history) {
       await history.addUserMessage(input);
@@ -62,7 +62,7 @@ export class ExecutorMiddleware implements ChatMiddleware {
     }));
 
     for (const message of context.systemMessages) {
-      request.history.push({ content: message, type: 'ai' });
+      request.history.push({ content: message, type: 'system' });
     }
 
     for (const message of stored) {
@@ -70,8 +70,9 @@ export class ExecutorMiddleware implements ChatMiddleware {
         throw new InternalError('Only string messages are supported.');
       }
 
-      const messageType = message.type;
-      if (messageType === 'human' || messageType === 'ai') {
+      if (message.type === 'human') {
+        request.history.push({ content: message.data.content, type: 'user' });
+      } else if (message.type === 'ai') {
         request.history.push({ content: message.data.content, type: 'ai' });
       }
     }
