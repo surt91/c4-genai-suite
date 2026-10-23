@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseBoolPipe,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -71,7 +84,7 @@ export class ConfigurationsController {
     type: Boolean,
   })
   @ApiOkResponse({ type: ConfigurationsDto })
-  async getConfigurations(@Req() req: Request, @Query('enabled') enabled?: boolean) {
+  async getConfigurations(@Req() req: Request, @Query('enabled', new ParseBoolPipe({ optional: true })) enabled?: boolean) {
     const fetchEnabledWithExtensions = enabled ?? false;
 
     const result: GetConfigurationsResponse = await this.queryBus.execute(

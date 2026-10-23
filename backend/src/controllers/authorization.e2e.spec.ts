@@ -226,5 +226,17 @@ describe('Authorization', () => {
       const response = await asAdmin(http().get('/configurations')).expect(200);
       expect(find(response.body).executorHeaders).toBe('Authorization=Bearer executor-secret');
     });
+
+    it('treats enabled=false as false', async () => {
+      const disabled = await dataSource
+        .getRepository(ConfigurationEntity)
+        .save({ name: `Disabled ${randomUUID()}`, description: '', status: ConfigurationStatus.DISABLED });
+
+      const all = await asAdmin(http().get('/configurations?enabled=false')).expect(200);
+      expect((all.body as Items).items.some((x) => x.id === disabled.id)).toBe(true);
+
+      const enabled = await asAdmin(http().get('/configurations?enabled=true')).expect(200);
+      expect((enabled.body as Items).items.some((x) => x.id === disabled.id)).toBe(false);
+    });
   });
 });
