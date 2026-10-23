@@ -44,7 +44,28 @@ Bewusst **nicht** angefasst wurde Code in `backend/src/domain/chat/**`, `fronten
   - `chat.updateRating.ratingHint`
   - `chat.settings.password*`
 
-## 2. Ungenutzte oder fragwürdige Features
+## 2. Entfernt bzw. umgebaut nach Entscheidung (Oktober 2026)
+
+Je Punkt ein eigener Commit (`feat!:` mit `BREAKING CHANGE`, wenn Nutzer es merken). Gespeicherte Extensions mit
+entfernten Namen werden weiterhin übersprungen (`buildConfiguration`/`GetExtensions` ignorieren unbekannte Namen,
+Ändern liefert „Extension is not supported anymore.“). Der Import einer Konfiguration, die eine entfernte Extension
+enthält, schlägt mit einer Fehlermeldung fehl.
+
+| Feature | Status |
+|---|---|
+| Bing-Web-Search-Tool (`bing-web-search`) | entfernt samt i18n und Doku (Bing Search APIs im August 2025 abgeschaltet) |
+| DALL·E-Tools (`dall-e`, `azure-dall-e`) | entfernt samt i18n und Doku; `gpt-image-1`/`azure-gpt-image-1` bleiben |
+| `AzureAISearchExtension` (`azure-ai-search`) | entfernt samt i18n; der REI-S-Store `azure-ai-search` bleibt |
+| `OpenApiExtension` (`open-api`) | entfernt samt `src/openapi/tools-spec.json`, generiertem Client, Skript `generate-tools` und CI-Schritt |
+| Dynamisches Laden aus `node_modules/@gaible/extensions/*` | entfernt |
+| `PUT /api/buckets/:id/files/:fileId`, `GET /api/users/:id` | entfernt samt Tests und dem Zweig `fileIdToUpdate`; Specs und Frontend-Client neu generiert; die Query `GetUser` bleibt |
+| Spalte `messages."sourcesOriginal"` | per Migration `DropMessageSourcesOriginal1792791000038` entfernt; deren `down` legt die Spalte mit den aktuellen Quellen wieder an, damit das `down` der alten Migration sie nicht leert |
+| `UserArgsExtension` („DEV: User Args“) | nach `extensions/dev-only/` verschoben, nur bei `NODE_ENV !== 'production'` registriert (E2E läuft mit `NODE_ENV=development`) |
+| `ContextExtension` („DEV: Contexts“) | bleibt bewusst unverändert |
+
+Bewusst nicht angefasst: Eval (`services/eval`), inkl. der Eval-Punkte unten.
+
+## 3. Ungenutzte oder fragwürdige Features
 
 Legende: Aufwand S = klein (Stunden), M = mittel (1–2 Tage).
 
@@ -53,25 +74,17 @@ Legende: Aufwand S = klein (Stunden), M = mittel (1–2 Tage).
 | Eval | **QA-Katalog-Generierung (RAGAS)** | `ragas` ist in `services/eval/pyproject.toml:39-48` wegen CVEs deaktiviert. Der Import schlägt zur Laufzeit fehl (`qa_catalog/generator/implementation/QACatalogGeneratorTypes.py:25-35`). Die Endpoints `POST /v1/qa-catalog/generator/{upload,catalog,from-gaible-bucket}` und `GET /generator/types` (`qa_catalog/router.py`) ruft das Frontend nie auf, die zugehörigen UI-Texte waren unbenutzt. Die Tests sind per `--ignore` ausgeschlossen (`pyproject.toml:90`). `langchain_community` wird importiert, ist aber keine Abhängigkeit. In Compose zeigt der Eval-File-Store auf `evalbucket` statt auf den REI-S-Bucket. | `qa_catalog/generator/**`, `qa_catalog/logic/{generation,upload}.py`, `qa_catalog/tasks/handle_generate_catalog_task.py`, `qa_catalog/db/crud_data_source_config.py`, die Generierungsteile von `synthetic_qa_pair.py`, `utils/mixed_document_loader.py`, `utils/model_settings/*` (`AZURE_OPENAI_*`-Env), das Paket `llm_eval/file_store/*` mit `boto3`/`boto3-stubs` und die `FILE_STORE_*`-Env (Compose, `.env.example`), die Tabelle `qa_catalog_generator_temp_data_source_config` (Alembic-Migration), die Behandlung des Status `GENERATING` (Frontend `QaCatalogStatusChip`, `QaCatalogDetailPage.tsx`) und die ignorierten Tests; Eval-Spec und `frontend/src/api/generated-eval` neu generieren | M (`models.py` und das Status-Enum sind verflochten; Migration und Client-Regenerierung nötig) | **entfernen** (heute nur kaputte Codepfade und eine kaputte API) oder ausdrücklich parken |
 | Eval | `GET /v1/dashboard` | `dashboard/router.py`, `dashboard/logic/get_dashboard_data.py`. Das Frontend instanziiert `EvalClient.dashboard` (`frontend/src/api/state/apiEvalClient.ts:20,35`), ruft `dashboardGetData` aber nie auf. Das Admin-Dashboard nutzt die Backend-`UsagesApi`. Keine Tests. | 2 Dateien, den Endpoint, `DashboardApi` im Client, die README-Zeile in `services/eval/README.md` | S, gering | **entfernen** |
 | Eval | `create_llm_query()` / `ChatModelQuery` | `llm_eval/llm_endpoints/plugins/interface.py:112`, `plugins/impl/openai.py:161`, `plugins/impl/azure_openai.py:159`, `llm_eval/llm_query/chat_model_query.py`. Werden nie aufgerufen: Antworten kommen immer von `GaibleAssistantQuery` (`retrieve_answer_task.py`), LLM-Endpoints dienen nur als Judge-Modelle. | 1 Datei, 3 Methoden | S, gering | **unklar**: entfernen, falls „rohes LLM evaluieren“ nicht geplant ist |
-| Backend | `ContextExtension` („DEV: Contexts“) | `backend/src/extensions/examples/show-context.ts`, in Produktion registriert (`extensions/module.ts`). Weder E2E noch UI verwenden sie. Ein Admin kann sie einem Assistenten hinzufügen; sie gibt dann nach einem fest eingebauten Sleep von 2 s `context.context` an das LLM. | 1 Datei, i18n `extensions.context` | S, gering | **entfernen** (reines Dev-Werkzeug) |
-| Backend | `UserArgsExtension` („DEV: User Args“) | `extensions/examples/user-args.ts`. Wird von `e2e/tests/extension/user-args.spec.ts`, `e2e/tests/utils/helper.ts` und `mock-llm-server.ts` verwendet, ist also eine Test-Fixture, die in Produktion ausgeliefert wird. | – | Die E2E-Tests hängen daran | **behalten**, aber aus `examples` herausnehmen bzw. umbenennen; ggf. nur in Dev/E2E registrieren |
-| Backend | Bing-Web-Search-Tool (`bing-web-search`) | `extensions/tools/bing-web-search.ts` nutzt fest `https://api.bing.microsoft.com/v7.0/search` und `mkt=de-DE`. Microsoft hat die Bing Search APIs im August 2025 abgeschaltet (bitte bestätigen), damit funktioniert das Tool nicht mehr. | 1 Datei, die Registrierung, i18n `extensions.bing.*`, die Erwähnung in `docs/roadmap.md` | S; bestehende Assistenten verlieren das Tool | **entfernen** (Brave Search oder MCP decken Websuche ab) |
-| Backend | DALL·E-Tools (`dall-e`, `azure-dall-e`) | `extensions/tools/dall-e.ts` (Modelle `dall-e-2`/`dall-e-3`), `azure-dall-e.ts`. Doppeln `gpt-image-1`/`azure-gpt-image-1`. Die DALL·E-Modelle sind bei OpenAI abgekündigt (Datum bitte prüfen). | 2 Dateien, i18n `dalle`/`azureDalle`, Referenzen in Specs (`api.responses.controller.spec.ts`), den Doku-Text zu `BASE_URL` | S; Assistenten, die die Tools nutzen, verlieren sie | **entfernen**, wenn die Abkündigung bestätigt ist, sonst **unklar** |
-| Backend | `OpenApiExtension` (`open-api`) mit eigenem „Tools-Server“-Protokoll | `extensions/tools/open-api.ts`, `src/openapi/tools-spec.json`, generierter Client `extensions/tools/generated/**`, Skript `generate-tools` und CI-Schritt. Im Repo gibt es keinen passenden Server (`dev/mcp-tool-as-server` spricht MCP) und keinen E2E-Test. MCP (`mcp-tools.ts`) deckt den Anwendungsfall ab. | Extension, Spec, generierter Client, npm-Skript, CI-Schritt, i18n `extensions.openapi` | S–M; trifft alle, die so einen Tools-Server betreiben | **unklar**, eher entfernen (Nutzung bei Deployments erfragen) |
-| Backend | Dynamisches Laden von Extensions aus `node_modules/@gaible/extensions/*` | `extensions/module.ts` (`getDynamicExtensionModules` u. a., ca. 55 Zeilen). Kein solches Paket existiert oder wird referenziert, die Funktion ist undokumentiert. Zur Laufzeit kopiert sie i18n-Dateien nach `dist/localization`. | ca. 55 Zeilen in `module.ts` | S; das ist ein Plugin-Hook | **unklar**: dokumentieren oder entfernen |
-| Backend | `PUT /api/buckets/:id/files/:fileId` (`putFile`) | `controllers/files/files.controller.ts`. Wird weder vom Frontend noch von E2E oder dem Confluence-Importer aufgerufen (der löscht und lädt neu hoch). Nur `files.e2e.spec.ts` testet ihn. | Endpoint, den Zweig `fileIdToUpdate` in `domain/files/use-cases/upload-file.ts` samt Spec-Fall, generiertes `putFile` | S; öffentliche Admin-API (API-Key) | **unklar**: behalten, falls er als externe API gilt, sonst entfernen |
-| Backend | `GET /api/users/:id` (`getUser`) | `controllers/users/users.controller.ts`. Keine Aufrufer in Frontend oder E2E. Die Query `GetUser` bleibt, weil `get-user-middleware.ts` sie nutzt. | Endpoint, generiertes `getUser` | S, gering | **unklar** (geringer Nutzen, aber harmlose API) |
-| Backend | `AzureAISearchExtension` | `extensions/tools/azure-ai-search.ts` fragt einen Azure-AI-Search-Index direkt ab. Herstellerspezifisch; überschneidet sich mit dem Store `azure-ai-search` von REI-S und dem `files`-Tool. | 1 Datei, i18n | S | **unklar** (nur behalten, wenn ein Deployment einen externen Index nutzt) |
-| Backend | Spalte `messages."sourcesOriginal"` | Wird nur von der Migration `1750134137266-migrateSourcesToNewFormat.ts` als Backup für deren `down` geschrieben, vom Code nie gelesen (`domain/database/entities/message.ts:59`). | DB-Spalte (neue Migration), Entity-Feld | S; das Backup für den Rückweg der alten Migration geht verloren | **entfernen** |
+| Backend | `ContextExtension` („DEV: Contexts“) | `backend/src/extensions/examples/show-context.ts`, in Produktion registriert (`extensions/module.ts`). Weder E2E noch UI verwenden sie. Ein Admin kann sie einem Assistenten hinzufügen; sie gibt dann nach einem fest eingebauten Sleep von 2 s `context.context` an das LLM. | 1 Datei, i18n `extensions.context` | S, gering | **behalten** (Entscheidung Oktober 2026) |
 | Backend | `initSchemaIfNotExistsAndMoveMigrations` (verschiebt `public.migrations` ins Schema) | `domain/database/typeorm.helper.ts` | Kompatibilitäts-Shim für sehr alte Installationen | S | **behalten**, solange nicht sicher ist, dass alle Installationen migriert sind |
 | Backend | Alias `LANGFUSE_BASE_URL` neben `LANGFUSE_BASEURL` | `metrics/langfuse.ts:20-21` | 1 Zeile | S | **behalten** (`LANGFUSE_BASE_URL` ist der Name der Langfuse-SDKs) |
-| Backend + Frontend | Caddy-Redirects `/blobs/*` und `/auth/*` → `/api…`, markiert mit „TODO remove after the transition“ | `frontend/Caddyfile:9-10`, `dev/Caddyfile:17-19`. Nicht wirklich Legacy: Bild-URLs (`dall-e.ts`, `gpt-image-1.ts`, `gemini-image.ts`) und OAuth-Callbacks (`domain/auth/strategies/*`) werden ohne `/api` gebaut, und alte Nachrichten enthalten `/blobs/`-URLs. | – | Entfernen bricht Bilder und OAuth | **behalten**, TODO-Kommentare korrigieren oder erst die URLs auf `/api/…` umstellen (inkl. Migration alter Nachrichten) |
+| Backend + Frontend | Caddy-Redirects `/blobs/*` und `/auth/*` → `/api…`, markiert mit „TODO remove after the transition“ | `frontend/Caddyfile:9-10`, `dev/Caddyfile:17-19`. Nicht wirklich Legacy: Bild-URLs (`gpt-image-1.ts`, `gemini-image.ts`) und OAuth-Callbacks (`domain/auth/strategies/*`) werden ohne `/api` gebaut, und alte Nachrichten enthalten `/blobs/`-URLs. | – | Entfernen bricht Bilder und OAuth | **behalten**, TODO-Kommentare korrigieren oder erst die URLs auf `/api/…` umstellen (inkl. Migration alter Nachrichten) |
 | REI-S | Store-Typ `dev-null` | `rei_s/config.py`, `vectorstores/devnull_store.py`. Wird nur von Tests genutzt, ist aber in Produktion wählbar. | – | – | **behalten** (Testhilfe, kostet nichts) |
 | Frontend | Eigener Fetch in `useEvalAvailability` statt des generierten `EvalApi.getEvalServiceStatus` | `frontend/src/api/state/useEvalAvailability.ts` | – | S | Aufräumen: den generierten Client verwenden |
 
-## 3. Weitere Auffälligkeiten (Bugs/Doku, kein toter Code)
+## 4. Weitere Auffälligkeiten (Bugs/Doku, kein toter Code)
 
-- **`VERSION` erreicht das Backend-Image nicht.**
+- **`VERSION` erreicht das Backend-Image nicht.** *Behoben:* `backend/Dockerfile` hat jetzt `ARG VERSION`/`ENV VERSION`,
+  Compose übergibt `VERSION` als Build-Argument statt es zur Laufzeit zu überschreiben.
   - `.github/workflows/release.yaml` übergibt `VERSION`, aber `backend/Dockerfile` hat kein `ARG/ENV VERSION`.
   - Export und Import von Konfigurationen lesen `process.env.VERSION` (`export-configuration.ts`, `import-configuration.ts`).
   - Deshalb melden Release-Images `unknown`, und beim Import gibt es eine unnötige Versionswarnung.
@@ -79,15 +92,16 @@ Legende: Aufwand S = klein (Stunden), M = mittel (1–2 Tage).
 - **Defekte Root-Skripte.**
   - `generate-specs-reis` in `package.json` ruft `rei_s/generate_open_api.py` auf, das es nicht gibt (richtig wäre `uv run generate-api-spec`).
   - Der Fehler wird durch `|| echo …` verdeckt.
+  - *Behoben:* das Skript ruft `uv run generate-api-spec` auf, ohne `|| echo`.
   - `generate-apis` generiert weder die Eval-Spec noch den Eval-Client.
-- **Nicht deklarierte Abhängigkeiten im Backend.** `express` (nur Typen) und `@ai-sdk/provider` (`extensions/models/model-tools.ts`) werden nur transitiv aufgelöst.
+- **Nicht deklarierte Abhängigkeiten im Backend.** `express` (nur Typen) und `@ai-sdk/provider` (`extensions/models/model-tools.ts`) werden nur transitiv aufgelöst. *Behoben:* beide sind in `backend/package.json` deklariert.
 - **Veraltete Doku.**
-  - `backend/docs/plantuml/context.puml` und die daraus erzeugten PNGs zeigen LangChain-Klassen (`AgentExecutor`, `ChatVertexAI`, …); das Backend nutzt das AI SDK.
+  - `backend/docs/plantuml/context.puml` und die daraus erzeugten PNGs zeigen LangChain-Klassen (`AgentExecutor`, `ChatVertexAI`, …); das Backend nutzt das AI SDK. *Behoben:* Diagramm und PNG aktualisiert.
   - `docs/dependency-reduction.md` nennt `wait-on`/`dotenv` in `e2e/` als Kandidaten, die bereits entfernt sind.
   - Die REI-S-Doku (`docs/Configuration.md`) beschreibt die Embedding-Variablen für Bedrock, NVIDIA, Ollama und OpenAI-kompatibel sowie `FILESIZE_THRESHOLD` nicht.
 - **Eval-Spec.** `eval-dev-spec.json` ist nicht im Format von `ruff format` eingecheckt. CI vergleicht nur die beiden frisch formatierten Dateien, daher fällt das nicht auf.
 
-## 4. Geprüft und in Ordnung
+## 5. Geprüft und in Ordnung
 
 - **REI-S:** Alle sechs Routen werden vom Backend-Client genutzt, alle Python-Abhängigkeiten werden verwendet.
 - **Helm:** Alle Values werden in Templates verwendet (die eine Ausnahme ist entfernt).
