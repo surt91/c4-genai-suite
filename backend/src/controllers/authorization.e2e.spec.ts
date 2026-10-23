@@ -132,6 +132,28 @@ describe('Authorization', () => {
     });
   });
 
+  describe('responses API', () => {
+    it('does not accept files for assistants the user cannot access', async () => {
+      const group = await dataSource
+        .getRepository(UserGroupEntity)
+        .save({ id: randomUUID(), name: `Other ${randomUUID()}`, isAdmin: false, isBuiltIn: false });
+      const assistant = await dataSource.getRepository(ConfigurationEntity).save({
+        name: `Assistant ${randomUUID()}`,
+        description: '',
+        status: ConfigurationStatus.ENABLED,
+        userGroups: [group],
+      });
+
+      await asUser(
+        http()
+          .post(`/public/assistants/${assistant.id}/files`)
+          .field('purpose', 'assistants')
+          .attach('file', Buffer.from('x'), 'image.png'),
+      ).expect(404);
+      await asUser(http().post(`/public/assistants/${assistant.id}/responses`).send({ input: 'hi' })).expect(404);
+    });
+  });
+
   describe('buckets (contain REI-S credentials)', () => {
     it('are not readable by regular users', async () => {
       await asUser(http().get('/buckets')).expect(403);

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -22,9 +23,16 @@ import * as mime from 'mime-types';
 import { Observable } from 'rxjs';
 import { LocalAuthGuard } from '../../domain/auth';
 import { SendMessage, SendMessageResponse, StartConversation, StartConversationResponse, StreamEvent } from '../../domain/chat';
-import { GetExtensions, GetExtensionsResponse } from '../../domain/extensions';
+import {
+  GetConfiguration,
+  GetConfigurationResponse,
+  GetExtensions,
+  GetExtensionsResponse,
+  hasUserGroupAccess,
+} from '../../domain/extensions';
 import { GetFiles, GetFilesResponse, UploadFile, UploadFileResponse } from '../../domain/files';
 import { UploadedFile as UploadedFileInternal } from '../../domain/files/interfaces';
+import { User } from '../../domain/users';
 import { FilesExtensionConfiguration } from '../../extensions/tools/files';
 import { FilesVisionExtensionConfiguration } from '../../extensions/tools/files-vision';
 import { WholeFilesExtensionConfiguration } from '../../extensions/tools/whole-files-conversation';
@@ -41,6 +49,20 @@ export class ApiResponsesController {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) {}
+
+  /**
+   * Files are uploaded (and models chosen) based on the extensions of the assistant, so the access to the assistant must
+   * be checked before, not only when the conversation is started.
+   */
+  private async getExtensionsOfAccessibleAssistant(assistantId: number, user: User) {
+    const { configuration }: GetConfigurationResponse = await this.queryBus.execute(new GetConfiguration(assistantId));
+    if (!configuration?.enabled || !hasUserGroupAccess(user, configuration.userGroupIds)) {
+      throw new NotFoundException(`Assistant with id '${assistantId}' not found`);
+    }
+
+    const { extensions }: GetExtensionsResponse = await this.queryBus.execute(new GetExtensions(assistantId, false, true));
+    return extensions;
+  }
 
   private getLlm(extensions: GetExtensionsResponse['extensions'], model?: string) {
     if (model != null) {
@@ -260,7 +282,7 @@ export class ApiResponsesController {
     @Param('assistantId', ParseIntPipe) assistantId: number,
     @Req() req: Request,
   ): Promise<ResponseDto> {
-    const { extensions }: GetExtensionsResponse = await this.queryBus.execute(new GetExtensions(assistantId, true, true));
+    const extensions = await this.getExtensionsOfAccessibleAssistant(assistantId, req.user);
     const llm = this.getLlm(extensions, request.model);
     const configuration = this.getConfiguration(extensions, request);
     const userMessages = this.getUserPrompts(request);
@@ -342,8 +364,8 @@ export class ApiResponsesController {
       throw new BadRequestException('file is missing');
     }
 
-    const result: GetExtensionsResponse = await this.queryBus.execute(new GetExtensions(assistantId, true, true));
-    const { bucketId, embedType } = this.findBucketForAssistant(result.extensions, file.originalname, purpose);
+    const extensions = await this.getExtensionsOfAccessibleAssistant(assistantId, req.user);
+    const { bucketId, embedType } = this.findBucketForAssistant(extensions, file.originalname, purpose);
     if (!embedType) {
       throw new BadRequestException('files are not accepted');
     }

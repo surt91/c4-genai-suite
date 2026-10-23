@@ -21,6 +21,7 @@ export {
   GetExtensionResponse,
   GetExtensions,
   GetExtensionsResponse,
+  hasUserGroupAccess,
   ImportConfiguration,
   ImportConfigurationResponse,
   UpdateConfiguration,
