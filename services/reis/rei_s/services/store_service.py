@@ -1,4 +1,3 @@
-import multiprocessing as mp
 from typing import Any, Generator, List
 from math import ceil
 
@@ -10,7 +9,7 @@ from tenacity import RetryCallState, retry, retry_if_exception_type, stop_after_
 from rei_s import logger
 from rei_s.services.filestore_adapter import FileStoreAdapter
 from rei_s.services.formats.utils import ProcessingError
-from rei_s.services.multiprocess_utils import convert_file_in_process, process_file_in_process
+from rei_s.services.multiprocess_utils import run_in_process
 from rei_s.services.embeddings_provider import get_embeddings
 from rei_s.config import Config
 from rei_s.services.vectorstore_adapter import VectorStoreAdapter, VectorStoreFilter
@@ -119,48 +118,16 @@ def process_file_synchronously(
 
     if not format_.may_start_separate_process_for_chunking or file.size < threshold:
         return format_.process_file(file, chunk_size)
-    else:
-        ctx = mp.get_context("spawn")
-        queue = ctx.Queue()
-        process = ctx.Process(target=process_file_in_process, args=(format_, file, chunk_size, queue))
-
-        process.start()
-        chunks_or_exception = queue.get()
-        process.join()
-
-        if isinstance(chunks_or_exception, Exception):
-            raise chunks_or_exception
-        else:
-            chunks: list[Document] = chunks_or_exception
-
-        return chunks
+    chunks: list[Document] = run_in_process("process_file", format_, file, chunk_size)
+    return chunks
 
 
 def convert_file_synchronously(format_: AbstractFormatProvider, file: SourceFile, threshold: int = 10**5) -> SourceFile:
-    # this function tries to optimize for performance,
-    # since the process step is the single CPU intensive part
-    # * small files are processed in the same thread to avoid overhead of starting a new process,
-    #   pickling, copying and unpickling the file
-    # * large files will start a new process to avoid the GIL
-    #   this will also lead python to release the RAM used for the processing back to the operating system
-
+    # see `process_file_synchronously`
     if not format_.may_start_separate_process_for_converting or file.size < threshold:
         return format_.convert_file_to_pdf(file)
-    else:
-        ctx = mp.get_context("spawn")
-        queue = ctx.Queue()
-        process = ctx.Process(target=convert_file_in_process, args=(format_, file, queue))
-
-        process.start()
-        file_or_exception = queue.get()
-        process.join()
-
-        if isinstance(file_or_exception, Exception):
-            raise file_or_exception
-        else:
-            pdf: SourceFile = file_or_exception
-
-        return pdf
+    pdf: SourceFile = run_in_process("convert_file_to_pdf", format_, file)
+    return pdf
 
 
 def generate_batches(
