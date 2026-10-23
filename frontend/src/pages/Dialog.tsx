@@ -50,7 +50,8 @@ export function Dialog({
             {thankYouText}
           </Text>
           <Tooltip label={texts.chat.updateRating.close}>
-            <ActionIcon variant="subtle" onClick={() => handleResult('dismiss')} aria-label={texts.chat.updateRating.close}>
+            {/* the answer has been given already, closing only hides the thanks */}
+            <ActionIcon variant="subtle" onClick={() => setShowThanks(false)} aria-label={texts.chat.updateRating.close}>
               <IconX size={16} />
             </ActionIcon>
           </Tooltip>
