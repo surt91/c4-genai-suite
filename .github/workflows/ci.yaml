@@ -1,0 +1,266 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  NODE_VERSION: 24.x
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run find-unused-resources
+      - name: Check generated API clients are up to date
+        run: |
+          npm run generate-api
+          npm run generate-eval-api
+          git add -N . && git diff --exit-code .
+      - run: npm test
+      - run: npm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17.5
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: gaible
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 2s --health-retries 20
+        ports:
+          - 5432:5432
+    env:
+      BASE_URL: https://example.com
+      DB_URL: postgres://admin:secret@localhost:5432/gaible
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - name: Check generated specs and clients are up to date
+        run: |
+          npm run generate-openapi-dev
+          npm run generate-reis
+          npm run generate-tools
+          npm run generate-executor
+          git add -N . && git diff --exit-code .
+      - run: npm test
+      - name: Check migrations are complete
+        run: |
+          npm run migration:run
+          # migration:generate fails if there are no schema changes, which is what we want
+          if npm run migration:generate --name=test; then cat src/migrations/*-test.ts; exit 1; fi
+
+  reis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/reis
+    services:
+      pgvector:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: gaible
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 2s --health-retries 20
+        ports:
+          - 5432:5432
+      minio:
+        image: lazybit/minio:latest
+        env:
+          MINIO_ROOT_USER: admin
+          MINIO_ROOT_PASSWORD: secretsecret
+        ports:
+          - 9000:9000
+    env:
+      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@localhost:5432/gaible
+      FILE_STORE_S3_ENDPOINT_URL: http://localhost:9000
+      FILE_STORE_S3_ACCESS_KEY_ID: admin
+      FILE_STORE_S3_SECRET_ACCESS_KEY: secretsecret
+      FILE_STORE_S3_BUCKET_NAME: testbucket
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/reis/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run ty check
+      - name: Check OpenAPI spec is up to date
+        run: |
+          uv run generate-api-spec --no-dev
+          uv run ruff format reis-spec.json reis-dev-spec.json
+          diff reis-dev-spec.json reis-spec.json
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress ffmpeg
+      - run: uv run pytest -rs --error-for-skips
+
+  eval:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/eval
+    services:
+      postgres:
+        image: postgres:17.5
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: gaible
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 2s --health-retries 20
+        ports:
+          - 5432:5432
+    env:
+      PG_HOST: localhost
+      PG_USER: admin
+      PG_PASSWORD: secret
+      PG_DB: gaible
+      PG_PORT: 5432
+      PG_SCHEMA: llm_eval
+      CELERY_BROKER_HOST: localhost
+      CELERY_BROKER_USER: rabbit
+      CELERY_BROKER_PASSWORD: rabbit
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/eval/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - name: Generate a throwaway encryption key
+        run: echo "LLM_EVAL_ENCRYPTION_KEY=$(uv run python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" >> "$GITHUB_ENV"
+      - name: Check OpenAPI spec is up to date
+        run: |
+          uv run generate-api-spec --no-dev
+          uv run ruff format eval-spec.json eval-dev-spec.json
+          diff eval-dev-spec.json eval-spec.json
+      - run: uv run pytest
+
+  confluence-importer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/confluence-importer
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/confluence-importer/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy .
+      - run: uv run pytest
+
+  helm-chart:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: helm-chart
+    steps:
+      - uses: actions/checkout@v6
+      - uses: azure/setup-helm@v4
+      - run: helm plugin install https://github.com/helm-unittest/helm-unittest.git
+      - run: helm dependency build && helm lint . && helm unittest .
+      - name: Check README and schema are up to date
+        run: |
+          npx --yes @bitnami/readme-generator-for-helm -v values.yaml -r README.md -s values.schema.json
+          git diff --exit-code .
+
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      REIS_EMBEDDINGS_TYPE: random-test-embeddings
+      NODE_ENV: development
+      # used by the tests; the backend runs in Docker and reaches the mock LLM on the host
+      URL: http://localhost:3333
+      REIS_ENDPOINT: http://reis:3201
+      MCP_SERVER_ENDPOINT: http://mcp-fetch:8000/sse
+      MOCK_LLM_HOST: host.docker.internal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v4
+      - name: Build images
+        uses: docker/bake-action@v6
+        with:
+          files: docker-compose.yml
+          targets: frontend,backend,reis,mcp-fetch
+          load: true
+          set: |
+            frontend.cache-from=type=gha,scope=frontend
+            frontend.cache-to=type=gha,scope=frontend,mode=max
+            backend.cache-from=type=gha,scope=backend
+            backend.cache-to=type=gha,scope=backend,mode=max
+            reis.cache-from=type=gha,scope=reis
+            reis.cache-to=type=gha,scope=reis,mode=max
+            mcp-fetch.cache-from=type=gha,scope=mcp-tool-as-server
+            mcp-fetch.cache-to=type=gha,scope=mcp-tool-as-server,mode=max
+      - run: docker compose --profile mcp up --no-build --wait --wait-timeout 300
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+      - working-directory: e2e
+        run: |
+          npm ci
+          npm run lint
+          npx playwright install chromium --with-deps
+          npx playwright test
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: e2e-report
+          path: |
+            e2e/test-results/
+            e2e/playwright-report/
+          retention-days: 7
+      - if: failure()
+        run: docker compose --profile mcp logs
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gitleaks/gitleaks:v8.27.0
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: |
+          git config --global --add safe.directory "$(pwd)"
+          gitleaks git -v --redact=80 --no-color --log-opts=HEAD

@@ -6,9 +6,9 @@ updates:
       - "/backend"
       - "/frontend"
       - "/services/reis"
-      - "/dev/caddy-gateway-proxy"
+      - "/services/eval"
+      - "/services/confluence-importer"
       - "/dev/mcp-tool-as-server"
-      - "/dev/oauth-mock"
     schedule:
       interval: "weekly"
     ignore:
@@ -17,7 +17,6 @@ updates:
   - package-ecosystem: "docker-compose"
     directories:
       - "/"
-      - "/dev/postgres"
     schedule:
       interval: "weekly"
 
@@ -32,7 +31,7 @@ updates:
       - "/e2e"
       - "/frontend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       ai-sdk:
         patterns:
@@ -74,9 +73,10 @@ updates:
   - package-ecosystem: "uv"
     directories:
       - "/services/reis"
+      - "/services/eval"
       - "/services/confluence-importer"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       langchain:
         patterns:
