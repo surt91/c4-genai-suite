@@ -49,6 +49,7 @@ import {
   UpdateConversationResponse,
 } from 'src/domain/chat';
 import { GetDocument, GetDocumentResponse } from 'src/domain/chat/use-cases/get-document';
+import { attachmentContentDisposition } from 'src/lib';
 import {
   ChatUICallbackResultDto,
   ConversationDto,
@@ -237,7 +238,7 @@ export class ConversationsController {
     const bytes = await document.bytes();
 
     response.setHeader('Content-Type', contentType);
-    response.setHeader('Content-Disposition', `attachment; filename="${document.name ?? 'document'}"`);
+    response.setHeader('Content-Disposition', attachmentContentDisposition(document.name ?? 'document'));
 
     response.send(bytes);
   }

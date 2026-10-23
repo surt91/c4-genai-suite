@@ -5,3 +5,4 @@ export * from './hash';
 export * from './types';
 export * from './template';
 export * from './headers';
+export * from './content-disposition';
