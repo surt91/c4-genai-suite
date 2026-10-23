@@ -21,6 +21,12 @@ export class ExceptionMiddleware implements ChatMiddleware {
     try {
       await next(context);
     } catch (err) {
+      if (context.abort.signal.aborted) {
+        // Errors after stopping the generation (e.g. aborted requests) are expected and nobody waits for the result.
+        this.logger.debug('Pipeline stopped.', err);
+        return;
+      }
+
       this.logger.error('Pipeline error.', err);
 
       if (is(err, ChatError)) {

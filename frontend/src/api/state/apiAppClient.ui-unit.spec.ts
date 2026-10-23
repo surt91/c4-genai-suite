@@ -72,4 +72,32 @@ describe('StreamApi.streamPrompt', () => {
     expect(handlers.next).not.toHaveBeenCalled();
     expect(handlers.complete).not.toHaveBeenCalled();
   });
+
+  it('aborts the request on abort', async () => {
+    let signal: AbortSignal | undefined;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_: string, init: RequestInit) => {
+        signal = init.signal ?? undefined;
+        // a stream that stays open until the request is aborted
+        const body = new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode('data: {"type":"chunk"}\n\n'));
+            signal?.addEventListener('abort', () => controller.error(new DOMException('aborted', 'AbortError')));
+          },
+        });
+        return Promise.resolve(new Response(body, { headers: { 'content-type': 'text/event-stream' } }));
+      }),
+    );
+    const handlers = observer();
+
+    const subscription = client.stream.streamPrompt(1, { query: 'hi' }, undefined, handlers);
+    await vi.waitFor(() => expect(handlers.next).toHaveBeenCalledOnce());
+    subscription.abort();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    expect(signal?.aborted).toBe(true);
+    expect(handlers.error).not.toHaveBeenCalled();
+    expect(handlers.complete).not.toHaveBeenCalled();
+  });
 });

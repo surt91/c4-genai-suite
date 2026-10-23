@@ -65,18 +65,21 @@ export const AIChatItemActions = ({
             <IconClipboard size={16} />
           </ActionIcon>
         </Tooltip>
-        <Tooltip label={texts.chat.rateMessage}>
-          <ActionIcon
-            onClick={toggleVisibility}
-            color="gray"
-            c="black"
-            size={'lg'}
-            variant="subtle"
-            aria-label={texts.chat.rateMessage}
-          >
-            <IconThumbDown size={16} />
-          </ActionIcon>
-        </Tooltip>
+        {/* Answers can only be rated once they are stored, i.e. they have an ID from the server. */}
+        {messageId > 0 && (
+          <Tooltip label={texts.chat.rateMessage}>
+            <ActionIcon
+              onClick={toggleVisibility}
+              color="gray"
+              c="black"
+              size={'lg'}
+              variant="subtle"
+              aria-label={texts.chat.rateMessage}
+            >
+              <IconThumbDown size={16} />
+            </ActionIcon>
+          </Tooltip>
+        )}
 
         {user.isAdmin && tokenCount && tokenCount > 0 && (
           <div className={classes.tokenCount}>

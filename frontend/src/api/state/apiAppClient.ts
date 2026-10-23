@@ -74,6 +74,8 @@ export interface StreamObserver<T> {
 export interface StreamSubscription {
   /** Stops delivering events to the observer. The request itself keeps running, so the server finishes the answer. */
   unsubscribe: () => void;
+  /** Stops delivering events and aborts the request, so the server stops generating the answer. */
+  abort: () => void;
 }
 
 class StreamApi {
@@ -86,6 +88,7 @@ class StreamApi {
     observer: StreamObserver<StreamEventDto>,
   ): StreamSubscription {
     let active = true;
+    const abortController = new AbortController();
 
     const basePath = `${this.configuration.basePath}/api/conversations/${conversationId}`;
     const path = messageId ? `${basePath}/messages/${messageId}/sse` : `${basePath}/messages/sse`;
@@ -95,6 +98,7 @@ class StreamApi {
       method: method,
       body: JSON.stringify(message),
       credentials: 'include',
+      signal: abortController.signal,
       headers: {
         'Accept-Language': i18next.language,
         'Content-Type': 'application/json',
@@ -123,6 +127,10 @@ class StreamApi {
     return {
       unsubscribe: () => {
         active = false;
+      },
+      abort: () => {
+        active = false;
+        abortController.abort();
       },
     };
   }

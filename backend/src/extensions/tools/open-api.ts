@@ -174,32 +174,41 @@ class InternalTool extends NamedStructuredTool {
 
         input = formResult.action === FormActionType.ACCEPT ? (formResult.data?.text as string) : undefined;
 
-        let expires: Date;
-        if (ui.cacheDuration > 0) {
-          expires = addMilliseconds(now, ui.cacheDuration);
-        } else {
-          expires = addYears(now, 1000);
-        }
+        // A cancelled form (e.g. because the generation was stopped) is no answer of the user, so it is not cached.
+        if (formResult.action !== FormActionType.CANCEL) {
+          let expires: Date;
+          if (ui.cacheDuration > 0) {
+            expires = addMilliseconds(now, ui.cacheDuration);
+          } else {
+            expires = addYears(now, 1000);
+          }
 
-        await this.cache.save({ key, value: input, expires });
+          await this.cache.save({ key, value: input, expires });
+        }
       }
     }
 
-    const { id, name, email } = this.context.user;
-    const { result, debug } = await this.api.executeTool({
-      confirmed,
-      context: this.context.context,
-      input,
-      // The tool server knows the tool by the name it listed, not by the internal (prefixed) name.
-      tool: this.tool.name,
-      user: {
-        id,
-        name,
-        email,
-      },
+    // Do not call the tool anymore when the generation has been stopped while waiting for the user.
+    this.context.abort.signal.throwIfAborted();
 
-      values: arg,
-    });
+    const { id, name, email } = this.context.user;
+    const { result, debug } = await this.api.executeTool(
+      {
+        confirmed,
+        context: this.context.context,
+        input,
+        // The tool server knows the tool by the name it listed, not by the internal (prefixed) name.
+        tool: this.tool.name,
+        user: {
+          id,
+          name,
+          email,
+        },
+
+        values: arg,
+      },
+      { signal: this.context.abort.signal },
+    );
 
     if (debug) {
       this.context.result.next({ type: 'debug', content: debug });

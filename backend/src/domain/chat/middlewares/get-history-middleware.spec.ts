@@ -22,6 +22,7 @@ describe(GetHistoryMiddleware.name, () => {
       {} as ConversationFileRepository,
     );
     const context = {
+      abort: new AbortController(),
       conversationId: 1,
       configuration: { id: 2 },
       input: 'edited',

@@ -23,6 +23,13 @@
   max-width: 100%;
 }
 
+.stopped {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
 .loadingDot {
   margin-top: 1rem;
   height: 0.75rem;

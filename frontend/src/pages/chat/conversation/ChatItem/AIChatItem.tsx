@@ -1,5 +1,6 @@
-import { Box } from '@mantine/core';
+import { Box, Text } from '@mantine/core';
 import { useClipboard, useDebouncedValue } from '@mantine/hooks';
+import { IconPlayerStopFilled } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import { toast } from 'react-toastify';
 import { Alert, Markdown } from 'src/components';
@@ -70,6 +71,12 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
         />
       ) : (
         <ChatItemDebug debug={message.debug || []} />
+      )}
+      {message.stopped && (
+        <Text size="xs" c="dimmed" className={classes.stopped} data-testid="chat-item-stopped">
+          <IconPlayerStopFilled size={12} aria-hidden />
+          {texts.chat.generationStopped}
+        </Text>
       )}
       {isLast && isWriting && <Box className={clsx('animate-loading-dot', classes.loadingDot)} bg="primary" />}
       {!isWriting && <ChatItemLogging logging={message.logging || []} />}

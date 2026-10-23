@@ -27,6 +27,7 @@ import {
   GetContext,
   StreamEvent,
 } from '../interfaces';
+import { ConversationRunsService } from '../services/conversation-runs';
 import { GetConversation, GetConversationResponse } from './get-conversation';
 
 export class SendMessage {
@@ -60,6 +61,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
     private readonly middlewares: ChatMiddleware[],
     private readonly i18n: I18nService,
     private readonly cache: ChatCacheImpl,
+    private readonly runs: ConversationRunsService,
   ) {}
 
   async execute(query: SendMessage): Promise<SendMessageResponse> {
@@ -116,6 +118,12 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       context.result.subscribe(observer);
 
       const run = async () => {
+        let finish!: () => void;
+        const done = new Promise<void>((resolve) => (finish = resolve));
+
+        // Stops a previous answer of this conversation and waits until it is persisted, so the history is consistent.
+        await this.runs.start(conversation.id, abort, done);
+
         // Provides access to the context, event if it cannot be accessed directly through parameters.
         const getContext = () => this.store.getStore() as ChatContext;
 
@@ -138,6 +146,7 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
         } finally {
           context.result.complete();
           this.cache.clean();
+          finish();
         }
       };
 

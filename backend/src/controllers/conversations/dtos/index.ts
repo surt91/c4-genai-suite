@@ -112,6 +112,12 @@ export class MessageDto {
   })
   logging?: string[];
 
+  @ApiProperty({
+    description: 'Whether the generation of the answer was stopped before it was complete.',
+    required: false,
+  })
+  stopped?: boolean;
+
   static fromDomain(this: void, source: Message) {
     const result = new MessageDto();
     result.id = source.id;
@@ -123,6 +129,7 @@ export class MessageDto {
     result.type = source.type;
     result.logging = source.logging;
     result.configurationId = source.configurationId;
+    result.stopped = source.stopped;
 
     return result;
   }

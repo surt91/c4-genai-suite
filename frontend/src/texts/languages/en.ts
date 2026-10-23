@@ -508,6 +508,8 @@ export const en = {
     newChat: 'New chat',
     welcomeText: 'How may I help you?',
     placeholder: 'Message {{configuration}}',
+    stopGeneration: 'Stop generating',
+    generationStopped: 'Generation stopped',
     rateConversation: 'Was this conversation helpful so far?',
     rateMessage: 'Rate response',
     selectAssistant: 'Select assistant',

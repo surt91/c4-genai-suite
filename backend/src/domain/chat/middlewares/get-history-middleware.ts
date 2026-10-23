@@ -52,7 +52,15 @@ export class GetHistoryMiddleware implements ChatMiddleware {
     await history.addMessage(new HumanMessage(context.input), true, context.editMessageId);
 
     context.history = history;
-    await next(context);
+    try {
+      await next(context);
+    } finally {
+      // When the generation was stopped before an answer could be stored, store an empty (stopped) answer, so that
+      // the conversation shows that the question was not answered completely.
+      if (context.abort.signal.aborted && !history.hasAIMessage) {
+        await history.addAIMessage('', { stopped: true });
+      }
+    }
   }
 }
 
@@ -63,6 +71,9 @@ class InternalChatHistory extends MessagesHistory {
   private sources: ExtensionSource[] = [];
   private stored?: BaseMessage[];
   private currentParentId?: number;
+
+  // Whether an AI message has been stored by this pipeline run.
+  public hasAIMessage = false;
 
   constructor(
     private readonly conversationId: number,
@@ -169,6 +180,7 @@ class InternalChatHistory extends MessagesHistory {
       debug: message.isAI() ? this.debug : [],
       // The sources information are only relevant for AI messages.
       sources: message.isAI() ? this.sources : [],
+      stopped: message.isAI() ? message.stopped : false,
     };
 
     try {
@@ -180,7 +192,8 @@ class InternalChatHistory extends MessagesHistory {
           configurationId: this.configurationId,
         });
         this.currentParentId = entity.id;
-        // Notifo the UI about the message ID, because it is needed to rate messages.
+        this.hasAIMessage = true;
+        // Notify the UI about the message ID, because it is needed to rate messages.
         this.context.result.next({ type: 'saved', messageId: entity.id, messageType: 'ai' });
       } else if (persistHuman) {
         if (editMessageId) {
@@ -225,18 +238,24 @@ class InternalChatHistory extends MessagesHistory {
 }
 
 function mapStoredMessagesToChatMessages(messages: MessageEntity[]): BaseMessage[] {
-  return messages.map((message) => {
-    // TODO: maybe we should not save this json structure but migrate to a string column
-    const data = message.data as { content: string };
-    const text = data.content;
+  return (
+    messages
+      // Answers that were stopped before any text was generated are only kept for the UI. Some LLM APIs reject empty
+      // assistant messages, so they are not part of the history for the LLM.
+      .filter((message) => !(message.type === 'ai' && message.stopped && !(message.data as { content?: string })?.content))
+      .map((message) => {
+        // TODO: maybe we should not save this json structure but migrate to a string column
+        const data = message.data as { content: string };
+        const text = data.content;
 
-    switch (message.type) {
-      case 'human':
-        return new HumanMessage(text);
-      case 'ai':
-        return new AIMessage(text);
-      default:
-        throw new Error(`Unsupported message type '${message.type}'.`);
-    }
-  });
+        switch (message.type) {
+          case 'human':
+            return new HumanMessage(text);
+          case 'ai':
+            return new AIMessage(text, { stopped: message.stopped });
+          default:
+            throw new Error(`Unsupported message type '${message.type}'.`);
+        }
+      })
+  );
 }

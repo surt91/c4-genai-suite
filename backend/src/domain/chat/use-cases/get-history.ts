@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConversationEntity, ConversationRepository, MessageEntity, MessageRepository } from 'src/domain/database';
 import { User } from 'src/domain/users';
 import { Message, MessageType } from '../interfaces';
+import { ConversationRunsService } from '../services/conversation-runs';
 import { normalizedMessageContent } from '../utils';
 
 export class GetHistory {
@@ -24,6 +25,7 @@ export class GetHistoryHandler implements IQueryHandler<GetHistory, GetHistoryRe
     private readonly conversations: ConversationRepository,
     @InjectRepository(MessageEntity)
     private readonly messages: MessageRepository,
+    private readonly runs: ConversationRunsService,
   ) {}
 
   async execute(query: GetHistory): Promise<GetHistoryResponse> {
@@ -38,6 +40,9 @@ export class GetHistoryHandler implements IQueryHandler<GetHistory, GetHistoryRe
     if (conversation.userId !== user.id) {
       throw new ForbiddenException();
     }
+
+    // If the user has just stopped the answer, wait until the partial answer is persisted.
+    await this.runs.waitForStopped(conversationId);
 
     const entities = await this.messages.getMessageThread(conversationId);
 

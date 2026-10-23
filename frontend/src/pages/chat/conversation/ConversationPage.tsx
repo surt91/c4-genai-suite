@@ -28,7 +28,7 @@ export function ConversationPage(props: ConversationPageProps) {
 
   const chatParam = useParams<'id'>();
   const chatId = +chatParam.id!;
-  const { sendMessage, isChatLoading } = useChatStream(chatId);
+  const { sendMessage, stopMessage, isChatLoading } = useChatStream(chatId);
   const chat = useStateOfChat();
   const messages = useStateOfMessages();
   const isAiWriting = useStateOfIsAiWriting();
@@ -124,8 +124,10 @@ export function ConversationPage(props: ConversationPageProps) {
                 chatId={chat.id}
                 configuration={assistant}
                 isDisabled={isAiWriting}
+                isAiWriting={isAiWriting}
                 isEmpty={isNewConversation}
                 submitMessage={submitMessage}
+                stopMessage={stopMessage}
               />
               <div
                 className={clsx(

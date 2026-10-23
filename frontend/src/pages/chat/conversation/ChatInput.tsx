@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Portal, Tooltip } from '@mantine/core';
-import { IconArrowUp, IconFilter, IconPaperclip } from '@tabler/icons-react';
+import { IconArrowUp, IconFilter, IconPaperclip, IconPlayerStopFilled } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -31,9 +31,21 @@ interface ChatInputProps {
   chatId: number;
   isDisabled?: boolean;
   isEmpty?: boolean;
+  // Whether an answer is being generated, which can be stopped.
+  isAiWriting?: boolean;
   submitMessage: (input: string, files?: FileDto[]) => void;
+  stopMessage?: () => void;
 }
-export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage }: ChatInputProps) {
+export function ChatInput({
+  textareaRef,
+  chatId,
+  configuration,
+  isDisabled,
+  isEmpty,
+  isAiWriting,
+  submitMessage,
+  stopMessage,
+}: ChatInputProps) {
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
@@ -117,9 +129,19 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
     void refetchConversationFiles();
   });
 
+  const canStop = !!isAiWriting && !!stopMessage;
+
+  const doStop = useEventCallback(() => {
+    stopMessage?.();
+    textareaRef?.current?.focus();
+  });
+
   const doKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
       doSubmit(event);
+    } else if (event.key === 'Escape' && canStop) {
+      event.preventDefault();
+      doStop();
     }
   });
 
@@ -299,17 +321,31 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 ) : showTranscribe ? (
                   <TranscribeButton isRecording={isRecording} isTranscribing={isTranscribing} onToggle={toggleRecording} />
                 ) : null}
-                <DisabledAwareTooltip label={texts.common.send}>
-                  <ActionIcon
-                    type="submit"
-                    size="lg"
-                    disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
-                    data-testid="chat-submit-button"
-                    aria-label={texts.common.send}
-                  >
-                    <IconArrowUp />
-                  </ActionIcon>
-                </DisabledAwareTooltip>
+                {canStop ? (
+                  <Tooltip label={`${texts.chat.stopGeneration} (Esc)`}>
+                    <ActionIcon
+                      type="button"
+                      size="lg"
+                      onClick={doStop}
+                      data-testid="chat-stop-button"
+                      aria-label={texts.chat.stopGeneration}
+                    >
+                      <IconPlayerStopFilled size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                ) : (
+                  <DisabledAwareTooltip label={texts.common.send}>
+                    <ActionIcon
+                      type="submit"
+                      size="lg"
+                      disabled={!input || isDisabled || uploadMutations.some((m) => m.status === 'pending') || listening}
+                      data-testid="chat-submit-button"
+                      aria-label={texts.common.send}
+                    >
+                      <IconArrowUp />
+                    </ActionIcon>
+                  </DisabledAwareTooltip>
+                )}
               </div>
             </div>
           </div>

@@ -35,6 +35,7 @@ import {
   UIMiddleware,
 } from './middlewares';
 import { CallbackService } from './services/callback-service';
+import { ConversationRunsService } from './services/conversation-runs';
 import {
   DeleteConversationHandler,
   DeleteConversationsHandler,
@@ -75,6 +76,7 @@ import {
     ChatCacheImpl,
     CallbackService,
     CheckUsageMiddleware,
+    ConversationRunsService,
     ChooseLllMiddleware,
     CompleteMiddleware,
     DefaultPromptMiddleware,

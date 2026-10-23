@@ -10,7 +10,14 @@ describe(OpenApiExtension.name, () => {
   const extension = { externalId: 'open-api_1', values: { endpoint: 'http://tools.internal', headers: '' } };
 
   function createContext(cache: ChatCacheImpl, user: User): ChatContext {
-    return { cache, user, tools: [], context: {}, result: { next: jest.fn() } } as unknown as ChatContext;
+    return {
+      abort: new AbortController(),
+      cache,
+      user,
+      tools: [],
+      context: {},
+      result: { next: jest.fn() },
+    } as unknown as ChatContext;
   }
 
   beforeEach(() => {
@@ -52,6 +59,8 @@ describe(OpenApiExtension.name, () => {
     await bobContext.tools[0].execute({});
     expect(ToolsApi.prototype.executeTool).toHaveBeenCalledWith(
       expect.objectContaining({ tool: 'lookup', user: { id: 'bob', name: 'Bob', email: 'bob@example.com' } }),
+      // stopping the second request aborts its tool call
+      { signal: bobContext.abort.signal },
     );
   });
 });

@@ -86,10 +86,17 @@ export abstract class BaseMessage {
   }
 }
 
+export interface AIMessageOptions {
+  // Whether the generation was stopped (e.g. by the user) before it was complete.
+  stopped?: boolean;
+}
+
 export class AIMessage extends BaseMessage {
   readonly role = 'assistant' as const;
-  constructor(content: string) {
+  readonly stopped: boolean;
+  constructor(content: string, options?: AIMessageOptions) {
     super(content);
+    this.stopped = options?.stopped ?? false;
   }
 }
 
@@ -111,8 +118,8 @@ export abstract class MessagesHistory {
   public addUserMessage(message: string): Promise<void> {
     return this.addMessage(new HumanMessage(message));
   }
-  public addAIMessage(message: string): Promise<void> {
-    return this.addMessage(new AIMessage(message));
+  public addAIMessage(message: string, options?: AIMessageOptions): Promise<void> {
+    return this.addMessage(new AIMessage(message, options));
   }
   public async addMessages(messages: BaseMessage[]): Promise<void> {
     for (const message of messages) {
@@ -286,6 +293,9 @@ export interface Message {
   rating?: MessageRating;
 
   logging?: string[];
+
+  // Whether the generation of this (AI) message was stopped before it was complete.
+  stopped?: boolean;
 
   configurationId: number;
 }

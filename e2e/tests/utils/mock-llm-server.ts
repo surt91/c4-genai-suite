@@ -26,6 +26,8 @@ interface MockResponse {
   // Optional pattern to match in system messages (for testing system prompt delivery)
   matchSystem?: RegExp;
   response?: string;
+  // Delay between the streamed words in ms (default: 20), e.g. to test stopping the generation
+  chunkDelayMs?: number;
   // Dump the full context (messages + tools) as pretty-printed JSON - useful for debugging
   dumpContext?: boolean;
   toolCall?: {
@@ -48,6 +50,12 @@ const DEFAULT_RESPONSES: MockResponse[] = [
   // Debug helper - dumps the full context as pretty-printed JSON
   { match: /dump context|debug context|show context/i, dumpContext: true },
   { match: /banane/i, response: 'banana' },
+  // A long and slow answer (about 60 seconds) to test stopping the generation
+  {
+    match: /slow stream/i,
+    response: Array.from({ length: 300 }, (_, i) => `word${i}`).join(' '),
+    chunkDelayMs: 200,
+  },
   {
     match: /wann hat.*geburtstag|when.*birthday|welcher seite|which page/i,
     toolCall: {
@@ -244,6 +252,21 @@ interface FoundResponse {
   type: 'text' | 'tool_call';
   text?: string;
   toolCall?: ToolCall;
+  chunkDelayMs?: number;
+}
+
+export interface StreamState {
+  // The client (the backend) closed the request before the answer was complete.
+  aborted: boolean;
+  finished: boolean;
+}
+
+// The state of the streamed answers by the last user message. Tests use unique messages to find their requests.
+const streamStates = new Map<string, StreamState>();
+
+/** Returns the state of the streamed answer to the given user message (in this worker). */
+export function getStreamState(userMessage: string): StreamState | undefined {
+  return streamStates.get(userMessage);
 }
 
 function findResponse(messages: ChatMessage[], tools?: Tool[]): FoundResponse {
@@ -325,7 +348,7 @@ ${JSON.stringify(context, null, 2)}
 
     // Regular text response
     if (mockResponse.response) {
-      return { type: 'text', text: mockResponse.response };
+      return { type: 'text', text: mockResponse.response, chunkDelayMs: mockResponse.chunkDelayMs };
     }
   }
 
@@ -372,6 +395,19 @@ function handleChatCompletions(body: string, res: http.ServerResponse) {
   const parsed = JSON.parse(body) as ChatRequest;
   const { messages, stream, tools } = parsed;
   const response = findResponse(messages, tools);
+
+  const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+  const isTitleRequest = messages.some((m) => m.role === 'system' && /Summarize the following content/i.test(m.content ?? ''));
+  const streamState: StreamState = { aborted: false, finished: false };
+  if (stream && !isTitleRequest) {
+    streamStates.set(lastUserMessage, streamState);
+  }
+  res.on('finish', () => {
+    streamState.finished = true;
+  });
+  res.on('close', () => {
+    streamState.aborted = !streamState.finished;
+  });
 
   if (stream) {
     // Streaming response
@@ -466,7 +502,12 @@ function handleChatCompletions(body: string, res: http.ServerResponse) {
       const words = responseText.split(' ');
       let i = 0;
 
+      const chunkDelayMs = response.chunkDelayMs ?? 20;
+
       const sendNext = () => {
+        if (res.destroyed) {
+          return;
+        }
         if (i < words.length) {
           res.write(
             `data: ${JSON.stringify({
@@ -478,7 +519,7 @@ function handleChatCompletions(body: string, res: http.ServerResponse) {
             })}\n\n`,
           );
           i++;
-          setTimeout(sendNext, 20);
+          setTimeout(sendNext, chunkDelayMs);
         } else {
           // Final chunk
           res.write(

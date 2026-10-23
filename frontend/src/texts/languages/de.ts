@@ -501,6 +501,8 @@ export const de: typeof en = {
     newChat: 'Neuer Chat',
     welcomeText: 'Wie kann ich dir helfen?',
     placeholder: 'Nachricht an {{configuration}}',
+    stopGeneration: 'Generierung abbrechen',
+    generationStopped: 'Generierung abgebrochen',
     rateConversation: 'War dieser Chat bisher hilfreich?',
     rateMessage: 'Antwort bewerten',
     selectAssistant: 'Assistent auswählen',

@@ -40,6 +40,10 @@ export class MessageEntity {
   @Column({ nullable: true })
   error?: string;
 
+  // Whether the generation of the answer was stopped (by the user or a disconnect) before it was complete.
+  @Column({ default: false })
+  stopped!: boolean;
+
   @Column('simple-json', { nullable: true })
   tools?: any;
 

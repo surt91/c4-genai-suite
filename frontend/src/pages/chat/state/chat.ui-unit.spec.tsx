@@ -1,6 +1,7 @@
 import { act, render } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useStateOfIsAiWriting } from './chat';
+import { loadStoppedMessages, useStateOfIsAiWriting } from './chat';
+import { ChatMessage } from './types';
 import { useChatStore } from './zustand/chatStore';
 
 describe('chat state selectors', () => {
@@ -42,6 +43,93 @@ describe('chat state selectors', () => {
 
     expect(renderValue).toHaveBeenCalledOnce();
     expect(renderValue).toHaveBeenCalledWith(false);
+  });
+});
+
+describe('stopping the generation', () => {
+  const question: ChatMessage = { id: 0, type: 'human', configurationId: 1, content: [{ type: 'text', text: 'Question' }] };
+  const answer: ChatMessage = { id: -1, type: 'ai', configurationId: 1, content: [{ type: 'text', text: 'Partial' }] };
+
+  function startStream(
+    messages: ChatMessage[] = [
+      question,
+      { ...answer, ui: { id: 'form', text: 'Confirm?', schema: { type: 'object', title: 'Confirm', properties: {} } } },
+    ],
+  ) {
+    const subscription = { unsubscribe: vi.fn(), abort: vi.fn() };
+    const store = useChatStore.getState();
+    store.switchToChat(1);
+    store.setMessages(1, messages);
+    store.setStreamingMessageId(1, -1);
+    store.setIsAiWriting(1, true);
+    store.setActiveStreamSubscription(1, subscription);
+    store.updateMessage(1, -1, { toolsInUse: { Search: 'Started' } });
+    return subscription;
+  }
+
+  beforeEach(() => {
+    useChatStore.setState({ currentChatId: 0, chatDataMap: new Map() });
+  });
+
+  it('aborts the request and marks the answer as stopped', () => {
+    const subscription = startStream();
+
+    expect(useChatStore.getState().stopActiveStream(1)).toBe(true);
+
+    expect(subscription.abort).toHaveBeenCalledOnce();
+    const chatData = useChatStore.getState().chatDataMap.get(1)!;
+    expect(chatData.isAiWriting).toBe(false);
+    expect(chatData.activeStreamSubscription).toBeUndefined();
+
+    const [stoppedQuestion, stoppedAnswer] = chatData.messages;
+    expect(stoppedAnswer).toMatchObject({ stopped: true, ui: undefined, toolsInUse: { Search: 'Completed' } });
+    expect(stoppedAnswer.content).toEqual(answer.content);
+    // the placeholder IDs are free for the next message
+    expect(stoppedQuestion.id).toBeLessThan(-1);
+    expect(stoppedAnswer.id).toBeLessThan(-1);
+    expect(stoppedAnswer.id).not.toBe(stoppedQuestion.id);
+  });
+
+  it('does nothing without an active stream', () => {
+    useChatStore.getState().switchToChat(1);
+
+    expect(useChatStore.getState().stopActiveStream(1)).toBe(false);
+  });
+
+  it('loads the stored messages after stopping', async () => {
+    startStream();
+    useChatStore.getState().stopActiveStream(1);
+
+    const stored: ChatMessage[] = [
+      { ...question, id: 10 },
+      { ...answer, id: 11, stopped: true },
+    ];
+    const getMessages = vi
+      .fn()
+      // the first request overtakes the abort and does not contain the answer yet
+      .mockResolvedValueOnce({ items: [stored[0]] })
+      .mockResolvedValue({ items: stored });
+
+    await loadStoppedMessages(1, getMessages);
+
+    expect(getMessages).toHaveBeenCalledTimes(2);
+    expect(useChatStore.getState().chatDataMap.get(1)!.messages).toEqual(stored);
+  });
+
+  it('does not replace the messages when a new message has been sent in the meantime', async () => {
+    startStream();
+    useChatStore.getState().stopActiveStream(1);
+    useChatStore.getState().setIsAiWriting(1, true);
+
+    const getMessages = vi.fn().mockResolvedValue({
+      items: [
+        { ...question, id: 10 },
+        { ...answer, id: 11 },
+      ],
+    });
+    await loadStoppedMessages(1, getMessages);
+
+    expect(useChatStore.getState().chatDataMap.get(1)!.messages[1].id).not.toBe(11);
   });
 });
 

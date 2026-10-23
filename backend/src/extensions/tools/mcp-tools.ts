@@ -536,7 +536,8 @@ export class MCPToolsExtension implements Extension<Configuration> {
                     method: 'tools/call',
                     params: { name, arguments: { ...llmArgs, ...adminArgs, ...userArgs } },
                   };
-                  const res = await client.request(req, CallToolResultSchema);
+                  // Aborting the request also notifies the server that the tool call has been cancelled.
+                  const res = await client.request(req, CallToolResultSchema, { signal: context.abort.signal });
                   const { sources, content } = transformMCPToolResponse(res);
                   if (sources.length) {
                     context.history?.addSources(extension.externalId, sources);

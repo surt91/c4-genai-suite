@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ExtensionArgument } from '../../extensions';
-import { ChatContext, ChatMiddleware, ChatNextDelegate, ChatUI, GetContext } from '../interfaces';
+import { ChatContext, ChatMiddleware, ChatNextDelegate, ChatUI, FormActionType, GetContext } from '../interfaces';
 import { CallbackService } from '../services/callback-service';
 
 @Injectable()
@@ -21,14 +21,27 @@ class ChatUIImpl implements ChatUI {
     private readonly callbacks: CallbackService,
   ) {}
 
-  form(text: string, schema: ExtensionArgument) {
+  async form(text: string, schema: ExtensionArgument) {
+    const { signal } = this.context.abort;
+    if (signal.aborted) {
+      return { action: FormActionType.CANCEL };
+    }
+
     const { id, result } = this.callbacks.form();
+
+    // When the generation is stopped, nobody can answer the form anymore.
+    const onAbort = () => this.callbacks.complete(id, { action: FormActionType.CANCEL });
+    signal.addEventListener('abort', onAbort, { once: true });
 
     this.context.result.next({
       type: 'ui',
       request: { id, text, schema },
     });
 
-    return result;
+    try {
+      return await result;
+    } finally {
+      signal.removeEventListener('abort', onAbort);
+    }
   }
 }

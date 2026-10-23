@@ -70,16 +70,6 @@ export class ExecuteMiddleware implements ChatMiddleware {
       ...llm.options,
       abortSignal: abort.signal,
       stopWhen: stepCountIs(1000),
-      onFinish: ({ totalUsage }) => addTokenUsage(context, llm, totalUsage.totalTokens),
-      // `onFinish` is not called when the user stops the answer; count at least the finished steps (e.g. tool calls),
-      // otherwise stopping each answer just before its end would bypass the token limits. The usage of the step
-      // that was interrupted is not reported by the providers.
-      onAbort: ({ steps }) =>
-        addTokenUsage(
-          context,
-          llm,
-          steps.reduce((sum, step) => sum + (step.usage.totalTokens ?? 0), 0),
-        ),
       experimental_telemetry: {
         isEnabled: context.telemetry ?? false,
         metadata: {
@@ -94,7 +84,13 @@ export class ExecuteMiddleware implements ChatMiddleware {
 
     let error: GenericAIError | null = null;
     const text: string[] = [];
-    for await (const event of fullStream) {
+    for await (const event of untilAborted(fullStream, abort.signal)) {
+      if (event.type === 'finish-step') {
+        // Count the usage per step (instead of the total at the end), so the finished steps (e.g. tool calls) are
+        // also counted when the answer is stopped. Otherwise stopping each answer just before its end would bypass the
+        // token limits. The usage of the interrupted step is not reported by the providers.
+        addTokenUsage(context, llm, event.usage.totalTokens);
+      }
       if (event.type === 'tool-call') {
         const toolName = tools.find((x) => x.name === event.toolName)?.displayName ?? event.toolName;
         result.next({ type: 'tool_start', tool: { name: toolName } });
@@ -119,7 +115,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
         text.push(event.text);
         result.next({ type: 'chunk', content: [{ type: 'text', text: event.text }] });
       }
-      if (event.type === 'error') {
+      if (event.type === 'error' && !abort.signal.aborted) {
         this.logger.error({ event });
         error = event.error as GenericAIError;
       }
@@ -130,9 +126,11 @@ export class ExecuteMiddleware implements ChatMiddleware {
       }
     }
 
-    await history?.addAIMessage(text.join(''));
+    // When the generation has been stopped (by the user or because the client disconnected), the partial answer is kept.
+    const stopped = abort.signal.aborted;
+    await history?.addAIMessage(text.join(''), { stopped });
 
-    if (error) {
+    if (error && !stopped) {
       // unwrap and throw the causing error to be handled by the ExceptionMiddleware
       throw error.error;
     }
@@ -144,29 +142,38 @@ export class ExecuteMiddleware implements ChatMiddleware {
     const messages = await history?.getMessages();
     const allTools = this.buildToolSet(tools);
 
-    const response = await generateText({
-      model: llm.model,
-      tools: allTools,
-      toolChoice: 'auto',
-      prompt: [
-        ...systemMessages.map((x) => ({ role: 'system' as const, content: x })),
-        ...(messages?.filter((x) => !!x) ?? []),
-        { role: 'user' as const, content: input },
-      ],
-      ...llm.options,
-      abortSignal: abort.signal,
-      stopWhen: stepCountIs(1000),
-      experimental_telemetry: {
-        isEnabled: context.telemetry ?? false,
-        metadata: {
-          conversationId: context.conversationId,
-          assistantId: context.configuration.id,
-          assistantName: context.configuration.name,
-          modelName: llm.modelName,
-          providerName: llm.providerName,
+    let response: Awaited<ReturnType<typeof generateText>>;
+    try {
+      response = await generateText({
+        model: llm.model,
+        tools: allTools,
+        toolChoice: 'auto',
+        prompt: [
+          ...systemMessages.map((x) => ({ role: 'system' as const, content: x })),
+          ...(messages?.filter((x) => !!x) ?? []),
+          { role: 'user' as const, content: input },
+        ],
+        ...llm.options,
+        abortSignal: abort.signal,
+        stopWhen: stepCountIs(1000),
+        experimental_telemetry: {
+          isEnabled: context.telemetry ?? false,
+          metadata: {
+            conversationId: context.conversationId,
+            assistantId: context.configuration.id,
+            assistantName: context.configuration.name,
+            modelName: llm.modelName,
+            providerName: llm.providerName,
+          },
         },
-      },
-    });
+      });
+    } catch (err) {
+      if (abort.signal.aborted) {
+        // Nothing has been generated yet, the empty answer is stored by the history middleware.
+        return;
+      }
+      throw err;
+    }
 
     addTokenUsage(context, llm, response.totalUsage?.totalTokens);
 
@@ -217,4 +224,38 @@ export class ExecuteMiddleware implements ChatMiddleware {
 function addTokenUsage(context: ChatContext, llm: LanguageModelContext, totalTokens: number | undefined) {
   context.tokenUsage ??= { tokenCount: 0, model: llm.modelName, llm: llm.providerName };
   context.tokenUsage.tokenCount += totalTokens ?? 0;
+}
+
+/**
+ * Iterates the stream until it ends or the signal is aborted. Unlike the stream itself, it stops immediately on abort,
+ * even when the stream is waiting for something that does not support aborting (e.g. a tool).
+ */
+export async function* untilAborted<T>(stream: AsyncIterable<T>, signal: AbortSignal): AsyncGenerator<T> {
+  const iterator = stream[Symbol.asyncIterator]();
+  let onAbort: (() => void) | undefined;
+  const aborted = new Promise<{ done: true; value: undefined }>((resolve) => {
+    onAbort = () => resolve({ done: true, value: undefined });
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+
+  try {
+    while (!signal.aborted) {
+      const next = await Promise.race([iterator.next(), aborted]);
+      if (next.done || signal.aborted) {
+        break;
+      }
+      yield next.value;
+    }
+  } catch (err) {
+    // Errors caused by the abort (e.g. an AbortError of the LLM request) are expected.
+    if (!signal.aborted) {
+      throw err;
+    }
+  } finally {
+    signal.removeEventListener('abort', onAbort!);
+    if (signal.aborted) {
+      // Cancel the underlying stream without waiting for it.
+      iterator.return?.().catch(() => {});
+    }
+  }
 }

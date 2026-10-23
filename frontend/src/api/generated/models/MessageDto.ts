@@ -87,6 +87,12 @@ export interface MessageDto {
      * @memberof MessageDto
      */
     logging?: Array<string>;
+    /**
+     * Whether the generation of the answer was stopped before it was complete.
+     * @type {boolean}
+     * @memberof MessageDto
+     */
+    stopped?: boolean;
 }
 
 
@@ -143,6 +149,7 @@ export function MessageDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'debug': json['debug'] == null ? undefined : json['debug'],
         'sources': json['sources'] == null ? undefined : ((json['sources'] as Array<any>).map(SourceDtoFromJSON)),
         'logging': json['logging'] == null ? undefined : json['logging'],
+        'stopped': json['stopped'] == null ? undefined : json['stopped'],
     };
 }
 
@@ -161,6 +168,7 @@ export function MessageDtoToJSON(value?: MessageDto | null): any {
         'debug': value['debug'],
         'sources': value['sources'] == null ? undefined : ((value['sources'] as Array<any>).map(SourceDtoToJSON)),
         'logging': value['logging'],
+        'stopped': value['stopped'],
     };
 }
 

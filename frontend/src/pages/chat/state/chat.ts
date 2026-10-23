@@ -14,6 +14,7 @@ import {
   useApi,
 } from 'src/api';
 import { texts } from 'src/texts';
+import { ChatMessage } from './types';
 import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
 
@@ -188,8 +189,43 @@ export const useChatStream = (chatId: number) => {
     chatStore.setActiveStreamSubscription(chatId, subscription);
   };
 
-  return { sendMessage, isChatLoading };
+  const stopMessage = () => {
+    if (useChatStore.getState().stopActiveStream(chatId)) {
+      // The server stores the partial answer. Load it to get the real message IDs (e.g. to rate the answer).
+      void loadStoppedMessages(chatId, () => api.conversations.getMessages(chatId));
+    }
+  };
+
+  return { sendMessage, stopMessage, isChatLoading };
 };
+
+const STOPPED_RELOAD_DELAYS = [0, 250, 500, 1000, 2000];
+
+/**
+ * Replaces the local messages with the messages of the server after the generation has been stopped. The server waits
+ * for the stopped answer to be stored, but the request may still overtake the abort, so it is retried a few times.
+ */
+export async function loadStoppedMessages(chatId: number, getMessages: () => Promise<{ items: ChatMessage[] }>) {
+  const expectedCount = useChatStore.getState().chatDataMap.get(chatId)?.messages.length ?? 0;
+
+  for (const delay of STOPPED_RELOAD_DELAYS) {
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    try {
+      const { items } = await getMessages();
+      const chatData = useChatStore.getState().chatDataMap.get(chatId);
+      if (!chatData || chatData.isAiWriting || chatData.messages.length !== expectedCount) {
+        // a new message has been sent in the meantime, which updates the messages anyway
+        return;
+      }
+      if (items.length >= expectedCount && items[items.length - 1]?.type === 'ai') {
+        useChatStore.getState().setMessages(chatId, items);
+        return;
+      }
+    } catch {
+      // try again
+    }
+  }
+}
 
 export const useStateMutateChat = (chatId: number) => {
   const api = useApi();

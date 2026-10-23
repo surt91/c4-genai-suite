@@ -48,6 +48,7 @@ type ChatActions = {
   appendToStreamingMessage: (chatId: number, text: string) => void;
   setActiveStreamSubscription: (chatId: number, subscription?: StreamSubscription) => void;
   cancelActiveStream: (chatId: number) => void;
+  stopActiveStream: (chatId: number) => boolean;
   getStream: (
     chatId: number,
     input: string,
@@ -63,6 +64,10 @@ type ChatActions = {
   setSelectedDocument: (document: DocumentSource | undefined) => void;
   setSelectedSource: (source: SourceDto | undefined) => void;
 };
+
+// Placeholder IDs of messages whose generation has been stopped before the server sent the real ID. They must not
+// collide with the placeholder IDs of the next messages (0 for the question, -1 for the answer).
+let lastStoppedPlaceholderId = -1;
 
 const createEmptyChatData = (chatId: number): ChatData => ({
   messages: [],
@@ -225,6 +230,37 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
         });
         return { chatDataMap: newMap };
       }),
+
+    stopActiveStream: (chatId) => {
+      const chatData = get().chatDataMap.get(chatId);
+      if (!chatData?.activeStreamSubscription) {
+        return false;
+      }
+
+      // Aborting the request stops the generation on the server, which stores the partial answer.
+      chatData.activeStreamSubscription.abort();
+
+      const messages = chatData.messages.map((message): ChatMessage => {
+        const id = message.id === 0 || message.id === -1 ? --lastStoppedPlaceholderId : message.id;
+        if (message.id !== chatData.streamingMessageId) {
+          return { ...message, id };
+        }
+
+        const toolsInUse = Object.fromEntries(Object.keys(message.toolsInUse ?? {}).map((name) => [name, 'Completed' as const]));
+        return { ...message, id, stopped: true, ui: undefined, reasoningInProgress: false, toolsInUse };
+      });
+
+      const newMap = new Map(get().chatDataMap);
+      newMap.set(chatId, {
+        ...chatData,
+        messages,
+        activeStreamSubscription: undefined,
+        isAiWriting: false,
+        streamingMessageId: undefined,
+      });
+      set({ chatDataMap: newMap });
+      return true;
+    },
 
     setSelectedDocument: (selectedDocument) => {
       set({ selectedDocument });

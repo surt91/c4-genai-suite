@@ -128,3 +128,22 @@ export async function ensureAssistantViaApi(api: APIRequestContext, name: string
     );
   }
 }
+
+/** Creates an (enabled) assistant that uses the mock LLM server of the worker. */
+export async function createMockAssistantViaApi(api: APIRequestContext, name: string, mockServerUrl: string) {
+  const assistant = await ok<{ id: number; name: string }>(
+    await api.post('/api/configurations', { data: { name, description: `Description of ${name}`, enabled: true } }),
+    `creating assistant ${name}`,
+  );
+  await ok(
+    await api.post(`/api/configurations/${assistant.id}/extensions`, {
+      data: {
+        name: 'open-ai-compatible-model',
+        enabled: true,
+        values: { apiKey: 'mock-api-key', baseUrl: mockServerUrl, modelName: 'mock-gpt-4' },
+      },
+    }),
+    `adding the mock LLM to assistant ${name}`,
+  );
+  return assistant;
+}

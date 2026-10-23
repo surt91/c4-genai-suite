@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { useConversationBucketAvailabilities } from 'src/hooks/api/extensions';
@@ -146,6 +146,40 @@ describe('ChatInput', () => {
 
     const textInput = await screen.findByRole('textbox');
     expect(textInput).toHaveValue('This is a suggestion');
+  });
+
+  it('should show a stop button instead of the send button while the answer is generated', () => {
+    mockConversationFiles([]);
+    const stopMessage = vi.fn();
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} isDisabled isAiWriting stopMessage={stopMessage} />);
+
+    expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
+    screen.getByRole('button', { name: 'Stop generating' }).click();
+
+    expect(stopMessage).toHaveBeenCalledOnce();
+  });
+
+  it('should stop the generation with escape', () => {
+    mockConversationFiles([]);
+    const stopMessage = vi.fn();
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} isDisabled isAiWriting stopMessage={stopMessage} />);
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
+
+    expect(stopMessage).toHaveBeenCalledOnce();
+  });
+
+  it('should show the send button when no answer is generated', () => {
+    mockConversationFiles([]);
+    const stopMessage = vi.fn();
+
+    render(<ChatInput chatId={0} submitMessage={() => {}} stopMessage={stopMessage} />);
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
+
+    expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Stop generating' })).toBeNull();
+    expect(stopMessage).not.toHaveBeenCalled();
   });
 });
 

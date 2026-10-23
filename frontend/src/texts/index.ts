@@ -538,6 +538,8 @@ function load() {
       newChat: translate('chat.newChat'),
       welcomeText: translate('chat.welcomeText'),
       placeholder: (configuration: string) => translate('chat.placeholder', { configuration }),
+      stopGeneration: translate('chat.stopGeneration'),
+      generationStopped: translate('chat.generationStopped'),
       rateConversation: translate('chat.rateConversation'),
       rateMessage: translate('chat.rateMessage'),
       selectAssistant: translate('chat.selectAssistant'),

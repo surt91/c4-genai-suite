@@ -3352,6 +3352,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "stopped": {
+            "type": "boolean",
+            "description": "Whether the generation of the answer was stopped before it was complete."
           }
         },
         "required": ["id", "configurationId", "content", "type"]
