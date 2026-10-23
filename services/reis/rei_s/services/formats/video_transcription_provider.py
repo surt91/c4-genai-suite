@@ -6,9 +6,9 @@ from langchain_core.documents import Document
 from rei_s import logger
 from rei_s.config import Config
 from rei_s.services.formats import ffmpeg_utils
-from rei_s.services.formats.utils import ProcessingError, generate_pdf_from_md_file
+from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
-from rei_s.types.source_file import SourceFile, temp_file
+from rei_s.types.source_file import SourceFile
 
 
 class VideoTranscriptionProvider(VoiceTranscriptionProvider):
@@ -78,11 +78,3 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         chunks = super().process_file(audio_file, chunk_size, chunk_overlap)
         audio_file.delete()
         return chunks
-
-    def convert_file_to_pdf(self, file: SourceFile) -> SourceFile:
-        docs = self.parse_file(file)
-
-        plain = "\n".join([doc.page_content for doc in docs])
-
-        with temp_file(plain.encode()) as plain_file:
-            return generate_pdf_from_md_file(plain_file, "plain")

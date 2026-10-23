@@ -1,8 +1,11 @@
 from io import BytesIO
+import subprocess
+from pathlib import Path
 from typing import Protocol
 from faker import Faker
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from langchain_core.documents import Document
 from rei_s.services.random_embeddings import RandomEmbeddings
 from pydantic import ValidationError
 import pytest
@@ -27,12 +30,17 @@ INDEX_NAME = "s3_test"
 
 
 def get_config_override() -> Config:
+    return _get_s3_config({})
+
+
+def _get_s3_config(overrides: dict[str, str]) -> Config:
     try:
         return get_test_config(
             dict(
                 file_store_type="s3",
                 store_type="pgvector",
                 store_pgvector_index_name=INDEX_NAME,
+                **overrides,
             )
         )
     except ValidationError as e:
@@ -127,3 +135,51 @@ def test_get_document_pdf(file_uploader: FileUploaderFixture, client: TestClient
     pdf_content = PdfProvider().process_file(pdf_file, chunk_overlap=0)
     text = "".join(i.page_content for i in pdf_content)
     assert input_content[:20] in text
+
+
+def get_config_override_with_stt() -> Config:
+    return _get_s3_config(
+        dict(
+            stt_type="azure-openai-whisper",
+            stt_azure_openai_whisper_endpoint="example.com",
+            stt_azure_openai_whisper_deployment_name="whisper",
+            stt_azure_openai_whisper_api_version="version",
+            stt_azure_openai_whisper_api_key="secret",
+        )
+    )
+
+
+def test_upload_large_audio_file(app: FastAPI, client: TestClient, mocker: MockerFixture, tmp_path: Path) -> None:
+    # Regression test: files above the size threshold were converted to the pdf preview in a spawned process,
+    # which failed for audio, since the provider holds an unpicklable Whisper (OpenAI) client.
+    app.dependency_overrides[get_config] = get_config_override_with_stt
+    transcript = "a mocked transcription"
+    mocker.patch(
+        "rei_s.services.formats.voice_transcription_provider.AzureOpenAIWhisperParser.parse",
+        return_value=[Document(transcript)],
+    )
+
+    audio = tmp_path / "large.wav"
+    cmd = ["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=10"]
+    subprocess.run([*cmd, "-ar", "16000", "-ac", "1", str(audio)], check=True, capture_output=True)
+    assert audio.stat().st_size > get_config_override_with_stt().filesize_threshold
+
+    response = client.post(
+        "/files",
+        content=audio.read_bytes(),
+        headers={
+            "bucket": "1",
+            "id": "audio",
+            "fileName": "large.wav",
+            "fileMimeType": "audio/wav",
+            "indexName": INDEX_NAME,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+
+    response_document_pdf = client.get("/documents/pdf", params={"doc_id": "audio"})
+    assert response_document_pdf.status_code == 200
+    pdf_file = SourceFile.new_temporary_file(response_document_pdf.read(), "pdf")
+    text = "".join(i.page_content for i in PdfProvider().process_file(pdf_file, chunk_overlap=0))
+    assert transcript in text
