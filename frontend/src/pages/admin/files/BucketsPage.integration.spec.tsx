@@ -24,6 +24,31 @@ describe('BucketsPage', () => {
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
+  it('shows the first page of the results when searching', async () => {
+    const files = Array.from({ length: 25 }, (_, i) => file(100 + i, `document-${i}.pdf`));
+    new mockedAPI()
+      .withGet<JsonBodyType>('/api/buckets', { items: [bucket(1, 'Bucket A')] })
+      .withGet<JsonBodyType>('/api/buckets/1', bucket(1, 'Bucket A'))
+      .withGet<JsonBodyType>('/api/buckets/1/files', { items: files, total: files.length })
+      .run();
+    window.history.pushState({}, '', '/admin/files/1');
+
+    render(
+      <Routes>
+        <Route path="/admin/files/*" element={<BucketsPage />} />
+      </Routes>,
+    );
+
+    await screen.findByText('document-0.pdf');
+    fireEvent.click(screen.getByRole('button', { name: texts.accessibility.pdf.nextPage }));
+    expect(await screen.findByText(texts.common.page(2, 2))).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(texts.common.search), { target: { value: 'document-3.pdf' } });
+
+    expect(await screen.findByText('document-3.pdf')).toBeInTheDocument();
+    expect(screen.getByText(texts.common.page(1, 1))).toBeInTheDocument();
+  });
+
   it('does not keep the selection of files when another bucket is shown', async () => {
     new mockedAPI()
       .withGet<JsonBodyType>('/api/buckets', { items: [bucket(1, 'Bucket A'), bucket(2, 'Bucket B')] })

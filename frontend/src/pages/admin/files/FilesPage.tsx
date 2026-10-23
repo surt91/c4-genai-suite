@@ -181,7 +181,11 @@ export function FilesPage() {
       pagination: pagination,
     },
     globalFilterFn: 'includesString',
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: (filter: string) => {
+      setGlobalFilter(filter);
+      // the results start on the first page
+      setPagination((p) => ({ ...p, pageIndex: 0 }));
+    },
     // the selection must stay with the file, not with the row index
     getRowId: (file) => String(file.id),
     getCoreRowModel: getCoreRowModel(),
@@ -195,6 +199,14 @@ export function FilesPage() {
     columnResizeMode: 'onChange',
     autoResetPageIndex: false,
   });
+
+  // e.g. after the last files of the last page have been deleted
+  const pageCount = table.getPageCount();
+  useEffect(() => {
+    if (pagination.pageIndex > 0 && pagination.pageIndex >= pageCount) {
+      setPagination((p) => ({ ...p, pageIndex: Math.max(pageCount - 1, 0) }));
+    }
+  }, [pageCount, pagination.pageIndex]);
 
   return (
     <>
@@ -241,7 +253,7 @@ export function FilesPage() {
 
           <div className={classes.tableCard}>
             <Group justify="space-between" wrap="nowrap" gap={0}>
-              <Search value={globalFilter ?? ''} onSearch={(value) => setGlobalFilter(String(value))} />
+              <Search value={globalFilter ?? ''} onSearch={(value) => table.setGlobalFilter(String(value))} />
               <NativeSelect
                 size="sm"
                 data={['10', '15', '20', '25', '30']}
