@@ -98,6 +98,9 @@ export class FilesController {
   @Get('')
   @ApiOperation({ operationId: 'getBuckets', description: 'Gets the buckets.' })
   @ApiOkResponse({ type: BucketsDto })
+  // Admin only: the bucket contains the REI-S endpoint and headers (credentials).
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
   async getBuckets() {
     const result: GetBucketsResponse = await this.queryBus.execute(new GetBuckets());
 
@@ -113,6 +116,8 @@ export class FilesController {
     type: Number,
   })
   @ApiOkResponse({ type: BucketDto })
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
   async getBucket(@Param('id', ParseIntPipe) bucketId: number) {
     const result: GetBucketResponse = await this.queryBus.execute(new GetBucket(bucketId));
 

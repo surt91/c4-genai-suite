@@ -7,6 +7,7 @@ import { ForbiddenException, INestApplication } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+import * as request from 'supertest';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../app.module';
 import { SendMessage } from '../domain/chat';
@@ -80,6 +81,10 @@ describe('Authorization', () => {
     });
   }, 30000);
 
+  const asAdmin = (req: request.Test) => req.set('x-api-key', ADMIN_KEY);
+  const asUser = (req: request.Test) => req.set('x-api-key', USER_KEY);
+  const http = () => request(app.getHttpServer());
+
   afterAll(async () => {
     await app.close();
   });
@@ -102,6 +107,18 @@ describe('Authorization', () => {
       await expect(
         queryBus.execute(new SendMessage(conversation.id, aliceUser, 'hi', [{ id: bobsFile.id, fileName: 'secret.pdf' }])),
       ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+  });
+
+  describe('buckets (contain REI-S credentials)', () => {
+    it('are not readable by regular users', async () => {
+      await asUser(http().get('/buckets')).expect(403);
+      await asUser(http().get(`/buckets/${bucket.id}`)).expect(403);
+    });
+
+    it('are readable by admins', async () => {
+      const response = await asAdmin(http().get(`/buckets/${bucket.id}`)).expect(200);
+      expect((response.body as { headers: string }).headers).toBe('Authorization=Bearer reis-secret');
     });
   });
 });
