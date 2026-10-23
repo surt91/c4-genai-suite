@@ -251,17 +251,13 @@ def search(
 
     # remove bucket before passing it back
     # also call possibly existing cleanup methods for the format
+    # the provider of a chunk may be disabled meanwhile (e.g. audio after removing STT_TYPE)
+    providers = get_format_provider_mappings(config)
     result: List[Document] = []
     for doc in docs:
-        provider = get_format_provider_mappings(config).get(doc.metadata["format"])
-
-        if provider is not None:
-            cleaned = provider.clean_up(doc)
-        try:
-            del cleaned.metadata["bucket"]
-        except KeyError:
-            pass
-
+        provider = providers.get(doc.metadata.get("format", ""))
+        cleaned = provider.clean_up(doc) if provider is not None else doc
+        cleaned.metadata.pop("bucket", None)
         result.append(cleaned)
 
     return result
