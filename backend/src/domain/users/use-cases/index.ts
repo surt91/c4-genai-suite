@@ -2,7 +2,6 @@ export * from './create-user-group';
 export * from './create-user';
 export * from './delete-user-group';
 export * from './delete-user';
-export * from './get-user-group';
 export * from './get-user-groups';
 export * from './get-user';
 export * from './get-users';

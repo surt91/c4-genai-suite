@@ -1,7 +1,3 @@
-export interface AuthUser {
-  id: string;
-}
-
 export interface AuthConfig {
   baseUrl: string;
   trustProxy: boolean;

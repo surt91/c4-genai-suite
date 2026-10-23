@@ -382,14 +382,6 @@ export class StreamMetadataDto {
   tokenCount!: number;
 }
 
-export class StreamStartMetadataDto {
-  @ApiProperty({
-    description: 'The conversation ID.',
-    required: true,
-  })
-  conversationId!: number;
-}
-
 export class StreamTokenEventDto {
   static TYPE_NAME = 'chunk';
 

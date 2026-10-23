@@ -22,9 +22,6 @@ export interface Settings {
   // The suggestions to be shown for the chat.
   siteLinks?: SiteLink[];
 
-  // The file server.
-  fileServer?: string;
-
   // Some custom css.
   customCss?: string;
 
