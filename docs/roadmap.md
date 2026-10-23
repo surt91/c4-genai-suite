@@ -34,7 +34,7 @@ Legende: ✅ vorhanden · ⚠️ teilweise/eingeschränkt · ❌ nicht vorhanden
 | | Tool-Feinsteuerung je Tool | ✅ aktivieren/deaktivieren, Beschreibung, Admin- und User-Argumente | ⚠️ | ⚠️ |
 | **Ausführung & Ausgabe** | Code-Interpreter | ❌ | ✅ Sandbox-API (gehostet/Enterprise; Self-Hosting unklar) | ✅ Pyodide/Jupyter (Legacy), Open Terminal |
 | | Artifacts/Canvas | ❌ (Markdown + KaTeX) | ✅ React/HTML/Mermaid | ✅ HTML/SVG/JS |
-| | Bildgenerierung | ✅ DALL·E, GPT-Image-1 (auch Azure), Gemini | ✅ GPT-Image-1, SD, Flux, MCP | ✅ DALL·E, Gemini, ComfyUI, A1111, Bearbeitung |
+| | Bildgenerierung | ✅ GPT-Image-1 (auch Azure), Gemini | ✅ GPT-Image-1, SD, Flux, MCP | ✅ DALL·E, Gemini, ComfyUI, A1111, Bearbeitung |
 | **Websuche** | Provider | ⚠️ nur Brave (Grounding, DuckDuckGo und Bing entfernt) | ✅ mehrere Provider, Scraper, Reranker | ✅ dutzende Provider inkl. SearXNG |
 | **RAG** | Dokumentformate | ✅ PDF, Office, LibreOffice, Outlook, HTML, Code, JSON/YAML/XML, Audio/Video-Transkription | ✅ | ✅ mehrere Extractors |
 | | Vektor-Stores | ⚠️ pgvector, Azure AI Search | ⚠️ pgvector (RAG API) | ✅ 9 Stores |

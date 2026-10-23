@@ -4,9 +4,7 @@ import { ChatContext, NamedStructuredTool } from 'src/domain/chat';
 import { UploadBlob } from 'src/domain/settings';
 import { User } from 'src/domain/users';
 import { I18nService } from '../../localization/i18n.service';
-import { AzureDallEExtension } from './azure-dall-e';
 import { AzureGPTImage1Extension } from './azure-gpt-image-1';
-import { DallEExtension } from './dall-e';
 import { GPTImage1Extension } from './gpt-image-1';
 
 // 1x1 transparent PNG
@@ -34,7 +32,7 @@ describe('image generation tools', () => {
   });
 
   async function callTool(
-    extension: DallEExtension | GPTImage1Extension,
+    extension: GPTImage1Extension,
     values: Record<string, unknown>,
     args: Record<string, string>,
   ) {
@@ -71,33 +69,6 @@ describe('image generation tools', () => {
     expect(result).toBe(`https://gaible.example/blobs/${upload.id}`);
   }
 
-  it('dall-e generates an image via the OpenAI API and stores it as blob', async () => {
-    const extension = new DallEExtension(authService, commandBus as unknown as CommandBus, i18n);
-
-    const result = await callTool(extension, { apiKey: 'sk-test', modelName: 'dall-e-3', size: '1024x1792' }, { input: 'a cat' });
-
-    const { url, headers, body } = requestOf(0);
-    expect(url).toBe('https://api.openai.com/v1/images/generations');
-    expect(headers.authorization).toBe('Bearer sk-test');
-    expect(body).toMatchObject({ model: 'dall-e-3', prompt: 'a cat', n: 1, size: '1024x1792', response_format: 'b64_json' });
-    expectUploadedPng(result);
-  });
-
-  it('azure dall-e uses the deployment based endpoint', async () => {
-    const extension = new AzureDallEExtension(authService, commandBus as unknown as CommandBus, i18n);
-
-    const result = await callTool(
-      extension,
-      { apiKey: 'key', modelName: 'dalle3', instanceName: 'my-instance', apiVersion: '2024-02-01' },
-      { input: 'a cat' },
-    );
-
-    const { url, headers } = requestOf(0);
-    expect(url).toBe('https://my-instance.openai.azure.com/openai/deployments/dalle3/images/generations?api-version=2024-02-01');
-    expect(headers['api-key']).toBe('key');
-    expectUploadedPng(result);
-  });
-
   it('gpt-image-1 generates an image via the OpenAI API', async () => {
     const extension = new GPTImage1Extension(authService, commandBus as unknown as CommandBus, i18n);
 
@@ -129,9 +100,9 @@ describe('image generation tools', () => {
     fetchMock.mockImplementation(() =>
       Promise.resolve(new Response(JSON.stringify({ error: { message: 'bad' } }), { status: 400 })),
     );
-    const extension = new DallEExtension(authService, commandBus as unknown as CommandBus, i18n);
+    const extension = new GPTImage1Extension(authService, commandBus as unknown as CommandBus, i18n);
 
-    const result = await callTool(extension, { apiKey: 'sk-test', modelName: 'dall-e-2' }, { input: 'a cat' });
+    const result = await callTool(extension, { apiKey: 'sk-test' }, { prompt: 'a cat' });
 
     expect(result).toBe('Failed');
     expect(commandBus.execute).not.toHaveBeenCalled();

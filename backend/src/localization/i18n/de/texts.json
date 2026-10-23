@@ -33,9 +33,6 @@
       "dateRange": "Datumsbereich",
       "dateFrom": "Datum (von)",
       "dateUntil": "Datum (bis)",
-      "style": "Stil",
-      "quality": "Qualität",
-      "size": "Größe",
       "bucket": "Bucket",
       "take": "Take",
       "title": "Titel",
@@ -107,18 +104,6 @@
       "searchLang": "Suchsprache",
       "freshness": "Zeitraum",
       "freshnessHint": "Filtert die Suchergebnisse nach dem Entdeckungszeitpunkt. pd: innerhalb der letzten 24 Stunden, pw: innerhalb der letzten 7 Tage, pm: innerhalb der letzten 31 Tage, py: innerhalb der letzten 365 Tage. Benutzerdefinierter Zeitraum möglich (YYYY-MM-DDtoYYYY-MM-DD)."
-    },
-    "azureDalle": {
-      "title": "Azure Dall-E",
-      "description": "Generiert Bilder mit dem Azure DALL-E-Bildgenerator."
-    },
-    "dalle": {
-      "title": "Dall-E",
-      "description": "Generiert Bilder mit dem DALL-E-Bildgenerator.",
-      "apiKeyHint": "API Key",
-      "styleHint": "Der Stil der generierten Bilder. Muss vivid oder natural sein. Vivid erzeugt hyperrealistische und dramatische Bilder. Natural erzeugt natürlichere, weniger hyperrealistische Bilder.",
-      "qualityHint": "Die Qualität des zu generierenden Bildes. HD erzeugt Bilder mit feineren Details und größerer Konsistenz.",
-      "sizeHint": "Die Größe des generierten Bildes. Muss 256x256, 512x512 oder 1024x1024 für DALL·E-2-Modelle sein. Für DALL·E-3-Modelle muss es 1024x1024, 1792x1024 oder 1024x1792 sein."
     },
     "calculator": {
       "title": "Rechner",

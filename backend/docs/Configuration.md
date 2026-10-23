@@ -4,7 +4,7 @@
 
 | Env Variable   | Required            | Default | Description                                                              |
 |----------------|---------------------|---------|--------------------------------------------------------------------------|
-| BASE_URL       | Yes                 | None    | Required for OpenID Connect or assistants using Dall-E image generation. |
+| BASE_URL       | Yes                 | None    | Required for OpenID Connect or assistants using image generation. |
 | GAIBLE_DB_RETRY_DELAY | No           | 100     | Delay in ms between the database connection attempts.                    |
 | DB_URL         | Yes                 | None    |                                                                          |
 | SESSION_SECRET | NODE_ENV=production | None    |                                                                          |

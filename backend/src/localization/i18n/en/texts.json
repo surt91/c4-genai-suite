@@ -33,9 +33,6 @@
       "dateRange": "Date Range",
       "dateFrom": "Date (from)",
       "dateUntil": "Date (until)",
-      "style": "Style",
-      "quality": "Quality",
-      "size": "Size",
       "bucket": "Bucket",
       "take": "Take",
       "title": "Title",
@@ -107,18 +104,6 @@
       "searchLang": "Search Language",
       "freshness": "Freshness",
       "freshnessHint": "Filters search results by when they were discovered. pd: last 24 hours, pw: last 7 days, pm: last 31 days, py: last 365 days. Custom date range also supported (YYYY-MM-DDtoYYYY-MM-DD)."
-    },
-    "azureDalle": {
-      "title": "Azure Dall-E",
-      "description": "Generates images with the Azure DALL-E image generator."
-    },
-    "dalle": {
-      "title": "Dall-E",
-      "description": "Generates images with the DALL-E image generator.",
-      "apiKeyHint": "The API Key",
-      "styleHint": "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images.",
-      "qualityHint": "The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image.",
-      "sizeHint": "The size of the generated image. Must be one of 256x256, 512x512, or 1024x1024 for DALL·E-2 models. Must be one of 1024x1024, 1792x1024, or 1024x1792 for DALL·E-3 models."
     },
     "calculator": {
       "title": "Calculator",

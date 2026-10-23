@@ -8,7 +8,7 @@ describe(ApiResponsesController.name, () => {
       getLlm(extensions: GetExtensionsResponse['extensions'], model?: string): string | undefined;
     };
     const extensions = [
-      { spec: { type: 'tool', name: 'dall-e' }, values: { model: 'gpt-4o' } },
+      { spec: { type: 'tool', name: 'gpt-image-1' }, values: { model: 'gpt-4o' } },
       { spec: { type: 'llm', name: 'open-ai' }, values: { modelName: 'gpt-4o' } },
     ] as unknown as GetExtensionsResponse['extensions'];
 

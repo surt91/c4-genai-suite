@@ -20,7 +20,7 @@ Assistants are highly customizable, allowing you to create different assistants 
 	- **Files (in Chat)**
 	  -- allows file uploads etc.
 
-	- **Dall-E**
+	- **GPT-Image-1**
 	  -- allows generating images.
 
 	- **Brave Web Search**
@@ -123,31 +123,8 @@ Connect to an LLM by Mistral, that will do the talking.
 ### Brave Web Search
 Enable the chat to search on the internet (with a Brave Search API key).
 
-### The Azure Dall-E
-Allows generating images.
-| Setting                | Description                          |
-|------------------------|--------------------------------------|
-| API Key                | The key for your Dall-E deployment on Azure
-| Model Name             | Make sure you have deployment the model you select here on Azure.
-| Style                  | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images.
-| Quality                | The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image.
-| Size                   | The size of the generated image. Must be one of 256x256, 512x512, or 1024x1024 for DALL·E-2 models. Must be one of 1024x1024, 1792x1024, or 1024x1792 for DALL·E-3 models.
-| Instance Name          | As configured on Azure
-| API Version            | The version of the Deployment on Azure
-
-*If you want to use an OpenAI API Key instead, use the "Dall-E" extension*
-
-### The Dall-E
-Allows generating images.
-| Setting                | Description                          |
-|------------------------|--------------------------------------|
-| API Key                | You own OpenAI API Key
-| Model Name             | Choose the model you want to use.
-| Style                  | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images.
-| Quality                | The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image.
-| Size                   | The size of the generated image. Must be one of 256x256, 512x512, or 1024x1024 for DALL·E-2 models. Must be one of 1024x1024, 1792x1024, or 1024x1792 for DALL·E-3 models.
-
-*If you want to use Dall-E via Azure, use the "Azure Dall-E" extension*
+### GPT-Image-1 and Azure GPT-Image-1
+Allows generating images with OpenAI's GPT-Image-1 model, either with your own OpenAI API key or via a deployment on Azure.
 
 ### Extension for Interacting with Files
 Files are usually managed via buckets, which need to be set up in the ["Files"](/admin/files) settings.

@@ -23,11 +23,9 @@ import { CustomPromptExtension } from './other/custom';
 import { SpeechToTextExtension } from './other/speech-to-text';
 import { SummaryPromptExtension } from './other/summary';
 import { AzureAISearchExtension } from './tools/azure-ai-search';
-import { AzureDallEExtension } from './tools/azure-dall-e';
 import { AzureGPTImage1Extension } from './tools/azure-gpt-image-1';
 import { BraveWebSearchExtension } from './tools/brave-web-search';
 import { CalculatorExtension } from './tools/calculator';
-import { DallEExtension } from './tools/dall-e';
 import { FilesExtension } from './tools/files';
 import { FilesConversationExtension } from './tools/files-conversation';
 import { FilesVisionExtension } from './tools/files-vision';
@@ -102,7 +100,6 @@ export class ExtensionLibraryModule {
       providers: [
         ...dynamicProviders,
         AzureAISearchExtension,
-        AzureDallEExtension,
         AzureGPTImage1Extension,
         AzureOpenAIModelExtension,
         BedrockModelExtension,
@@ -110,7 +107,6 @@ export class ExtensionLibraryModule {
         CalculatorExtension,
         ContextExtension,
         CustomPromptExtension,
-        DallEExtension,
         AzureTranscribeExtension,
         FilesConversationExtension,
         FilesExtension,
