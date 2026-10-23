@@ -29,7 +29,7 @@ export function AdminPage() {
   const [isEvalsOpen, setIsEvalsOpen] = useState(false);
   const { theme } = useTheme();
   const chatId = useStateOfSelectedChatId();
-  const { isEvalAvailable } = useEvalAvailability();
+  const { isEvalAvailable, isLoading: isEvalAvailabilityLoading } = useEvalAvailability();
 
   return (
     <div className={classes.root}>
@@ -173,7 +173,8 @@ export function AdminPage() {
               </>
             )}
 
-            <Route path="*" element={<TransientNavigate to="/admin/dashboard" />} />
+            {/* the eval routes are only known when the availability has been loaded (e.g. a reload of an eval page) */}
+            {!isEvalAvailabilityLoading && <Route path="*" element={<TransientNavigate to="/admin/dashboard" />} />}
           </Routes>
           <CollapseButton
             className={classes.collapse}

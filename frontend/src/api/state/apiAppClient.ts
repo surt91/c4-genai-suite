@@ -3,6 +3,7 @@ import {
   AuthApi,
   Configuration,
   ConversationApi,
+  EvalApi,
   ExtensionsApi,
   FilesApi,
   Middleware,
@@ -27,6 +28,7 @@ export class AppClient {
   public readonly auditLogs: AuditLogsApi;
   public readonly auth: AuthApi;
   public readonly conversations: ConversationApi;
+  public readonly eval: EvalApi;
   public readonly extensions: ExtensionsApi;
   public readonly files: FilesApi;
   public readonly settings: SettingsApi;
@@ -50,6 +52,8 @@ export class AppClient {
     this.auth = new AuthApi(configuration).withMiddleware(middleware);
 
     this.conversations = new ConversationApi(configuration).withMiddleware(middleware);
+
+    this.eval = new EvalApi(configuration).withMiddleware(middleware);
 
     this.extensions = new ExtensionsApi(configuration).withMiddleware(middleware);
 
