@@ -89,7 +89,9 @@ async function start(port: number, stdioClient: Client, stdioTransport: StdioCli
   await startSSEServer({
     createServer: async () => {
       const mcpServer = new Server(serverVersion, {
-        capabilities: serverCapabilities,
+        // mcp-proxy always registers a completion handler, which the MCP SDK only allows
+        // if the server advertises the completions capability
+        capabilities: { ...serverCapabilities, completions: {} },
       });
 
       proxyServer({
