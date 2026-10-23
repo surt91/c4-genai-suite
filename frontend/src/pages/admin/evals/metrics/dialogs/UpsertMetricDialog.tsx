@@ -80,11 +80,13 @@ type CreateMetricProps = {
 
 type UpsertMetricDialogProps = UpdateMetricProps | CreateMetricProps;
 
-// Exported wrapper components (Gaible pattern)
-export const UpdateMetricDialog = (props: Omit<UpdateMetricProps, 'type'>): React.ReactElement =>
-  UpsertMetricDialog({ ...props, type: 'update' });
-export const CreateMetricDialog = (props: Omit<CreateMetricProps, 'type'>): React.ReactElement =>
-  UpsertMetricDialog({ ...props, type: 'create' });
+// The dialogs to create and to update (rendered as components, so that they have their own hooks)
+export const UpdateMetricDialog = (props: Omit<UpdateMetricProps, 'type'>): React.ReactElement => (
+  <UpsertMetricDialog {...props} type="update" />
+);
+export const CreateMetricDialog = (props: Omit<CreateMetricProps, 'type'>): React.ReactElement => (
+  <UpsertMetricDialog {...props} type="create" />
+);
 
 // Metric type options for the Select dropdown
 const getMetricTypeOptions = () => [

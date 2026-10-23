@@ -118,11 +118,13 @@ type CreateLlmEndpointProps = {
 
 type UpsertLlmEndpointDialogProps = UpdateLlmEndpointProps | CreateLlmEndpointProps;
 
-// Exported wrapper components (Gaible pattern)
-export const UpdateLlmEndpointDialog = (props: Omit<UpdateLlmEndpointProps, 'type'>): React.ReactElement =>
-  UpsertLlmEndpointDialog({ ...props, type: 'update' });
-export const CreateLlmEndpointDialog = (props: Omit<CreateLlmEndpointProps, 'type'>): React.ReactElement =>
-  UpsertLlmEndpointDialog({ ...props, type: 'create' });
+// The dialogs to create and to update (rendered as components, so that they have their own hooks)
+export const UpdateLlmEndpointDialog = (props: Omit<UpdateLlmEndpointProps, 'type'>): React.ReactElement => (
+  <UpsertLlmEndpointDialog {...props} type="update" />
+);
+export const CreateLlmEndpointDialog = (props: Omit<CreateLlmEndpointProps, 'type'>): React.ReactElement => (
+  <UpsertLlmEndpointDialog {...props} type="create" />
+);
 
 // Endpoint type options for the Select dropdown
 const getEndpointTypeOptions = () => [
