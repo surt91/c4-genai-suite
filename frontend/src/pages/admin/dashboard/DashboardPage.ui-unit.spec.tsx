@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '../test-utils.tsx';
+import { texts } from 'src/texts';
 import { DashboardPage } from './DashboardPage.tsx';
 
 vi.mock('recharts', async () => {
@@ -23,6 +24,6 @@ describe('DashboardPage', () => {
   it('should show the version hash', () => {
     render(<DashboardPage />);
 
-    expect(screen.getByTestId('version').innerHTML).toEqual('Version: No hash available§');
+    expect(screen.getByTestId('version')).toHaveTextContent(texts.dashboard.version(texts.dashboard.noVersion));
   });
 });
