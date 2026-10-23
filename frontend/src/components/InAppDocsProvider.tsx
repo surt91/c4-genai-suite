@@ -51,11 +51,18 @@ const InAppDocsLayout: React.FC<InAppDocsLayoutProps> = ({ docsMarkdown, isDocsV
           <div className={classes.docs}>
             <div className={classes.docsHeader}>
               <h2 className={classes.docsTitle}>{texts.common.docsHeader}</h2>
-              <ActionIcon onClick={toggleDocs} size="xl" mr="xs" variant="subtle" color="primary-content">
-                <Tooltip label={texts.common.hide(texts.common.docs)}>
+              <Tooltip label={texts.common.hide(texts.common.docs)}>
+                <ActionIcon
+                  onClick={toggleDocs}
+                  size="xl"
+                  mr="xs"
+                  variant="subtle"
+                  color="primary-content"
+                  aria-label={texts.common.hide(texts.common.docs)}
+                >
                   <IconX data-testid="close-icon" />
-                </Tooltip>
-              </ActionIcon>
+                </ActionIcon>
+              </Tooltip>
             </div>
             <div className={classes.docsBody}>
               <Markdown>{docsMarkdown}</Markdown>
@@ -67,23 +74,26 @@ const InAppDocsLayout: React.FC<InAppDocsLayoutProps> = ({ docsMarkdown, isDocsV
   );
 };
 
+async function fetchMarkdown(path: string): Promise<string> {
+  const response = await fetch(`/docs${path}/index.md`);
+  const contentType = response.headers.get('content-type') || '';
+  // the SPA fallback answers unknown paths with the HTML of the application
+  if (!response.ok || contentType.includes('html')) {
+    throw new Error('Failed to fetch documentation.');
+  }
+  return response.text();
+}
+
 /**
  * @description This is a combined context provider for the useDocsContext hook and a layout component which displays the docs penal on the right.
  */
 export const InAppDocsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const fetchMarkdown = async (urlPath: string): Promise<string> => {
-    const urlPathWithoutIds = urlPath.replace(/\/[0-9]+$/, '');
-    const response = await fetch(`/docs${urlPathWithoutIds}/index.md`);
-    const contentType = response.headers.get('content-type') || '';
-    const markdownDocsFileExists = !contentType.includes('html');
-    if (!markdownDocsFileExists) throw new Error('Failed to fetch documentation.');
-    return response.text();
-  };
-
   const location = useLocation();
+  // all pages of the same kind share the documentation (e.g. every chat)
+  const docsPath = location.pathname.replace(/\/[0-9]+$/, '');
   const query = useQuery<string, unknown>({
-    queryKey: ['docs', location.pathname],
-    queryFn: () => fetchMarkdown(location.pathname),
+    queryKey: ['docs', docsPath],
+    queryFn: () => fetchMarkdown(docsPath),
   });
   const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [docsHost, setDocsHost] = useState<DocsHost>();

@@ -1,6 +1,9 @@
 import { MantineProvider } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useLocation } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
+import { texts } from 'src/texts';
 import { InAppDocsProvider, useDocsContext } from './InAppDocsProvider';
 
 vi.mock('react-router-dom', () => ({
@@ -71,5 +74,33 @@ describe('InAppDocsProvider', () => {
     fireEvent.click(screen.queryByTestId('close-icon')!);
     expect(screen.queryByTestId('test-button')!.textContent).toBe('show docs button');
     expect(screen.queryByText(docsMarkdownMock)).not.toBeInTheDocument();
+  });
+
+  it('loads the documentation once for all pages of the same kind', () => {
+    vi.mocked(useLocation).mockReturnValue({ pathname: '/chat/42' } as ReturnType<typeof useLocation>);
+
+    render(
+      <MantineProvider>
+        <InAppDocsProvider>
+          <TestComponent />
+        </InAppDocsProvider>
+      </MantineProvider>,
+    );
+
+    expect(useQuery).toHaveBeenLastCalledWith(expect.objectContaining({ queryKey: ['docs', '/chat'] }));
+  });
+
+  it('has an accessible close button', () => {
+    render(
+      <MantineProvider>
+        <InAppDocsProvider>
+          <TestComponent />
+        </InAppDocsProvider>
+      </MantineProvider>,
+    );
+
+    fireEvent.click(screen.getByTestId('test-button'));
+
+    expect(screen.getByRole('button', { name: texts.common.hide(texts.common.docs) })).toBeInTheDocument();
   });
 });
