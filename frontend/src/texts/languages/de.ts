@@ -427,6 +427,11 @@ export const de: typeof en = {
     },
   },
   chat: {
+    conversationDeleted: 'Chat „{{name}}“ gelöscht',
+    conversationDeletedUnnamed: 'Chat gelöscht',
+    undo: 'Rückgängig',
+    restoreConversationFailed: 'Der Chat konnte nicht wiederhergestellt werden',
+    openConversation: 'Öffnen',
     myFiles: {
       button: 'Meine Dateien',
       buttonCount: 'Meine Dateien ({{count}})',

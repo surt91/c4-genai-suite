@@ -462,6 +462,11 @@ function load() {
       },
     },
     chat: {
+      conversationDeleted: (name: string | number) => translate('chat.conversationDeleted', { name }),
+      conversationDeletedUnnamed: translate('chat.conversationDeletedUnnamed'),
+      undo: translate('chat.undo'),
+      restoreConversationFailed: translate('chat.restoreConversationFailed'),
+      openConversation: translate('chat.openConversation'),
       myFiles: {
         button: translate('chat.myFiles.button'),
         buttonCount: (count: string | number) => translate('chat.myFiles.buttonCount', { count }),

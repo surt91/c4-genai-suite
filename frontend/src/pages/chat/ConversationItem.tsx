@@ -1,4 +1,4 @@
-import { Button, Menu, rem, Tooltip } from '@mantine/core';
+import { Button, Menu, rem, TextInput, Tooltip } from '@mantine/core';
 import { IconCopy, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import { FormEvent, memo, useState } from 'react';
@@ -39,18 +39,22 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   if (showRenameInput) {
     return (
       <form className={classes.renameForm} onSubmit={submitRename}>
-        <div>
-          <input
-            autoFocus
-            name="name"
-            className={classes.renameInput}
-            onBlur={() => setShowRenameInput(false)}
-            onKeyUp={(e) => e.key === 'Escape' && setShowRenameInput(false)}
-            defaultValue={chat.name}
-            data-testid="conversation-rename-input"
-            aria-label={texts.accessibility.renameConversation}
-          />
-        </div>
+        <TextInput
+          autoFocus
+          size="sm"
+          name="name"
+          onBlur={() => setShowRenameInput(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              setShowRenameInput(false);
+            }
+          }}
+          onFocus={(e) => e.currentTarget.select()}
+          defaultValue={chat.name}
+          data-testid="conversation-rename-input"
+          aria-label={texts.accessibility.renameConversation}
+        />
       </form>
     );
   }
@@ -120,7 +124,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
               c="red.9"
               leftSection={<IconTrash size={16} />}
               disabled={removeChat.isPending}
-              onClick={() => removeChat.mutate(chat.id)}
+              onClick={() => removeChat.mutate(chat)}
             >
               {texts.common.remove}
             </Menu.Item>

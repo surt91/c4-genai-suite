@@ -434,6 +434,11 @@ export const en = {
     },
   },
   chat: {
+    conversationDeleted: 'Chat "{{name}}" deleted',
+    conversationDeletedUnnamed: 'Chat deleted',
+    undo: 'Undo',
+    restoreConversationFailed: 'Failed to restore the chat',
+    openConversation: 'Open',
     myFiles: {
       button: 'My files',
       buttonCount: 'My files ({{count}})',

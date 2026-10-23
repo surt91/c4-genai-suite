@@ -5,7 +5,7 @@ import { ConversationDto, useApi } from 'src/api';
 import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { usePersistentState } from 'src/hooks/stored';
 import { buildError } from 'src/lib';
-import { toast } from 'src/lib/notifications';
+import { notify, toast } from 'src/lib/notifications';
 import { useStateOfChat } from 'src/pages/chat/state/chat';
 import { useStateOfEnabledAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
@@ -42,12 +42,16 @@ export const useListOfChatsInit = () => {
 export const useStateMutateDuplicateChat = () => {
   const api = useApi();
   const refetchChatsList = useListOfChatsStore((s) => s.refetch);
+  const navigate = useTransientNavigate();
 
   return useMutation({
     mutationFn: (id: number) => api.conversations.duplicateConversation(id),
-    onSuccess: () => {
+    onSuccess: (duplicated) => {
       refetchChatsList();
-      toast.success(texts.chat.duplicateConversationSuccess);
+      notify(texts.chat.duplicateConversationSuccess, {
+        type: 'success',
+        action: { label: texts.chat.openConversation, onClick: () => navigate(`/chat/${duplicated.id}`) },
+      });
     },
     onError: async () => {
       toast.error(await buildError(texts.chat.duplicateConversationFailed));
@@ -67,24 +71,46 @@ export const useStateMutateRenameChat = () => {
   });
 };
 
+/**
+ * Deletes a chat immediately and offers to undo it in a notification (the server keeps deleted chats for a while).
+ */
 export const useStateMutateRemoveChat = () => {
   const api = useApi();
 
   const chat = useStateOfChat();
   const removeChat = useListOfChatsStore((s) => s.removeChat);
+  const refetchChatsList = useListOfChatsStore((s) => s.refetch);
   const createNewChat = useMutateNewChat();
+  const navigate = useTransientNavigate();
   const [persistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
 
+  const restore = async (id: number) => {
+    try {
+      await api.conversations.restoreConversation(id);
+      refetchChatsList();
+      navigate(`/chat/${id}`);
+    } catch (error) {
+      toast.error(await buildError(texts.chat.restoreConversationFailed, error as Error));
+    }
+  };
+
   return useMutation({
-    mutationFn: (id: number) => api.conversations.deleteConversation(id),
-    onSuccess: (_, deletedId) => {
-      removeChat(deletedId);
-      if (deletedId === chat.id) {
+    mutationFn: (conversation: ConversationDto) => api.conversations.deleteConversation(conversation.id),
+    onMutate: (conversation) => {
+      removeChat(conversation.id);
+    },
+    onSuccess: (_, conversation) => {
+      if (conversation.id === chat.id) {
         // Use last selected assistant instead of the deleted chat's assistant
         createNewChat.mutate(persistentAssistantId || undefined);
       }
+      notify(conversation.name ? texts.chat.conversationDeleted(conversation.name) : texts.chat.conversationDeletedUnnamed, {
+        action: { label: texts.chat.undo, onClick: () => void restore(conversation.id) },
+        autoClose: 8000,
+      });
     },
     onError: async () => {
+      refetchChatsList();
       toast.error(await buildError(texts.chat.removeConversationFailed, texts.common.reloadAndTryAgain));
     },
   });
