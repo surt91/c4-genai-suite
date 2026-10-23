@@ -5,7 +5,7 @@ import { assignDefined } from '../../../lib';
 import { ExtensionEntity, ExtensionRepository } from '../../database';
 import { ConfiguredExtension, ExtensionConfiguration } from '../interfaces';
 import { ExplorerService } from '../services';
-import { buildExtension, unmaskExtensionValues } from './utils';
+import { buildExtension, maskKeyValues, unmaskExtensionValues } from './utils';
 
 export class RebuildExtension {
   constructor(
@@ -40,7 +40,7 @@ export class RebuildExtensionHandler implements ICommandHandler<RebuildExtension
     }
 
     const entity = id ? await this.extensions.findOneBy({ id }) : undefined;
-    if (id && !entity) {
+    if (id && (!entity || entity.name !== name)) {
       throw new NotFoundException('Cannot find extension.');
     }
 
@@ -58,6 +58,8 @@ export class RebuildExtensionHandler implements ICommandHandler<RebuildExtension
       true,
     );
 
+    // The stored secrets were merged into the values; they must not be returned.
+    maskKeyValues(extensionInstance);
     return new RebuildExtensionResponse(extensionInstance);
   }
 }

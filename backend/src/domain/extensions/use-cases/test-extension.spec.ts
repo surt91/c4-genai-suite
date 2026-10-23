@@ -75,7 +75,7 @@ describe(TestExtension.name, () => {
     });
 
     jest.spyOn(repository, 'findOneBy').mockImplementation(async () => {
-      return Promise.resolve({} as ExtensionEntity);
+      return Promise.resolve({ name: 'unknown' } as ExtensionEntity);
     });
 
     const result = await handler.execute(new TestExtension('unknown', {}, 1));
@@ -110,7 +110,7 @@ describe(TestExtension.name, () => {
     });
 
     jest.spyOn(repository, 'findOneBy').mockImplementation(async () => {
-      return Promise.resolve({} as ExtensionEntity);
+      return Promise.resolve({ name: 'unknown' } as ExtensionEntity);
     });
 
     const result = await handler.execute(
@@ -128,5 +128,22 @@ describe(TestExtension.name, () => {
       foo: 'abc',
     });
     expect(result).toBe(true);
+  });
+
+  it('should not use the stored values of an extension of another type', async () => {
+    const test = jest.fn();
+    jest.spyOn(explorer, 'getExtension').mockImplementation((name) => ({
+      spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
+      test,
+      getMiddlewares: () => Promise.resolve([]),
+    }));
+    jest
+      .spyOn(repository, 'findOneBy')
+      .mockResolvedValue({ name: 'other', values: { apiKey: 'secret' } } as unknown as ExtensionEntity);
+
+    await expect(handler.execute(new TestExtension('open-ai', { endpoint: 'http://attacker' }, 1))).rejects.toMatchObject({
+      status: HttpStatus.NOT_FOUND,
+    });
+    expect(test).not.toHaveBeenCalled();
   });
 });

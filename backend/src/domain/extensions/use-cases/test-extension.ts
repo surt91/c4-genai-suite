@@ -36,7 +36,8 @@ export class TestExtensionHandler implements ICommandHandler<TestExtension, bool
     }
 
     const entity = id ? await this.extensions.findOneBy({ id }) : undefined;
-    if (id && !entity) {
+    // The stored values (secrets) of another extension type must not be sent to the endpoint of this one.
+    if (id && (!entity || entity.name !== name)) {
       throw new NotFoundException('Cannot find extension.');
     }
 
