@@ -7,7 +7,7 @@ import { useProfile } from 'src/hooks';
 import { toast } from 'src/lib/notifications';
 import { useStateOfAllAssistants, useStateOfEnabledAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
-import { useStateOfIsAiWriting } from '../../state/chat';
+import { useStateOfIsAiWriting, useStateOfSelectedChatId } from '../../state/chat';
 import { ChatItemDebug } from '../ChatItemDebug';
 import { ChatItemLogging } from '../ChatItemLogging';
 import ChatItemSources from '../ChatItemSources';
@@ -19,13 +19,14 @@ import { ChatItemProps } from './ChatItem';
 import classes from './ChatItem.module.css';
 import { ChatItemUserInput } from './ChatItemUserInput';
 
-export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatItemProps) => {
+export const AIChatItem = ({ agentName, message, isLast }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
   // It may be refactored to become a simple string
   // instead of an array with one entry (in the futute ;) ).
   const textContent = message.content[0]?.type === 'text' ? message.content[0].text : '';
   const user = useProfile();
   const isWriting = useStateOfIsAiWriting();
+  const conversationId = useStateOfSelectedChatId();
   const clipboard = useClipboard();
   const assistants = useStateOfAllAssistants();
   const assistantsWithExtensions = useStateOfEnabledAssistants();
@@ -60,7 +61,7 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
         {assistantStatus && <small className={classes.assistantStatus}>[{assistantStatus}]</small>}
       </div>
       {message.error && <Alert text={message.error} className={classes.error} />}
-      <ChatItemTools tools={message.toolsInUse || {}} />
+      <ChatItemTools tools={message.toolCalls ?? []} />
       {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
       {message.reasoning?.length && (
         <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />
@@ -68,14 +69,10 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
       <Markdown animateText={isLast && newReply} className={classes.markdown}>
         {textContent}
       </Markdown>
-      {message.sources && message.sources?.length > 0 ? (
-        <ChatItemSources
-          sources={message.sources || []}
-          selectDocument={(documentUri) => selectDocument(message.id, documentUri)}
-        />
-      ) : (
-        <ChatItemDebug debug={message.debug || []} />
+      {message.sources && message.sources.length > 0 && (
+        <ChatItemSources sources={message.sources} conversationId={conversationId} messageId={message.id} />
       )}
+      <ChatItemDebug debug={message.debug || []} />
       {message.stopped && (
         <Text size="xs" c="dimmed" className={classes.stopped} data-testid="chat-item-stopped">
           <IconPlayerStopFilled size={12} aria-hidden />

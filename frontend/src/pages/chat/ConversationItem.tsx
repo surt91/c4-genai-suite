@@ -4,8 +4,8 @@ import { clsx } from 'clsx';
 import { FormEvent, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationDto } from 'src/api';
+import { useIsCompact } from 'src/hooks/useIsCompact';
 import { texts } from 'src/texts';
-import { isMobile } from '../utils';
 import classes from './ConversationItem.module.css';
 import { useStateOfSelectedChatId } from './state/chat';
 import { useStateMutateDuplicateChat, useStateMutateRemoveChat, useStateMutateRenameChat } from './state/listOfChats';
@@ -24,6 +24,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRenameInput, setShowRenameInput] = useState(false);
+  const isCompact = useIsCompact();
 
   const submitRename = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -70,7 +71,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
       >
         {chat.name}
       </Button>
-      <div className={clsx(classes.actions, !isMobile() && classes.actionsHover)}>
+      <div className={clsx(classes.actions, !isCompact && !isSelected && classes.actionsHover)}>
         <Menu width={200} opened={menuOpen} onChange={setMenuOpen} withInitialFocusPlaceholder={false}>
           <Menu.Target>
             <Button

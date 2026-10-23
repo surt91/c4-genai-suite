@@ -11,7 +11,6 @@ export interface ChatItemProps {
   isBeforeLast: boolean;
   rating?: MessageDtoRatingEnum;
   llmLogo?: string;
-  selectDocument: (messageId: number, documentUri: string) => void;
   editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 }
 

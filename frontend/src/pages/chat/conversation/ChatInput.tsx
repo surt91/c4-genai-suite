@@ -14,6 +14,7 @@ import { FilterModal } from 'src/pages/chat/conversation/FilterModal';
 import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/SpeechRecognitionButton';
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
+import { closeInspectorIfOpen } from '../state/inspector';
 import { useChatDropzone } from '../useChatDropzone';
 import classes from './ChatInput.module.css';
 import { Suggestions } from './Suggestions';
@@ -139,9 +140,14 @@ export function ChatInput({
   const doKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
       doSubmit(event);
-    } else if (event.key === 'Escape' && canStop) {
-      event.preventDefault();
-      doStop();
+    } else if (event.key === 'Escape') {
+      // Esc closes the inspector first and stops the generation afterwards.
+      if (closeInspectorIfOpen()) {
+        event.preventDefault();
+      } else if (canStop) {
+        event.preventDefault();
+        doStop();
+      }
     }
   });
 

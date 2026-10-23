@@ -1,0 +1,60 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  background-color: var(--mantine-color-body);
+  border-left: 1px solid var(--mantine-color-gray-3);
+}
+
+.header {
+  flex-shrink: 0;
+  min-height: 3rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.title {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--mantine-font-size-md);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: none;
+}
+
+.body {
+  flex-grow: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.passage {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--mantine-color-yellow-5);
+  border-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-yellow-light);
+  font-size: var(--mantine-font-size-sm);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pre {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-gray-0);
+  font-size: var(--mantine-font-size-xs);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

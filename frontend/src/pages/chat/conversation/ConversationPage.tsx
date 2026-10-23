@@ -71,7 +71,7 @@ export function ConversationPage(props: ConversationPageProps) {
     }
   }, [showScrollToBottomButton, textareaRef]);
   return (
-    <div className={classes.root} style={{ height: 'calc(100vh - 48px)' }} {...getRootProps()}>
+    <div className={classes.root} {...getRootProps()}>
       <input {...getInputProps()} />
       {isDragActive && (
         <>
@@ -83,7 +83,7 @@ export function ConversationPage(props: ConversationPageProps) {
         <Configuration canEditConfiguration={true} />
       </div>
       {isChatLoading ? (
-        <div className={clsx('fade-in', classes.loading)} style={{ height: 'calc(100vh - 4rem)' }} />
+        <div className={clsx('fade-in', classes.loading)} />
       ) : (
         <>
           {messages.length > 0 && (

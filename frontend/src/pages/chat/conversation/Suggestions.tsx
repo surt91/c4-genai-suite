@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { ConfigurationDto } from 'src/api';
 import { Theme } from 'src/hooks';
-import { isMobile } from 'src/pages/utils';
+import { useIsPhone } from 'src/hooks/useIsCompact';
 import classes from './Suggestions.module.css';
 
 interface SuggestionsProps {
@@ -12,6 +12,7 @@ interface SuggestionsProps {
 
 export function Suggestions(props: SuggestionsProps) {
   const { configuration, onSelect, theme } = props;
+  const isPhone = useIsPhone();
 
   const suggestions = [...(theme.chatSuggestions || []), ...(configuration?.chatSuggestions || [])];
 
@@ -20,7 +21,7 @@ export function Suggestions(props: SuggestionsProps) {
   }
 
   return (
-    <div className={clsx(classes.grid, !isMobile() && classes.columns)}>
+    <div className={clsx(classes.grid, !isPhone && classes.columns)}>
       {suggestions.map((x, i) => (
         <button type="button" className={classes.suggestion} key={i} onClick={() => onSelect(x.text)}>
           <div>{x.title}</div>

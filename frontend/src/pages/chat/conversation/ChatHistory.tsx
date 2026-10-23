@@ -1,8 +1,6 @@
 import { clsx } from 'clsx';
-import { useCallback } from 'react';
 import { FileDto } from 'src/api';
-import { useSidebarState } from 'src/hooks/stored';
-import { useStateOfMessages, useStateOfSelectedChatId, useStateOfSelectedDocument } from '../state/chat';
+import { useStateOfMessages, useStateOfSelectedChatId } from '../state/chat';
 import classes from './ChatHistory.module.css';
 import { ChatItem } from './ChatItem/ChatItem';
 
@@ -17,30 +15,12 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
   const lastTwoMessages = messages.slice(-2);
   const chatId = useStateOfSelectedChatId();
 
-  const [_, setSidebarRight] = useSidebarState('sidebar-right');
-
-  const { setSelectedDocument } = useStateOfSelectedDocument();
-  const selectDocument = useCallback(
-    (messageId: number, documentUri: string) => {
-      setSelectedDocument({ conversationId: chatId, messageId, documentUri });
-      setSidebarRight(true);
-    },
-    [chatId, setSelectedDocument, setSidebarRight],
-  );
-
   return (
     <>
       <div className={classes.grid}>
         {allMessagesButLastTwo.map((message, i) => (
           <div className={clsx('chat-history-deferred', classes.grid)} data-testid="deferred-chat-item" key={`${i}_${chatId}`}>
-            <ChatItem
-              agentName={agentName}
-              isLast={false}
-              isBeforeLast={false}
-              message={message}
-              selectDocument={selectDocument}
-              editMessage={editMessage}
-            />
+            <ChatItem agentName={agentName} isLast={false} isBeforeLast={false} message={message} editMessage={editMessage} />
           </div>
         ))}
       </div>
@@ -52,7 +32,6 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
             isLast={i === 1}
             isBeforeLast={i === 0}
             message={message}
-            selectDocument={selectDocument}
             editMessage={editMessage}
           />
         ))}

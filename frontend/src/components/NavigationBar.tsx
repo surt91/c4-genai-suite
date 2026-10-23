@@ -28,11 +28,17 @@ export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
       )}
       {isDocsButtonVisible && (
         <div className={classes.actions}>
-          <ActionIcon onClick={toggleDocs} size="xl" variant="subtle" color="primary">
-            <Tooltip label={texts.common.show(texts.common.docs)}>
+          <Tooltip label={texts.common.show(texts.common.docs)}>
+            <ActionIcon
+              onClick={toggleDocs}
+              size="xl"
+              variant="subtle"
+              color="primary"
+              aria-label={texts.common.show(texts.common.docs)}
+            >
               <IconHelp data-testid="docs-icon" />
-            </Tooltip>
-          </ActionIcon>
+            </ActionIcon>
+          </Tooltip>
         </div>
       )}
     </div>

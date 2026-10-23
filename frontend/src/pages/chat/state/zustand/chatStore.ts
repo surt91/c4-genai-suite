@@ -1,15 +1,5 @@
 import { create } from 'zustand';
-import {
-  AppClient,
-  ConversationDto,
-  FileDto,
-  MessageDto,
-  SourceDto,
-  StreamEventDto,
-  StreamObserver,
-  StreamSubscription,
-} from 'src/api';
-import { DocumentSource } from '../../SourcesChunkPreview';
+import { AppClient, ConversationDto, FileDto, MessageDto, StreamEventDto, StreamObserver, StreamSubscription } from 'src/api';
 import { ChatMessage } from '../types';
 
 type ChatData = {
@@ -24,10 +14,6 @@ type ChatData = {
 type ChatState = {
   currentChatId: number;
   chatDataMap: Map<number, ChatData>;
-
-  // sources selected to be shown in the viewer
-  selectedDocument: DocumentSource | undefined;
-  selectedSource: SourceDto | undefined;
 };
 
 type ChatActions = {
@@ -60,9 +46,6 @@ type ChatActions = {
 
   updateReasoning: (chatId: number, content: string) => void;
   clearReasoning: (chatId: number) => void;
-
-  setSelectedDocument: (document: DocumentSource | undefined) => void;
-  setSelectedSource: (source: SourceDto | undefined) => void;
 };
 
 // Placeholder IDs of messages whose generation has been stopped before the server sent the real ID. They must not
@@ -82,9 +65,6 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
   return {
     currentChatId: 0,
     chatDataMap: new Map(),
-
-    selectedDocument: undefined,
-    selectedSource: undefined,
 
     initializeChatIfNeeded: (chatId) => {
       set((state) => {
@@ -246,8 +226,10 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
           return { ...message, id };
         }
 
-        const toolsInUse = Object.fromEntries(Object.keys(message.toolsInUse ?? {}).map((name) => [name, 'Completed' as const]));
-        return { ...message, id, stopped: true, ui: undefined, reasoningInProgress: false, toolsInUse };
+        const toolCalls = message.toolCalls?.map((tool) =>
+          tool.status === 'running' ? { ...tool, status: 'cancelled' as const } : tool,
+        );
+        return { ...message, id, stopped: true, ui: undefined, reasoningInProgress: false, toolCalls };
       });
 
       const newMap = new Map(get().chatDataMap);
@@ -260,13 +242,6 @@ export const useChatStore = create<ChatState & ChatActions>()((set, get) => {
       });
       set({ chatDataMap: newMap });
       return true;
-    },
-
-    setSelectedDocument: (selectedDocument) => {
-      set({ selectedDocument });
-    },
-    setSelectedSource: (selectedSource) => {
-      set({ selectedSource });
     },
 
     updateReasoning: (chatId, content) =>

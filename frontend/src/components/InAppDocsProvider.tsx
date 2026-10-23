@@ -2,15 +2,27 @@
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { texts } from 'src/texts';
 import { Markdown } from '../components/Markdown';
 import classes from './InAppDocsProvider.module.css';
 
+/**
+ * A page that shows the documentation itself, e.g. the chat shows it in its inspector (the one side panel of the chat).
+ * When a host is registered, the provider does not render its own panel.
+ */
+export type DocsHost = {
+  toggle: () => void;
+  isOpen: boolean;
+};
+
 type DocsContextType = {
   isDocsButtonVisible: boolean;
   toggleDocs: () => void;
+  // The markdown of the documentation of the current page (empty if there is none).
+  docsMarkdown: string;
+  setDocsHost: (host: DocsHost | undefined) => void;
 };
 
 const DocsContext = createContext<DocsContextType | undefined>(undefined);
@@ -74,14 +86,31 @@ export const InAppDocsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     queryFn: () => fetchMarkdown(location.pathname),
   });
   const [isDocsOpen, setIsDocsOpen] = useState(false);
+  const [docsHost, setDocsHost] = useState<DocsHost>();
 
-  const toggleDocs = () => setIsDocsOpen((prev) => !prev);
   const isDocsAvailable = query.isSuccess;
-  const isDocsButtonVisible = isDocsAvailable && !isDocsOpen;
+  const toggleDocs = useCallback(() => {
+    if (docsHost) {
+      docsHost.toggle();
+    } else {
+      setIsDocsOpen((prev) => !prev);
+    }
+  }, [docsHost]);
+  const isDocsButtonVisible = isDocsAvailable && !(docsHost ? docsHost.isOpen : isDocsOpen);
+  const docsMarkdown = isDocsAvailable ? (query.data ?? '') : '';
+
+  const context = useMemo(
+    () => ({ isDocsButtonVisible, toggleDocs, docsMarkdown, setDocsHost }),
+    [isDocsButtonVisible, toggleDocs, docsMarkdown],
+  );
 
   return (
-    <DocsContext.Provider value={{ isDocsButtonVisible, toggleDocs }}>
-      <InAppDocsLayout docsMarkdown={query.data || ''} isDocsVisible={isDocsOpen && isDocsAvailable} toggleDocs={toggleDocs}>
+    <DocsContext.Provider value={context}>
+      <InAppDocsLayout
+        docsMarkdown={docsMarkdown}
+        isDocsVisible={!docsHost && isDocsOpen && isDocsAvailable}
+        toggleDocs={toggleDocs}
+      >
         {children}
       </InAppDocsLayout>
     </DocsContext.Provider>

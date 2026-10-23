@@ -1,7 +1,7 @@
 import { Tooltip } from '@mantine/core';
 import { clsx } from 'clsx';
 import { ButtonHTMLAttributes } from 'react';
-import { isMobile } from 'src/pages/utils';
+import { useIsPhone } from 'src/hooks/useIsCompact';
 import classes from './CollapseButton.module.css';
 
 interface CollapseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,6 +17,7 @@ interface CollapseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function CollapseButton(props: CollapseButtonProps) {
   const { className, isToggled, side, tooltip, ...other } = props;
+  const isPhone = useIsPhone();
 
   return (
     <Tooltip label={tooltip} position={side === 'left' ? 'right' : 'left'} disabled={!tooltip}>
@@ -24,7 +25,7 @@ export function CollapseButton(props: CollapseButtonProps) {
         className={clsx(className, classes.root)}
         data-side={side === 'left' ? 'left' : 'right'}
         data-toggled={isToggled || undefined}
-        data-mobile={isMobile() || undefined}
+        data-mobile={isPhone || undefined}
         {...other}
         aria-label={tooltip}
       >

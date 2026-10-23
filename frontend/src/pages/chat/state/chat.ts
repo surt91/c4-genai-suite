@@ -14,9 +14,20 @@ import {
 import { toast } from 'src/lib/notifications';
 
 import { texts } from 'src/texts';
-import { ChatMessage } from './types';
+import { ChatMessage, ToolCallState } from './types';
 import { useChatStore } from './zustand/chatStore';
 import { useListOfChatsStore } from './zustand/listOfChatsStore';
+
+/** Tool calls without an ID (older servers) are identified by their name. */
+const toolId = (tool: { name: string; id?: string }) => tool.id ?? tool.name;
+
+function upsertToolCall(toolCalls: ToolCallState[] | undefined, update: ToolCallState): ToolCallState[] {
+  const existing = toolCalls ?? [];
+  if (!existing.some((t) => t.id === update.id)) {
+    return [...existing, update];
+  }
+  return existing.map((t) => (t.id === update.id ? { ...t, ...update, error: update.error ?? t.error } : t));
+}
 
 const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEnum) => {
   return messageType === 'ai' ? -1 : 0;
@@ -135,11 +146,11 @@ export const useChatStream = (chatId: number) => {
           }
           case 'tool_start':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
-              toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Started' },
+              toolCalls: upsertToolCall(oldMessage.toolCalls, { id: toolId(msg.tool), name: msg.tool.name, status: 'running' }),
             }));
           case 'tool_end':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
-              toolsInUse: { ...oldMessage.toolsInUse, [msg.tool.name]: 'Completed' },
+              toolCalls: upsertToolCall(oldMessage.toolCalls, { id: toolId(msg.tool), name: msg.tool.name, status: 'success' }),
             }));
           case 'debug':
             return chatStore.updateMessage(chatId, actualAiMessageId, (oldMessage) => ({
@@ -305,26 +316,10 @@ export const useStateOfMessages = () => {
   return chatData?.messages || [];
 };
 
+/** A message of a (loaded) conversation. */
+export const useStateOfMessage = (conversationId: number, messageId: number) =>
+  useChatStore((state) => state.chatDataMap.get(conversationId)?.messages.find((m) => m.id === messageId));
+
 export const useStateOfIsAiWriting = () => {
   return useChatStore((state) => state.chatDataMap.get(state.currentChatId)?.isAiWriting || false);
-};
-
-export const useStateOfSelectedDocument = () => {
-  const selectedDocument = useChatStore((state) => state.selectedDocument);
-  const setSelectedDocument = useChatStore((state) => state.setSelectedDocument);
-
-  return {
-    selectedDocument,
-    setSelectedDocument,
-  };
-};
-
-export const useStateOfSelectedSource = () => {
-  const selectedSource = useChatStore((state) => state.selectedSource);
-  const setSelectedSource = useChatStore((state) => state.setSelectedSource);
-
-  return {
-    selectedSource,
-    setSelectedSource,
-  };
 };

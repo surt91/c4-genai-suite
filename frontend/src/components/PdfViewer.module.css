@@ -1,3 +1,9 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .error {
   margin-top: 1rem;
 }
@@ -6,13 +12,9 @@
   margin: 8rem auto;
 }
 
-.viewerSection {
-  padding: 0 1rem 1rem;
-}
-
 .viewport {
-  height: 100%;
   width: 100%;
+  min-width: 25%;
   overflow: auto;
   border: 1px solid var(--mantine-color-gray-3);
 }

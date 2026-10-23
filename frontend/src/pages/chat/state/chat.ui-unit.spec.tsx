@@ -9,8 +9,6 @@ describe('chat state selectors', () => {
     useChatStore.setState({
       currentChatId: 0,
       chatDataMap: new Map(),
-      selectedDocument: undefined,
-      selectedSource: undefined,
     });
   });
 
@@ -63,7 +61,7 @@ describe('stopping the generation', () => {
     store.setStreamingMessageId(1, -1);
     store.setIsAiWriting(1, true);
     store.setActiveStreamSubscription(1, subscription);
-    store.updateMessage(1, -1, { toolsInUse: { Search: 'Started' } });
+    store.updateMessage(1, -1, { toolCalls: [{ id: 'call-1', name: 'Search', status: 'running' }] });
     return subscription;
   }
 
@@ -82,7 +80,11 @@ describe('stopping the generation', () => {
     expect(chatData.activeStreamSubscription).toBeUndefined();
 
     const [stoppedQuestion, stoppedAnswer] = chatData.messages;
-    expect(stoppedAnswer).toMatchObject({ stopped: true, ui: undefined, toolsInUse: { Search: 'Completed' } });
+    expect(stoppedAnswer).toMatchObject({
+      stopped: true,
+      ui: undefined,
+      toolCalls: [{ id: 'call-1', name: 'Search', status: 'cancelled' }],
+    });
     expect(stoppedAnswer.content).toEqual(answer.content);
     // the placeholder IDs are free for the next message
     expect(stoppedQuestion.id).toBeLessThan(-1);

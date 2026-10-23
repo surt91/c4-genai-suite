@@ -5,24 +5,34 @@ import React, { useMemo } from 'react';
 import { SourceDto } from 'src/api';
 import Source from 'src/pages/chat/conversation/Source';
 import { texts } from 'src/texts';
+import { useInspectorActions } from '../state/inspector';
 import classes from './ChatItemDetails.module.css';
 
-const ChatItemSources: React.FC<{ sources: SourceDto[]; selectDocument: (documentUri: string) => void }> = ({
+const ChatItemSources: React.FC<{ sources: SourceDto[]; conversationId: number; messageId: number }> = ({
   sources,
-  selectDocument,
+  conversationId,
+  messageId,
 }) => {
   const uniqueSources = useMemo(() => mergeIdenticalSources(sources), [sources]);
+  const { open: openInspector } = useInspectorActions();
 
   if (!uniqueSources || uniqueSources.length === 0) return null;
 
   return (
     <div className={classes.sources} data-testid="sources-section">
-      <h2 className={classes.sourcesTitle}>{texts.chat.sources.sources}</h2>
-      <ul>
+      <h3 className={classes.sourcesTitle}>{texts.chat.sources.sources}</h3>
+      <ol className={classes.sourceList}>
         {uniqueSources.map((source, index) => (
-          <Source key={index} source={source} selectDocument={selectDocument} />
+          <Source
+            key={index}
+            index={index}
+            source={source}
+            conversationId={conversationId}
+            messageId={messageId}
+            onOpen={() => openInspector({ type: 'source', conversationId, messageId, sources: uniqueSources, index })}
+          />
         ))}
-      </ul>
+      </ol>
     </div>
   );
 };

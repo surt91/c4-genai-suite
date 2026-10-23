@@ -2,9 +2,9 @@ import { ActionIcon, Group, Select, SelectProps, Text, Tooltip } from '@mantine/
 import { IconCheck, IconChevronDown, IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePersistentState } from 'src/hooks';
+import { useIsPhone } from 'src/hooks/useIsCompact';
 import { ConfigurationUserValuesModal } from 'src/pages/chat/conversation/ConfigurationUserValuesModal';
 import { useStateOfEnabledAssistants, useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
-import { isMobile } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { useStateMutateChat, useStateOfChat } from '../state/chat';
 import classes from './Configuration.module.css';
@@ -20,6 +20,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   const assistant = useStateOfSelectedAssistant();
 
   const [showModal, setShowModal] = useState(false);
+  const isPhone = useIsPhone();
 
   const [, setPersistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
 
@@ -48,14 +49,14 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
     <div className={classes.root}>
       <Select
         aria-label={texts.chat.selectAssistant}
-        w={isMobile() ? '100%' : undefined}
-        maw={isMobile() ? undefined : 224}
+        w={isPhone ? '100%' : undefined}
+        maw={isPhone ? undefined : 224}
         radius={'md'}
         comboboxProps={{
           radius: 'md',
           shadow: 'md',
           position: 'bottom-start',
-          width: isMobile() ? '100%' : '280px',
+          width: isPhone ? '100%' : '280px',
         }}
         classNames={{
           input: classes.input,

@@ -2,20 +2,25 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
+}
+
+.group {
+  flex: 1;
+  min-height: 0;
 }
 
 .resizeHandle {
   display: flex;
   align-items: center;
-  width: 0.5rem;
-  margin-left: -2px;
-  padding: 2px;
-  background-color: var(--mantine-color-gray-1);
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0.25rem;
+  background-color: var(--mantine-color-gray-2);
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.resizeHandle:hover {
-  background-color: var(--mantine-color-gray-2);
+.resizeHandle:hover,
+.resizeHandle:focus-visible {
+  background-color: var(--mantine-color-gray-4);
 }
 
 .resizeHandleGrip {
@@ -24,15 +29,10 @@
   border-radius: 0.25rem;
 }
 
-.resizeHandle:hover .resizeHandleGrip {
-  background-color: white;
-}
-
 .leftPanel {
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  width: 16rem;
+  height: 100%;
   overflow: hidden;
   background-color: var(--mantine-color-gray-1);
 }
@@ -55,28 +55,28 @@
 
 .main {
   position: relative;
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
 }
 
-.mobileOverlay {
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--mantine-color-gray-4);
-}
-
-.collapseLeft {
-  position: absolute;
-  top: 40%;
-}
-
-.collapseRight {
-  position: absolute;
-  top: 40%;
-  right: 0.5rem;
+.conversation {
+  flex: 1;
+  min-height: 0;
 }
 
 .rightPanel {
-  background-color: var(--mantine-color-gray-1);
+  height: 100%;
+}
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerBody {
+  height: 100%;
+  padding: 0;
 }

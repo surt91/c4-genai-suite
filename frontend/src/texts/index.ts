@@ -462,6 +462,38 @@ function load() {
       },
     },
     chat: {
+      inspector: {
+        details: translate('chat.inspector.details'),
+        label: translate('chat.inspector.label'),
+        back: translate('chat.inspector.back'),
+        close: translate('chat.inspector.close'),
+        source: translate('chat.inspector.source'),
+        sourcePosition: (index: string | number, total: string | number) =>
+          translate('chat.inspector.sourcePosition', { index, total }),
+        previousSource: translate('chat.inspector.previousSource'),
+        nextSource: translate('chat.inspector.nextSource'),
+        text: translate('chat.inspector.text'),
+        document: translate('chat.inspector.document'),
+        pages: (pages: string | number) => translate('chat.inspector.pages', { pages }),
+        citedPassages: translate('chat.inspector.citedPassages'),
+        noPassages: translate('chat.inspector.noPassages'),
+        goToPage: (page: string | number) => translate('chat.inspector.goToPage', { page }),
+        tool: translate('chat.inspector.tool'),
+        toolOutput: translate('chat.inspector.toolOutput'),
+        toolError: translate('chat.inspector.toolError'),
+        toolNoDetails: translate('chat.inspector.toolNoDetails'),
+        help: translate('chat.inspector.help'),
+      },
+      header: {
+        conversations: translate('chat.header.conversations'),
+        newChat: translate('chat.header.newChat'),
+      },
+      sourcesQuote: {
+        show: translate('chat.sourcesQuote.show'),
+        hide: translate('chat.sourcesQuote.hide'),
+        loading: translate('chat.sourcesQuote.loading'),
+        open: (title: string | number) => translate('chat.sourcesQuote.open', { title }),
+      },
       status: {
         running: translate('chat.status.running'),
         success: translate('chat.status.success'),

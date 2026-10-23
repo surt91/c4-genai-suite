@@ -6,8 +6,8 @@ import { ConfirmDialog } from 'src/components/ConfirmDialog';
 import { UserProfileModal } from 'src/components/UserProfileModal';
 import { useLogoutUrl, useProfile } from 'src/hooks';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
+import { useIsPhone } from 'src/hooks/useIsCompact';
 import { useStateOfSelectedChatId } from 'src/pages/chat/state/chat';
-import { isMobile } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { Avatar } from './Avatar';
 import classes from './ProfileButton.module.css';
@@ -24,6 +24,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   const { data: authSettings } = useAuthSettings();
+  const isPhone = useIsPhone();
 
   return (
     <Menu width={250} withInitialFocusPlaceholder={false}>
@@ -55,7 +56,7 @@ export const ProfileButton = ({ onClearConversations, section }: ProfileButtonPr
           </Menu.Item>
         )}
 
-        {section === 'chat' && profile.isAdmin && !isMobile() && (
+        {section === 'chat' && profile.isAdmin && !isPhone && (
           <Menu.Item leftSection={<IconUserCog size={14} />} component={NavLink} to="/admin">
             {texts.common.administration}
           </Menu.Item>

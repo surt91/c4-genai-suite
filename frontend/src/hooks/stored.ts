@@ -1,11 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { isMobile } from 'src/pages/utils';
 
 export function useSidebarState(key: string): [boolean, (value: boolean) => void] {
   const [state, setState] = useState(() => {
-    if (isMobile()) {
-      return false;
-    }
     const fromLocalStore = localStorage.getItem(key);
     return fromLocalStore !== 'false';
   });
