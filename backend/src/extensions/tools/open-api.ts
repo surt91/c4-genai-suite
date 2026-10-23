@@ -7,7 +7,7 @@ import { ChatContext, ChatMiddleware, ChatNextDelegate, FormActionType, GetConte
 import { CacheEntity, CacheRepository } from 'src/domain/database';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
-import { InternalError } from 'src/lib';
+import { InternalError, parseHeaders } from 'src/lib';
 import { I18nService } from '../../localization/i18n.service';
 import { Configuration, HTTPHeaders, ToolDto, ToolsApi } from './generated';
 
@@ -86,17 +86,7 @@ export class OpenApiExtension implements Extension<OpenApiExtensionConfiguration
   }
 
   private getApi(configuration: OpenApiExtensionConfiguration) {
-    const headers: HTTPHeaders = {};
-
-    if (configuration.headers) {
-      for (const pair of configuration.headers.split(/[,;\n]/)) {
-        const [key, value] = pair.trim().split('=');
-
-        if (key && value) {
-          headers[key.trim()] = value.trim();
-        }
-      }
-    }
+    const headers: HTTPHeaders = parseHeaders(configuration.headers);
 
     const api = new ToolsApi(
       new Configuration({

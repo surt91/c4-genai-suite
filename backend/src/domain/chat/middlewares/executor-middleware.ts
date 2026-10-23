@@ -3,7 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { isString } from 'class-validator';
 import { ConfigurationModel } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
-import { InternalError } from 'src/lib';
+import { InternalError, parseHeaders } from 'src/lib';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../interfaces';
 import { UpdateConversation } from '../use-cases';
 import { ExecuteMiddleware } from './execute-middleware';
@@ -97,17 +97,7 @@ export class ExecutorMiddleware implements ChatMiddleware {
 }
 
 function buildClient(configuration: ConfigurationModel) {
-  const headers: HTTPHeaders = {};
-
-  if (configuration.executorHeaders) {
-    for (const pair of configuration.executorHeaders.split(/[,;\n]/)) {
-      const [key, value] = pair.trim().split('=');
-
-      if (key && value) {
-        headers[key.trim()] = value.trim();
-      }
-    }
-  }
+  const headers: HTTPHeaders = parseHeaders(configuration.executorHeaders);
 
   const api = new ChatApi(
     new Configuration({

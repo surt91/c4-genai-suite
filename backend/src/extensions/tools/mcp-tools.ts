@@ -31,7 +31,7 @@ import {
   ExtensionStringArgument,
 } from 'src/domain/extensions';
 import { User } from 'src/domain/users';
-import { renderTemplate } from 'src/lib';
+import { parseHeaders, renderTemplate } from 'src/lib';
 import { I18nService } from '../../localization/i18n.service';
 import { transformMCPToolResponse } from './mcp-types/transformer';
 
@@ -587,20 +587,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
 
     const url = new URL(configuration.endpoint);
 
-    const headers =
-      configuration.headers?.split(/\r?\n/).reduce<Record<string, string>>((prev, pair) => {
-        const index = pair.indexOf('=');
-
-        if (index >= 0) {
-          const key = pair.substring(0, index).trim();
-          const value = pair.substring(index + 1).trim();
-          if (key && value) {
-            prev[key.trim()] = value.trim();
-          }
-        }
-
-        return prev;
-      }, {}) ?? {};
+    const headers = parseHeaders(configuration.headers);
 
     const transport =
       configuration.transport === Transport.STREAMABLE_HTTP
