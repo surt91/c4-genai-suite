@@ -5,8 +5,9 @@ import { useSearchParams } from 'react-router-dom';
 import { AuthSettingsDto, useApi } from 'src/api';
 import { LoginDto, ResponseError } from 'src/api/generated';
 import { Logo } from 'src/components';
-import { Theme, useLoginUrl, useTheme, useTransientNavigate } from 'src/hooks';
+import { Theme, useLoginUrl, useTheme, useTransientLinkBuilder } from 'src/hooks';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
+import { loadPage, takePostLoginRedirect } from 'src/lib/navigation';
 import { texts } from 'src/texts';
 import classes from './LoginPage.module.css';
 
@@ -91,13 +92,14 @@ function LoginProviders(props: {
 function LoginForm() {
   const api = useApi();
 
-  const navigate = useTransientNavigate();
+  const buildLink = useTransientLinkBuilder();
   const login = useMutation({
     mutationFn: (request: LoginDto) => {
       return api.auth.login(request);
     },
     onSuccess: () => {
-      navigate('/chat');
+      // A full page load: the caches and stores may still contain the data of the previous user (session expired).
+      loadPage(buildLink(takePostLoginRedirect()) as string);
     },
   });
 

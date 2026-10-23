@@ -3,11 +3,17 @@ import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthSettingsDto } from 'src/api';
+import { loadPage } from 'src/lib/navigation';
 import { mockedAPI } from 'src/mock/factory';
 import { render } from 'src/pages/admin/test-utils';
 import { LoginPage } from 'src/pages/login/LoginPage';
 import { texts } from 'src/texts';
 import { server } from '../../../mock/node';
+
+vi.mock('src/lib/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('src/lib/navigation')>()),
+  loadPage: vi.fn(),
+}));
 
 describe('LoginPage authentication', () => {
   beforeAll(() => server.listen());
@@ -70,7 +76,26 @@ describe('LoginPage authentication', () => {
     const loginBtn = screen.getAllByRole('button', { name: 'Login' });
     await user.click(loginBtn[0]);
 
-    expect(location.href).toMatch('/chat');
+    // a full page load, which drops the data of a previous session
+    await vi.waitFor(() => expect(loadPage).toHaveBeenCalledWith('/chat'));
+  });
+
+  it('should return to the page where the session expired after the login', async () => {
+    document.cookie = `post-login-redirect=${encodeURIComponent('/chat/42')}; path=/`;
+    new mockedAPI()
+      .withGet<AuthSettingsDto>('/api/auth/settings', { providers: [], enablePasswordAuth: true })
+      .withPost(`/api/auth/login`)
+      .run();
+
+    render(<LoginPage />);
+
+    const user = userEvent.setup();
+    await user.type(await screen.findByPlaceholderText('Email'), 'admin@example.com');
+    await user.type(await screen.findByPlaceholderText('Password'), 'secret');
+    await user.click(screen.getAllByRole('button', { name: 'Login' })[0]);
+
+    await vi.waitFor(() => expect(loadPage).toHaveBeenCalledWith('/chat/42'));
+    expect(document.cookie).not.toContain('post-login-redirect=%2F');
   });
 
   it('should inform user that something went wrong by fetching the auth settings', async () => {
