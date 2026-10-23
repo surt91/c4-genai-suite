@@ -589,7 +589,7 @@ export async function uploadFileWithPaperclip(page: Page, filename: string, mayF
   await fileChooser.setFiles(path.join(__dirname, `files/${filename}`));
 
   if (!mayFail) {
-    await expect(page.getByTestId('file-chip-uploaded').first()).toContainText(filename);
+    await expect(page.getByTestId('file-chip-uploaded').filter({ hasText: filename }).first()).toBeVisible();
   }
 }
 

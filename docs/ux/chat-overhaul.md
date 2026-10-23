@@ -2,8 +2,9 @@
 
 Stand: 23.10.2026, Codebasis `main` nach der Umstellung auf Mantine plus „Generierung abbrechen“.
 Es geht nur um die Oberfläche für Nutzer (Chat). Der Admin-Bereich ist ausgeklammert.
-Das Dokument ist ein Konzept, noch nichts davon ist umgesetzt. Am Ende stehen die
-[Entscheidungen](#6-entscheidungen) und ein [Umsetzungsplan](#7-umsetzungsplan).
+Kapitel 1–7 beschreiben den Stand vor der Überarbeitung und das Konzept. Am Ende stehen die
+[Entscheidungen](#6-entscheidungen), ein [Umsetzungsplan](#7-umsetzungsplan) und der
+[Umsetzungsstand](#8-umsetzungsstand) mit Screenshots danach.
 
 Die Screenshots in `docs/ux/img/` sind mit Playwright gegen den Compose-Stack und das Mock-LLM entstanden
 (englische Oberfläche, Viewport 1440×900 bzw. 390×844). Die Zustände in 15 und 16 (Formular, Tool-Fehler)
@@ -683,3 +684,60 @@ Allgemein für die E2E-Tests:
 - Neue Zustände (Inspector, Karten, Drawer) bekommen `data-testid`s und axe-Prüfungen.
 - Die Tests müssen parallel-sicher bleiben (eindeutige Namen, nur eigene Daten). Für Elicitation braucht es
   einen Mock-MCP-Server je Worker (analog `mockServerUrl`), damit sich Tests nicht gegenseitig Fragen stellen.
+
+---
+
+## 8. Umsetzungsstand
+
+Stand: 24.10.2026. Umgesetzt sind alle Entscheidungen mit den Empfehlungen aus Kapitel 6, in den Schritten aus
+Kapitel 7 (je Schritt ein oder mehrere Commits). Die Screenshots `img/after-*.png` erzeugt
+`e2e/screenshots/chat-overhaul.spec.ts` (`TEST_DIR=./screenshots npx playwright test --project=chromium`).
+
+| # | Entscheidung | Umsetzung |
+|---|---|---|
+| E1 | Variante B | `pages/chat/inspector/*`: Inspector als Stapel (Quelle, Tool-Details, Hilfe) mit Zurück, X und Esc, standardmäßig zu, Breite gespeichert (`useDefaultLayout`). Quellen als nummerierte Liste mit Inline-Zitat (aus C), im Inspector mit Blättern, markierten Fundstellen und Sprung zu den zitierten PDF-Seiten. |
+| E2 | Dateien im Composer | Chip „My files (n)“ öffnet ein Popover (Suche, Auswahl, Upload); „Manage…“ öffnet ein Modal zum Umbenennen (`PATCH /user-files/:id`) und Löschen. Die Chips über der Eingabe zeigen die Herkunft (`FileDto.bucketType`), persönliche Dateien werden beim Entfernen nur abgewählt. |
+| E3 | Inline-Karten | `components/ChatCard.tsx` mit Status-Vokabular. Tool-Karten mit Status und Fehler (neues Event `tool_error`, MCP-Ergebnisse mit `isError`), Details im Inspector; Formulare als Karte mit Absender und Frist, danach Protokollzeile; Wartehinweis im Composer, Markierung in der Chatliste, Live-Region. Debug-Ausgaben werden auch bei Quellen gezeigt. |
+| E4/E5 | URL-Modus | `ChatUI.openUrl` (`domain/chat/middlewares/ui-middleware.ts`), Capability `elicitation: { form, url }`, `notifications/elicitation/complete`, Wiederholung bei `-32042`, Frist 10 min, Audit-Log ohne Query. Karte mit Domain (Punycode), voller Adresse auf Wunsch, Zustimmung → neuer Tab (`noopener,noreferrer`), dann „Ich bin fertig“/„Abbrechen“. Die Karte ist von der Quelle unabhängig und kann für MCP-OAuth wiederverwendet werden. |
+| E6 | Persistenz | Neue Spalte `messages.interactions` (JSON, Migration `AddInteractionsAndConversationDeletedAt`): Formularantworten ohne Passwortfelder, URL-Anfragen (ohne Query), Tool-Fehler. Neues Event `ui_update` für Antworten, Ablauf, Abbruch und Abschluss. Formulare bleiben an Nutzer und Konversation gebunden. |
+| E7 | Hilfe im Inspector | `InAppDocsProvider` kennt einen „Docs-Host“; im Chat öffnet das Hilfe-Icon die Hilfe im Inspector (`public/docs/chat/index.md`). Der Admin-Bereich behält sein Panel. |
+| E8 | Allowlist optional | Feld „Allowed domains for pages to open“ je MCP-Extension (inkl. Subdomains). Ohne Liste mit deutlicher Warnung, nicht erlaubte Domains werden blockiert (die Adresse wird dann nicht gezeigt). |
+| E9 | Löschen mit Rückgängig | Soft-Delete (`conversations.deletedAt`), `POST /conversations/:id/restore` für 5 min, ältere werden beim nächsten Löschen endgültig entfernt; Benachrichtigung mit „Undo“. |
+| E10 | Chips + Popover | Assistent, Assistenten-Einstellungen und Optionen der Extensions als Chips im Composer, ein gemeinsames Popover „Chat settings“ (`[Reset all] [Cancel] [Apply]`). Die Auswahl oben und beide Modals entfallen. |
+| E11 | Kopfzeile | `useIsCompact`/`useIsPhone` (`useMediaQuery`) statt `isMobile()`. Kopfzeile der Konversation mit Chatliste/Burger, Neuer Chat und Details; unter `md` Drawer, Popovers als Bottom-Sheet. Shortcuts Ctrl/Cmd+. und Ctrl/Cmd+Shift+O. |
+| E12 | Mantine Notifications | `src/lib/notifications.tsx` (`notify` mit Aktion, `toast`-Kurzformen), `react-toastify` entfernt. |
+| E13 | Profil für alle | Menüpunkt immer da, Daten des Identitätsanbieters schreibgeschützt, Passwort nur mit lokalem Login (`ProfileDto.hasPassword`). |
+
+Außerdem behoben: Knopfregeln im Bestätigungsdialog (sekundär links, nur primär rot, Fokus auf Abbrechen),
+neutrale Knöpfe bei der Chat-Bewertung, hart codierte Texte, Aria-Labels im PDF-Viewer, Umbenennen mit Mantine-Input
+(Esc bricht ab), Menü des aktiven Chats immer sichtbar, `OverlayDropdown` entfernt, abgelaufene Formulare bleiben
+nicht stehen, fokussierbarer Datei-Upload, Error-Boundary im Inspector.
+
+**E2E:** Neuer Test-MCP-Server je Worker (`e2e/tests/utils/test-mcp-server.ts`) mit Formular, URL-Anfrage und
+fehlschlagendem Tool; neue Tests in `interactions.spec.ts` (Formular, URL inkl. „kein Popup ohne Zustimmung“,
+Allowlist, Tool-Fehler), Inspector Zurück/Schließen, Dateien-Popover, Rückgängig und mobile Navigation.
+
+**Offen:**
+
+- Umbenennen ändert nur den angezeigten Namen; Quellen zeigen weiter den Namen aus dem Index (REI-S).
+- Chat-Suche (Roadmap #2), ↑ zum Bearbeiten und Artifacts sind nicht Teil dieser Umsetzung.
+- Die Zwischenstufe md–lg (Chatliste als Overlay neben der Spalte) ist zusammengefasst: unter `md` Drawer, darüber Spalten.
+- Tool-Details zeigen Status, Fehler und Debug-Ausgaben; Ein-/Ausgaben der Tools werden noch nicht übertragen.
+- Lange Formulare (> 5 Felder) öffnen noch kein eigenes Modal.
+
+| | |
+|---|---|
+| ![Leerer Chat](img/after-01-empty-chat.png) | ![Quellen](img/after-02-conversation-sources.png) |
+| *Leerer Chat: Assistent und Optionen als Chips im Composer* | *Quellen mit Inline-Zitat, Chips mit Herkunft der Dateien* |
+| ![Inspector](img/after-11-inspector-source.png) | ![PDF](img/after-12-inspector-pdf.png) |
+| *Inspector: zitierte Stellen der Quelle* | *Inspector: PDF an der zitierten Seite* |
+| ![Meine Dateien](img/after-09-my-files-popover.png) | ![Chat-Einstellungen](img/after-08-chat-settings-popover.png) |
+| *Popover „My files“* | *Gemeinsames Popover „Chat settings“* |
+| ![Formular](img/after-15-form-card.png) | ![URL](img/after-19-url-card.png) |
+| *Formular als Karte mit Absender und Frist* | *URL-Anfrage mit Domain, Warnung und Zustimmung* |
+| ![Tool-Fehler](img/after-16-tool-error.png) | ![Tool-Details](img/after-20-inspector-tool.png) |
+| *Fehlgeschlagenes Tool als Fehler-Karte* | *Details des Tools im Inspector* |
+| ![Rückgängig](img/after-04-delete-undo.png) | ![Mobil](img/after-17-mobile-chat.png) |
+| *Gelöschter Chat mit „Undo“* | *Mobil: Kopfzeile mit Burger und Neuer Chat* |
+| ![Mobil Chatliste](img/after-18-mobile-chat-list.png) | ![Mobil Bottom-Sheet](img/after-21-mobile-bottom-sheet.png) |
+| *Mobil: Chatliste als Drawer* | *Mobil: Popover als Bottom-Sheet* |

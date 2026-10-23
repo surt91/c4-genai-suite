@@ -263,6 +263,7 @@ export function ChatSettings(props: ChatSettingsProps) {
       onClose={close}
       title={texts.chat.chatSettings.title}
       width={420}
+      focusTitle
       data-testid="chat-settings-popover"
       target={
         <Group gap={6} className={classes.chips}>

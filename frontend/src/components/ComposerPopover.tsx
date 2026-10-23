@@ -10,6 +10,8 @@ interface ComposerPopoverProps extends PropsWithChildren {
   target: ReactNode;
   title: string;
   width?: number;
+  // Focus the title instead of the first input when opened (e.g. to not open a select right away).
+  focusTitle?: boolean;
   'data-testid'?: string;
 }
 
@@ -21,7 +23,7 @@ const NESTED_DROPDOWNS = '.mantine-Popover-dropdown, .mantine-Combobox-dropdown,
  * sheet. Esc and a click outside close it.
  */
 export function ComposerPopover(props: ComposerPopoverProps) {
-  const { opened, onClose, target, title, width = 400, children } = props;
+  const { opened, onClose, target, title, width = 400, focusTitle, children } = props;
   const isPhone = useIsPhone();
   const targetRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -94,7 +96,9 @@ export function ComposerPopover(props: ComposerPopoverProps) {
         data-testid={props['data-testid']}
         className={classes.dropdown}
       >
-        <div className={classes.title}>{title}</div>
+        <div className={classes.title} tabIndex={focusTitle ? -1 : undefined} data-autofocus={focusTitle || undefined}>
+          {title}
+        </div>
         {children}
       </Popover.Dropdown>
     </Popover>
