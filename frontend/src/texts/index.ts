@@ -392,6 +392,7 @@ function load() {
       metric: {
         // List page
         create: translate('evals.metric.create'),
+        loadFailed: translate('evals.metric.loadFailed'),
         empty: translate('evals.metric.empty'),
         emptyHint: translate('evals.metric.emptyHint'),
         // Table columns

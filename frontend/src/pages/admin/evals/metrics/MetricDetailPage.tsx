@@ -2,7 +2,7 @@ import { Badge, Box, Button, Card, Flex, Group, Skeleton, Stack } from '@mantine
 import { IconArrowLeft, IconPencil, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Page } from 'src/components';
+import { Alert, Page } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { texts } from 'src/texts';
 import classes from './MetricDetailPage.module.css';
@@ -18,7 +18,7 @@ export function MetricDetailPage() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const { data: metric, isLoading, refetch } = useMetric(metricId);
+  const { data: metric, isLoading, isError, refetch } = useMetric(metricId);
 
   const handleBack = useEventCallback(() => {
     void navigate('/admin/evals/metrics');
@@ -57,6 +57,19 @@ export function MetricDetailPage() {
       minute: '2-digit',
     });
   };
+
+  if (isError) {
+    return (
+      <Page>
+        <Box mb={16}>
+          <Button variant="subtle" leftSection={<IconArrowLeft />} onClick={handleBack}>
+            {texts.evals.metrics}
+          </Button>
+        </Box>
+        <Alert text={texts.evals.metric.loadFailed} />
+      </Page>
+    );
+  }
 
   if (isLoading || !metric) {
     return (

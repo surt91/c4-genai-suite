@@ -285,6 +285,7 @@ export const de: typeof en = {
     metric: {
       // List page
       create: 'Metrik erstellen',
+      loadFailed: 'Die Metrik konnte nicht geladen werden. Möglicherweise wurde sie gelöscht.',
       empty: 'Keine Metriken gefunden.',
       emptyHint: 'Erstellen Sie Ihre erste Metrik, um Bewertungskriterien zu definieren.',
       // Table columns

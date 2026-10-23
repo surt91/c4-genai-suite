@@ -295,6 +295,7 @@ export const en = {
     metric: {
       // List page
       create: 'Create Metric',
+      loadFailed: 'The metric could not be loaded. It may have been deleted.',
       empty: 'No metrics found.',
       emptyHint: 'Create your first metric to start defining evaluation criteria.',
       // Table columns
