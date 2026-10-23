@@ -1,4 +1,3 @@
-import queryString from 'query-string';
 import { createContext, useContext } from 'react';
 import { NavigateOptions, To, useNavigate } from 'react-router-dom';
 import { isString } from 'src/lib';
@@ -12,6 +11,17 @@ export function useTransientContext() {
   return useContext(TransientContext);
 }
 
+function withContext(search: string, context: TransientContext) {
+  const query = new URLSearchParams(search);
+
+  for (const [key, value] of Object.entries(context)) {
+    query.set(`context.${key}`, value);
+  }
+
+  query.sort();
+  return query.toString();
+}
+
 export function useTransientLinkBuilder() {
   const context = useTransientContext();
 
@@ -21,21 +31,14 @@ export function useTransientLinkBuilder() {
     }
 
     if (isString(to)) {
-      const { url, query } = queryString.parseUrl(to);
+      const [withoutHash] = to.split('#');
+      const queryStart = withoutHash.indexOf('?');
+      const url = queryStart < 0 ? withoutHash : withoutHash.substring(0, queryStart);
+      const search = queryStart < 0 ? '' : withoutHash.substring(queryStart);
 
-      for (const [key, value] of Object.entries(context)) {
-        query[`context.${key}`] = value;
-      }
-
-      return queryString.stringifyUrl({ url, query });
+      return `${url}?${withContext(search, context)}`;
     } else if (to.search) {
-      const query = queryString.parse(to.search);
-
-      for (const [key, value] of Object.entries(context)) {
-        query[`context.${key}`] = value;
-      }
-
-      return { ...to, search: `?${queryString.stringify(query)}` };
+      return { ...to, search: `?${withContext(to.search, context)}` };
     }
 
     return to;

@@ -17,6 +17,7 @@
  * built-in group.
  */
 
+import { randomUUID } from 'crypto';
 import { CanActivate, ExecutionContext, ForbiddenException, HttpStatus } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -25,7 +26,6 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import * as request from 'supertest';
 import { DataSource } from 'typeorm';
-import * as uuid from 'uuid';
 import { AppModule } from '../../app.module';
 import { configureCookies, configureSession } from '../../config';
 import { AuthService, GithubAuthGuard, GoogleAuthGuard, MicrosoftAuthGuard, OAuthAuthGuard } from '../../domain/auth';
@@ -64,16 +64,16 @@ async function seedForbiddenUser(dataSource: DataSource): Promise<{ email: strin
 
   // A completely custom group that is NOT a built-in system group.
   const externalGroup = userGroupRepo.create({
-    id: uuid.v4(),
+    id: randomUUID(),
     name: 'external-only',
     isAdmin: false,
     isBuiltIn: false,
   });
   await userGroupRepo.save(externalGroup);
 
-  const email = `forbidden-${uuid.v4()}@example.com`;
+  const email = `forbidden-${randomUUID()}@example.com`;
   const forbiddenUser = userRepo.create({
-    id: uuid.v4(),
+    id: randomUUID(),
     name: 'Forbidden User',
     email,
     passwordHash: await hashPassword(PASSWORD),
@@ -97,9 +97,9 @@ async function seedAllowedUser(dataSource: DataSource): Promise<{ email: string;
   });
   await userGroupRepo.save(defaultGroup);
 
-  const email = `allowed-${uuid.v4()}@example.com`;
+  const email = `allowed-${randomUUID()}@example.com`;
   const allowedUser = userRepo.create({
-    id: uuid.v4(),
+    id: randomUUID(),
     name: 'Allowed User',
     email,
     passwordHash: await hashPassword(PASSWORD),
@@ -143,7 +143,7 @@ class AllowedOAuthGuardStub implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Record<string, unknown>>();
     req.user = {
-      id: `oauth-allowed-${uuid.v4()}`,
+      id: `oauth-allowed-${randomUUID()}`,
       email: `oauth-allowed@example.com`,
       name: 'OAuth Allowed',
       userGroupIds: [],
@@ -161,7 +161,7 @@ class BuiltInGroupOAuthGuardStub implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Record<string, unknown>>();
     req.user = {
-      id: `oauth-builtin-${uuid.v4()}`,
+      id: `oauth-builtin-${randomUUID()}`,
       email: `oauth-builtin@example.com`,
       name: 'OAuth BuiltIn',
       userGroupIds: [BUILTIN_USER_GROUP_DEFAULT],
@@ -187,12 +187,12 @@ async function seedExistingUser(
   await userGroupRepo.save([adminGroup, defaultGroup]);
 
   // A non-built-in group the user starts with (will be overwritten by IdP groups).
-  const externalGroupName = `external-${uuid.v4()}`;
-  const externalGroup = userGroupRepo.create({ id: uuid.v4(), name: externalGroupName, isAdmin: false, isBuiltIn: false });
+  const externalGroupName = `external-${randomUUID()}`;
+  const externalGroup = userGroupRepo.create({ id: randomUUID(), name: externalGroupName, isAdmin: false, isBuiltIn: false });
   await userGroupRepo.save(externalGroup);
 
-  const id = uuid.v4();
-  const email = `existing-${uuid.v4()}@example.com`;
+  const id = randomUUID();
+  const email = `existing-${randomUUID()}@example.com`;
   const user = userRepo.create({
     id,
     name: 'Existing User',
@@ -215,8 +215,8 @@ async function seedOAuthForbiddenUser(dataSource: DataSource): Promise<void> {
   const userRepo = dataSource.getRepository(UserEntity);
 
   const externalGroup = userGroupRepo.create({
-    id: uuid.v4(),
-    name: `oauth-external-${uuid.v4()}`,
+    id: randomUUID(),
+    name: `oauth-external-${randomUUID()}`,
     isAdmin: false,
     isBuiltIn: false,
   });

@@ -1,8 +1,8 @@
+import { randomUUID } from 'crypto';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { generateText } from 'ai';
-import * as uuid from 'uuid';
 import { z } from 'zod';
 import { AuthService } from 'src/domain/auth';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
@@ -127,7 +127,7 @@ class InternalTool extends NamedStructuredTool {
         throw new Error('No image file received from Google');
       }
 
-      const id = uuid.v4();
+      const id = randomUUID();
       const mimeType = file.mediaType || 'image/png';
       const imageBuffer = Buffer.from(file.uint8Array);
       const extension = mimeType.split('/')[1] || 'png';

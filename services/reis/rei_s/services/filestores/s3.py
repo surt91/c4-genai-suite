@@ -1,20 +1,23 @@
 from threading import Lock
+from typing import TYPE_CHECKING
 
 import boto3
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
-from mypy_boto3_s3 import S3Client
 
 from rei_s.config import Config
 from rei_s.services.filestore_adapter import FileStoreAdapter
 from rei_s.types.source_file import SourceFile
+
+if TYPE_CHECKING:
+    from mypy_boto3_s3 import S3Client
 
 
 lock = Lock()
 
 
 class S3FileStoreAdapter(FileStoreAdapter):
-    client: S3Client
+    client: "S3Client"
     bucket_name: str
 
     def add_document(self, document: SourceFile) -> None:

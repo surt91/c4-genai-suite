@@ -14,7 +14,6 @@ dependencies = [
     "python-dotenv>=1.2.4,<2",
     "pydantic>=2.14.1,<3",
     "loguru>=0.7.3,<0.8",
-    "pypdf>=6.21.2,<7",
     "deepeval>=4.3.1,<5",
     "langchain-openai>=1.7.2,<2",
     "pyyaml>=6.0.3,<7",
@@ -26,15 +25,11 @@ dependencies = [
     "httpx>=0.28.1,<0.29",
     "fastapi[standard]>=0.136.3,<0.137",
     "langchain-core>=1.7.0,<2",
-    "email-validator>=2.3.0,<3",
     "cryptography>=50.0.2,<51",
-    "pyjwt>=2.15.1,<3",
     "openpyxl>=3.1.5,<4",
-    "celery[redis]>=5.6.3,<6",
+    "celery>=5.6.3,<6",
     "pydantic-settings>=2.16.1,<3",
-    "rapidfuzz>=3.14.6,<4",
     "boto3>=1.35.0,<2",
-    "boto3-stubs[s3]>=1.35.0,<2",
     "python-multipart>=0.0.32,<1",
     "pandas>=3.1.0,<4",
 ]
@@ -48,16 +43,15 @@ generate-api-spec = "generate_openapi:generate"
 # llm_eval/qa_catalog/generator/implementation/ragas/ but won't be
 # importable until ragas is re-added here once upstream fixes land.
 # To re-enable: add '"ragas>=0.3.0,<0.4"' back to [dependencies] or
-# [project.optional-dependencies] and run 'uv lock'.
+# [project.optional-dependencies] and run 'uv lock'. Its document loader
+# (llm_eval/utils/mixed_document_loader.py) additionally needs
+# '"langchain-community"' and '"pypdf>=6.21.2,<7"'.
 
 [dependency-groups]
 dev = [
+    "boto3-stubs[s3]>=1.35.0,<2",
     "psycopg2-binary>=2.9.13,<3",
-    "pre-commit>=4.7.0,<5",
     "ruff>=0.17.2,<0.18",
-    "debugpy>=1.8.22,<2",
-    "black>=26.10.1,<27",
-    "flower>=2.2.0,<3",
 ]
 test = [
     "pytest>=9.1.1,<10",

@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'util';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -14,7 +15,6 @@ import {
 import { JsonSchemaObject, jsonSchemaToZod } from '@n8n/json-schema-to-zod';
 import type { JsonSchema } from '@n8n/json-schema-to-zod/dist/types/types';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { diff } from 'json-diff-ts';
 import { renderString } from 'nunjucks';
 import { z } from 'zod';
 import {
@@ -303,7 +303,9 @@ export class MCPToolsExtension implements Extension<Configuration> {
   }
 
   toolsChanged(before: ListToolsResult['tools'], after: ListToolsResult['tools']) {
-    return diff(before, after);
+    // Compare the JSON representation, since `before` was persisted as JSON (e.g. without undefined properties).
+    const toJson = (value: unknown): unknown => JSON.parse(JSON.stringify(value ?? null));
+    return !isDeepStrictEqual(toJson(before), toJson(after));
   }
 
   async buildSpec(
@@ -323,8 +325,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
         this.resetUnmodifiedDescriptionNames(values.schema, tools);
         if (state.tools) {
           this.resetUnmodifiedDescriptionNames(values.schema, state.tools);
-          const changes = this.toolsChanged(state.tools, tools);
-          state.changed = changes.length > 0;
+          state.changed = this.toolsChanged(state.tools, tools);
         }
 
         state.tools = tools;

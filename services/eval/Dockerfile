@@ -16,8 +16,8 @@ ENV UV_COMPILE_BYTECODE=1 \
 # Copy dependency files first for caching
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies (no dev, no project itself yet)
-RUN uv sync --frozen --no-install-project --no-dev
+# Install dependencies (no dev/test groups, no project itself yet)
+RUN uv sync --frozen --no-install-project --no-default-groups
 
 #
 # RUNTIME

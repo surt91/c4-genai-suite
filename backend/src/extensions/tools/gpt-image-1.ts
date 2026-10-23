@@ -1,7 +1,7 @@
+import { randomUUID } from 'crypto';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import OpenAI from 'openai';
-import * as uuid from 'uuid';
 import { z } from 'zod';
 import { AuthService } from 'src/domain/auth';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from 'src/domain/chat';
@@ -121,7 +121,7 @@ class InternalTool extends NamedStructuredTool {
         throw new Error('No image data received from OpenAI');
       }
 
-      const id = uuid.v4();
+      const id = randomUUID();
       const contentType = response.output_format || 'png';
       let imageBuffer: Buffer;
       let fileName;

@@ -1,9 +1,12 @@
 import * as path from 'path';
-import { config as dotenvConfig } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { initSchemaIfNotExistsAndMoveMigrations, schema } from '../domain/database/typeorm.helper';
 
-dotenvConfig();
+try {
+  process.loadEnvFile();
+} catch {
+  // no .env file, use the environment as is
+}
 
 const url = process.env.DB_URL as string;
 

@@ -7,10 +7,10 @@ from langchain_core.documents.base import Blob
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.parsers.audio import AzureOpenAIWhisperParser
 import openai
-import ffmpeg
 
 from rei_s import logger
 from rei_s.config import Config
+from rei_s.services.formats import ffmpeg_utils
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
 from rei_s.services.formats.utils import (
     ProcessingError,
@@ -63,7 +63,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
     # Output options for reencoding to vorbis. A fixed bitrate (e.g. 128k) is rejected by libvorbis for many
     # sample rate / channel combinations (e.g. 16 kHz mono), so we use quality-based VBR instead. Downmixing to
     # mono is sufficient for speech recognition and keeps the segments small.
-    reencode_output_kwargs: dict[str, Any] = {"acodec": "libvorbis", "q:a": 4, "ac": 1}
+    reencode_output_args: list[str] = ["-acodec", "libvorbis", "-q:a", "4", "-ac", "1"]
 
     parser: AzureOpenAIWhisperParser | None
 
@@ -112,13 +112,14 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
         return False
 
     @staticmethod
-    def build_ffmpeg_error_message(e: ffmpeg.Error) -> str:
-        return f"Error handling audio file for voice transcription\n\nffmpeg stderr:\n{e.stderr}"
+    def build_ffmpeg_error_message(e: ffmpeg_utils.FfmpegError) -> str:
+        stderr = e.stderr.decode(errors="replace")
+        return f"Error handling audio file for voice transcription\n\nffmpeg stderr:\n{stderr}"
 
     def probe_audio_codec(self, input_video_file: str | Path) -> MediaMetadata:
         try:
-            metadata = ffmpeg.probe(input_video_file, loglevel="warning")
-        except ffmpeg.Error as e:
+            metadata = ffmpeg_utils.probe(input_video_file)
+        except ffmpeg_utils.FfmpegError as e:
             message = self.build_ffmpeg_error_message(e)
             logger.error(message)
             raise ProcessingError(message, 400) from e
@@ -148,10 +149,10 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
         if audio_codec in self.supported_audio_codecs and not force_reencode:
             logger.info(f"segment audio of length {duration} s")
-            output_kwargs: dict[str, Any] = {"c": "copy"}
+            output_args = ["-c", "copy"]
         else:
             logger.info(f"segment and reencode audio of length {duration} s")
-            output_kwargs = self.reencode_output_kwargs
+            output_args = self.reencode_output_args
             audio_codec = "vorbis"
 
         segments_files: list[SourceFile] = []
@@ -161,12 +162,13 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
 
             segment_file = SourceFile.new_temporary_file(extension=self.audio_codecs_to_file_extension[audio_codec])
             try:
-                _out, _err = (
-                    ffmpeg.input(input_path, ss=start_time, t=segment_duration_seconds)
-                    .output(segment_file.path, y=None, **output_kwargs)
-                    .run(capture_stdout=True, capture_stderr=True)
+                ffmpeg_utils.convert(
+                    input_path,
+                    segment_file.path,
+                    output_args,
+                    input_args=["-ss", str(start_time), "-t", str(segment_duration_seconds)],
                 )
-            except ffmpeg.Error as e:  # pragma: no cover
+            except ffmpeg_utils.FfmpegError as e:  # pragma: no cover
                 message = self.build_ffmpeg_error_message(e)
                 logger.error(message)
                 raise ProcessingError(message, 400) from e

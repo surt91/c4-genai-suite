@@ -1,4 +1,3 @@
-import Cookies from 'universal-cookie';
 import { create } from 'zustand';
 
 import { Configuration, Middleware } from 'src/api/generated-eval';
@@ -24,9 +23,8 @@ const createEvalClientMiddleware: (navigate: TransientNavigateFn) => Middleware 
   post: async (context) => {
     if (context.response?.status === 401) {
       const secure = window.location.protocol === 'https:';
-      const sameSite = secure ? 'none' : 'strict';
-      const cookies = new Cookies(null, { path: '/', secure, sameSite });
-      cookies.set('post-login-redirect', window.location.pathname);
+      const sameSite = secure ? 'None' : 'Strict';
+      document.cookie = `post-login-redirect=${encodeURIComponent(window.location.pathname)}; path=/; SameSite=${sameSite}${secure ? '; Secure' : ''}`;
       navigate('/login');
     }
     return Promise.resolve();

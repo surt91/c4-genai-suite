@@ -1,3 +1,4 @@
+import { setTimeout as delay } from 'timers/promises';
 import {
   AgentsClient,
   isOutputOfType,
@@ -5,7 +6,6 @@ import {
   MessageTextUrlCitationAnnotation,
   ToolUtility,
 } from '@azure/ai-agents';
-import { delay } from '@azure/core-util';
 import { ClientSecretCredential } from '@azure/identity';
 import { Logger } from '@nestjs/common';
 import { z } from 'zod';

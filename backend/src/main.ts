@@ -2,7 +2,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 import { configureCookies, configureLogger, configureSession, configureSwagger } from './config';
 import { PrometheusModule } from './metrics/prometheus.module';
@@ -16,8 +15,8 @@ async function bootstrap() {
   configureSwagger(app);
 
   app.useGlobalPipes(new ValidationPipe());
-  app.use(bodyParser.json({ limit: '50mb' }));
-  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+  app.useBodyParser('json', { limit: '50mb' });
+  app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
 
   const config = app.get(ConfigService);
 

@@ -1,6 +1,6 @@
+import { randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as uuid from 'uuid';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserGroupEntity, UserGroupRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
@@ -32,7 +32,7 @@ export class CreateUserGroupHandler implements ICommandHandler<CreateUserGroup, 
     const { values, performedBy } = request;
     const { monthlyTokens, monthlyUserTokens, name } = values;
 
-    const entity = this.userGroups.create({ id: uuid.v4() });
+    const entity = this.userGroups.create({ id: randomUUID() });
 
     // Assign the object manually to avoid updating unexpected values.
     assignDefined(entity, { monthlyTokens, monthlyUserTokens, name });

@@ -1,7 +1,7 @@
+import { randomUUID } from 'crypto';
 import { BadRequestException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as uuid from 'uuid';
 import {
   BlobCategory,
   BlobEntity,
@@ -89,7 +89,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
     }
 
     await this.blob.save({
-      id: uuid.v4(),
+      id: randomUUID(),
       fileId: created.id,
       userId: user?.id,
       type: mimeType,
@@ -231,7 +231,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
         });
         await this.blob.delete({ fileId: entity.id });
         await this.blob.save({
-          id: uuid.v4(),
+          id: randomUUID(),
           fileId: entity.id,
           userId: user?.id,
           type: 'application/reis+processed',

@@ -1,8 +1,7 @@
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import * as uuid from 'uuid';
 import { AuditLogService, PerformedBy } from 'src/domain/audit-log';
 import { UserEntity, UserGroupEntity, UserRepository } from 'src/domain/database';
 import { assignDefined } from 'src/lib';
@@ -34,7 +33,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, CreateUser
     const { values, performedBy } = request;
     const { apiKey, email, name, password, userGroupIds } = values;
 
-    const entity = this.users.create({ id: uuid.v4() });
+    const entity = this.users.create({ id: randomUUID() });
 
     if (password) {
       entity.passwordHash = await bcrypt.hash(password, 10);

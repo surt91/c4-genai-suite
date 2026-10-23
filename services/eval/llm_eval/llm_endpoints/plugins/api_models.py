@@ -11,16 +11,13 @@ from llm_eval.llm_endpoints.plugins.impl.openai import (
 )
 
 type LLMEndpointConfigurationRead = (
-    AzureOpenAILLMEndpointConfigurationRead
-    | OpenAILLMEndpointConfigurationRead
+    AzureOpenAILLMEndpointConfigurationRead | OpenAILLMEndpointConfigurationRead
 )
 
 type LLMEndpointConfigurationCreate = (
-    AzureOpenAILLMEndpointConfigurationCreate
-    | OpenAILLMEndpointConfigurationCreate
+    AzureOpenAILLMEndpointConfigurationCreate | OpenAILLMEndpointConfigurationCreate
 )
 
 type LLMEndpointConfigurationUpdate = (
-    AzureOpenAILLMEndpointConfigurationUpdate
-    | OpenAILLMEndpointConfigurationUpdate
+    AzureOpenAILLMEndpointConfigurationUpdate | OpenAILLMEndpointConfigurationUpdate
 )

@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { globSync } from 'glob';
+import { globSync, readFileSync, writeFileSync } from 'fs';
 import { EOL } from "node:os";
 
 const main = async () => {

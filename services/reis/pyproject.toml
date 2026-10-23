@@ -24,36 +24,32 @@ dependencies = [
     "azure-identity==1.26.0",
     "pdfminer-six>=20260107",
     "pypdf>=6.21.2",
-    "ffmpeg-python>=0.2.0",
     "python-oxmsg>=0.0.2",
-    "aiofiles>=25.1.0",
     "prometheus-fastapi-instrumentator>=8.1.0",
-    "fastmcp>=3.4.4,<4",
     "mcp>=1.30.0,<2",
     "boto3>=1.43.118",
-    "boto3-stubs[s3]>=1.43.118",
     "weasyprint>=70.0",
     "markdown>=3.11.2",
     "pygments>=2.21.0",
     "orjson>=3.13.0",
     "pyyaml>=6.0.3",
     "tenacity>=9.2.1",
+    "anyio>=4.15.1",
 ]
 
 [dependency-groups]
 dev = [
     "ruff==0.17.2",
     "ty==0.0.57",
-    "pip==26.2.2",
     "pre-commit==4.7.0",
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
     "pytest-mock==3.17.0",
     "pytest-responses==0.6.0",
-    "pytest-github-report==0.0.1",
     "pytest-error-for-skips==2.0.2",
     "faker==40.43.0",
     "responses==0.26.3",
+    "boto3-stubs[s3]==1.43.118",
 ]
 
 [project.scripts]

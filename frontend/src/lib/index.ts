@@ -14,7 +14,7 @@ export function isString(value: unknown): value is string {
   return typeof value === 'string' || value instanceof String;
 }
 
-export function isArray<T>(value: unknown): value is T[] {
+function isArray<T>(value: unknown): value is T[] {
   return Array.isArray(value);
 }
 

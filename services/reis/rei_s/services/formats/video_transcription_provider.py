@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import Any
 
 from langchain_core.documents import Document
-import ffmpeg
 
 from rei_s import logger
 from rei_s.config import Config
+from rei_s.services.formats import ffmpeg_utils
 from rei_s.services.formats.utils import ProcessingError, generate_pdf_from_md_file
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
 from rei_s.types.source_file import SourceFile, temp_file
@@ -35,10 +35,10 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
         super().__init__(config=config, chunk_size=chunk_size, chunk_overlap=chunk_overlap, **kwargs)
 
     @staticmethod
-    def build_ffmpeg_error_message(e: ffmpeg.Error) -> str:
+    def build_ffmpeg_error_message(e: ffmpeg_utils.FfmpegError) -> str:
         return (
             "Error extracting audio track from video file for voice transcription with ffmpeg\n\n"
-            f"ffmpeg stderr:\n{e.stderr}"
+            f"ffmpeg stderr:\n{e.stderr.decode(errors='replace')}"
         )
 
     def extract_audio_to_file(self, input_video_path: str | Path) -> SourceFile:
@@ -47,20 +47,16 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
 
         if audio_codec in self.supported_audio_codecs:
             logger.info(f"extract audiotrack ({audio_codec}) from video")
-            output_kwargs: dict[str, Any] = {"acodec": "copy"}
+            output_args = ["-acodec", "copy"]
         else:
             logger.info(f"transcode audiotrack ({audio_codec}) to ogg")
-            output_kwargs = self.reencode_output_kwargs
+            output_args = self.reencode_output_args
             audio_codec = "vorbis"
 
         audio_only_file = SourceFile.new_temporary_file(extension=self.audio_codecs_to_file_extension[audio_codec])
         try:
-            _out, _err = (
-                ffmpeg.input(input_video_path)
-                .output(audio_only_file.path, y=None, vn=None, **output_kwargs)
-                .run(capture_stdout=True, capture_stderr=True)
-            )
-        except ffmpeg.Error as e:  # pragma: no cover
+            ffmpeg_utils.convert(input_video_path, audio_only_file.path, ["-vn", *output_args])
+        except ffmpeg_utils.FfmpegError as e:  # pragma: no cover
             message = self.build_ffmpeg_error_message(e)
             logger.error(message)
             raise ProcessingError(message, 400) from e

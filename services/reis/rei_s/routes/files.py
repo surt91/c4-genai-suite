@@ -2,9 +2,9 @@ import re
 from typing import Annotated, List, Optional
 from asyncio import wrap_future
 import uuid
-import aiofiles
 from urllib.parse import unquote
 
+import anyio
 from fastapi import APIRouter, Depends, Request, Header, Response, HTTPException
 from fastapi.params import Query
 
@@ -177,7 +177,7 @@ async def post_files(
         raise ValueError("content_type is not defined")
 
     dest_path = get_new_file_path(file_id)
-    async with aiofiles.open(dest_path, "wb") as temp_file:
+    async with await anyio.open_file(dest_path, "wb") as temp_file:
         async for chunk in request.stream():
             await temp_file.write(chunk)
 
@@ -232,7 +232,7 @@ async def post_files_only_processing(
     file_id = str(uuid.uuid4())
 
     dest_path = get_new_file_path(file_id)
-    async with aiofiles.open(dest_path, "wb") as temp_file:
+    async with await anyio.open_file(dest_path, "wb") as temp_file:
         async for chunk in request.stream():
             await temp_file.write(chunk)
 

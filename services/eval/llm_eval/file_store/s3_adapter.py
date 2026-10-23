@@ -1,11 +1,14 @@
 from threading import Lock
+from typing import TYPE_CHECKING
 
 import boto3
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
-from mypy_boto3_s3 import S3Client
 
 from llm_eval.file_store.filestore_adapter import FileStoreAdapter
+
+if TYPE_CHECKING:
+    from mypy_boto3_s3 import S3Client
 
 lock = Lock()
 
@@ -13,7 +16,7 @@ lock = Lock()
 class S3FileStoreAdapter(FileStoreAdapter):
     """S3-based file store adapter for reading files from S3."""
 
-    client: S3Client
+    client: "S3Client"
     bucket_name: str
 
     async def get(self, file_id: str) -> bytes:

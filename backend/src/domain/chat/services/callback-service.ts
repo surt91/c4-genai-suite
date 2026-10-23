@@ -1,5 +1,5 @@
+import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import * as uuid from 'uuid';
 import { ChatUICallbackResult, FormActionType } from '../interfaces';
 
 export type CallbackResult<T> = { id: string; result: Promise<T> };
@@ -46,7 +46,7 @@ export class CallbackService {
   }
 
   private request(timeout?: number) {
-    const requestId = uuid.v4();
+    const requestId = randomUUID();
     const result = new Result();
 
     this.results[requestId] = { result, created: this.getTime(), timeout };

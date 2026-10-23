@@ -1,11 +1,10 @@
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { ForbiddenException, Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { DeepPartial, FindOptionsWhere, In } from 'typeorm';
-import * as uuid from 'uuid';
 import {
   BUILTIN_USER_GROUP_ADMIN,
   BUILTIN_USER_GROUP_DEFAULT,
@@ -171,7 +170,7 @@ export class AuthService implements OnModuleInit {
       this.logger.log(`Created user with email '${email}'.`);
     } else {
       await this.users.save({
-        id: uuid.v4(),
+        id: randomUUID(),
         apiKey,
         email,
         name: email,
@@ -233,7 +232,7 @@ export class AuthService implements OnModuleInit {
       }
     } else {
       user = this.users.create({
-        id: uuid.v4(),
+        id: randomUUID(),
         email,
         name: 'Eval Service',
         apiKey: hashedKey,
