@@ -11,7 +11,7 @@ lock = Lock()
 
 
 class S3FileStoreAdapter(FileStoreAdapter):
-    """S3-based file store adapter for reading files from S3/MinIO."""
+    """S3-based file store adapter for reading files from S3."""
 
     client: S3Client
     bucket_name: str
@@ -65,7 +65,7 @@ class S3FileStoreAdapter(FileStoreAdapter):
         """Create an S3 file store adapter.
 
         Args:
-            endpoint_url: S3 endpoint URL (for MinIO or custom S3)
+            endpoint_url: S3 endpoint URL (for a custom S3 compatible store)
             access_key_id: AWS access key ID
             secret_access_key: AWS secret access key
             bucket_name: S3 bucket name

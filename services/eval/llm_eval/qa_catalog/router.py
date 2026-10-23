@@ -225,7 +225,7 @@ async def generate_from_gaible_bucket(
 ) -> QACatalogGenerationResult:
     """Generate a QA catalog from PDF files stored in a Gaible bucket.
 
-    This endpoint downloads PDF files from the configured S3/MinIO file store
+    This endpoint downloads PDF files from the configured S3 file store
     (same storage used by REIS) and generates a QA catalog from them.
 
     Args:
@@ -269,7 +269,7 @@ async def generate_from_gaible_bucket(
     os.makedirs(temp_source_location, exist_ok=True)
 
     try:
-        # Download files from S3/MinIO
+        # Download files from S3
         for file_id in request.file_ids:
             # Get file content from storage
             file_bytes = await file_store.get(str(file_id))

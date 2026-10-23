@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Docker** with Compose v2 – runs the whole stack and the infrastructure (Postgres/pgvector, MinIO).
+- **Docker** with Compose v2 – runs the whole stack and the infrastructure (Postgres/pgvector, S3Mock).
 - **Node.js** in the version from `.nvmrc` (we recommend `nvm install`).
 - **uv** (>= 0.5) for the Python services ([installation guide](https://docs.astral.sh/uv/getting-started/installation/)); uv manages the Python version itself.
 - **JRE** – only needed when changing APIs, to run the OpenAPI generator.
@@ -25,7 +25,7 @@ See the [README](README.md#using-docker-compose) for the optional profiles (`oll
 Start only the infrastructure from the same Compose file and run the component you are working on natively:
 
 ```bash
-docker compose up -d postgres minio reis
+docker compose up -d postgres s3 reis
 
 cd backend && cp .env.example .env && npm run start:dev    # http://localhost:3000
 cd frontend && cp .env.example .env && npm run dev         # http://localhost:5173 (proxies to the backend)
@@ -40,7 +40,7 @@ The `.env.example` files contain working defaults for this setup.
 | ---------- | ------------------------------------------------------ | ---------------------------- |
 | frontend   | `npm test`                                             | –                            |
 | backend    | `npm test`                                             | Postgres (`DB_URL`)          |
-| REI-S      | `uv run pytest`                                        | Postgres + MinIO for some tests |
+| REI-S      | `uv run pytest`                                        | Postgres + S3 (S3Mock) for some tests |
 | eval       | `uv run pytest`                                        | Postgres                     |
 | e2e        | `npx playwright test`                                  | running stack (see below)    |
 

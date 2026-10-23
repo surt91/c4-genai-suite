@@ -23,7 +23,7 @@ uv run pytest -rs
 
 Unit tests need `ffmpeg` and LibreOffice (`soffice`) on the host, but no credentials or network services.
 The tests in `tests/e2e` need a local postgres with pgvector (`STORE_PGVECTOR_URL`) and, for the S3 file store,
-an S3 compatible store like minio (`FILE_STORE_S3_ENDPOINT_URL`, `FILE_STORE_S3_ACCESS_KEY_ID`,
+an S3 compatible store like S3Mock or MinIO (`FILE_STORE_S3_ENDPOINT_URL`, `FILE_STORE_S3_ACCESS_KEY_ID`,
 `FILE_STORE_S3_SECRET_ACCESS_KEY`, `FILE_STORE_S3_BUCKET_NAME`). They are skipped if those environment variables are
 not set (CI runs with `--error-for-skips`, so they cannot be skipped silently there).
 
