@@ -17,7 +17,7 @@ export class OpenTelemetryModule implements OnApplicationBootstrap, OnApplicatio
     if (langfuse) {
       this.sdk = new NodeSDK({
         traceExporter: new LangfuseSpanExporter(langfuse),
-        // The only traces are the AI SDK spans (`experimental_telemetry` of `streamText`/`generateText`) and the Langfuse
+        // The only traces are the AI SDK spans (`telemetry` of `streamText`/`generateText`) and the Langfuse
         // exporter drops every span that does not come from the `ai` instrumentation scope. Spans of auto
         // instrumentations (http, express, pg, undici, ...) were never exported, so none are registered.
         instrumentations: [],

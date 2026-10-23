@@ -148,7 +148,7 @@ export class AzureOpenAIModelExtension implements Extension<AzureOpenAIModelExte
           openai: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
-                reasoningSummary: summary === 'off' ? undefined : summary || 'detailed',
+                reasoningSummary: summary === 'off' ? null : summary || 'detailed',
               }
             : {},
         },

@@ -1,6 +1,6 @@
 import { AzureOpenAIProvider, createAzure } from '@ai-sdk/azure';
 import { BadRequestException, Logger } from '@nestjs/common';
-import { experimental_transcribe as transcribe } from 'ai';
+import { transcribe } from 'ai';
 import { TranscribeExtensionConfiguration } from '../../../extensions/other/azure-transcribe.js';
 
 export class AzureTranscriptionProvider {

@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateText, stepCountIs, streamText, tool, ToolSet } from 'ai';
+import { generateText, isStepCount, streamText, TelemetryOptions, tool, ToolSet } from 'ai';
 import { I18nService } from '../../../localization/i18n.service.js';
 import { MetricsService } from '../../../metrics/metrics.service.js';
+import { aiSdkTelemetry } from '../../../metrics/opentelemetry.js';
 import { ChatContext, ChatError, ChatMiddleware, LanguageModelContext, NamedStructuredTool } from '../interfaces.js';
 
 // this is the general structure of how AI SDK wraps errors
@@ -58,33 +59,21 @@ export class ExecuteMiddleware implements ChatMiddleware {
     const messages = await history?.getMessages();
     const allTools = this.buildToolSet(tools);
 
-    const { fullStream } = streamText({
+    const { stream } = streamText({
       model: llm.model,
       tools: allTools,
       toolChoice: 'auto',
-      prompt: [
-        ...systemMessages.map((x) => ({ role: 'system' as const, content: x })),
-        ...(messages?.filter((x) => !!x) ?? []),
-        { role: 'user' as const, content: input },
-      ],
+      instructions: systemMessages.map((x) => ({ role: 'system' as const, content: x })),
+      prompt: [...(messages?.filter((x) => !!x) ?? []), { role: 'user' as const, content: input }],
       ...llm.options,
       abortSignal: abort.signal,
-      stopWhen: stepCountIs(1000),
-      experimental_telemetry: {
-        isEnabled: context.telemetry ?? false,
-        metadata: {
-          conversationId: context.conversationId,
-          assistantId: context.configuration.id,
-          assistantName: context.configuration.name,
-          modelName: llm.modelName,
-          providerName: llm.providerName,
-        },
-      },
+      stopWhen: isStepCount(1000),
+      ...telemetryOptions(context, llm),
     });
 
     let error: GenericAIError | null = null;
     const text: string[] = [];
-    for await (const event of untilAborted(fullStream, abort.signal)) {
+    for await (const event of untilAborted(stream, abort.signal)) {
       if (event.type === 'finish-step') {
         // Count the usage per step (instead of the total at the end), so the finished steps (e.g. tool calls) are
         // also counted when the answer is stopped. Otherwise stopping each answer just before its end would bypass the
@@ -147,24 +136,12 @@ export class ExecuteMiddleware implements ChatMiddleware {
         model: llm.model,
         tools: allTools,
         toolChoice: 'auto',
-        prompt: [
-          ...systemMessages.map((x) => ({ role: 'system' as const, content: x })),
-          ...(messages?.filter((x) => !!x) ?? []),
-          { role: 'user' as const, content: input },
-        ],
+        instructions: systemMessages.map((x) => ({ role: 'system' as const, content: x })),
+        prompt: [...(messages?.filter((x) => !!x) ?? []), { role: 'user' as const, content: input }],
         ...llm.options,
         abortSignal: abort.signal,
-        stopWhen: stepCountIs(1000),
-        experimental_telemetry: {
-          isEnabled: context.telemetry ?? false,
-          metadata: {
-            conversationId: context.conversationId,
-            assistantId: context.configuration.id,
-            assistantName: context.configuration.name,
-            modelName: llm.modelName,
-            providerName: llm.providerName,
-          },
-        },
+        stopWhen: isStepCount(1000),
+        ...telemetryOptions(context, llm),
       });
     } catch (err) {
       if (abort.signal.aborted) {
@@ -174,7 +151,7 @@ export class ExecuteMiddleware implements ChatMiddleware {
       throw err;
     }
 
-    addTokenUsage(context, llm, response.totalUsage?.totalTokens);
+    addTokenUsage(context, llm, response.usage?.totalTokens);
 
     if (response.finishReason === 'content-filter') {
       throw { code: 'content_filter' } as unknown;
@@ -196,8 +173,9 @@ export class ExecuteMiddleware implements ChatMiddleware {
     }
 
     // Emit reasoning if present
-    if (response.reasoningText && !llm.suppressReasoning) {
-      result.next({ type: 'reasoning', content: response.reasoningText });
+    const { reasoningText } = response.finalStep;
+    if (reasoningText && !llm.suppressReasoning) {
+      result.next({ type: 'reasoning', content: reasoningText });
       result.next({ type: 'reasoning_end' });
     }
 
@@ -227,6 +205,32 @@ export function toolErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error);
   const text = message || 'Unknown error';
   return text.length > 1000 ? `${text.slice(0, 1000)}…` : text;
+}
+
+/**
+ * The telemetry (Langfuse) of the chat. The metadata is passed as runtime context and exported as
+ * `ai.settings.context.*` span attributes (see LangfuseSpanExporter).
+ */
+function telemetryOptions(context: ChatContext, llm: LanguageModelContext) {
+  const runtimeContext = {
+    conversationId: context.conversationId,
+    assistantId: context.configuration.id,
+    assistantName: context.configuration.name,
+    modelName: llm.modelName,
+    providerName: llm.providerName,
+  };
+  const telemetry: TelemetryOptions<typeof runtimeContext> = {
+    isEnabled: context.telemetry ?? false,
+    integrations: aiSdkTelemetry,
+    includeRuntimeContext: {
+      conversationId: true,
+      assistantId: true,
+      assistantName: true,
+      modelName: true,
+      providerName: true,
+    },
+  };
+  return { runtimeContext, telemetry };
 }
 
 function addTokenUsage(context: ChatContext, llm: LanguageModelContext, totalTokens: number | undefined) {

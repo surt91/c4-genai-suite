@@ -140,7 +140,7 @@ export class OpenAIModelExtension implements Extension<OpenAIModelExtensionConfi
           openai: effort
             ? {
                 reasoningEffort: effort ? effort : undefined,
-                reasoningSummary: summary === 'off' ? undefined : summary || 'detailed',
+                reasoningSummary: summary === 'off' ? null : summary || 'detailed',
                 parallelToolCalls,
               }
             : {

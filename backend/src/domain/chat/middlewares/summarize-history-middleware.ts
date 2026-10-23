@@ -58,10 +58,8 @@ export class SummarizeHistoryMiddleware implements ChatMiddleware {
     try {
       const { text } = await generateText({
         model: llm.model,
-        prompt: [
-          { role: 'system' as const, content: historyPrompt },
-          { role: 'user' as const, content: userMessages.join(' ') },
-        ],
+        instructions: historyPrompt,
+        prompt: [{ role: 'user' as const, content: userMessages.join(' ') }],
         ...llm.options,
       });
 

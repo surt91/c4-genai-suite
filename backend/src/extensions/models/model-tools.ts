@@ -1,7 +1,7 @@
-import { LanguageModelV3 } from '@ai-sdk/provider';
+import { LanguageModelV4 } from '@ai-sdk/provider';
 import { extractReasoningMiddleware, wrapLanguageModel } from 'ai';
 
-export const wrapWithReasoningTagName = (model: LanguageModelV3, reasoningTagName?: string) =>
+export const wrapWithReasoningTagName = (model: LanguageModelV4, reasoningTagName?: string) =>
   reasoningTagName
     ? wrapLanguageModel({
         model,

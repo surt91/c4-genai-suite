@@ -2,7 +2,7 @@ import { GoogleGenAIModelExtension } from './google-genai.js';
 import { modelExtensionTestSuite } from './model-test.base.js';
 
 vi.mock('@ai-sdk/google', () => ({
-  createGoogleGenerativeAI: vi.fn(() => () => 'mocked model'),
+  createGoogle: vi.fn(() => () => 'mocked model'),
 }));
 vi.mock('ai', () => ({
   generateText: vi.fn(() => () => 'test output'),

@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createGoogle } from '@ai-sdk/google';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { generateText } from 'ai';
@@ -56,7 +56,7 @@ export class GeminiImageExtension implements Extension<GeminiImageExtensionConfi
   }
 
   async test({ apiKey, modelName }: GeminiImageExtensionConfiguration) {
-    const client = createGoogleGenerativeAI({ apiKey });
+    const client = createGoogle({ apiKey });
 
     await generateText({
       model: client(modelName),
@@ -105,7 +105,7 @@ class InternalTool extends NamedStructuredTool {
     try {
       const { apiKey, modelName, aspectRatio } = this.configuration;
 
-      const googleProvider = createGoogleGenerativeAI({
+      const googleProvider = createGoogle({
         apiKey,
       });
 

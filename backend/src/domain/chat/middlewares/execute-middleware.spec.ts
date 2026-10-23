@@ -1,10 +1,11 @@
-import { LanguageModelV3StreamPart } from '@ai-sdk/provider';
-import { MockLanguageModelV3 } from 'ai/test';
+import { LanguageModelV4StreamPart } from '@ai-sdk/provider';
+import { MockLanguageModelV4 } from 'ai/test';
 import { ReplaySubject } from 'rxjs';
 import type { Mocked } from 'vitest';
 import * as z from 'zod';
 import { I18nService } from '../../../localization/i18n.service.js';
 import { MetricsService } from '../../../metrics/metrics.service.js';
+import { aiSdkTelemetry } from '../../../metrics/opentelemetry.js';
 import { ChatContext, MessagesHistory, NamedDynamicStructuredTool, StreamEvent } from '../interfaces.js';
 import { ExecuteMiddleware, untilAborted } from './execute-middleware.js';
 
@@ -14,8 +15,8 @@ const usage = (total: number) => ({
 });
 
 /** A stream that emits the given parts and then stays open (like a slow LLM) until the request is aborted. */
-function openStream(parts: LanguageModelV3StreamPart[], signal?: AbortSignal) {
-  return new ReadableStream<LanguageModelV3StreamPart>({
+function openStream(parts: LanguageModelV4StreamPart[], signal?: AbortSignal) {
+  return new ReadableStream<LanguageModelV4StreamPart>({
     start(controller) {
       for (const part of parts) {
         controller.enqueue(part);
@@ -25,8 +26,8 @@ function openStream(parts: LanguageModelV3StreamPart[], signal?: AbortSignal) {
   });
 }
 
-function closedStream(parts: LanguageModelV3StreamPart[]) {
-  return new ReadableStream<LanguageModelV3StreamPart>({
+function closedStream(parts: LanguageModelV4StreamPart[]) {
+  return new ReadableStream<LanguageModelV4StreamPart>({
     start(controller) {
       parts.forEach((part) => controller.enqueue(part));
       controller.close();
@@ -34,7 +35,7 @@ function closedStream(parts: LanguageModelV3StreamPart[]) {
   });
 }
 
-function createContext(model: MockLanguageModelV3, tools: NamedDynamicStructuredTool<any, any, any>[] = []) {
+function createContext(model: MockLanguageModelV4, tools: NamedDynamicStructuredTool<any, any, any>[] = []) {
   const abort = new AbortController();
   const result = new ReplaySubject<StreamEvent>();
   const history = {
@@ -64,7 +65,7 @@ describe(ExecuteMiddleware.name, () => {
   const middleware = new ExecuteMiddleware(i18n, metrics);
 
   it('stores the complete answer', async () => {
-    const model = new MockLanguageModelV3({
+    const model = new MockLanguageModelV4({
       doStream: () =>
         Promise.resolve({
           stream: closedStream([
@@ -87,7 +88,7 @@ describe(ExecuteMiddleware.name, () => {
   it('stops the LLM request and stores the partial answer as stopped when aborted', async () => {
     let llmSignal: AbortSignal | undefined;
     let call = 0;
-    const model = new MockLanguageModelV3({
+    const model = new MockLanguageModelV4({
       doStream: ({ abortSignal }) => {
         llmSignal = abortSignal;
         call++;
@@ -137,7 +138,7 @@ describe(ExecuteMiddleware.name, () => {
   });
 
   it('stops immediately even if a tool does not react to the abort', async () => {
-    const model = new MockLanguageModelV3({
+    const model = new MockLanguageModelV4({
       doStream: () =>
         Promise.resolve({
           stream: closedStream([
@@ -167,8 +168,61 @@ describe(ExecuteMiddleware.name, () => {
     expect(history.addAIMessage).toHaveBeenCalledWith('', { stopped: true });
   });
 
+  it('sends the system messages as instructions', async () => {
+    const model = new MockLanguageModelV4({
+      doStream: () =>
+        Promise.resolve({
+          stream: closedStream([{ type: 'finish', finishReason: { unified: 'stop', raw: 'stop' }, usage: usage(2) }]),
+        }),
+    });
+    const { context } = createContext(model);
+    context.systemMessages = ['Be nice', 'Be brief'];
+
+    await middleware.invoke(context);
+
+    expect(model.doStreamCalls[0].prompt).toEqual([
+      { role: 'system', content: 'Be nice' },
+      { role: 'system', content: 'Be brief' },
+      { role: 'user', content: [{ type: 'text', text: 'Hello' }] },
+    ]);
+  });
+
+  it.each([true, false])('passes the telemetry metadata to the AI SDK telemetry if enabled (%s)', async (telemetry) => {
+    const onStart = vi.spyOn(aiSdkTelemetry, 'onStart');
+    const model = new MockLanguageModelV4({
+      doStream: () =>
+        Promise.resolve({
+          stream: closedStream([{ type: 'finish', finishReason: { unified: 'stop', raw: 'stop' }, usage: usage(2) }]),
+        }),
+    });
+    const { context } = createContext(model);
+    Object.assign(context, { telemetry, conversationId: 42 });
+
+    await middleware.invoke(context);
+    const calls = onStart.mock.calls;
+    onStart.mockRestore();
+
+    if (telemetry) {
+      expect(calls).toEqual([
+        [
+          expect.objectContaining({
+            runtimeContext: {
+              conversationId: 42,
+              assistantId: 1,
+              assistantName: 'Assistant',
+              modelName: 'mock-model',
+              providerName: 'mock-provider',
+            },
+          }),
+        ],
+      ]);
+    } else {
+      expect(calls).toEqual([]);
+    }
+  });
+
   it('does not store a message in non-streaming mode when aborted', async () => {
-    const model = new MockLanguageModelV3({
+    const model = new MockLanguageModelV4({
       doGenerate: ({ abortSignal }) =>
         new Promise((_, reject) => {
           abortSignal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));

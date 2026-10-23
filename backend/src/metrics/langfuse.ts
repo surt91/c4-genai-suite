@@ -24,10 +24,15 @@ export function getLangfuseConfig(configService: ConfigService): LangfuseConfig 
   return publicKey && secretKey ? { publicKey, secretKey, baseUrl } : undefined;
 }
 
-// instrumentation scope of the spans of the AI SDK (`experimental_telemetry`)
+// instrumentation scope of the spans of the AI SDK (`telemetry`, LegacyOpenTelemetry integration)
 const AI_SDK_SCOPE = 'ai';
 
-// trace-level attributes of the Langfuse OpenTelemetry ingestion, set from the `experimental_telemetry` metadata
+// The AI SDK exports the telemetry metadata (runtime context) as `ai.settings.context.*`, Langfuse reads the
+// metadata from `ai.telemetry.metadata.*` (the attributes of the former `experimental_telemetry.metadata`).
+const RUNTIME_CONTEXT_PREFIX = 'ai.settings.context.';
+const METADATA_PREFIX = 'ai.telemetry.metadata.';
+
+// trace-level attributes of the Langfuse OpenTelemetry ingestion, set from the telemetry metadata
 const TRACE_ATTRIBUTES: Record<string, string> = {
   'ai.telemetry.metadata.conversationId': 'langfuse.session.id',
 };
@@ -71,11 +76,21 @@ export class LangfuseSpanExporter implements SpanExporter {
 }
 
 function withTraceAttributes(span: ReadableSpan): ReadableSpan {
-  const extra = Object.fromEntries(
-    Object.entries(TRACE_ATTRIBUTES)
-      .filter(([source, target]) => span.attributes[source] != null && span.attributes[target] == null)
-      .map(([source, target]) => [target, String(span.attributes[source])]),
-  );
+  const metadata: ReadableSpan['attributes'] = {};
+  for (const [key, value] of Object.entries(span.attributes)) {
+    const metadataKey = METADATA_PREFIX + key.slice(RUNTIME_CONTEXT_PREFIX.length);
+    if (key.startsWith(RUNTIME_CONTEXT_PREFIX) && span.attributes[metadataKey] == null) {
+      metadata[metadataKey] = value;
+    }
+  }
+  const attributes = { ...span.attributes, ...metadata };
+  const extra: ReadableSpan['attributes'] = { ...metadata };
+  for (const [source, target] of Object.entries(TRACE_ATTRIBUTES)) {
+    const value = attributes[source];
+    if ((typeof value === 'string' || typeof value === 'number') && attributes[target] == null) {
+      extra[target] = String(value);
+    }
+  }
 
   if (Object.keys(extra).length === 0) {
     return span;

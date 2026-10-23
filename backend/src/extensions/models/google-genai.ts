@@ -1,4 +1,4 @@
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createGoogle } from '@ai-sdk/google';
 import { CallSettings, generateText } from 'ai';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext } from '../../domain/chat/index.js';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
@@ -102,7 +102,7 @@ export class GoogleGenAIModelExtension implements Extension<VertexAIModelExtensi
   private createModel(configuration: VertexAIModelExtensionConfiguration) {
     const { modelName, apiKey, temperature, topP, topK } = configuration;
 
-    const open = createGoogleGenerativeAI({
+    const open = createGoogle({
       apiKey,
       fetch: fetchWithDebugLogging(GoogleGenAIModelExtension.name),
     });

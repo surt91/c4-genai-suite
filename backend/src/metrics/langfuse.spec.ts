@@ -77,7 +77,7 @@ describe('Langfuse', () => {
       provider
         .getTracer('ai')
         .startSpan('ai.streamText', {
-          attributes: { 'ai.telemetry.metadata.conversationId': 42, 'ai.telemetry.metadata.assistantName': 'Bot' },
+          attributes: { 'ai.settings.context.conversationId': 42, 'ai.settings.context.assistantName': 'Bot' },
         })
         .end();
       await provider.forceFlush();
