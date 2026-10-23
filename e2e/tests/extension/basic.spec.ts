@@ -1,11 +1,9 @@
 import { expect } from '@playwright/test';
-import { config } from '../utils/config';
 import { test } from '../utils/fixtures';
 import {
   addBucketToConfiguration,
   addMockModelToConfiguration,
   addSystemPromptToConfiguration,
-  createBucketIfNotExist,
   createConfiguration,
   editBucket,
   enterAdminArea,
@@ -21,11 +19,11 @@ import {
   uploadFileWhileInChat,
 } from '../utils/helper';
 
-test('chat with file search', async ({ page, mockServerUrl }) => {
+test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
   const configuration = { name: uniqueName('E2E-Test'), description: '' };
   const bucket = { name: globalUserBucketName() };
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('should not add Configuration without required fields', async () => {
@@ -105,17 +103,11 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
     await expectElementInYRange(element, -200, 116);
   });
 
-  await test.step('should create bucket', async () => {
+  await test.step('should show the shared user bucket', async () => {
+    // there may only be one user bucket, it is shared by all tests and created in global.setup.ts
     await enterAdminArea(page);
-    await createBucketIfNotExist(
-      page,
-      {
-        name: bucket.name,
-        type: 'user',
-        endpoint: config.REIS_ENDPOINT,
-      },
-      true,
-    );
+    await page.getByRole('link', { name: 'Files' }).click();
+    await expect(page.getByRole('link', { name: bucket.name })).toBeVisible();
   });
 
   await test.step('should add bucket to Configuration', async () => {
@@ -212,7 +204,8 @@ test('chat with file search', async ({ page, mockServerUrl }) => {
   });
 
   await test.step('should preview the used sources', async () => {
-    await page.getByTestId('sources-section').locator('a').click();
+    // the sources of the last answer (earlier answers may have sources as well)
+    await page.getByTestId('sources-section').last().locator('a', { hasText: 'e2e-test.txt' }).first().click();
     await page.waitForSelector(`blockquote:has-text("gaible-test")`);
     await expectA11yCompliant(page);
   });

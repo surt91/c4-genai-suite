@@ -15,12 +15,12 @@ import {
   uniqueName,
 } from '../utils/helper';
 
-test('chat', async ({ page, mockServerUrl }) => {
+test('chat', async ({ page, mockServerUrl, adminUser }) => {
   const firstAssistant = { name: uniqueName('E2E-Test-A'), description: 'Bob' };
   const secondAssistant = { name: uniqueName('E2E-Test-B'), description: 'Alice' };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('should add two assistants', async () => {

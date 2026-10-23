@@ -1,34 +1,32 @@
 import { expect } from '@playwright/test';
-import { config } from '../utils/config';
 import { test } from '../utils/fixtures';
 import {
   addFilesInChatExtensionToConfiguration,
   addMockModelToConfiguration,
   addSystemPromptToConfiguration,
-  createBucketIfNotExist,
   createConfiguration,
   deleteFirstFileFromPaperclip,
   duplicateActiveConversation,
-  editBucket,
   enterAdminArea,
   enterUserArea,
   globalConversationBucketName,
   login,
   newChat,
+  openAssistant,
   selectConfiguration,
   sendMessage,
   uniqueName,
   uploadFileWithPaperclip,
 } from '../utils/helper';
 
-test('files in chat', async ({ page, mockServerUrl }) => {
+test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
   let originalConversationWithChatWithFiles: string | null;
   const conversationFilesBucket = globalConversationBucketName();
 
   const configuration = { name: '', description: '' };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('add assistant', async () => {
@@ -38,12 +36,7 @@ test('files in chat', async ({ page, mockServerUrl }) => {
     await createConfiguration(page, configuration);
     await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
     await addSystemPromptToConfiguration(page, configuration, { text: 'Your are a helpful assistant.' });
-    await createBucketIfNotExist(page, {
-      name: conversationFilesBucket,
-      type: 'conversation',
-      endpoint: config.REIS_ENDPOINT,
-    });
-    await editBucket(page, { name: conversationFilesBucket, fileSizeLimits: { general: 10 } });
+    // the conversation bucket is shared by all tests and created in global.setup.ts (with a general size limit of 10 MB)
   });
 
   await test.step('should add files in chat extension to Configuration', async () => {
@@ -53,8 +46,7 @@ test('files in chat', async ({ page, mockServerUrl }) => {
   });
 
   await test.step('should show current bucket value when editing extension', async () => {
-    await page.getByRole('link', { name: 'Assistants' }).click();
-    await page.getByRole('link', { name: configuration.name }).click();
+    await openAssistant(page, configuration.name);
     await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
     await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
 
@@ -211,8 +203,11 @@ test('files in chat', async ({ page, mockServerUrl }) => {
     const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
     await expect(duplicatedConversation).toBeVisible();
 
+    const originalUrl = page.url();
     await duplicatedConversation.click();
-    await page.waitForTimeout(1000);
+    // wait until the duplicated conversation (which still has the file) is loaded
+    await page.waitForURL((url) => url.href !== originalUrl);
+    await expect(page.getByTestId('file-chip')).toContainText('birthdays.pdf');
 
     await sendMessage(page, configuration, {
       message: 'Welche Geburtstage stehen in der Datei?',

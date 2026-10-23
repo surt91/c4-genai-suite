@@ -1,8 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../utils/fixtures';
 import {
   addVisionFileExtensionToConfiguration,
   checkSelectedConfiguration,
-  cleanup,
   clearMessages,
   createConfiguration,
   enterAdminArea,
@@ -10,19 +9,20 @@ import {
   goto,
   login,
   navigateToConfigurationAdministration,
+  navigateToThemeAdministration,
   newChat,
   selectConfiguration,
   sendMessage,
+  uniqueName,
 } from '../utils/helper';
 
-const assistantWithoutLlmName = 'Configuration without llm';
-const secondAssistant = 'Assistant';
-const thirdAssistant = 'Other Assistant';
+test('Chat', async ({ page, adminUser }) => {
+  const assistantWithoutLlmName = uniqueName('Configuration without llm');
+  const secondAssistant = uniqueName('Assistant');
+  const thirdAssistant = uniqueName('Other Assistant');
 
-test('Chat', async ({ page }) => {
   await test.step('should login', async () => {
-    await login(page);
-    await cleanup(page);
+    await login(page, adminUser);
   });
 
   await test.step('will navigate to configuration administration page', async () => {
@@ -42,9 +42,9 @@ test('Chat', async ({ page }) => {
   });
 
   await test.step('should upload avatar logo', async () => {
-    await page.getByRole('link', { name: 'Theme' }).click();
+    await navigateToThemeAdministration(page);
 
-    const parentElement = page.locator('.card').nth(1);
+    const parentElement = page.locator('.mantine-Card-root').nth(1);
     const fileInput = parentElement.locator('input');
     await fileInput.setInputFiles(__dirname + '/../utils/files/react.svg');
     const saveButton = parentElement.locator('button:has-text("Save")');
@@ -53,6 +53,7 @@ test('Chat', async ({ page }) => {
 
   await test.step('should show no-LLM-error', async () => {
     await enterUserArea(page);
+    await selectConfiguration(page, { name: assistantWithoutLlmName });
 
     const userMessage = `Hello`;
 
@@ -141,10 +142,10 @@ test('Chat', async ({ page }) => {
     await page.getByTestId('menu user').click();
     await page.waitForSelector('[role="menu"]');
     await page.getByRole('menuitem', { name: 'Chat' }).click();
-    const newUrl = page.url();
+    // should return to the same chat
+    await page.waitForURL(url);
 
     await checkSelectedConfiguration(page, { name: thirdAssistant });
-    expect(url).toBe(newUrl);
   });
 
   await test.step('return to last selected chat from admin page, via logo click', async () => {
@@ -154,10 +155,10 @@ test('Chat', async ({ page }) => {
     const url = page.url();
     await enterAdminArea(page);
     await page.getByTestId('logo-link').click();
-    const newUrl = page.url();
+    // should return to the same chat
+    await page.waitForURL(url);
 
     await checkSelectedConfiguration(page, { name: secondAssistant });
-    expect(url).toBe(newUrl);
   });
 
   await test.step('initial load of "" should open a new chat (with the last used assistant on this client?)', async () => {

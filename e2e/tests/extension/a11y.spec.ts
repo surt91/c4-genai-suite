@@ -1,8 +1,8 @@
-import { test } from '@playwright/test';
 import { config } from '../utils/config';
+import { test } from '../utils/fixtures';
 import { expectA11yCompliant, login } from '../utils/helper';
 
-test('accessibility', async ({ page }) => {
+test('accessibility', async ({ page, adminUser }) => {
   await test.step('login page accessible', async () => {
     await page.goto(`${config.URL}/login`);
     await page.getByRole('button', { name: 'Login' }).waitFor();
@@ -10,7 +10,7 @@ test('accessibility', async ({ page }) => {
   });
 
   await test.step('main page accessible', async () => {
-    await login(page);
+    await login(page, adminUser);
     await expectA11yCompliant(page);
   });
 });

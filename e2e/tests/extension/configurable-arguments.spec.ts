@@ -9,17 +9,18 @@ import {
   enterUserArea,
   login,
   newChat,
+  openAssistant,
   save,
   selectConfiguration,
   sendMessage,
   uniqueName,
 } from '../utils/helper';
 
-test('configurable arguments', async ({ page, mockServerUrl }) => {
+test('configurable arguments', async ({ page, mockServerUrl, adminUser }) => {
   const configuration = { name: '', description: '' };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('add assistant', async () => {
@@ -59,8 +60,7 @@ test('configurable arguments', async ({ page, mockServerUrl }) => {
 
   await test.step('verify configurable argument is listed on assistant page', async () => {
     await enterAdminArea(page);
-    await page.getByRole('link', { name: 'Assistants' }).click();
-    await page.getByRole('link').filter({ hasText: configuration.name }).click();
+    await openAssistant(page, configuration.name);
 
     await expect(page.getByText('Text', { exact: true })).toBeVisible();
   });

@@ -1,58 +1,51 @@
-import { faker } from '@faker-js/faker';
-import { expect, test } from '@playwright/test';
-import { createUserIfNotExists, enterAdminArea, login, navigateToUserAdministration } from '../utils/helper';
+import { BUILTIN_GROUP_DEFAULT, createUserViaApi } from '../utils/api';
+import { expect, test } from '../utils/fixtures';
+import { createUser, enterAdminArea, login, navigateToUserAdministration, searchUser, uniqueName } from '../utils/helper';
 
 test.describe('User management', () => {
-  const randomName = faker.person.fullName();
-  const randomEmail = faker.internet.email();
-  const randomNewName = faker.person.fullName();
-  const randomNewEmail = faker.internet.email();
-
-  test.beforeEach(async ({ page }) => {
-    await login(page);
+  test.beforeEach(async ({ page, adminUser }) => {
+    await login(page, adminUser);
     await enterAdminArea(page);
   });
 
   test('should create a user', async ({ page }) => {
+    const name = uniqueName('e2e-created-user');
     await navigateToUserAdministration(page);
-    await createUserIfNotExists(page, { email: randomEmail, name: randomName });
+    await createUser(page, { email: `${name}@example.com`, name });
   });
 
-  test('should edit the user details', async ({ page }) => {
+  test('should edit the user details', async ({ page, adminApi }) => {
+    // edit a user of our own, other tests use other users concurrently
+    const user = await createUserViaApi(adminApi, { userGroupIds: [BUILTIN_GROUP_DEFAULT] });
+    const newName = uniqueName('e2e-edited-user');
+    const newEmail = `${newName}@example.com`;
     await navigateToUserAdministration(page);
 
-    await page.locator('tr:nth-child(2) > td').first().click();
+    const row = await searchUser(page, user);
+    await row.locator('td').first().click();
     await page.getByLabel('Name').click();
-    await page.getByLabel('Name').fill(randomNewName);
+    await page.getByLabel('Name').fill(newName);
     await page.getByLabel('Email').click();
-    await page.getByLabel('Email').fill(randomNewEmail);
+    await page.getByLabel('Email').fill(newEmail);
     await page.getByRole('button', { name: 'Save' }).click();
 
-    const userName = await page.getByRole('cell', { name: randomNewName }).textContent();
-    const userEmail = await page.getByRole('cell', { name: randomNewEmail }).textContent();
-
-    expect(userName).toEqual(randomNewName);
-    expect(userEmail).toEqual(randomNewEmail);
+    await expect(page.getByRole('cell', { name: newName, exact: true })).toHaveText(newName);
+    await expect(page.getByRole('cell', { name: newEmail, exact: true })).toHaveText(newEmail);
   });
 
-  test('should delete a user', async ({ page }) => {
+  test('should delete a user', async ({ page, adminApi }) => {
+    const user = await createUserViaApi(adminApi, { userGroupIds: [BUILTIN_GROUP_DEFAULT] });
     await navigateToUserAdministration(page);
 
-    const adminCell = page.getByRole('cell', { name: 'Admin', exact: true });
-    await adminCell.last().waitFor();
-
-    const userToBeDeleted = await page.getByRole('table').getByRole('row').last().textContent();
-    expect(userToBeDeleted).toBeDefined();
-
-    await page.getByRole('table').getByRole('row').last().click();
+    const row = await searchUser(page, user);
+    await row.click();
     await page.getByRole('button', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Confirm' }).click();
 
     const updateUserModal = page.getByRole('heading', { name: 'Update User' });
     await updateUserModal.waitFor({ state: 'detached' });
 
-    const editedRows = page.getByRole('table').getByRole('row').filter({ hasText: userToBeDeleted! });
-    await expect(editedRows).toHaveCount(0);
+    await expect(page.getByRole('table').getByRole('row').filter({ hasText: user.email })).toHaveCount(0);
   });
 
   test('should set user group to default when creating a new user', async ({ page }) => {

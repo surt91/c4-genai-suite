@@ -1,5 +1,4 @@
 import { expect, Locator } from '@playwright/test';
-import { config } from '../utils/config';
 import { test } from '../utils/fixtures';
 import {
   addFilesInChatExtensionToConfiguration,
@@ -7,7 +6,6 @@ import {
   addSystemPromptToConfiguration,
   addVisionFileExtensionToConfiguration,
   addWholeFileExtensionToConfiguration,
-  createBucketIfNotExist,
   createConfiguration,
   deactivateFileInChatExtensionToConfiguration,
   deleteFirstFileFromPaperclip,
@@ -24,7 +22,7 @@ import {
   uploadFileWithPaperclip,
 } from '../utils/helper';
 
-test('whole file extension', async ({ page, mockServerUrl }) => {
+test('whole file extension', async ({ page, mockServerUrl, adminUser }) => {
   let lastMessageOriginal: Locator;
   let originalConversationName: string | null;
   const conversationFilesBucket = globalConversationBucketName();
@@ -32,7 +30,7 @@ test('whole file extension', async ({ page, mockServerUrl }) => {
   const configuration = { name: '', description: '' };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('add assistant', async () => {
@@ -51,11 +49,7 @@ test('whole file extension', async ({ page, mockServerUrl }) => {
   });
 
   await test.step('should add whole file extension to Assistant', async () => {
-    await createBucketIfNotExist(page, {
-      name: conversationFilesBucket,
-      type: 'conversation',
-      endpoint: config.REIS_ENDPOINT,
-    });
+    // the conversation bucket is shared by all tests and created in global.setup.ts
     await addWholeFileExtensionToConfiguration(page, configuration, {
       bucketName: conversationFilesBucket,
     });
@@ -128,17 +122,19 @@ test('whole file extension', async ({ page, mockServerUrl }) => {
 
   await test.step('change file size limit', async () => {
     await enterAdminArea(page);
-    await editBucket(page, { name: conversationFilesBucket, fileSizeLimits: { general: 0 } });
+    // The conversation bucket is shared with other tests running in parallel, which upload pdf files.
+    // So only reject txt files (which no other test uploads to this bucket) instead of all files.
+    await editBucket(page, { name: conversationFilesBucket, fileSizeLimits: { general: 10, txt: 0 } });
   });
 
   await test.step('should reject large file', async () => {
     await enterUserArea(page);
     await newChat(page);
     await selectConfiguration(page, configuration);
-    await uploadFileWithPaperclip(page, 'birthdays.pdf', true);
+    await uploadFileWithPaperclip(page, 'e2e-test.txt', true);
     await page
       .getByRole('alert')
-      .filter({ hasText: /^Failed to upload file. 'birthdays.pdf': The file is larger than allowed for this file type./ })
+      .filter({ hasText: /^Failed to upload file. 'e2e-test.txt': The file is larger than allowed for this file type./ })
       .click();
   });
 

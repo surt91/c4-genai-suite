@@ -29,7 +29,7 @@ type TUserArgs = {
   };
 };
 
-test('user args', async ({ page, mockServerUrl }) => {
+test('user args', async ({ page, mockServerUrl, adminUser }) => {
   const configuration = { name: '', description: '' };
   const filter = {
     string: 'Test-String',
@@ -41,7 +41,7 @@ test('user args', async ({ page, mockServerUrl }) => {
   };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('add assistant', async () => {

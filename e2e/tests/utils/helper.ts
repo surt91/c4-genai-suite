@@ -1,4 +1,4 @@
-import { randomInt } from 'crypto';
+import { randomUUID } from 'crypto';
 import path from 'path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, Locator, Page } from '@playwright/test';
@@ -9,8 +9,15 @@ export async function login(page: Page, user?: { email: string; password: string
   await page.getByPlaceholder('Email').fill(user?.email ?? 'admin@example.com');
   await page.getByPlaceholder('Password').fill(user?.password ?? 'secret');
   await page.getByRole('button', { name: 'Login' }).click();
-  await page.waitForURL(`${config.URL}/chat`);
+  await waitForConversation(page);
   await page.getByTestId('menu user').waitFor({ state: 'visible' });
+}
+
+// After login (or when entering the chat area) the app redirects from /chat to a new conversation /chat/<id>
+// asynchronously. Wait for it, otherwise the redirect could override a navigation the test started in the meantime.
+// (global.setup.ts makes sure there is an assistant, which is required for the redirect.)
+async function waitForConversation(page: Page) {
+  await page.waitForURL(/\/chat\/[^/]+$/);
 }
 
 export async function goto(page: Page, relativePath: `/${string}` | '') {
@@ -20,6 +27,7 @@ export async function goto(page: Page, relativePath: `/${string}` | '') {
 export async function enterAdminArea(page: Page) {
   await page.getByTestId('menu user').click();
   await page.getByRole('menuitem', { name: 'Admin' }).click();
+  await page.waitForURL(/\/admin/);
 }
 
 export async function logout(page: Page) {
@@ -38,6 +46,7 @@ export async function hasMenuItem(page: Page, item: { name: string }) {
 export async function enterUserArea(page: Page) {
   await page.getByTestId('menu user').click();
   await page.getByRole('menuitem', { name: 'Chat' }).click();
+  await waitForConversation(page);
   await page.getByRole('button', { name: 'New chat' }).waitFor({ state: 'visible' });
 }
 
@@ -49,10 +58,14 @@ export async function newChat(page: Page) {
 }
 
 export async function sendMessage(page: Page, configuration: { name: string }, content: { message: string }) {
+  const chatItems = page.getByTestId('chat-item');
+  const numberOfChatItems = await chatItems.count();
   await page.getByPlaceholder(`Message ${configuration.name}`).fill(content.message);
   await page.locator('form').getByRole('button').last().click();
-  // wait for the answer to arrive
-  await page.waitForLoadState('networkidle', { timeout: 30000 });
+  // wait until the answer is complete: there is a chat item for the question and the answer, and the UI does not show
+  // the AI as writing (the loading dot) anymore
+  await expect.poll(() => chatItems.count()).toBeGreaterThanOrEqual(numberOfChatItems + 2);
+  await expect(page.locator('.animate-loading-dot')).toHaveCount(0);
 }
 
 export async function save(page: Page, expectDetached = true) {
@@ -98,82 +111,12 @@ export async function deleteConfiguration(page: Page, configuration: { name: str
   await confirmButton.waitFor({ state: 'detached' });
 }
 
-async function deleteListItems(page: Page, filter: { label: string }) {
-  // wait until the list is rendered (otherwise count might be falsely 0)
-  await page.waitForLoadState('networkidle');
-  await page.isVisible(`h3:has-text("${filter.label}")`);
-
-  const entries = page.locator(`[aria-labelledby="${filter.label}"]`).getByRole('listitem').getByTestId('more-actions');
-  const count = await entries.count();
-
-  for (let i = 0; i < count; i++) {
-    const element = entries.nth(0);
-    await element.click();
-    await page.click('button:has-text("Delete")');
-    const confirmButton = page.locator('button:has-text("Confirm")');
-    await page.click('button:has-text("Confirm")');
-    await confirmButton.waitFor({ state: 'detached' });
-  }
-}
-
-async function deleteConfigurations(page: Page) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await deleteListItems(page, { label: 'Assistants' });
-}
-
-async function deleteBuckets(page: Page) {
-  await page.getByRole('link', { name: 'Files' }).click();
-  await deleteListItems(page, { label: 'Buckets' });
-}
-
-export async function cleanup(page: Page) {
-  await clearMessages(page);
-  await enterAdminArea(page);
-  await deleteConfigurations(page);
-  await deleteBuckets(page);
-  await enterUserArea(page);
-}
-
 export async function clearMessages(page: Page) {
   await page.getByTestId('menu user').click();
   await page.getByRole('menuitem', { name: 'Clear conversations' }).click();
   const confirm = page.getByRole('button', { name: 'Confirm deletion' });
   await confirm.click();
   await confirm.waitFor({ state: 'detached' });
-}
-
-export async function createBucketIfNotExist(
-  page: Page,
-  bucket: { name: string; indexName?: string; endpoint: string; type: 'user' | 'conversation' | 'general' },
-  performTest: boolean = false,
-) {
-  await page.getByRole('link', { name: 'Files' }).click();
-  await page.waitForTimeout(1000);
-  if ((await page.getByRole('link', { name: bucket.name }).count()) > 0) {
-    // Bucket already exists
-    return;
-  }
-
-  await page
-    .locator('*')
-    .filter({ hasText: /^Buckets$/ })
-    .getByRole('button')
-    .click();
-  await page.getByLabel(/^Name/).fill(bucket.name);
-  await page.getByLabel(/^Endpoint/).fill(bucket.endpoint);
-  await page.getByLabel(/^Index name/).fill(bucket.indexName ?? '');
-  await selectOption(page, 'Bucket Type', bucket.type);
-
-  if (performTest) {
-    await page.getByRole('button', { name: 'Test' }).click();
-    await page
-      .getByRole('alert')
-      .filter({ hasText: /^Bucket is valid./ })
-      .getByRole('button')
-      .click();
-  }
-
-  await save(page);
 }
 
 export async function deleteBucket(page: Page, bucket: { name: string }, ifExists = false) {
@@ -239,13 +182,22 @@ export async function editBucket(
   await save(page);
 }
 
+/**
+ * Opens the admin page of the assistant and waits until it is shown. Otherwise the next actions could still be
+ * performed on the previously shown page (e.g. "Add Extension" of another assistant).
+ */
+export async function openAssistant(page: Page, name: string | RegExp) {
+  await page.getByRole('link', { name: 'Assistants' }).click();
+  await page.getByRole('link').filter({ hasText: name }).click();
+  await expect(page.getByRole('heading', { level: 2, name, exact: typeof name === 'string' })).toBeVisible();
+}
+
 export async function addBucketToConfiguration(
   page: Page,
   configuration: { name: string },
   files: { bucketName: string; description: string },
 ) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link', { name: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files', exact: true }).click();
@@ -256,8 +208,7 @@ export async function addBucketToConfiguration(
 }
 
 export async function addUserArgsToConfiguration(page: Page, configuration: { name: string }) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page
@@ -273,8 +224,7 @@ export async function addMCPToConfiguration(
   configuration: { name: string },
   mcp: { name: string; endpoint: string },
 ) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page
@@ -300,8 +250,7 @@ export async function addMCPToConfiguration(
 }
 
 export async function disableUserArgsInConfiguration(page: Page, configuration: { name: string }) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'DEV: User Args', exact: true }).click();
   await page.getByRole('checkbox').uncheck();
@@ -314,8 +263,7 @@ export async function addWholeFileExtensionToConfiguration(
   configuration: { name: string },
   wholeFilesConfig: { bucketName: string },
 ) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Complete Files', exact: true }).click();
@@ -325,8 +273,7 @@ export async function addWholeFileExtensionToConfiguration(
 }
 
 export async function editWholeFileExtension(page: Page, configuration: { name: string }) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Complete Files', exact: true }).click();
 
@@ -350,8 +297,7 @@ export async function addImageToClipboard(page: Page) {
 
 export async function addVisionFileExtensionToConfiguration(page: Page, configuration: { name: string }, matchName?: RegExp) {
   const name = matchName ?? configuration.name;
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: name }).click();
+  await openAssistant(page, name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Files Vision', exact: true }).click();
@@ -364,8 +310,7 @@ export async function addFilesInChatExtensionToConfiguration(
   configuration: { name: string },
   filesInChatConfig: { bucketName: string },
 ) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByRole('button', { name: 'Add Extension' }).click();
   await page.getByLabel('Create Extension').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
@@ -376,8 +321,7 @@ export async function addFilesInChatExtensionToConfiguration(
 }
 
 export async function deactivateFileInChatExtensionToConfiguration(page: Page, configuration: { name: string }) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
   await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
   await page.getByRole('heading', { name: 'Search Files in Chat', exact: true }).click();
   await page
@@ -420,12 +364,11 @@ export async function addMockModelToConfiguration(
   configuration: { name: string },
   mockServer: { endpoint: string; modelName?: string },
 ) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
 
   await page.getByRole('button', { name: 'Add Extension' }).click();
 
-  await page.getByRole('heading', { name: 'OpenAI compatible' }).click();
+  await page.getByLabel('Create Extension').getByRole('heading', { name: 'OpenAI compatible' }).click();
 
   await page.getByLabel('API Key').fill('mock-api-key');
   await page.getByLabel('Endpoint').fill(mockServer.endpoint);
@@ -448,8 +391,7 @@ export async function addSystemPromptToConfiguration(
   configuration: { name: string },
   prompt: { title?: string; text: string; configurable?: boolean },
 ) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
 
   await page.getByRole('button', { name: 'Add Extension' }).click();
 
@@ -467,8 +409,7 @@ export async function addSystemPromptToConfiguration(
 }
 
 export async function addOllamaModelToConfiguration(page: Page, configuration: { name: string }, ollama: { model: string }) {
-  await page.getByRole('link', { name: 'Assistants' }).click();
-  await page.getByRole('link').filter({ hasText: configuration.name }).click();
+  await openAssistant(page, configuration.name);
 
   await page.getByRole('button', { name: 'Add Extension' }).click();
 
@@ -497,11 +438,17 @@ export async function checkSelectedConfiguration(page: Page, configuration: { na
 }
 
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
-  await page.getByTestId('chat-assistant-select').click();
+  const select = page.getByTestId('chat-assistant-select');
   const element = page.locator('p').getByText(configuration.name, { exact: true });
-  await expect(element).toBeVisible();
-  await element.click();
-  await page.waitForLoadState('networkidle');
+  // While a chat is loading, the app focuses the message input, which closes the dropdown again. So reopen it
+  // until the assistant could be clicked.
+  await expect(async () => {
+    if (!(await element.isVisible())) {
+      await select.click();
+    }
+    await element.click({ timeout: 2_000 });
+  }).toPass();
+  await expect(page.locator(`input[value="${configuration.name}"]`).first()).toBeVisible();
 }
 
 export async function navigateToUserAdministration(page: Page) {
@@ -522,28 +469,16 @@ export async function navigateToThemeAdministration(page: Page) {
   await page.waitForURL(`${config.URL}/admin/theme`);
 }
 
-export async function createUserIfNotExists(page: Page, user: { email: string; name: string; password?: string }) {
+export async function createUser(page: Page, user: { email: string; name: string; password?: string }) {
   await navigateToUserAdministration(page);
-
-  const adminCell = page.getByRole('cell', { name: 'Admin', exact: true });
-  await adminCell.last().waitFor();
-
-  if ((await page.getByRole('table').getByRole('row').filter({ hasText: user.name }).count()) > 0) {
-    // User already exists
-    return;
-  }
-
-  const oldUsersCount = await page.getByRole('table').getByRole('row').count();
+  // wait until the list is rendered
+  await page.getByRole('table').locator('tbody tr').first().waitFor();
 
   await page.getByRole('button', { name: 'Create User' }).click();
-  await page.getByLabel('Name').click();
   await page.getByLabel('Name').fill(user.name);
-  await page.getByLabel('Email').click();
   await page.getByLabel('Email').fill(user.email);
   if (user.password != null) {
-    await page.locator('#password').click();
     await page.locator('#password').fill(user.password);
-    await page.locator('#passwordConfirm').click();
     await page.locator('#passwordConfirm').fill(user.password);
   }
 
@@ -552,10 +487,20 @@ export async function createUserIfNotExists(page: Page, user: { email: string; n
   const createUserModal = page.getByRole('heading', { name: 'Create User' });
   await createUserModal.waitFor({ state: 'detached' });
 
-  const newUsersCount = await page.getByRole('table').getByRole('row').count();
-  expect(newUsersCount).toEqual(oldUsersCount + 1);
-  const newUser = page.getByRole('table').getByRole('row').filter({ hasText: user.name });
+  // other tests create users concurrently, so only check for our own user and not for the number of rows
+  const newUser = page.getByRole('table').getByRole('row').filter({ hasText: user.email });
   await expect(newUser).toHaveCount(1);
+}
+
+/** Filters the (paginated) user list by name (the search only matches names) and returns the row of the user. */
+export async function searchUser(page: Page, user: { name: string; email: string }) {
+  await page.getByPlaceholder('Search', { exact: true }).fill(user.name);
+  await page.getByPlaceholder('Search', { exact: true }).press('Enter');
+  // wait until the search result is shown
+  await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(1);
+  const row = page.getByRole('table').getByRole('row').filter({ hasText: user.email });
+  await expect(row).toHaveCount(1);
+  return row;
 }
 
 export async function uploadFileWhileInChat(page: Page, filename: string, mayFail: boolean = false) {
@@ -681,8 +626,10 @@ export async function changePassword(page: Page, currentPassword: string, newPas
   await page.getByRole('button', { name: 'Update Password' }).click({ timeout: 3000 });
 }
 
+// Unique names allow tests to run in parallel and repeatedly against the same database. The suffix has a fixed
+// length, so that one name is never a prefix of another one (many locators match on substrings).
 export function uniqueName(prefix: string): string {
-  return `${prefix}-${randomInt(100000)}`;
+  return `${prefix}-${randomUUID().slice(0, 8)}`;
 }
 
 export function globalUserBucketName(): string {
@@ -703,9 +650,9 @@ export async function expectA11yCompliant(page: Page) {
     )
     .catch(() => {});
 
-  // Exclude react-tooltip portal from axe scan: it renders into <body> outside any landmark,
+  // Exclude open Mantine tooltips from the axe scan: they render into <body> outside any landmark,
   // which violates the "region" rule. Tooltips are transient supplementary content and do not
   // need landmark containment per WCAG best practices.
-  const accessibilityScanResults = await new AxeBuilder({ page }).exclude('#default[role="tooltip"]').analyze();
+  const accessibilityScanResults = await new AxeBuilder({ page }).exclude('.mantine-Tooltip-tooltip').analyze();
   expect(accessibilityScanResults.violations).toEqual([]);
 }

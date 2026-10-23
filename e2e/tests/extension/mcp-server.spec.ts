@@ -15,11 +15,11 @@ import {
   uniqueName,
 } from '../utils/helper';
 
-test('mcp', async ({ page, mockServerUrl }) => {
+test('mcp', async ({ page, mockServerUrl, adminUser }) => {
   const configuration = { name: '', description: '' };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('add assistant', async () => {

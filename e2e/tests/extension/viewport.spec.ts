@@ -13,11 +13,11 @@ import {
   uniqueName,
 } from '../utils/helper';
 
-test('Chat viewport scrolling', async ({ page, mockServerUrl }) => {
+test('Chat viewport scrolling', async ({ page, mockServerUrl, adminUser }) => {
   const configuration = { name: uniqueName('E2E-Test'), description: '' };
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('should add mock assistant', async () => {
@@ -71,6 +71,15 @@ test('Chat viewport scrolling', async ({ page, mockServerUrl }) => {
   });
 
   await test.step('should show and allow clicking auto-scroll button when user scrolls up', async () => {
+    const chatContainer = page
+      .getByTestId('chat-item')
+      .first()
+      .locator('xpath=ancestor::div[contains(@class, "overflow-auto")][1]');
+    // The button hides as soon as the (smooth) scrolling is close to the bottom. Wait until the scrolling has finished,
+    // otherwise it would override our scrolling below.
+    await expect.poll(() => chatContainer.evaluate((e) => e.scrollHeight - e.scrollTop - e.clientHeight)).toBeLessThan(2);
+    // the wheel event scrolls the element under the mouse
+    await chatContainer.hover();
     await page.mouse.wheel(0, -800);
     const autoScrollButton = page.locator('[data-testid="scrollToBottomButton"]');
     await expect(autoScrollButton).toHaveCSS('opacity', '1');

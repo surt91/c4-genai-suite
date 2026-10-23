@@ -4,22 +4,21 @@ import {
   addMockModelToConfiguration,
   checkSelectedConfiguration,
   createConfiguration,
-  createUserIfNotExists,
   enterAdminArea,
+  enterUserArea,
   login,
-  logout,
   newChat,
   selectConfiguration,
   sendMessage,
   uniqueName,
 } from '../utils/helper';
 
-test('Chat workflow with Mock LLM', async ({ page, mockServerUrl }) => {
+test('Chat workflow with Mock LLM', async ({ page, mockServerUrl, adminUser }) => {
   const configuration = { name: '', description: '' };
   const secondAssistantName = uniqueName('Second Assistant');
 
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('add assistant', async () => {
@@ -35,18 +34,10 @@ test('Chat workflow with Mock LLM', async ({ page, mockServerUrl }) => {
     await addMockModelToConfiguration(page, { ...configuration, name: secondAssistantName }, { endpoint: mockServerUrl });
   });
 
-  await test.step('switch user', async () => {
-    // Since we test on the total number of conversations, we switch here to a fresh user without conversation.
-    // This way we do not need to delete the conversations of the admin account
-    // (which would lead to problems if we ever want to run the tests in parallel)
-    const testuserName = uniqueName('test-user');
-    await createUserIfNotExists(page, {
-      name: testuserName,
-      email: `${testuserName}@example.com`,
-      password: 'test-secret',
-    });
-    await logout(page);
-    await login(page, { email: `${testuserName}@example.com`, password: 'test-secret' });
+  await test.step('switch to chat', async () => {
+    // The test asserts on the total number of conversations. This works because `adminUser` is a fresh user
+    // without conversations.
+    await enterUserArea(page);
   });
 
   await test.step('should start chat in new configuration', async () => {

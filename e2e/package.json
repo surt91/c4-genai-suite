@@ -24,11 +24,9 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.5.7",
     "globals": "17.13.0",
-    "typescript": "5.9.3",
-    "wait-on": "9.5.1"
+    "typescript": "5.9.3"
   },
   "dependencies": {
-    "dotenv": "^18.0.9",
     "zod": "^4.6.7"
   }
 }

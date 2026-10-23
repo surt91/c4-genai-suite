@@ -1,11 +1,18 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// eslint-disable-next-line
-require('dotenv').config();
+// Read environment variables from an optional .env file (already set variables take precedence).
+try {
+  process.loadEnvFile();
+} catch {
+  // no .env file
+}
+
+const SERIAL_TESTS = [/suggestions\.spec\.ts/];
+
+const chromium = {
+  ...devices['Desktop Chrome'],
+  permissions: ['clipboard-read', 'clipboard-write'],
+};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -16,27 +23,46 @@ export default defineConfig({
   timeout: 120_000,
   // timeout for each assertion
   expect: { timeout: 30_000 },
-  /* Run tests in files in parallel */
-  fullyParallel: false,
+  // Tests run in parallel, also the tests within a file. They are isolated from each other by using their own data:
+  // a fresh admin user per test (see `adminUser` in tests/utils/fixtures.ts), unique names for everything they create,
+  // assertions scoped to their own entities and one mock LLM server per worker.
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  // Only one worker: the tests share one backend/database state (e.g. global settings, user and
-  // assistant lists, audit log, the shared mock LLM server) and several assert on global lists/counts.
-  workers: 1,
-  reporter: [['list', { printSteps: true }], ['html']],
+  // The whole stack runs on the same machine (docker), so do not use too many browsers at once.
+  // The GitHub runners have 4 vCPUs. Override with `--workers=<n>`.
+  workers: process.env.CI ? 3 : 4,
+  // the github reporter shows failures as annotations of the CI job
+  reporter: process.env.CI
+    ? [['github'], ['list', { printSteps: true }], ['html', { open: 'never' }]]
+    : [['list', { printSteps: true }], ['html']],
   use: {
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
 
   projects: [
     {
+      // creates the shared buckets (there may only be one user and one conversation bucket) before the tests run
+      name: 'setup',
+      testMatch: /global\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        permissions: ['clipboard-read', 'clipboard-write'],
-      },
+      testIgnore: SERIAL_TESTS,
+      dependencies: ['setup'],
+      use: chromium,
+    },
+    {
+      // Tests that modify global state other tests (or other instances of themselves, e.g. with `--repeat-each`)
+      // would observe. They run one at a time, but in parallel to the tests of the `chromium` project.
+      // - suggestions: replaces the global chat suggestions and the language in the theme settings
+      name: 'chromium-serial',
+      testMatch: SERIAL_TESTS,
+      dependencies: ['setup'],
+      workers: 1,
+      use: chromium,
     },
   ],
 });

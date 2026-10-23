@@ -1,13 +1,16 @@
-import { expect, test } from '@playwright/test';
-import { enterAdminArea, login } from '../utils/helper';
+import { expect, test } from '../utils/fixtures';
+import { enterAdminArea, login, uniqueName } from '../utils/helper';
 
-test('Documentation on Admin page', async ({ page }) => {
+test('Documentation on Admin page', async ({ page, adminUser }) => {
+  const assistantName = uniqueName('Fake Assistant');
+
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('should not show documentation on chat page', async () => {
-    await page.waitForTimeout(2000); // such that docs have some time to load
+    // such that docs would have been loaded, if they were shown
+    await page.waitForLoadState('networkidle');
     await expect(page.getByTestId('docs-icon')).toBeHidden();
   });
 
@@ -63,10 +66,10 @@ test('Documentation on Admin page', async ({ page }) => {
   await test.step('should still show documentation when an Assistant is selected', async () => {
     // create Fake Assistant for test
     await page.getByRole('button', { name: 'Create assistant' }).click();
-    await page.getByRole('textbox', { name: 'Name' }).fill('Fake Assistant');
+    await page.getByRole('textbox', { name: 'Name' }).fill(assistantName);
     await page.getByRole('textbox', { name: 'Description' }).fill('Test');
     await page.getByRole('button', { name: 'Save' }).click();
-    await page.getByRole('link', { name: 'Fake Assistant' }).click();
+    await page.getByRole('link', { name: assistantName }).click();
     await page.getByRole('heading', { name: 'The Assistants Page' }).click();
   });
 

@@ -1,15 +1,16 @@
 import { faker } from '@faker-js/faker';
-import { expect, test } from '@playwright/test';
-import { enterAdminArea, login, navigateToUserGroupAdministration } from '../utils/helper';
+import { expect, test } from '../utils/fixtures';
+import { enterAdminArea, login, navigateToUserGroupAdministration, uniqueName } from '../utils/helper';
 
-const configName = faker.commerce.productName();
-const configDescription = faker.commerce.productDescription();
-const groupName = faker.vehicle.bicycle();
-const updatedGroupName = faker.vehicle.bicycle();
+test('Audit Log', async ({ page, adminUser }) => {
+  // the audit log is global, other tests add entries concurrently: only look at entries of our own entities
+  const configName = uniqueName('Audit Config');
+  const configDescription = faker.commerce.productDescription();
+  const groupName = uniqueName('Audit Group');
+  const updatedGroupName = uniqueName('Audit Group Renamed');
 
-test('Audit Log', async ({ page }) => {
   await test.step('should login', async () => {
-    await login(page);
+    await login(page, adminUser);
     await enterAdminArea(page);
   });
 
@@ -31,7 +32,7 @@ test('Audit Log', async ({ page }) => {
     await createConfigurationModal.waitFor({ state: 'detached' });
 
     // Check audit log
-    await page.waitForTimeout(300); // Give time for audit log to be created
+    // the audit log entry is written before the create request returns
     await page.getByRole('link', { name: 'Audit Log' }).click();
 
     // Find the row with our configuration
@@ -152,18 +153,11 @@ test('Audit Log', async ({ page }) => {
     await entityTypeSelect.click();
     await page.getByRole('option', { name: 'User Group' }).click();
 
-    // Wait for filtering
-    await page.waitForTimeout(500);
-
-    // All visible rows should have User Group badge
-    const rows = page.getByRole('table').getByRole('row').filter({ hasText: 'User Group' });
+    // All visible rows should have User Group badge (retried until the filtered list is loaded),
+    // at least our own user group entries must be there
     const allRows = page.getByRole('table').locator('tbody tr');
-    const rowCount = await allRows.count();
-
-    if (rowCount > 0) {
-      const userGroupRows = await rows.count();
-      expect(userGroupRows).toBe(rowCount);
-    }
+    await expect(allRows.filter({ hasNotText: 'User Group' })).toHaveCount(0);
+    await expect(allRows.filter({ hasText: 'User Group' }).first()).toBeVisible();
   });
 
   await test.step('should paginate audit log entries', async () => {
@@ -177,15 +171,17 @@ test('Audit Log', async ({ page }) => {
     // If pagination exists, test it
     if ((await paginationNext.count()) > 0) {
       const tableBody = page.getByRole('table').locator('tbody');
+      await tableBody.locator('tr').first().waitFor();
       const firstPageContent = (await tableBody.textContent()) ?? '';
 
       // Go to next page: content should be different
       await paginationNext.click();
       await expect(tableBody).not.toHaveText(firstPageContent);
+      const secondPageContent = (await tableBody.textContent()) ?? '';
 
-      // Go back
+      // Go back: other tests may have added entries in the meantime, so the first page is not necessarily identical
       await paginationPrev.click();
-      await expect(tableBody).toHaveText(firstPageContent);
+      await expect(tableBody).not.toHaveText(secondPageContent);
     }
   });
 

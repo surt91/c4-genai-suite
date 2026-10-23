@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { resetGlobalSuggestionsViaApi } from '../utils/api';
+import { expect, test } from '../utils/fixtures';
 import {
   enterUserArea,
   login,
@@ -11,12 +12,19 @@ import {
 } from '../utils/helper';
 
 const MAX_SUGGESTIONS = 12;
-const ASSISTANT_NAME = uniqueName('Assistant Suggestions');
-const ASSISTANT_NAME_GLOBAL = uniqueName('Global Suggestions');
 
-test('When using suggestions gaible', async ({ page }) => {
+// This test changes the global chat suggestions (and the language) in the theme settings. It runs in the
+// `chromium-serial` project (see playwright.config.ts), so that no other instance of it runs at the same time.
+test('When using suggestions gaible', async ({ page, adminUser, adminApi }) => {
+  const ASSISTANT_NAME = uniqueName('Assistant Suggestions');
+  const ASSISTANT_NAME_GLOBAL = uniqueName('Global Suggestions');
+
+  await test.step('will remove global suggestions of previous runs', async () => {
+    await resetGlobalSuggestionsViaApi(adminApi);
+  });
+
   await test.step('will login', async () => {
-    await login(page);
+    await login(page, adminUser);
   });
 
   await test.step('will navigate to configuration administration page', async () => {
@@ -118,7 +126,8 @@ test('When using suggestions gaible', async ({ page }) => {
   });
 
   await test.step('will allow adding the maximum amount of suggestions globally', async () => {
-    await page.waitForTimeout(1000);
+    // wait until the form shows the saved suggestion
+    await expect(page.locator(`input[placeholder='Title']`).first()).toHaveValue('Global 1');
     for (let i = 2; i <= MAX_SUGGESTIONS; i++) {
       await page.getByRole('button', { name: 'Add suggestion' }).click();
       await page.fill(`input[placeholder='Title'] >> nth=${i - 1}`, `Global ${i}`);

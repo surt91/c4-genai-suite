@@ -23,8 +23,24 @@ Only the `chromium` project is configured.
 
 ## How to Add or Debug E2Es
 
-**Many tests depend on the database state**, so tests do not run in parallel and use the step syntax (look for `.step` in the test files).
-Restart the stack with a clean database (`docker compose down -v`) if a previous run left unexpected state behind.
+The tests run in parallel (`fullyParallel`, 4 workers locally and 3 in CI, override with `--workers=<n>`) against one
+shared backend and database. To keep them independent of each other and of previous runs:
+
+- Use the `test` from [`tests/utils/fixtures.ts`](tests/utils/fixtures.ts) and log in with the `adminUser` fixture
+  (`await login(page, adminUser)`): every test gets a fresh admin user, so per-user state like conversations,
+  uploaded user files or the password does not collide. `adminApi` is an API context of the initial admin to set up
+  data quickly via the REST API (see [`tests/utils/api.ts`](tests/utils/api.ts)).
+- Give everything a test creates a unique name (`uniqueName(...)`), inside the test function (not at module level,
+  which is shared by repeated runs in the same worker).
+- Only assert on the entities the test created (filter by their unique names), never on global lists, counts or the
+  first/last row. Do not delete or modify entities the test did not create.
+- There may only be one `user` and one `conversation` bucket. They are created by the `setup` project
+  ([`tests/global.setup.ts`](tests/global.setup.ts)) and shared by all tests.
+- Tests that change global state (e.g. the theme settings) must run in the `chromium-serial` project (see
+  `SERIAL_TESTS` in [`playwright.config.ts`](playwright.config.ts)), which runs one test at a time.
+
+The step syntax (look for `.step` in the test files) structures long tests. The tests do not need a clean database,
+but you can always restart the stack with one (`docker compose down -v`).
 
 Use playwright's code generator to append to test files: `npx playwright codegen http://localhost:3333/login`.
 

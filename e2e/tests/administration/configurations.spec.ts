@@ -1,16 +1,16 @@
 import { faker } from '@faker-js/faker';
-import { expect, test } from '@playwright/test';
-import { cleanup, login, navigateToConfigurationAdministration } from '../utils/helper';
+import { expect, test } from '../utils/fixtures';
+import { login, navigateToConfigurationAdministration, uniqueName } from '../utils/helper';
 
-const configName = faker.commerce.productName();
-const configDescription = faker.commerce.productDescription();
-const configNewName = faker.commerce.productName();
 const apiKey = '1234567890';
 
-test('Configuration Management', async ({ page }) => {
+test('Configuration Management', async ({ page, adminUser }) => {
+  const configName = uniqueName(faker.commerce.productName());
+  const configDescription = faker.commerce.productDescription();
+  const configNewName = uniqueName(faker.commerce.productName());
+
   await test.step('should login', async () => {
-    await login(page);
-    await cleanup(page);
+    await login(page, adminUser);
   });
 
   await test.step('will navigate to configuration administration page', async () => {
