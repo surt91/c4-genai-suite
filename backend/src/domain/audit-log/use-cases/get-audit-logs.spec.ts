@@ -46,7 +46,7 @@ describe('GetAuditLogsHandler', () => {
           userName: 'Test User',
           snapshot: { name: 'Test Config' },
           createdAt: new Date('2026-01-01'),
-        } as AuditLogEntity,
+        },
         {
           id: 2,
           entityType: 'extension',
@@ -56,7 +56,7 @@ describe('GetAuditLogsHandler', () => {
           userName: 'Test User',
           snapshot: { name: 'Test Extension' },
           createdAt: new Date('2026-01-02'),
-        } as AuditLogEntity,
+        },
       ];
 
       queryBuilder.getManyAndCount.mockResolvedValue([mockAuditLogs, 2]);
@@ -180,7 +180,7 @@ describe('GetAuditLogsHandler', () => {
         userName: 'Admin User',
         snapshot: { key: 'value' },
         createdAt: new Date('2026-01-15'),
-      } as AuditLogEntity;
+      };
 
       queryBuilder.getManyAndCount.mockResolvedValue([[mockEntity], 1]);
 

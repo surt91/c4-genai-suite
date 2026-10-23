@@ -33,7 +33,7 @@ export function ThemeProvider(props: React.PropsWithChildren) {
   }, [i18n, loadedSettings]);
 
   const theme = useMemo(() => {
-    return merge(api.url, initialTheme, customTheme) as Theme;
+    return merge(api.url, initialTheme, customTheme);
   }, [api.url, customTheme, initialTheme]);
 
   const setTheme = useCallback(

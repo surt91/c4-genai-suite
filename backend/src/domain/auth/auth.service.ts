@@ -69,7 +69,7 @@ export class AuthService implements OnModuleInit {
       if (!user) {
         req.session.destroy(resolve);
       } else {
-        req.session.user = user as User;
+        req.session.user = user;
         req.session.save(resolve);
       }
     });
@@ -237,7 +237,7 @@ export class AuthService implements OnModuleInit {
         email,
         name: 'Eval Service',
         apiKey: hashedKey,
-        userGroups: [{ id: BUILTIN_USER_GROUP_ADMIN } as UserGroupEntity],
+        userGroups: [{ id: BUILTIN_USER_GROUP_ADMIN }],
       });
     }
 

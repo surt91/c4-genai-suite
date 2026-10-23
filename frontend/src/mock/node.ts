@@ -5,7 +5,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 export const server = setupServer();
 
 // Start server before all tests
-beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }));
+beforeAll(() => server.listen({ onUnhandledFrame: 'bypass' }));
 
 // Reset handlers after each test
 afterEach(() => server.resetHandlers());

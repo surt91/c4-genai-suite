@@ -43,7 +43,7 @@ export function UpdateUserGroupDialog({ onClose, onDelete, onUpdate, target }: U
 
   const form = useForm<SchemaType>({
     validate: zod4Resolver(SCHEME),
-    initialValues: target as SchemaType,
+    initialValues: target,
     mode: 'controlled',
   });
   return (

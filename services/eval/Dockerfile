@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS builder
+FROM python:3.12.15-slim AS builder
 
 WORKDIR /eval
 
@@ -22,7 +22,7 @@ RUN uv sync --frozen --no-install-project --no-dev
 #
 # RUNTIME
 #
-FROM python:3.12-slim AS production
+FROM python:3.12.15-slim AS production
 
 ARG VERSION
 

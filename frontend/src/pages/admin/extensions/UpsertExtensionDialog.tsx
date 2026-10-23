@@ -167,10 +167,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
   return (
     <Portal>
-      <form
-        noValidate
-        onSubmit={form.onSubmit((v) => (selected ? updating.mutate(v as UpdateExtensionDto) : creating.mutate(v)))}
-      >
+      <form noValidate onSubmit={form.onSubmit((v) => (selected ? updating.mutate(v) : creating.mutate(v)))}>
         <Modal
           onClose={onClose}
           header={
@@ -199,7 +196,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
                         variant="outline"
                         data-tooltip-id="default"
                         data-tooltip-content={texts.extensions.testTooltip}
-                        onClick={() => form.onSubmit((v) => rebuild.mutate(v as TestExtensionDto))()}
+                        onClick={() => form.onSubmit((v) => rebuild.mutate(v))()}
                         loading={rebuild.isPending}
                         disabled={rebuild.isPending}
                       >

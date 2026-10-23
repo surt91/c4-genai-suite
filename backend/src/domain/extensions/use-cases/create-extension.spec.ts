@@ -110,7 +110,7 @@ describe(CreateExtension.name, () => {
         },
         test,
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     const result = await handler.execute(

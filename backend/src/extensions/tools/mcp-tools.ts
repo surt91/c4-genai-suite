@@ -205,6 +205,8 @@ function toArguments(i18n: I18nService, tools: ListToolsResult['tools']) {
               default: tool.description,
               description: i18n.t('texts.extensions.mcpTools.toolDescriptionHint'),
             },
+            // the assertion types the reduce accumulator; removing it breaks the indexed assignment above
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             attributes: { type: 'object', title: '', properties: {} as { [name: string]: ExtensionArgument } },
           },
         } satisfies ExtensionObjectArgument,
@@ -435,7 +437,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
       }
 
       // Form mode (mode is optional or "form")
-      const schema = toExtensionArgument(request.params.requestedSchema as JsonSchemaObject, {});
+      const schema = toExtensionArgument(request.params.requestedSchema, {});
       if (schema) {
         const userResponse = await context.ui.form(request.params.message, schema);
         return {

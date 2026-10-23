@@ -11,32 +11,32 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "python-dotenv>=1.1.0,<2",
-    "pydantic>=2.11.1,<3",
+    "python-dotenv>=1.2.4,<2",
+    "pydantic>=2.14.1,<3",
     "loguru>=0.7.3,<0.8",
-    "pypdf>=6.15.0,<7",
-    "deepeval>=4.0,<5",
-    "langchain-openai>=1.1.14,<2",
-    "pyyaml>=6.0.2,<7",
-    "sqlalchemy>=2.0.40,<3",
-    "alembic>=1.15.2,<2",
-    "asyncpg>=0.30.0,<0.31",
-    "greenlet>=3.0.3,<4",
-    "anyio>=4.9.0,<5",
+    "pypdf>=6.21.2,<7",
+    "deepeval>=4.3.1,<5",
+    "langchain-openai>=1.7.2,<2",
+    "pyyaml>=6.0.3,<7",
+    "sqlalchemy>=2.1.6,<3",
+    "alembic>=1.20.1,<2",
+    "asyncpg>=0.32.0,<0.33",
+    "greenlet>=3.5.6,<4",
+    "anyio>=4.15.1,<5",
     "httpx>=0.28.1,<0.29",
-    "fastapi[standard]>=0.116.0,<1",
-    "langchain-core>=1.2.22,<2",
-    "email-validator>=2.2.0,<3",
-    "cryptography>=50.0.0,<51",
-    "pyjwt>=2.13.0,<3",
+    "fastapi[standard]>=0.136.3,<0.137",
+    "langchain-core>=1.7.0,<2",
+    "email-validator>=2.3.0,<3",
+    "cryptography>=50.0.2,<51",
+    "pyjwt>=2.15.1,<3",
     "openpyxl>=3.1.5,<4",
-    "celery[redis]>=5.4.0,<6",
-    "pydantic-settings>=2.14.2,<3",
-    "rapidfuzz>=3.13.0,<4",
+    "celery[redis]>=5.6.3,<6",
+    "pydantic-settings>=2.16.1,<3",
+    "rapidfuzz>=3.14.6,<4",
     "boto3>=1.35.0,<2",
     "boto3-stubs[s3]>=1.35.0,<2",
-    "python-multipart>=0.0.31,<1",
-    "pandas>=2.2,<3",
+    "python-multipart>=0.0.32,<1",
+    "pandas>=3.1.0,<4",
 ]
 
 [project.scripts]
@@ -52,21 +52,20 @@ generate-api-spec = "generate_openapi:generate"
 
 [dependency-groups]
 dev = [
-    "psycopg2-binary>=2.9.9,<3",
-    "pre-commit>=4.2.0,<5",
-    "ruff>=0.11.2,<0.12",
-    "debugpy>=1.8.8,<2",
-    "black>=26.3.1,<27",
-    "flower>=2.0.1,<3",
+    "psycopg2-binary>=2.9.13,<3",
+    "pre-commit>=4.7.0,<5",
+    "ruff>=0.17.2,<0.18",
+    "debugpy>=1.8.22,<2",
+    "black>=26.10.1,<27",
+    "flower>=2.2.0,<3",
 ]
 test = [
-    "pytest>=9.0.3,<10",
-    "pytest-asyncio>=1,<2",
-    "pytest-cov>=6.0.0,<7",
-    "pytest-dotenv>=0.5.2,<0.6",
-    "sqlalchemy-utils>=0.41.2,<0.42",
-    "pytest-env>=1.1.5,<2",
-    "pytest-mock>=3.14.0,<4",
+    "pytest>=9.1.1,<10",
+    "pytest-asyncio>=1.4.0,<2",
+    "pytest-cov>=7.1.0,<8",
+    "sqlalchemy-utils>=0.43.0,<0.44",
+    "pytest-env>=1.8.1,<2",
+    "pytest-mock>=3.17.0,<4",
 ]
 
 [tool.uv]
@@ -86,12 +85,11 @@ module-root = ""
 namespace = true
 
 [build-system]
-requires = ["uv_build>=0.11.7,<0.12.0"]
+requires = ["uv_build>=0.13.5,<0.14.0"]
 build-backend = "uv_build"
 
 [tool.ruff]
 lint.select = ["E", "F", "ANN"]
-lint.ignore = ["ANN101", "ANN102"]
 
 [tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
@@ -99,7 +97,6 @@ allow-star-arg-any = true
 [tool.pytest.ini_options]
 addopts = "--cov=alembic --cov=database --cov=config --cov=utils --cov=llm_eval --cov-report=term-missing --ignore=tests/unit/qa_catalog/generator/implementation/ragas --ignore=tests/unit/qa_catalog/test_synthetic_qa_pair.py --ignore=tests/unit/qa_catalog/generator/implementation/test___init__.py --ignore=tests/unit/utils/test_mixed_document_loader.py"
 testpaths = "tests"
-env_override_existing_values = 1
 env_files = [".env", ".env.local"]
 
 [tool.pyright]

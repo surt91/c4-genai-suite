@@ -46,7 +46,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Test User',
         snapshot: { name: 'Updated Config', version: 2 },
         createdAt: new Date('2026-01-02'),
-      } as AuditLogEntity;
+      };
 
       const previousEntity: AuditLogEntity = {
         id: 1,
@@ -57,7 +57,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Test User',
         snapshot: { name: 'Original Config', version: 1 },
         createdAt: new Date('2026-01-01'),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
       queryBuilder.getOne.mockResolvedValue(previousEntity);
@@ -98,7 +98,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Test User',
         snapshot: { name: 'My Bucket' },
         createdAt: new Date('2026-01-01'),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(firstEntity);
       queryBuilder.getOne.mockResolvedValue(null);
@@ -120,7 +120,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Admin',
         snapshot: { name: 'Updated Group' },
         createdAt: new Date('2026-01-15T10:00:00Z'),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
       queryBuilder.getOne.mockResolvedValue(null);
@@ -151,7 +151,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Test User',
         snapshot: { version: 3 },
         createdAt: new Date('2026-01-15'),
-      } as AuditLogEntity;
+      };
 
       const mostRecentPreviousEntity: AuditLogEntity = {
         id: 4,
@@ -162,7 +162,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Test User',
         snapshot: { version: 2 },
         createdAt: new Date('2026-01-10'),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(currentEntity);
       queryBuilder.getOne.mockResolvedValue(mostRecentPreviousEntity);
@@ -185,7 +185,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: 'Administrator',
         snapshot: { email: 'deleted@example.com' },
         createdAt: new Date('2026-02-01T12:30:00Z'),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(entity);
       queryBuilder.getOne.mockResolvedValue(null);
@@ -215,7 +215,7 @@ describe('GetAuditLogByIdHandler', () => {
         userName: undefined,
         snapshot: { theme: 'dark' },
         createdAt: new Date('2026-02-05'),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(entity);
       queryBuilder.getOne.mockResolvedValue(null);

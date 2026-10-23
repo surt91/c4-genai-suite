@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { config as dotenvConfig } from 'dotenv';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { initSchemaIfNotExistsAndMoveMigrations, schema } from '../domain/database/typeorm.helper';
 
 dotenvConfig();
@@ -14,7 +14,7 @@ const migrationDataSource = new DataSource({
   migrations: [path.join(__dirname, '..', 'migrations', '*{.ts,.js}')],
   logging: true,
   schema,
-} as DataSourceOptions);
+});
 
 async function createDataSourceConfig() {
   await initSchemaIfNotExistsAndMoveMigrations(url, schema);

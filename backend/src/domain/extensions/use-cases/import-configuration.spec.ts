@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import { I18nService } from 'src/localization/i18n.service';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
 import { ChatSuggestion } from '../../shared';
-import { Extension, ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
+import { ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
 import { ExplorerService } from '../services';
 import { PortableConfiguration } from './export-configuration';
 import { ImportConfiguration, ImportConfigurationHandler } from './import-configuration';
@@ -141,7 +141,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Test Config',
@@ -179,7 +179,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Test Config',
@@ -221,7 +221,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Test Config',
@@ -296,7 +296,7 @@ describe(ImportConfiguration.name, () => {
           type: 'tool',
         },
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     const importData: PortableConfiguration = {
@@ -358,7 +358,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Disabled Config',
@@ -417,7 +417,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Test Config',
@@ -498,7 +498,7 @@ describe(ImportConfiguration.name, () => {
         type: 'llm',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Config with args',
@@ -552,7 +552,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     // Set current VERSION
     process.env.VERSION = '2.0.0';
@@ -610,7 +610,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     // Set current VERSION
     process.env.VERSION = '2.0.0';
@@ -694,7 +694,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Config with masked nested values',
@@ -759,7 +759,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const exportedAt = new Date().toISOString();
 
@@ -796,7 +796,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     // No user groups found
     jest.spyOn(queryRunner.manager, 'findBy').mockResolvedValue([]);
@@ -852,7 +852,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Config with valid groups',
@@ -910,7 +910,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Config with partial groups',
@@ -967,7 +967,7 @@ describe(ImportConfiguration.name, () => {
         type: 'tool',
       },
       getMiddlewares: () => Promise.resolve([]),
-    } as Extension);
+    });
 
     const importData: PortableConfiguration = {
       name: 'Config without groups',

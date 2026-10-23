@@ -1,6 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
 import { AuditLogService } from 'src/domain/audit-log';
-import { AuditLogEntity } from 'src/domain/database';
 import { Extension, ExtensionStringArgument } from 'src/domain/extensions';
 import { ConfigurationRepository, ExtensionEntity, ExtensionRepository } from '../../database';
 import { ExplorerService } from '../services';
@@ -64,7 +63,7 @@ describe(DeleteExtension.name, () => {
       findOneBy: jest.fn().mockResolvedValue({ id: 1, name: 'My Config' }),
     } as unknown as ConfigurationRepository;
     auditLogService = {
-      createAuditLog: jest.fn().mockResolvedValue({} as AuditLogEntity),
+      createAuditLog: jest.fn().mockResolvedValue({}),
     } as unknown as AuditLogService;
 
     handler = new DeleteExtensionHandler(extensionRepository, configurationRepository, explorer, auditLogService);

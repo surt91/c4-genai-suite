@@ -48,7 +48,7 @@ describe(GetExtensionsHandler.name, () => {
         spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test,
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     jest.spyOn(repository, 'find').mockImplementation(async () => {
@@ -86,7 +86,7 @@ describe(GetExtensionsHandler.name, () => {
         },
         test,
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     jest.spyOn(repository, 'find').mockImplementation(() => {
@@ -123,7 +123,7 @@ describe(GetExtensionsHandler.name, () => {
         },
         test,
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     jest.spyOn(repository, 'find').mockImplementation(() => {

@@ -271,11 +271,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
             />
 
             {/* Conditional Fields based on type */}
-            {metricType === 'G_EVAL' ? (
-              <GEvalMetricFields form={form as Parameters<typeof GEvalMetricFields>[0]['form']} />
-            ) : (
-              <SimpleMetricFields form={form as Parameters<typeof SimpleMetricFields>[0]['form']} />
-            )}
+            {metricType === 'G_EVAL' ? <GEvalMetricFields form={form} /> : <SimpleMetricFields form={form} />}
 
             {/* Danger Zone - only in update mode */}
             {!isCreating && (

@@ -95,10 +95,7 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
           {/* Format selection */}
           <div className="mb-6">
             <label className="mb-2 block text-sm font-medium">{texts.evals.qaCatalog.downloadFormat}</label>
-            <Radio.Group
-              value={form.values.format}
-              onChange={(value) => form.setFieldValue('format', value as SupportedQACatalogDownloadFormat)}
-            >
+            <Radio.Group value={form.values.format} onChange={(value) => form.setFieldValue('format', value)}>
               <Stack gap="xs">
                 <Radio value={SupportedQACatalogDownloadFormat.Csv} label={texts.evals.qaCatalog.downloadFormatCsv} />
                 <Radio value={SupportedQACatalogDownloadFormat.Json} label={texts.evals.qaCatalog.downloadFormatJson} />
@@ -111,10 +108,7 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
           {/* Version selection */}
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium">{texts.evals.qaCatalog.downloadVersions}</label>
-            <Radio.Group
-              value={form.values.versionSelection}
-              onChange={(value) => form.setFieldValue('versionSelection', value as VersionSelection)}
-            >
+            <Radio.Group value={form.values.versionSelection} onChange={(value) => form.setFieldValue('versionSelection', value)}>
               <Stack gap="xs">
                 <Radio value="current" label={texts.evals.qaCatalog.downloadCurrentVersion} />
                 {versions.length > 1 && (

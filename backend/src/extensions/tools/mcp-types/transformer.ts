@@ -34,6 +34,6 @@ export function transformMCPToolResponse(res: CallToolResult): TransformedRespon
 
       return prev;
     },
-    { content: [] as MCPText[], sources: [] as Source[] } as TransformedResponse,
+    { content: [] as MCPText[], sources: [] as Source[] },
   );
 }

@@ -10,7 +10,7 @@ interface UseTranscribeProps {
   maxDurationMs?: number;
 }
 
-export type TranscribeState = 'idle' | 'recording' | 'transcribing' | 'error';
+type TranscribeState = 'idle' | 'recording' | 'transcribing' | 'error';
 
 export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs = 10 * 60 * 1000 }: UseTranscribeProps) {
   const [recordingState, setRecordingState] = useState<TranscribeState>('idle');

@@ -1,4 +1,4 @@
-FROM python:3.13-slim AS builder
+FROM python:3.13.17-slim AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY pyproject.toml uv.lock ./
 RUN pip install uv
 RUN uv sync --locked
 
-FROM python:3.13-slim
+FROM python:3.13.17-slim
 
 WORKDIR /app
 

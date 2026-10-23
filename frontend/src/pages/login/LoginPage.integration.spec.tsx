@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthSettingsDto } from 'src/api';
-import { Theme } from 'src/hooks';
 import { mockedAPI } from 'src/mock/factory';
 import { render } from 'src/pages/admin/test-utils';
 import { LoginPage } from 'src/pages/login/LoginPage';
@@ -114,7 +113,7 @@ describe('LoginPage design', () => {
           { text: 'Impressum', link: 'http://example.org' },
           { text: 'Datenschutz', link: 'http://example.org' },
         ],
-      } as Theme,
+      },
     });
 
     expect(await screen.findByText('Impressum')).toHaveAttribute('href', 'http://example.org');

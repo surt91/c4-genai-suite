@@ -1,10 +1,8 @@
-/// <reference types="vitest" />
-
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 const dirName = fileURLToPath(new URL('.', import.meta.url));
 

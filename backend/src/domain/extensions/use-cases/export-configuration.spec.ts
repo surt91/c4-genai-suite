@@ -2,7 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../database';
 import { ChatSuggestion } from '../../shared';
-import { Extension, ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
+import { ExtensionObjectArgument, ExtensionStringArgument } from '../interfaces';
 import { ExplorerService } from '../services';
 import { ExportConfiguration, ExportConfigurationHandler } from './export-configuration';
 
@@ -84,7 +84,7 @@ describe(ExportConfiguration.name, () => {
           type: 'llm',
         },
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     // Set VERSION for test
@@ -192,7 +192,7 @@ describe(ExportConfiguration.name, () => {
           type: 'tool',
         },
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     const result = await handler.execute(new ExportConfiguration(3));

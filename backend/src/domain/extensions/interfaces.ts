@@ -120,11 +120,7 @@ export interface ExtensionBooleanArgument extends ExtensionArgumentBase {
 }
 
 export type ExtensionArgument =
-  | ExtensionArrayArgument
-  | ExtensionObjectArgument
-  | ExtensionStringArgument
-  | ExtensionNumberArgument
-  | ExtensionBooleanArgument;
+  ExtensionArrayArgument | ExtensionObjectArgument | ExtensionStringArgument | ExtensionNumberArgument | ExtensionBooleanArgument;
 
 export const EXTENSION_ARGUMENT_TYPES = ['string', 'number', 'boolean', 'object', 'array'] as const;
 

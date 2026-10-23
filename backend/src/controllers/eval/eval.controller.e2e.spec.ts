@@ -71,8 +71,7 @@ describe('EvalController (e2e)', () => {
     it('should deny unauthenticated requests (401)', async () => {
       // When no valid session exists, LocalAuthGuard rejects the request
       // We simulate this by having validate return null/undefined
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null as any);
+      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null);
 
       await request(app.getHttpServer()).get('/api/eval/catalogs').expect(HttpStatus.UNAUTHORIZED);
     });
@@ -344,8 +343,7 @@ describe('EvalController (e2e)', () => {
     });
 
     it('should deny unauthenticated requests to status endpoint (401)', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null as any);
+      jest.spyOn(localStrategy, 'validate').mockResolvedValue(null);
 
       await request(app.getHttpServer()).get('/api/eval/status').expect(HttpStatus.UNAUTHORIZED);
     });

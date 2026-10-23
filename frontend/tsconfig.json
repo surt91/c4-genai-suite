@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "baseUrl": ".",
     "isolatedModules": true,
     "allowJs": true,
     "jsx": "react-jsx",
@@ -19,15 +18,9 @@
     "types": ["vitest/jsdom"],
     "useDefineForClassFields": true,
     "paths": {
-      "src*": [
-        "src*"
-      ]
+      "src*": ["./src*"]
     }
   },
-  "include": [
-    "src",
-    "node_modules/@vitest/expect/dist/chai.d.cts",
-    "./vitest.setup.ts"
-  ],
+  "include": ["src", "node_modules/@vitest/expect/dist/chai.d.cts", "./vitest.setup.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

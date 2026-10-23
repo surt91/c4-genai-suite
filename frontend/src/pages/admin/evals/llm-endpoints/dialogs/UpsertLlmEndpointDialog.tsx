@@ -332,15 +332,11 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
             />
 
             {/* Base Configuration Fields */}
-            <BaseConfigurationFields form={form as Parameters<typeof BaseConfigurationFields>[0]['form']} isEdit={isEdit} />
+            <BaseConfigurationFields form={form} isEdit={isEdit} />
 
             {/* Type-specific Fields */}
-            {endpointType === 'OPENAI' && (
-              <OpenAiEndpointFields form={form as Parameters<typeof OpenAiEndpointFields>[0]['form']} isEdit={isEdit} />
-            )}
-            {endpointType === 'AZURE_OPENAI' && (
-              <AzureOpenAiEndpointFields form={form as Parameters<typeof AzureOpenAiEndpointFields>[0]['form']} isEdit={isEdit} />
-            )}
+            {endpointType === 'OPENAI' && <OpenAiEndpointFields form={form} isEdit={isEdit} />}
+            {endpointType === 'AZURE_OPENAI' && <AzureOpenAiEndpointFields form={form} isEdit={isEdit} />}
 
             {/* Danger Zone - only in update mode */}
             {!isCreating && (

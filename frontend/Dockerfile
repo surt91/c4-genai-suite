@@ -1,4 +1,4 @@
-FROM node:24.4.1-alpine3.22 AS build
+FROM node:24.22.1-alpine3.24 AS build
 ARG VERSION
 WORKDIR /src
 
@@ -9,7 +9,7 @@ COPY . .
 RUN VITE_VERSION="$VERSION" npm run build
 
 
-FROM caddy:2.11.4
+FROM caddy:2.11.7
 
 RUN setcap -r /usr/bin/caddy
 

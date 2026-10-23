@@ -7,17 +7,14 @@ import { render, screen } from '../test-utils';
 import { UsersPage } from './UsersPage';
 
 const generateMockUsers = (count: number): UserDto[] => {
-  return Array.from(
-    { length: count },
-    (_, i): UserDto => ({
-      id: i.toString(),
-      name: `User ${i + 1}`,
-      email: `user${i + 1}@example.com`,
-      userGroupIds: ['default'],
-      hasPassword: i % 2 === 0,
-      hasApiKey: false,
-    }),
-  );
+  return Array.from({ length: count }, (_, i): UserDto => ({
+    id: i.toString(),
+    name: `User ${i + 1}`,
+    email: `user${i + 1}@example.com`,
+    userGroupIds: ['default'],
+    hasPassword: i % 2 === 0,
+    hasApiKey: false,
+  }));
 };
 
 const mockUsers = generateMockUsers(50);

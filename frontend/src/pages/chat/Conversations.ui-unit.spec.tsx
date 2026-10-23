@@ -12,6 +12,7 @@ vi.mock('src/api', () => ({
 }));
 
 function mockMutation<TData = unknown, TVariables = void>(): UseMutationResult<TData, Error, TVariables, unknown> {
+  type Result = UseMutationResult<TData, Error, TVariables, unknown>;
   return {
     data: undefined,
     error: null,
@@ -20,8 +21,8 @@ function mockMutation<TData = unknown, TVariables = void>(): UseMutationResult<T
     isPaused: false,
     isSuccess: false,
     status: 'idle',
-    mutate: vi.fn(),
-    mutateAsync: vi.fn(),
+    mutate: vi.fn<Result['mutate']>(),
+    mutateAsync: vi.fn<Result['mutateAsync']>(),
     reset: vi.fn(),
     variables: undefined,
     context: undefined,

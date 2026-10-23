@@ -50,7 +50,7 @@ describe(TestExtension.name, () => {
         spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test: async () => {},
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     jest.spyOn(repository, 'findOneBy').mockImplementation(() => Promise.resolve(null));
@@ -71,7 +71,7 @@ describe(TestExtension.name, () => {
         spec: { name, arguments: {}, title: 'test', description: '', type: 'llm' },
         test,
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     jest.spyOn(repository, 'findOneBy').mockImplementation(async () => {
@@ -106,7 +106,7 @@ describe(TestExtension.name, () => {
         },
         test,
         getMiddlewares: () => Promise.resolve([]),
-      } as Extension;
+      };
     });
 
     jest.spyOn(repository, 'findOneBy').mockImplementation(async () => {

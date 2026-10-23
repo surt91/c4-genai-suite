@@ -13,7 +13,7 @@ const PAGE_SIZE = 20;
 const diffpatcher = create({
   objectHash: (obj: object) => {
     if ('id' in obj) {
-      return String((obj as { id: unknown }).id);
+      return String(obj.id);
     }
     return JSON.stringify(obj);
   },

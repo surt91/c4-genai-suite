@@ -123,7 +123,7 @@ services:
 
   # --- profile: ollama -------------------------------------------------------
   ollama:
-    image: ollama/ollama:0.32.14
+    image: ollama/ollama:0.40.10
     profiles: [ollama]
     ports:
       - "11434:11434"
@@ -137,7 +137,7 @@ services:
       start_period: 60s
 
   ollama-models-pull:
-    image: curlimages/curl:8.21.0
+    image: curlimages/curl:8.23.0
     profiles: [ollama]
     depends_on:
       ollama:
@@ -193,7 +193,7 @@ services:
     command: celery -A llm_eval.tasks worker --loglevel=info --pool=solo
 
   rabbitmq:
-    image: rabbitmq:4.3-management
+    image: rabbitmq:4.4-management
     profiles: [eval]
     environment:
       RABBITMQ_DEFAULT_USER: rabbit

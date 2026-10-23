@@ -37,7 +37,7 @@ describe('AuditLogService', () => {
         userName: 'Test User',
         snapshot: { name: 'Test Config' },
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -75,7 +75,7 @@ describe('AuditLogService', () => {
         userName: 'Admin User',
         snapshot: { name: 'OpenAI Extension', type: 'llm' },
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -105,7 +105,7 @@ describe('AuditLogService', () => {
         userName: 'Another User',
         snapshot: { name: 'Updated Bucket', permissions: ['read', 'write'] },
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -141,7 +141,7 @@ describe('AuditLogService', () => {
         userName: 'Administrator',
         snapshot: { name: 'Deleted Group', memberCount: 5 },
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -171,7 +171,7 @@ describe('AuditLogService', () => {
         userName: 'System Admin',
         snapshot: { theme: 'dark', language: 'en' },
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -205,7 +205,7 @@ describe('AuditLogService', () => {
         userName: undefined,
         snapshot: { email: 'updated@example.com' },
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -254,7 +254,7 @@ describe('AuditLogService', () => {
         userName: 'Test User',
         snapshot: complexSnapshot,
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);
@@ -290,7 +290,7 @@ describe('AuditLogService', () => {
         userName: 'Test User',
         snapshot: snapshotWithNulls,
         createdAt: new Date(),
-      } as AuditLogEntity;
+      };
 
       jest.spyOn(repository, 'create').mockReturnValue(mockEntity);
       jest.spyOn(repository, 'save').mockResolvedValue(mockEntity);

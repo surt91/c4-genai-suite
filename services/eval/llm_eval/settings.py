@@ -106,7 +106,7 @@ class Settings(BaseSettings):
 
     def __postgres_string(self, sync: bool = False) -> PostgresDsn:
         return PostgresDsn.build(
-            scheme="postgresql+asyncpg" if not sync else "postgresql",
+            scheme="postgresql+asyncpg" if not sync else "postgresql+psycopg2",
             username=self.pg_user,
             password=self.pg_password,
             port=self.pg_port,

@@ -1,8 +1,8 @@
-FROM python:3.14-alpine3.22 AS builder
+FROM python:3.14.9-alpine3.24 AS builder
 
 WORKDIR /reis
 
-RUN apk add --no-cache build-base=0.5-r3 linux-headers=6.14.2-r0 rust=1.87.0-r1 cargo=1.87.0-r1
+RUN apk add --no-cache build-base=0.5-r4 linux-headers=7.0.0-r1 rust=1.96.1-r0 cargo=1.96.1-r0
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -19,22 +19,22 @@ RUN uv sync --frozen --no-install-project --no-dev
 #
 # RUNTIME
 #
-FROM python:3.14-alpine3.22 AS production
+FROM python:3.14.9-alpine3.24 AS production
 
 # we need this library for extracting audio streams from videos and handeling office formats
 RUN apk add --no-cache \
-    ffmpeg=6.1.2-r2 \
-    libreoffice-calc=25.2.5.2-r0 \
-    libreoffice-impress=25.2.5.2-r0 \
-    libreoffice-writer=25.2.5.2-r0
+    ffmpeg=8.1.2-r0 \
+    libreoffice-calc=25.8.7.3-r0 \
+    libreoffice-impress=25.8.7.3-r0 \
+    libreoffice-writer=25.8.7.3-r0
 # Install fonts for pdf generation
 RUN apk --no-cache add \
     msttcorefonts-installer=3.8.1-r1 \
-    fontconfig=2.15.0-r3 \
-    font-droid-nonlatin=20200215-r4 \
-    font-droid=20200215-r4 \
-    ttf-dejavu=2.37-r6 \
-    ttf-freefont=20120503-r4 \
+    fontconfig=2.17.1-r1 \
+    font-droid-nonlatin=20200215-r5 \
+    font-droid=20200215-r5 \
+    font-dejavu=2.37-r6 \
+    font-freefont=20120503-r4 \
     ttf-liberation=2.1.5-r2 && \
     update-ms-fonts && \
     fc-cache -f
