@@ -34,15 +34,18 @@ class PdfProvider(AbstractFormatProvider):
     def process_file(
         self, file: SourceFile, chunk_size: int | None = None, chunk_overlap: int | None = None
     ) -> list[Document]:
-        try:
-            documents = parse_pdf_pdfminer(file.buffer)
-            parser_info = f"PDFMiner {pdfminer.__version__}"
-        except Exception as e:
-            # Fallback to PyPDF if PDFMiner fails
-            # sometimes PyPDF is more tolerant to malformed PDFs
-            logger.warning(f"PDFMiner failed to load PDF {file.id}, falling back to PyPDF. Error: `{e}`")
-            documents = parse_pdf_pypdf(file.buffer)
-            parser_info = f"PyPDF {pypdf.__version__}"
+        # parse from the file instead of reading it into memory
+        with open(file.path, "rb") as fp:
+            try:
+                documents = parse_pdf_pdfminer(fp)
+                parser_info = f"PDFMiner {pdfminer.__version__}"
+            except Exception as e:
+                # Fallback to PyPDF if PDFMiner fails
+                # sometimes PyPDF is more tolerant to malformed PDFs
+                logger.warning(f"PDFMiner failed to load PDF {file.id}, falling back to PyPDF. Error: `{e}`")
+                fp.seek(0)
+                documents = parse_pdf_pypdf(fp)
+                parser_info = f"PyPDF {pypdf.__version__}"
 
         uninteresting_metadata = [
             "producer",

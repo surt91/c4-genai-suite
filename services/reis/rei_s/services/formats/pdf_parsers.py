@@ -5,8 +5,8 @@ langchain-community produced in `mode="page"` without image extraction, which th
 """
 
 from datetime import datetime
-from io import BytesIO, StringIO
-from typing import Any
+from io import StringIO
+from typing import Any, BinaryIO
 
 from langchain_core.documents import Document
 from pdfminer.converter import PDFLayoutAnalyzer
@@ -81,7 +81,7 @@ def _resolve_and_decode(obj: Any) -> Any:
     return obj
 
 
-def _pdfminer_metadata(fp: BytesIO) -> dict[str, Any]:
+def _pdfminer_metadata(fp: BinaryIO) -> dict[str, Any]:
     doc = PDFDocument(PDFParser(fp), password="", caching=True)
     metadata: dict[str, Any] = {}
     for info in doc.info:
@@ -122,9 +122,11 @@ class _TextCollector(PDFLayoutAnalyzer):
         render(ltpage)
 
 
-def parse_pdf_pdfminer(data: bytes) -> list[Document]:
-    """Extract the text of every page with pdfminer.six, one document per page (`page` starts at 0)."""
-    fp = BytesIO(data)
+def parse_pdf_pdfminer(fp: BinaryIO) -> list[Document]:
+    """Extract the text of every page with pdfminer.six, one document per page (`page` starts at 0).
+
+    `fp` needs to be seekable, it is read more than once.
+    """
     doc_metadata = _purge_metadata(
         {"producer": "PDFMiner", "creator": "PDFMiner", "creationdate": ""} | _pdfminer_metadata(fp)
     )
@@ -142,9 +144,9 @@ def parse_pdf_pdfminer(data: bytes) -> list[Document]:
     return documents
 
 
-def parse_pdf_pypdf(data: bytes) -> list[Document]:
+def parse_pdf_pypdf(fp: BinaryIO) -> list[Document]:
     """Extract the text of every page with pypdf, one document per page (`page` starts at 0)."""
-    reader = pypdf.PdfReader(BytesIO(data))
+    reader = pypdf.PdfReader(fp)
     doc_metadata = _purge_metadata(
         {"producer": "PyPDF", "creator": "PyPDF", "creationdate": ""}
         | dict(reader.metadata or {})
