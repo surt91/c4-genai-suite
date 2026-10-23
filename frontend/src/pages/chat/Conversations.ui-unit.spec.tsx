@@ -1,9 +1,10 @@
 import { UseMutationResult } from '@tanstack/react-query';
 import { screen } from '@testing-library/react';
-import { addDays, startOfDay } from 'date-fns';
+import { addDays, addMonths, startOfDay, startOfMonth } from 'date-fns';
 import { describe, expect, it, vi } from 'vitest';
 import { ConversationDto } from 'src/api';
 import { render } from 'src/pages/admin/test-utils';
+import { i18next } from 'src/texts/i18n';
 import { ConversationItems } from './ConversationItems';
 import { useStateOfChats } from './state/listOfChats';
 
@@ -88,5 +89,26 @@ describe('Conversations', () => {
 
     // 2023 is above 2022
     expect(year2023Element.compareDocumentPosition(year2022Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('shows the months in the language of the installation', async () => {
+    // a date older than 30 days in the last three months, whose month has another name in German
+    const monthName = (locale: string, date: Date) => new Intl.DateTimeFormat(locale, { month: 'long' }).format(date);
+    const twoMonthsAgo = [...Array(55).keys()]
+      .map((n) => addDays(now, -35 - n))
+      .filter((date) => date >= startOfMonth(addMonths(now, -3)))
+      .find((date) => monthName('de', date) !== monthName('en', date))!;
+    vi.mocked(useStateOfChats).mockImplementation(() => [
+      { id: 1, updatedAt: twoMonthsAgo, createdAt: twoMonthsAgo, configurationId: 1 },
+    ]);
+    await i18next.changeLanguage('de');
+
+    try {
+      render(<ConversationItems />);
+
+      expect(screen.getByText(monthName('de', twoMonthsAgo))).toBeInTheDocument();
+    } finally {
+      await i18next.changeLanguage('en');
+    }
   });
 });

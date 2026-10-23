@@ -1,6 +1,7 @@
 import { addDays, addMonths, format, isSameDay, startOfDay, startOfMonth } from 'date-fns';
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
+import { i18next } from 'src/texts/i18n';
 import { ConversationItem } from './ConversationItem';
 import classes from './ConversationItems.module.css';
 import { useStateOfChats } from './state/listOfChats';
@@ -32,7 +33,7 @@ function groupConversations(chats: ConversationDto[]): ConversationGroup[] {
         } else if (date >= withinMonth) {
           group = { label: texts.chat.thisMonth, date: withinMonth };
         } else if (date >= withinMonths) {
-          group = { label: format(date, 'LLLL'), date: withinMonths };
+          group = { label: new Intl.DateTimeFormat(i18next.language, { month: 'long' }).format(date), date: withinMonths };
         } else {
           group = { label: format(date, 'yyyy'), date: date };
         }
