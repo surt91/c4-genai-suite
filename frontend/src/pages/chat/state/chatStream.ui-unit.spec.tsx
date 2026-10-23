@@ -94,6 +94,22 @@ describe('useChatStream', () => {
     });
   });
 
+  it('forgets the subscription when the stream is complete', async () => {
+    api.conversations.getConversation.mockResolvedValue({ id: 1, configurationId: 1 });
+    api.conversations.getMessages.mockResolvedValue({ items: [] });
+    api.stream.streamPrompt.mockImplementation((_chatId, _message, _messageId, observer: StreamObserver<unknown>) => {
+      setTimeout(() => observer.complete());
+      return { unsubscribe: vi.fn(), abort: vi.fn() };
+    });
+
+    const { result } = renderHook(() => useChatStream(1));
+    await waitFor(() => expect(useChatStore.getState().chatDataMap.get(1)?.hasLoadedFromServer).toBe(true));
+    act(() => (result.current as ReturnType<typeof useChatStream>).sendMessage('Hello'));
+    expect(useChatStore.getState().chatDataMap.get(1)?.activeStreamSubscription).toBeDefined();
+
+    await waitFor(() => expect(useChatStore.getState().chatDataMap.get(1)?.activeStreamSubscription).toBeUndefined());
+  });
+
   it.each([404, 400])('reports an unknown chat (%i)', async (status) => {
     api.conversations.getConversation.mockRejectedValue(new ResponseError(new Response(null, { status })));
 

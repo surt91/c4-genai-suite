@@ -1,6 +1,6 @@
 import { act, render } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { loadStoppedMessages, useStateOfIsAiWriting } from './chat';
+import { loadStoppedMessages, useStateOfChat, useStateOfIsAiWriting, useStateOfSelectedAssistantId } from './chat';
 import { ChatMessage } from './types';
 import { useChatStore } from './zustand/chatStore';
 
@@ -42,7 +42,36 @@ describe('chat state selectors', () => {
     expect(renderValue).toHaveBeenCalledOnce();
     expect(renderValue).toHaveBeenCalledWith(false);
   });
+
+  it('does not rerender subscribers of the chat or the assistant while streaming', () => {
+    act(() => {
+      const store = useChatStore.getState();
+      store.switchToChat(1);
+      store.setChat(1, { id: 1, configurationId: 7, updatedAt: new Date(), createdAt: new Date() });
+      store.setMessages(1, [{ id: -1, type: 'ai', configurationId: 7, content: [{ type: 'text', text: '' }] }]);
+      store.setStreamingMessageId(1, -1);
+    });
+
+    const renderValue = vi.fn();
+    render(<ChatSubscriber renderValue={renderValue} />);
+    expect(renderValue).toHaveBeenLastCalledWith({ chatId: 1, assistantId: 7 });
+    renderValue.mockClear();
+
+    act(() => {
+      useChatStore.getState().appendToStreamingMessage(1, 'Hello');
+      useChatStore.getState().appendToStreamingMessage(1, ' world');
+    });
+
+    expect(renderValue).not.toHaveBeenCalled();
+  });
 });
+
+function ChatSubscriber({ renderValue }: { renderValue: (value: unknown) => void }) {
+  const chat = useStateOfChat();
+  const assistantId = useStateOfSelectedAssistantId();
+  renderValue({ chatId: chat.id, assistantId });
+  return null;
+}
 
 describe('stopping the generation', () => {
   const question: ChatMessage = { id: 0, type: 'human', configurationId: 1, content: [{ type: 'text', text: 'Question' }] };

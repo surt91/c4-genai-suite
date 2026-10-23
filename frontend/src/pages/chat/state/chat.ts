@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChatUICallbackResultDto,
+  ConversationDto,
   ConversationDtoRatingEnum,
   FileDto,
   MessageDtoRatingEnum,
@@ -52,16 +53,17 @@ const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEn
 export const useChatStream = (chatId: number) => {
   const api = useApi();
   const navigate = useNavigate();
-  const chatStore = useChatStore();
+  // The actions are stable; the state is read with `getState()` to never use a stale snapshot (and to not re-render on every chunk).
+  const chatStore = useChatStore.getState();
 
   useEffect(() => {
-    if (chatStore.currentChatId !== chatId) {
+    if (useChatStore.getState().currentChatId !== chatId) {
       chatStore.switchToChat(chatId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
 
-  const listOfChatsStore = useListOfChatsStore();
+  const refetchChats = () => useListOfChatsStore.getState().refetch();
 
   const {
     isLoading: isChatLoading,
@@ -114,12 +116,12 @@ export const useChatStream = (chatId: number) => {
     chatStore.cancelActiveStream(chatId);
 
     if (editMessageId) {
-      const currentMessages = chatStore.chatDataMap.get(chatId)?.messages || [];
+      const currentMessages = useChatStore.getState().chatDataMap.get(chatId)?.messages || [];
       const filteredMessages = currentMessages.filter((message) => message.id > 0 && message.id < editMessageId);
       chatStore.setMessages(chatId, filteredMessages);
     }
 
-    const configurationId = chatStore.chatDataMap.get(chatId)?.chat.configurationId;
+    const configurationId = useChatStore.getState().chatDataMap.get(chatId)?.chat.configurationId;
 
     chatStore.addMessage(chatId, {
       type: 'human',
@@ -217,7 +219,7 @@ export const useChatStream = (chatId: number) => {
               ...(msg.update.data ? { data: msg.update.data as Record<string, unknown> } : {}),
             });
           case 'summary':
-            listOfChatsStore.refetch();
+            refetchChats();
         }
       },
       error: (error) => {
@@ -230,10 +232,10 @@ export const useChatStream = (chatId: number) => {
         chatStore.setStreamingMessageId(chatId, undefined);
       },
       complete: () => {
-        listOfChatsStore.refetch();
+        refetchChats();
         chatStore.setIsAiWriting(chatId, false);
         chatStore.setStreamingMessageId(chatId, undefined);
-        const currentChatData = chatStore.chatDataMap.get(chatId);
+        const currentChatData = useChatStore.getState().chatDataMap.get(chatId);
         if (currentChatData?.activeStreamSubscription === subscription) {
           chatStore.setActiveStreamSubscription(chatId, undefined);
         }
@@ -283,14 +285,14 @@ export async function loadStoppedMessages(chatId: number, getMessages: () => Pro
 
 export const useStateMutateChat = (chatId: number) => {
   const api = useApi();
-  const chatStore = useChatStore();
+  const setChat = useChatStore((s) => s.setChat);
 
   return useMutation({
     mutationFn: (conversionUpdate: UpdateConversationDto) => {
       return api.conversations.patchConversation(chatId, conversionUpdate);
     },
     onSuccess: (updatedChat) => {
-      chatStore.setChat(chatId, updatedChat);
+      setChat(chatId, updatedChat);
     },
   });
 };
@@ -335,8 +337,8 @@ export const useStateMutateChatRating = (chatId: number) => {
 
 export const useStateMutateMessageRating = (messageId: number) => {
   const api = useApi();
-  const chatStore = useChatStore();
-  const chatId = chatStore.currentChatId;
+  const chatId = useChatStore((s) => s.currentChatId);
+  const updateMessage = useChatStore((s) => s.updateMessage);
 
   return useMutation({
     mutationFn: async (rating: MessageDtoRatingEnum) => {
@@ -345,33 +347,25 @@ export const useStateMutateMessageRating = (messageId: number) => {
       }
     },
     onSuccess: (_, rating) => {
-      chatStore.updateMessage(chatId, messageId, { rating });
+      updateMessage(chatId, messageId, { rating });
     },
   });
 };
 
-export const useStateOfChat = () => {
-  const currentChatId = useChatStore((s) => s.currentChatId);
-  const chatDataMap = useChatStore((s) => s.chatDataMap);
-  const chatData = chatDataMap.get(currentChatId);
-  return chatData?.chat || { id: 0, configurationId: -1, rating: null, updatedAt: new Date(), createdAt: new Date() };
-};
+// Stable fallbacks: the selectors must not return new objects, otherwise every store update re-renders the subscribers.
+const NO_CHAT: ConversationDto = { id: 0, configurationId: -1, updatedAt: new Date(0), createdAt: new Date(0) };
+const NO_MESSAGES: ChatMessage[] = [];
+
+// The selectors only select what they return, so that streaming (which updates the messages) does not re-render
+// components that only need the chat or the assistant (e.g. the chat list).
+export const useStateOfChat = () => useChatStore((s) => s.chatDataMap.get(s.currentChatId)?.chat ?? NO_CHAT);
 
 export const useStateOfSelectedChatId = () => useChatStore((s) => s.currentChatId);
 
-export const useStateOfSelectedAssistantId = () => {
-  const currentChatId = useChatStore((s) => s.currentChatId);
-  const chatDataMap = useChatStore((s) => s.chatDataMap);
-  const chatData = chatDataMap.get(currentChatId);
-  return chatData?.chat.configurationId || -1;
-};
+export const useStateOfSelectedAssistantId = () =>
+  useChatStore((s) => s.chatDataMap.get(s.currentChatId)?.chat.configurationId || -1);
 
-export const useStateOfMessages = () => {
-  const currentChatId = useChatStore((s) => s.currentChatId);
-  const chatDataMap = useChatStore((s) => s.chatDataMap);
-  const chatData = chatDataMap.get(currentChatId);
-  return chatData?.messages || [];
-};
+export const useStateOfMessages = () => useChatStore((s) => s.chatDataMap.get(s.currentChatId)?.messages ?? NO_MESSAGES);
 
 /** A message of a (loaded) conversation. */
 export const useStateOfMessage = (conversationId: number, messageId: number) =>
