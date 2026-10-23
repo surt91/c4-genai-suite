@@ -677,11 +677,6 @@
                                     "description": "The OpenAI endpoint.",
                                     "default": "\"\""
                                 },
-                                "deploymentName": {
-                                    "type": "string",
-                                    "description": "The OpenAI deployment name.",
-                                    "default": "\"\""
-                                },
                                 "modelName": {
                                     "type": "string",
                                     "description": "The OpenAI model name.",

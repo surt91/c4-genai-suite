@@ -277,8 +277,6 @@ reis:
       existingApiKeySecret: ""
       ## @param reis.embeddings.openAi.endpoint [string] The OpenAI endpoint.
       endpoint: ""
-      ## @param reis.embeddings.openAi.deploymentName [string] The OpenAI deployment name.
-      deploymentName: ""
       ## @param reis.embeddings.openAi.modelName [string] The OpenAI model name.
       modelName: ""
     openAiCompatible:
