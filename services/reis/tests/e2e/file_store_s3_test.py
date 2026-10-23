@@ -116,7 +116,7 @@ def test_get_document_pdf(file_uploader: FileUploaderFixture, client: TestClient
     _filename, input_content = file_uploader(bucket=1, file_id=1, index_name=INDEX_NAME)
 
     response_get_files = client.get(
-        "/files", params={"query": "test", "bucket": "1", "take": "3", "indexName": INDEX_NAME}
+        "/files", params={"query": "test", "bucket": "1", "take": "3", "indexName": INDEX_NAME, "files": "1"}
     )
 
     assert response_get_files.status_code == 200
