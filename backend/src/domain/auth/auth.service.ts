@@ -177,7 +177,7 @@ export class AuthService implements OnModuleInit {
 
     const userFromDb = await this.users.findOne({
       where: { email: email },
-      relations: ['userGroups'],
+      relations: { userGroups: true },
     });
 
     if (userFromDb) {
@@ -240,7 +240,7 @@ export class AuthService implements OnModuleInit {
 
     let user = await this.users.findOne({
       where: { email },
-      relations: ['userGroups'],
+      relations: { userGroups: true },
     });
 
     if (user) {
@@ -286,7 +286,7 @@ export class AuthService implements OnModuleInit {
   }
 
   async loginWithPassword(email: string, password: string, req: Request) {
-    const user = await this.users.findOne({ where: { email }, relations: ['userGroups'] });
+    const user = await this.users.findOne({ where: { email }, relations: { userGroups: true } });
     // Same error and (roughly) the same time for unknown users and wrong passwords, so that the login cannot be used
     // to find out which e-mail addresses have an account.
     this.dummyPasswordHash ??= bcrypt.hash('dummy-password', 10);
@@ -302,7 +302,7 @@ export class AuthService implements OnModuleInit {
   async login(user: User, req: Request) {
     const userFilter = user.email ? { email: user.email } : { id: user.id };
     // Check if the user exist in the database.
-    let fromDB = await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
+    let fromDB = await this.users.findOne({ where: userFilter, relations: { userGroups: true } });
 
     const userDoesNotExist = !fromDB;
     if (userDoesNotExist) {
@@ -350,7 +350,7 @@ export class AuthService implements OnModuleInit {
   private async saveAndReloadUser(user: DeepPartial<UserEntity>, userFilter: FindOptionsWhere<UserEntity>) {
     await this.users.save(user);
     // Reload the user again to get the default values from the database.
-    return await this.users.findOne({ where: userFilter, relations: ['userGroups'] });
+    return await this.users.findOne({ where: userFilter, relations: { userGroups: true } });
   }
 
   private async getNumberOfAdmins() {

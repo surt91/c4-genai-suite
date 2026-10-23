@@ -52,7 +52,7 @@ export class ExportConfigurationHandler implements IQueryHandler<ExportConfigura
   async execute(query: ExportConfiguration): Promise<ExportConfigurationResponse> {
     const configurationEntity = await this.repository.findOne({
       where: { id: query.id },
-      relations: ['extensions'],
+      relations: { extensions: true },
     });
 
     if (!configurationEntity) {

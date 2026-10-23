@@ -49,7 +49,7 @@ export class GetConfigurationsHandler implements IQueryHandler<GetConfigurations
       order: {
         name: 'ASC',
       },
-      relations: withExtensions ? ['extensions'] : [],
+      relations: withExtensions ? { extensions: true } : {},
     });
     entities = entities.filter((e) => hasUserGroupAccess(user, e.userGroupIds));
 

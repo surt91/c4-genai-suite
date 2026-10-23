@@ -36,10 +36,14 @@ export class UserGroupEntity {
   @Column({ nullable: true })
   monthlyUserTokens?: number;
 
-  @ManyToMany(() => UserEntity, (user) => user.userGroups)
+  // The foreign keys of the join tables to the user groups have no referential actions (the default of TypeORM 0.3).
+  @ManyToMany(() => UserEntity, (user) => user.userGroups, { onDelete: 'NO ACTION', onUpdate: 'NO ACTION' })
   users!: UserEntity[];
 
-  @ManyToMany(() => ConfigurationEntity, (configuration) => configuration.userGroups)
+  @ManyToMany(() => ConfigurationEntity, (configuration) => configuration.userGroups, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
   configurations!: ConfigurationEntity[];
 
   @RelationId('configurations')

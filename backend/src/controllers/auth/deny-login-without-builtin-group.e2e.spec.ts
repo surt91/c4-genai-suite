@@ -245,7 +245,7 @@ async function cleanupNonBuiltInData(dataSource: DataSource): Promise<void> {
   const userGroupRepo = dataSource.getRepository(UserGroupEntity);
 
   // Delete all users that do not belong to any built-in group (test users).
-  const allUsers = await userRepo.find({ relations: ['userGroups'] });
+  const allUsers = await userRepo.find({ relations: { userGroups: true } });
   const testUsers = allUsers.filter((u) => !u.userGroups.some((g) => g.isBuiltIn));
   if (testUsers.length > 0) {
     await userRepo.remove(testUsers);
@@ -310,7 +310,7 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
 
     // The user's groups in the DB must now be the Default group only.
     const userRepo = dataSource.getRepository(UserEntity);
-    const saved = await userRepo.findOne({ where: { email }, relations: ['userGroups'] });
+    const saved = await userRepo.findOne({ where: { email }, relations: { userGroups: true } });
     expect(saved?.userGroups.map((g) => g.name)).toContain(defaultGroupName);
 
     vi.restoreAllMocks();
@@ -340,7 +340,7 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
 
     // The user's groups in the DB must have been cleared.
     const userRepo = dataSource.getRepository(UserEntity);
-    const saved = await userRepo.findOne({ where: { email }, relations: ['userGroups'] });
+    const saved = await userRepo.findOne({ where: { email }, relations: { userGroups: true } });
     expect(saved?.userGroups).toHaveLength(0);
   });
 });

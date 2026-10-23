@@ -68,7 +68,7 @@ export class DeleteConfigurationHandler implements ICommandHandler<DeleteConfigu
       // We will just use the first enabled assistant. If the user tries to delete the last one, we show an error.
       const toBeDeleted = await queryRunner.manager.findOne(ConfigurationEntity, {
         where: { id },
-        relations: ['conversations'],
+        relations: { conversations: true },
       });
       if (!toBeDeleted) {
         throw new NotFoundException();

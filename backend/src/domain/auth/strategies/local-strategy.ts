@@ -23,7 +23,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     const key = this.findApiKey(request);
 
     if (key) {
-      return this.userRepository.findOne({ where: { apiKey: key }, relations: ['userGroups'] });
+      return this.userRepository.findOne({ where: { apiKey: key }, relations: { userGroups: true } });
     } else if (request.session.user) {
       return request.session.user;
     }

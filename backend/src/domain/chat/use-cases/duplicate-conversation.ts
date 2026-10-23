@@ -55,7 +55,7 @@ export class DuplicateConversationHandler implements ICommandHandler<DuplicateCo
     const conflictingEntities = await this.conversationRepository.find({
       // only the user's own conversations (the chosen number must not reveal titles of other users)
       where: { name: Like(`${escapedBasename} (%)`), userId: user.id },
-      select: ['name'],
+      select: { name: true },
     });
     const conflictingNames = conflictingEntities.map((entity) => entity.name);
 

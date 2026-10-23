@@ -84,7 +84,7 @@ export class ImportConfigurationHandler implements ICommandHandler<ImportConfigu
   private async reloadConfiguration(savedConfiguration: ConfigurationEntity) {
     const reloadedConfiguration = await this.dataSource.manager.findOne(ConfigurationEntity, {
       where: { id: savedConfiguration.id },
-      relations: ['extensions'],
+      relations: { extensions: true },
     });
 
     if (!reloadedConfiguration) throw new BadRequestException('Failed to reload imported configuration');
