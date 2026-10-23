@@ -116,8 +116,6 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
       context.result.subscribe(observer);
 
       const run = async () => {
-        this.store.enterWith(context);
-
         // Provides access to the context, event if it cannot be accessed directly through parameters.
         const getContext = () => this.store.getStore() as ChatContext;
 
@@ -140,11 +138,11 @@ export class SendMessageHandler implements IQueryHandler<SendMessage, SendMessag
         } finally {
           context.result.complete();
           this.cache.clean();
-          this.store.disable();
         }
       };
 
-      void run();
+      // `run` scopes the context to this request; `disable()` would clear the store of all running requests.
+      void this.store.run(context, run);
 
       return () => {
         context.abort.abort();
