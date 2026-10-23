@@ -63,9 +63,6 @@ def clean_bucket(app: FastAPI) -> None:
         if "Contents" in objects:
             objects_to_delete: list[ObjectIdentifierTypeDef] = [{"Key": obj["Key"]} for obj in objects["Contents"]]
             s3.client.delete_objects(Bucket=s3.bucket_name, Delete={"Objects": objects_to_delete})
-
-        # Delete the bucket
-        s3.client.delete_bucket(Bucket=s3.bucket_name)
     except Exception:
         pass
 
