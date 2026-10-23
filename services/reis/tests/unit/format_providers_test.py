@@ -382,6 +382,37 @@ def test_pdf_preview_does_not_load_external_resources(tmp_path: Path, file_name:
             pdf.delete()
 
 
+@pytest.mark.parametrize(
+    "content",
+    [
+        "Grüße, Dagobert".encode("utf-8"),
+        "Grüße, Dagobert".encode("utf-8-sig"),
+        "Grüße, Dagobert".encode("utf-16"),  # with BOM
+        "Grüße, Dagobert".encode("cp1252"),
+    ],
+)
+def test_text_encodings(content: bytes) -> None:
+    with temp_file(buffer=content, file_name="text.txt") as source_file:
+        docs = PlainProvider().process_file(source_file)
+        assert docs[0].page_content == "Grüße, Dagobert"
+
+        pdf = PlainProvider().convert_file_to_pdf(source_file)
+        assert_pdf_contains_text(pdf, "Grüße, Dagobert")
+        pdf.delete()
+
+
+def test_json_with_bom() -> None:
+    with temp_file(buffer='{"name": "Dagobert"}'.encode("utf-8-sig"), file_name="a.json") as source_file:
+        docs = JsonProvider().process_file(source_file)
+        assert docs[0].page_content == '{"name": "Dagobert"}'
+
+
+def test_binary_data_is_not_text() -> None:
+    with temp_file(buffer=b"\x00\x01\x81\x8d\xff" * 100, file_name="a.txt") as source_file:
+        with pytest.raises(UnicodeDecodeError):
+            PlainProvider().process_file(source_file)
+
+
 def assert_pdf_contains_text(file: SourceFile, text: str) -> None:
     pdf = PdfProvider()
     docs = pdf.process_file(file, chunk_overlap=0)

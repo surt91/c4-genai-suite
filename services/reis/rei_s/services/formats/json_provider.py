@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveJsonSplitter
 
 from rei_s.services.formats.abstract_format_provider import AbstractFormatProvider
-from rei_s.services.formats.utils import generate_pdf_from_md_file, validate_chunk_size
+from rei_s.services.formats.utils import decode_text, generate_pdf_from_md_file, validate_chunk_size
 from rei_s.types.source_file import SourceFile
 
 
@@ -24,7 +24,7 @@ class JsonProvider(AbstractFormatProvider):
         return RecursiveJsonSplitter(max_chunk_size=chunk_size)
 
     def process_file(self, file: SourceFile, chunk_size: int | None = None) -> list[Document]:
-        text = file.buffer.decode()
+        text = decode_text(file.buffer)
 
         json_dict = json.loads(text)
         if not isinstance(json_dict, dict):

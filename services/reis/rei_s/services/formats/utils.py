@@ -1,3 +1,4 @@
+import codecs
 import os
 from pathlib import Path
 import shutil
@@ -24,6 +25,30 @@ def check_file_name_extensions(file_name_extensions: list[str], file: SourceFile
     return False
 
 
+_BOMS = [
+    (codecs.BOM_UTF8, "utf-8"),
+    (codecs.BOM_UTF16_LE, "utf-16-le"),
+    (codecs.BOM_UTF16_BE, "utf-16-be"),
+]
+
+
+def decode_text(data: bytes) -> str:
+    """Decodes the content of a text file.
+
+    Honors a byte order mark (UTF-8, UTF-16), then tries UTF-8 and falls back to Windows-1252, the usual encoding of
+    legacy text files. Binary data raises a `UnicodeDecodeError` (Windows-1252 leaves some bytes undefined).
+    """
+    for bom, encoding in _BOMS:
+        if data.startswith(bom):
+            return data[len(bom) :].decode(encoding)
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        if b"\x00" in data:
+            raise
+    return data.decode("cp1252")
+
+
 def validate_chunk_size(chunk_size: int | None, default: int) -> int:
     chunk_size = chunk_size if chunk_size is not None else default
     if chunk_size <= 0:
@@ -46,7 +71,7 @@ class ProcessingError(Exception):
 
 
 def generate_pdf_from_md_file(file: SourceFile, format_: str | None = None) -> SourceFile:
-    markdown_text = file.buffer.decode()
+    markdown_text = decode_text(file.buffer)
     if format_ in {"plain", "md", "markdown"}:
         markdown_text = markdown_text
     elif format_:
