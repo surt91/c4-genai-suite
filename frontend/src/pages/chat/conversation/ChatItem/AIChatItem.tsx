@@ -1,5 +1,6 @@
 import { Box } from '@mantine/core';
 import { useClipboard, useDebouncedValue } from '@mantine/hooks';
+import { clsx } from 'clsx';
 import { toast } from 'react-toastify';
 import { Alert, Markdown } from 'src/components';
 import { useProfile } from 'src/hooks';
@@ -14,6 +15,7 @@ import { ReasoningLoadingIndicator } from '../ReasoningLoadingIndicator';
 import { AIChatItemActions } from './AIChatItemActions';
 import { AiAvatar } from './AiAvatar';
 import { ChatItemProps } from './ChatItem';
+import classes from './ChatItem.module.css';
 import { ChatItemUserInput } from './ChatItemUserInput';
 
 export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatItemProps) => {
@@ -41,8 +43,8 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
   const assistantStatus = !messageAssistant ? ' [assistant deleted]' : !messageAssistant.enabled ? ' [disabled]' : '';
 
   return (
-    <div className={'scroll-y-m-4 group box-border max-w-full'} data-testid="chat-item">
-      <div className="flex items-center gap-2">
+    <div className={classes.aiItem} data-testid="chat-item">
+      <div className={classes.aiHeader}>
         <AiAvatar llmLogo={assistantLLmLogo} />
         <strong>{agentName}</strong>
         {messageAssistant && (
@@ -50,15 +52,15 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
             |<strong>{messageAssistant.name}</strong>
           </>
         )}
-        {assistantStatus && <small className="text-gray-500">{assistantStatus}</small>}
+        {assistantStatus && <small className={classes.assistantStatus}>{assistantStatus}</small>}
       </div>
-      {message.error && <Alert text={message.error} className="mt-1" />}
+      {message.error && <Alert text={message.error} className={classes.error} />}
       <ChatItemTools tools={message.toolsInUse || {}} />
       {message.ui && <ChatItemUserInput key={message.ui.id} request={message.ui} />}
       {message.reasoning?.length && (
         <ReasoningLoadingIndicator message={message.reasoning} inProgress={message.reasoningInProgress} />
       )}
-      <Markdown animateText={isLast && newReply} className="box-border max-w-full">
+      <Markdown animateText={isLast && newReply} className={classes.markdown}>
         {textContent}
       </Markdown>
       {message.sources && message.sources?.length > 0 ? (
@@ -69,7 +71,7 @@ export const AIChatItem = ({ agentName, message, isLast, selectDocument }: ChatI
       ) : (
         <ChatItemDebug debug={message.debug || []} />
       )}
-      {isLast && isWriting && <Box className="animate-loading-dot mt-4 h-3 w-3 rounded-full bg-gray-700" bg="primary" />}
+      {isLast && isWriting && <Box className={clsx('animate-loading-dot', classes.loadingDot)} bg="primary" />}
       {!isWriting && <ChatItemLogging logging={message.logging || []} />}
       {!(isWriting && isLast) && (
         <AIChatItemActions

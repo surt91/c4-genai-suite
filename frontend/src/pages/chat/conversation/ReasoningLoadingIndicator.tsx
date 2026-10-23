@@ -2,6 +2,7 @@ import { IconCheck, IconChevronDown, IconChevronUp, IconRefresh } from '@tabler/
 import { memo, useState } from 'react';
 import { Markdown } from 'src/components';
 import { texts } from 'src/texts';
+import classes from './ChatItemDetails.module.css';
 
 interface ReasoningLoadingIndicatorProps {
   message: string;
@@ -16,35 +17,27 @@ export const ReasoningLoadingIndicator = memo(({ message, inProgress }: Reasonin
   };
 
   return (
-    <div className={`my-3 rounded-lg border border-gray-300 bg-gray-100 p-4`}>
-      <div className="flex items-start gap-3">
-        <div className="relative">
-          {inProgress && <IconRefresh size={20} className="animate-spin text-gray-600" />}
-          {!inProgress && <IconCheck size={20} className="text-green-600" />}
+    <div className={classes.reasoning}>
+      <div className={classes.reasoningRow}>
+        <div className={classes.reasoningIcon}>
+          {inProgress && <IconRefresh size={20} className={classes.spinning} />}
+          {!inProgress && <IconCheck size={20} className={classes.done} />}
         </div>
 
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-gray-800">{texts.chat.reasoning}</p>
-            <button
-              onClick={toggleExpanded}
-              className="ml-2 text-gray-500 transition-colors hover:text-gray-700"
-              aria-label={isExpanded ? 'Collapse' : 'Expand'}
-            >
+        <div className={classes.reasoningBody}>
+          <div className={classes.reasoningHeader}>
+            <p className={classes.reasoningTitle}>{texts.chat.reasoning}</p>
+            <button onClick={toggleExpanded} className={classes.reasoningToggle} aria-label={isExpanded ? 'Collapse' : 'Expand'}>
               {isExpanded ? (
-                <IconChevronUp size={16} className="transition-transform duration-200" />
+                <IconChevronUp size={16} className={classes.chevron} />
               ) : (
-                <IconChevronDown size={16} className="transition-transform duration-200" />
+                <IconChevronDown size={16} className={classes.chevron} />
               )}
             </button>
           </div>
 
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-            }`}
-          >
-            <Markdown animateText={true} className="mt-1 box-border max-w-full text-xs text-gray-600">
+          <div className={classes.reasoningContent} data-expanded={isExpanded || undefined}>
+            <Markdown animateText={true} className={classes.reasoningMarkdown}>
               {message}
             </Markdown>
           </div>

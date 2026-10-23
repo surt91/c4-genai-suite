@@ -8,6 +8,7 @@ import { ExtensionContext } from 'src/hooks';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { useUserArgumentsSpecResolver } from 'src/pages/admin/extensions/hooks';
 import { texts } from 'src/texts';
+import classes from './ArgumentsModal.module.css';
 
 interface JsonFormProps {
   onClose?: () => void;
@@ -44,16 +45,16 @@ export function FilterModal(props: JsonFormProps & PropsWithChildren) {
         header={texts.chat.filterHeadline}
         footer={
           <fieldset>
-            <div className="flex flex-row justify-between">
+            <div className={classes.footer}>
               <Button
                 type="button"
                 variant="outline"
-                leftSection={<IconRotate className="w-4" />}
+                leftSection={<IconRotate size={16} />}
                 onClick={() => form.setValues(defaultValues ?? {})}
               >
                 {texts.chat.filterResetAll}
               </Button>
-              <div className="flex gap-2">
+              <div className={classes.buttons}>
                 <Button type="button" variant="subtle" onClick={onClose}>
                   {texts.common.cancel}
                 </Button>
@@ -63,14 +64,14 @@ export function FilterModal(props: JsonFormProps & PropsWithChildren) {
           </fieldset>
         }
       >
-        <div className="flex flex-col">
+        <div className={classes.fields}>
           {extensions.map((x) => (
             <Fieldset
               key={x.name}
               legend={
-                <div className="flex items-center">
-                  <h4 className="mr-2.5 font-bold">{x.title}</h4>
-                  <p className="text-xs">{x.description}</p>
+                <div className={classes.legend}>
+                  <h4 className={classes.legendTitle}>{x.title}</h4>
+                  <p className={classes.legendDescription}>{x.description}</p>
                 </div>
               }
             >

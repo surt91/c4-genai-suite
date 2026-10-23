@@ -2,6 +2,7 @@ import { addDays, addMonths, format, isSameDay, startOfDay, startOfMonth } from 
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
 import { ConversationItem } from './ConversationItem';
+import classes from './ConversationItems.module.css';
 import { useStateOfChats } from './state/listOfChats';
 
 type ConversationGroup = { date: string; entries: ConversationDto[] };
@@ -53,11 +54,11 @@ export function ConversationItems() {
   const grouped = groupConversations(chats);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className={classes.groups}>
       {grouped.map((group) => (
-        <div key={group.date} className="grid">
-          <h2 className="pb-1 pl-2 text-xs font-light">{group.date}</h2>
-          <div className="grid">
+        <div key={group.date} className={classes.grid}>
+          <h2 className={classes.groupTitle}>{group.date}</h2>
+          <div className={classes.grid}>
             {group.entries.map((chat) => (
               <ConversationItem key={chat.id} chat={chat} />
             ))}

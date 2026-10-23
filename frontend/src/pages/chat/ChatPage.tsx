@@ -1,5 +1,6 @@
 import { Button, Tabs } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { useEffect, useRef } from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { Route, Routes } from 'react-router-dom';
@@ -12,6 +13,7 @@ import { useConversationFiles } from 'src/hooks/api/files';
 import { useListOfAllAssistantsInit, useListOfEnabledAssistantsInit } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { isMobile } from '../utils';
+import classes from './ChatPage.module.css';
 import { ConversationItems } from './ConversationItems';
 import { NewChatRedirect } from './NewChatRedirect';
 import { SourcesChunkPreview } from './SourcesChunkPreview';
@@ -27,8 +29,8 @@ import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, use
 import { useUserBucket } from './useUserBucket';
 
 const CustomResizeHandle = () => (
-  <Separator className="group ml-[-2px] flex w-2 items-center bg-gray-100 p-[2px] transition-all hover:bg-gray-200">
-    <div className="h-6 w-full rounded group-hover:bg-white" />
+  <Separator className={classes.resizeHandle}>
+    <div className={classes.resizeHandleGrip} />
   </Separator>
 );
 
@@ -106,7 +108,7 @@ export function ChatPage() {
   }, [selectedChatId, setSelectedDocument, setSelectedSource]);
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className={classes.root}>
       <header>
         <NavigationBar theme={theme} />
       </header>
@@ -114,7 +116,7 @@ export function ChatPage() {
         {sidebarLeft && (
           <>
             <Panel
-              className="chat-conversations flex w-64 shrink-0 flex-col overflow-hidden bg-gray-100"
+              className={clsx('chat-conversations', classes.leftPanel)}
               id="left"
               style={{ overflow: 'auto' }}
               onClick={() => {
@@ -122,25 +124,24 @@ export function ChatPage() {
               }}
               {...panelSizes.left}
             >
-              <nav aria-label={texts.common.conversations} className="flex h-full flex-col">
-                <div className="p-2">
+              <nav aria-label={texts.common.conversations} className={classes.nav}>
+                <div className={classes.section}>
                   <Button
-                    className="justify-start"
                     variant="subtle"
                     p="xs"
                     onClick={openNewChatIfNeeded}
                     fullWidth
                     justify="space-between"
-                    rightSection={<IconEdit className="w-4" />}
+                    rightSection={<IconEdit size={16} />}
                   >
                     {texts.chat.newChat}
                   </Button>
                 </div>
 
-                <div className="grow overflow-y-auto p-2">
+                <div className={classes.conversations}>
                   <ConversationItems />
                 </div>
-                <div className="p-2" onClick={(e) => e.stopPropagation()}>
+                <div className={classes.section} onClick={(e) => e.stopPropagation()}>
                   <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
                 </div>
               </nav>
@@ -150,10 +151,10 @@ export function ChatPage() {
         )}
 
         <Panel id="center" {...panelSizes.content}>
-          <main className="chat-main relative min-h-0 grow overflow-hidden">
+          <main className={clsx('chat-main', classes.main)}>
             {isMobileView && (rightPanelVisible || sidebarLeft) ? (
               <div
-                className="h-screen w-screen bg-gray-300"
+                className={classes.mobileOverlay}
                 onClick={() => (sidebarLeft ? setSidebarLeft(!sidebarLeft) : setSidebarRight(!sidebarRight))}
               ></div>
             ) : (
@@ -164,7 +165,7 @@ export function ChatPage() {
             )}
             {(!isMobileView || !rightPanelVisible) && (
               <CollapseButton
-                className="left absolute top-[40%]"
+                className={classes.collapseLeft}
                 side="left"
                 isToggled={!sidebarLeft}
                 onClick={() => setSidebarLeft(!sidebarLeft)}
@@ -175,7 +176,7 @@ export function ChatPage() {
             )}
             {(!isMobileView || !sidebarLeft) && userBucket && (
               <CollapseButton
-                className="absolute top-[40%] right-2"
+                className={classes.collapseRight}
                 side="right"
                 isToggled={!sidebarRight}
                 onClick={() => setSidebarRight(!sidebarRight)}
@@ -191,7 +192,7 @@ export function ChatPage() {
         {rightPanelVisible && (
           <>
             {!isMobileView && <CustomResizeHandle />}
-            <Panel style={{ overflow: 'auto' }} id="right" {...panelSizes.right} className="bg-gray-100">
+            <Panel style={{ overflow: 'auto' }} id="right" {...panelSizes.right} className={classes.rightPanel}>
               <aside aria-label={selectedDocument ? texts.chat.sources.content : texts.common.files}>
                 {selectedDocument ? (
                   <Tabs defaultValue="sources-chunk-preview">

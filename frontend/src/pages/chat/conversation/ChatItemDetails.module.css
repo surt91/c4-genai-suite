@@ -1,0 +1,237 @@
+/* Boxes shown inside an AI chat item: debug, logging, tools, reasoning, sources. */
+
+.box {
+  position: relative;
+  margin: 0.25rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--mantine-color-gray-4);
+  padding: 1rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+}
+
+.grayBox {
+  background-color: var(--mantine-color-gray-1);
+}
+
+/* Logging */
+.loggingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loggingTitle {
+  font-weight: 700;
+}
+
+.loggingToggle {
+  cursor: pointer;
+  padding: 0.25rem;
+
+  @mixin hover {
+    border-radius: 0.25rem;
+    background-color: var(--mantine-color-gray-4);
+  }
+}
+
+.loggingContent {
+  margin-top: 1rem;
+  overflow-wrap: break-word;
+}
+
+/* Tools */
+.tools {
+  margin-bottom: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--mantine-color-gray-3);
+  padding: 0.25rem 0.5rem;
+}
+
+/* Reasoning */
+.reasoning {
+  margin: 0.75rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--mantine-color-gray-4);
+  background-color: var(--mantine-color-gray-1);
+  padding: 1rem;
+}
+
+.reasoningRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.reasoningIcon {
+  position: relative;
+}
+
+.spinning {
+  color: var(--mantine-color-gray-7);
+  animation: spin 1s linear infinite;
+}
+
+.done {
+  color: var(--mantine-color-green-8);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.reasoningBody {
+  flex: 1;
+}
+
+.reasoningHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reasoningTitle {
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--mantine-color-gray-9);
+}
+
+.reasoningToggle {
+  margin-left: 0.5rem;
+  color: var(--mantine-color-dark-3);
+  transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  @mixin hover {
+    color: var(--mantine-color-gray-8);
+  }
+}
+
+.chevron {
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reasoningContent {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+}
+
+.reasoningContent[data-expanded] {
+  max-height: 24rem;
+  opacity: 1;
+}
+
+.reasoningMarkdown {
+  margin-top: 0.25rem;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1rem;
+  color: var(--mantine-color-gray-7);
+}
+
+/* Sources */
+.sources {
+  margin: 0.5rem 0;
+  border-radius: 1rem;
+  border: 2px solid var(--mantine-color-gray-3);
+  padding: 1rem;
+  word-break: break-all;
+}
+
+.sourcesTitle {
+  margin-bottom: 1rem;
+  font-size: var(--mantine-font-size-xl);
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+
+.source {
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+
+  @mixin hover {
+    background-color: var(--mantine-color-gray-1);
+  }
+}
+
+.sourceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+}
+
+.sourceTitle {
+  display: flex;
+  align-items: center;
+}
+
+.expander {
+  margin-right: 0.5rem;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1rem;
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expander[data-expanded] {
+  transform: rotate(90deg);
+}
+
+.externalLink {
+  color: var(--mantine-color-blue-6);
+
+  @mixin hover {
+    color: var(--mantine-color-blue-8);
+  }
+}
+
+.externalIcon {
+  display: inline-block;
+  vertical-align: baseline;
+  margin-bottom: -1px;
+}
+
+.metadata {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1rem;
+  color: var(--mantine-color-gray-7);
+}
+
+/* One column: the previous `grid-cols-[auto,1fr]` was not valid in Tailwind 4 and was ignored. */
+.metadataGrid {
+  margin-top: 0.5rem;
+  margin-right: 1rem;
+  display: grid;
+  column-gap: 1rem;
+  row-gap: 0.125rem;
+}
+
+.metadataKey {
+  font-weight: 500;
+  color: var(--mantine-color-gray-9);
+  text-transform: capitalize;
+}
+
+.metadataValue {
+  font-weight: 300;
+  word-break: break-all;
+  color: var(--mantine-color-gray-9);
+}

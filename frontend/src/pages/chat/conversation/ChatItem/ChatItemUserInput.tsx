@@ -7,6 +7,7 @@ import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { useArgumentObjectSpecResolver } from 'src/pages/admin/extensions/hooks';
 import { texts } from 'src/texts';
 import { useConfirmAiAction } from '../../state/chat';
+import classes from './ChatItem.module.css';
 
 type DynamicFormProps<T> = { schema: ExtensionArgumentObjectSpecDto; form: UseFormReturnType<T> };
 
@@ -16,7 +17,7 @@ function DynamicForm<T>(props: DynamicFormProps<T>) {
   return (
     <>
       {schema.type === 'object' && Object.keys(schema.properties).length > 0 && (
-        <div className="flex flex-col">
+        <div className={classes.userInputFields}>
           {Object.entries(schema.properties).map(([name, spec]) => (
             <Argument key={name} buckets={[]} name={name} argument={spec} form={form} />
           ))}
@@ -46,15 +47,15 @@ export const ChatItemUserInput = memo(({ request }: { request: StreamUIRequestDt
 
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
-      <div className="my-1 flex flex-col gap-2 rounded border-[1px] border-gray-200 p-3">
+      <div className={classes.userInput}>
         <div>
           <Markdown>{request.text}</Markdown>
         </div>
         <DynamicForm schema={request.schema} form={form} />
         <fieldset>
-          <div className="flex flex-row justify-between">
+          <div className={classes.userInputFooter}>
             <div></div>
-            <div className="flex gap-2">
+            <div className={classes.userInputButtons}>
               <Button type="button" variant="subtle" onClick={() => confirmAiAction.mutate({ action: 'reject' })}>
                 {texts.common.reject}
               </Button>

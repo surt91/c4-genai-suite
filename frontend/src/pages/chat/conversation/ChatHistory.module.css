@@ -1,0 +1,12 @@
+.grid {
+  display: grid;
+}
+
+/* Auto-scroll container for the last message exchange. */
+.lastMessageExchange {
+  display: grid;
+  grid-template-rows: max-content 1fr;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+}

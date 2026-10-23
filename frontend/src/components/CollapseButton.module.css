@@ -1,0 +1,45 @@
+.root {
+  --collapse-angle: -20deg;
+  padding: 0.75rem;
+}
+
+.root[data-side='left'] {
+  --collapse-angle: 20deg;
+}
+
+.root[data-mobile] {
+  padding-right: 0;
+  padding-left: 0.25rem;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  height: 0.75rem;
+  width: 0.25rem;
+  border-radius: 9999px;
+  background-color: var(--mantine-color-dark-3);
+  transition: all 150ms ease-in;
+}
+
+.root:hover .bar {
+  background-color: var(--mantine-color-black);
+}
+
+.bottom {
+  translate: 0 -0.25rem;
+}
+
+/* Toggled: the bars form an arrow pointing to the side. */
+.root[data-toggled] .top,
+.root:not([data-toggled]):where(:hover, [data-mobile]) .bottom {
+  rotate: calc(-1 * var(--collapse-angle));
+}
+
+.root[data-toggled] .bottom,
+.root:not([data-toggled]):where(:hover, [data-mobile]) .top {
+  rotate: var(--collapse-angle);
+}

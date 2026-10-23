@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert } from 'src/components';
 import { useDocumentContent } from 'src/hooks/api/files';
 import { texts } from 'src/texts';
+import classes from './SourcesChunkPreview.module.css';
 
 export type SourcesChunkPreviewProps = {
   document: DocumentSource;
@@ -41,18 +42,18 @@ export const SourcesChunkPreview = ({ onClose, document }: SourcesChunkPreviewPr
 
   if (isError)
     return container(
-      <Alert text={t('common.errorLoading')} className="mt-4">
+      <Alert text={t('common.errorLoading')} className={classes.alert}>
         <Button color="red" size="compact-xs" variant="light" mt="sm" onClick={() => refetch()}>
           {t('common.tryAgain')}
         </Button>
       </Alert>,
     );
 
-  if (isPending) return container(<Loader className="mx-auto my-32" />);
+  if (isPending) return container(<Loader mx="auto" my={128} />);
 
   return container(
     data.map((chunk, index) => (
-      <Blockquote key={index} mt="lg" p="md" className="overflow-clip">
+      <Blockquote key={index} mt="lg" p="md" className={classes.chunk}>
         <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
           {chunk}
         </Text>

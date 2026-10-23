@@ -1,15 +1,16 @@
 import { ActionIcon, Button, Textarea, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard, IconPencil } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { Alert } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { useConversationFiles } from 'src/hooks/api/files';
-import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../../state/chat';
 import { ChatItemProps } from './ChatItem';
+import classes from './ChatItem.module.css';
 
 export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
   // MessageDTO ist generated from the backend models.
@@ -37,11 +38,11 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
   });
 
   return (
-    <div className={cn('group justify-self-end', isEditing ? 'w-full' : 'box-border max-w-full pl-32')} data-testid="chat-item">
-      {message.error && <Alert text={message.error} className="mt-1" />}
+    <div className={classes.humanItem} data-editing={isEditing || undefined} data-testid="chat-item">
+      {message.error && <Alert text={message.error} className={classes.error} />}
 
       {isEditing ? (
-        <div className="rounded-xl bg-gray-100 p-3">
+        <div className={classes.editor}>
           <Textarea
             value={editedText}
             onChange={(e) => setEditedText(e.target.value)}
@@ -49,7 +50,7 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
             autosize
             aria-label={texts.accessibility.editMessage}
           />
-          <div className="mt-2 flex items-center justify-end gap-2">
+          <div className={classes.editorActions}>
             <Button onClick={() => setIsEditing(false)} size="xs" variant="subtle">
               {texts.common.cancel}
             </Button>
@@ -60,8 +61,8 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
         </div>
       ) : (
         <>
-          <div className="max-w-full rounded-xl bg-gray-100 px-4 py-3 whitespace-pre-wrap">{textContent}</div>
-          <div className={'flex items-center justify-end opacity-0 group-focus-within:opacity-100 group-hover:opacity-100'}>
+          <div className={classes.humanText}>{textContent}</div>
+          <div className={clsx(classes.actions, classes.humanActions)}>
             <Tooltip label={texts.common.copy}>
               <ActionIcon
                 color="gray"
@@ -71,7 +72,7 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
                 onClick={copyTextToClipboard}
                 aria-label={texts.common.copy}
               >
-                <IconClipboard className="w-4" />
+                <IconClipboard size={16} />
               </ActionIcon>
             </Tooltip>
             <Tooltip label={texts.common.edit}>
@@ -83,7 +84,7 @@ export const HumanChatItem = ({ message, editMessage }: ChatItemProps) => {
                 onClick={() => setIsEditing(true)}
                 aria-label={texts.common.edit}
               >
-                <IconPencil className="w-4" />
+                <IconPencil size={16} />
               </ActionIcon>
             </Tooltip>
           </div>

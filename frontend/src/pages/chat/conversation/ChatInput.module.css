@@ -1,0 +1,99 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.uploadLimit {
+  color: var(--mantine-color-dark-3);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filterChip {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--mantine-color-gray-1);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.filterChip:hover {
+  opacity: 0.6;
+}
+
+.inputBox {
+  box-sizing: border-box;
+  padding: 1rem 1rem 0.75rem;
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px var(--mantine-color-gray-1);
+}
+
+.inputBox:focus-within {
+  box-shadow:
+    0 0 0 1px black,
+    0 25px 50px -12px var(--mantine-color-gray-1);
+}
+
+.textarea {
+  width: 100%;
+  padding: 0 0 1rem;
+  border: 0;
+  background-color: transparent;
+  font: inherit;
+  color: inherit;
+  resize: none;
+  outline: none;
+}
+
+.textarea:focus-visible {
+  outline: none;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.submitActions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.fileInput {
+  display: none;
+}
+
+.attachLabel {
+  cursor: pointer;
+}
+
+.attachDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+div.footer {
+  margin-inline: auto;
+  color: var(--mantine-color-gray-6);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-align: center;
+}

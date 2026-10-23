@@ -1,0 +1,31 @@
+.grid {
+  display: grid;
+  gap: 0.5rem;
+  max-height: calc(100vh - 400px);
+  overflow: auto;
+}
+
+.columns {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.suggestion {
+  height: auto;
+  padding: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--mantine-color-gray-4);
+  border-radius: 0.5rem;
+  background-color: transparent;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+.subtitle {
+  color: var(--mantine-color-dark-3);
+}

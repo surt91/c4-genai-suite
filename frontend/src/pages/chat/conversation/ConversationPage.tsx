@@ -1,5 +1,6 @@
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconArrowDown } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
@@ -7,7 +8,6 @@ import { useParams } from 'react-router-dom';
 import { FileDto } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
 import { useScrollToBottom } from 'src/hooks/useScrollToBottom';
-import { cn } from 'src/lib';
 import { useStateOfSelectedAssistant } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
 import { useChatStream, useStateOfChat, useStateOfIsAiWriting, useStateOfMessages } from '../state/chat';
@@ -16,6 +16,7 @@ import { ChatHistory } from './ChatHistory';
 import { ChatInput } from './ChatInput';
 import { ChatRating } from './ChatRating';
 import { Configuration } from './Configuration';
+import classes from './ConversationPage.module.css';
 import { DragAndDropLayout } from './DragAndDropLayout/DragAndDropLayout';
 
 interface ConversationPageProps {
@@ -70,49 +71,41 @@ export function ConversationPage(props: ConversationPageProps) {
     }
   }, [showScrollToBottomButton, textareaRef]);
   return (
-    <div
-      className={
-        'relative mx-auto flex flex-col pb-2 outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset'
-      }
-      style={{ height: 'calc(100vh - 48px)' }}
-      {...getRootProps()}
-    >
-      <input {...getInputProps()} className="hidden" />
+    <div className={classes.root} style={{ height: 'calc(100vh - 48px)' }} {...getRootProps()}>
+      <input {...getInputProps()} />
       {isDragActive && (
         <>
           {isDragAccept && <>{uploadLimitReached ? <DragAndDropLayout.UploadLimitReached /> : <DragAndDropLayout.Accept />}</>}
           {isDragReject && <DragAndDropLayout.InvalidFileFormat allowedFileNameExtensions={allowedFileNameExtensions} />}
         </>
       )}
-      <div className="p-3">
+      <div className={classes.configuration}>
         <Configuration canEditConfiguration={true} />
       </div>
       {isChatLoading ? (
-        <div className="fade-in w-full" style={{ height: 'calc(100vh - 4rem)' }} />
+        <div className={clsx('fade-in', classes.loading)} style={{ height: 'calc(100vh - 4rem)' }} />
       ) : (
         <>
           {messages.length > 0 && (
-            <div
-              className={'fade-in overflow-anchor-none mx-auto box-border w-full max-w-[min(800px,100%)] grow overflow-auto px-4'}
-              ref={containerRef}
-            >
+            <div className={clsx('fade-in overflow-anchor-none', classes.history)} ref={containerRef}>
               <ChatHistory agentName={agentName} editMessage={submitMessage} />
             </div>
           )}
-          <div className={`${!messages.length && 'grow'} flex shrink-0 flex-col items-center justify-center px-4`}>
-            {!messages.length && <h2 className="mb-6 text-center text-3xl font-bold">{texts.chat.welcomeText}</h2>}
+          <div className={clsx(classes.bottom, !messages.length && classes.grow)}>
+            {!messages.length && <h2 className={classes.welcome}>{texts.chat.welcomeText}</h2>}
             <div
-              className={cn(
-                'fade-in relative mx-auto w-full max-w-[800px]',
+              className={clsx(
+                'fade-in',
+                classes.inputArea,
                 (showScrollToBottomButton || showRateThisConversation) && 'white-shadow',
               )}
             >
               <div
                 data-testid={'scrollToBottomButton'}
                 aria-hidden={!showScrollToBottomButton}
-                className={cn(
-                  'absolute inset-x-0 top-0 flex w-full -translate-y-full justify-center p-2 opacity-0 transition-all',
-                  showScrollToBottomButton ? 'fade-in opacity-100 delay-200' : 'pointer-events-none opacity-0',
+                className={clsx(
+                  classes.floating,
+                  showScrollToBottomButton ? ['fade-in', classes.floatingVisible] : classes.scrollButtonHidden,
                 )}
               >
                 <Tooltip label={texts.common.scrollToBottom}>
@@ -122,7 +115,7 @@ export function ConversationPage(props: ConversationPageProps) {
                     tabIndex={showScrollToBottomButton ? 0 : -1}
                     onClick={handleScrollToBottom}
                   >
-                    <IconArrowDown className="w-4" />
+                    <IconArrowDown size={16} />
                   </ActionIcon>
                 </Tooltip>
               </div>
@@ -135,9 +128,9 @@ export function ConversationPage(props: ConversationPageProps) {
                 submitMessage={submitMessage}
               />
               <div
-                className={cn(
-                  'absolute inset-x-0 top-0 flex w-full -translate-y-full justify-center p-2 transition-all delay-1000',
-                  showRateThisConversation ? 'fade-in opacity-100 delay-200' : 'hidden opacity-0',
+                className={clsx(
+                  classes.floating,
+                  showRateThisConversation ? ['fade-in', classes.floatingVisible] : classes.ratingHidden,
                 )}
               >
                 <ChatRating key={chatId} chatId={chatId} />

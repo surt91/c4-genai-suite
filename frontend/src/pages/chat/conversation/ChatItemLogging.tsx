@@ -1,6 +1,8 @@
+import { clsx } from 'clsx';
 import { memo, useState } from 'react';
 import { Icon, Markdown } from 'src/components';
 import { texts } from 'src/texts';
+import classes from './ChatItemDetails.module.css';
 
 export interface ChatItemLoggingProps {
   logging: string[];
@@ -17,12 +19,12 @@ export const ChatItemLogging = memo((props: ChatItemLoggingProps) => {
   return (
     <div>
       {logging?.length > 0 && (
-        <div className="relative my-1 rounded-lg border-[1px] border-gray-300 bg-gray-100 p-4 text-sm">
-          <div className="flex items-center justify-between">
-            <p className="font-bold">{texts.chat.chunksInformation}</p>
+        <div className={clsx(classes.box, classes.grayBox)}>
+          <div className={classes.loggingHeader}>
+            <p className={classes.loggingTitle}>{texts.chat.chunksInformation}</p>
             <button
               type="button"
-              className="cursor-pointer p-1 hover:rounded hover:bg-gray-300"
+              className={classes.loggingToggle}
               onClick={toggleCollapse}
               aria-label={texts.accessibility.toggleChunksInformation}
               aria-expanded={isExpanded}
@@ -31,7 +33,7 @@ export const ChatItemLogging = memo((props: ChatItemLoggingProps) => {
             </button>
           </div>
           {isExpanded && (
-            <div className="mt-4 break-words">
+            <div className={classes.loggingContent}>
               {logging.map((l, i) => (
                 <Markdown key={i}>{l}</Markdown>
               ))}

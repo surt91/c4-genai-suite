@@ -91,17 +91,6 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-div.markdown > pre {
-  display: grid;
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-/* The surrounding <pre> provides the dark background of code blocks. */
-.markdown pre code.hljs {
-  background: transparent;
-  padding: 0;
-}
 
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;

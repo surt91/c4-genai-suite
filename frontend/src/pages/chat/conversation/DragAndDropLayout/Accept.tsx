@@ -1,4 +1,6 @@
+import { clsx } from 'clsx';
 import { texts } from 'src/texts';
+import classes from './DragAndDropLayout.module.css';
 
 /*
 SVG from:
@@ -6,7 +8,7 @@ https://github.com/danny-avila/LibreChat/blob/main/client/src/components/Chat/In
  */
 export const Accept = () => {
   return (
-    <div className="text-text-primary animate-in fade-in absolute top-0 left-0 z-[9999] flex h-full w-full flex-col items-center justify-center gap-2 bg-white/5 backdrop-blur-[4px] transition-all duration-200 ease-in-out">
+    <div className={clsx('fade-in', classes.overlay)}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 108" fill="none" width="132" height="108">
         <g clipPath="url(#clip0_3605_64419)">
           <path

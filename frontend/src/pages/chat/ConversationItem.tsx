@@ -1,10 +1,12 @@
 import { Button, Menu, rem } from '@mantine/core';
 import { IconCopy, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { FormEvent, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationDto } from 'src/api';
 import { texts } from 'src/texts';
 import { isMobile } from '../utils';
+import classes from './ConversationItem.module.css';
 import { useStateOfSelectedChatId } from './state/chat';
 import { useStateMutateDuplicateChat, useStateMutateRemoveChat, useStateMutateRenameChat } from './state/listOfChats';
 
@@ -34,12 +36,12 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
 
   if (showRenameInput) {
     return (
-      <form className="p-0" onSubmit={submitRename}>
+      <form className={classes.renameForm} onSubmit={submitRename}>
         <div>
           <input
             autoFocus
             name="name"
-            className="input input-sm input-bordered h-9 w-full"
+            className={classes.renameInput}
             onBlur={() => setShowRenameInput(false)}
             onKeyUp={(e) => e.key === 'Escape' && setShowRenameInput(false)}
             defaultValue={chat.name}
@@ -52,7 +54,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
   }
 
   return (
-    <div className="group flex w-full min-w-0 items-stretch" data-testid="conversation-item">
+    <div className={classes.root} data-testid="conversation-item">
       <Button
         size="sm"
         px="xs"
@@ -60,17 +62,15 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
         justify="flex-start"
         variant={isSelected ? 'filled' : 'subtle'}
         classNames={{
-          root: 'transition-all flex-1 min-w-0',
-          label: 'w-full min-w-0 text-left truncate',
+          root: classes.button,
+          label: classes.buttonLabel,
         }}
         onDoubleClick={() => isSelected && setShowRenameInput(true)}
         title={chat.name}
       >
         {chat.name}
       </Button>
-      <div
-        className={`flex shrink-0 items-center ${isMobile() ? '' : 'opacity-0 group-focus-within:opacity-100 group-hover:opacity-100'}`}
-      >
+      <div className={clsx(classes.actions, !isMobile() && classes.actionsHover)}>
         <Menu width={200} opened={menuOpen} onChange={setMenuOpen} withInitialFocusPlaceholder={false}>
           <Menu.Target>
             <Button
@@ -89,14 +89,14 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
           </Menu.Target>
           <Menu.Dropdown aria-label={texts.accessibility.conversationOptions}>
             <Menu.Item
-              leftSection={<IconEdit className="h-4 w-4" />}
+              leftSection={<IconEdit size={16} />}
               disabled={renameChat.isPending}
               onClick={() => setShowRenameInput(true)}
             >
               {texts.common.rename}
             </Menu.Item>
             <Menu.Item
-              leftSection={<IconCopy className="h-4 w-4" />}
+              leftSection={<IconCopy size={16} />}
               disabled={duplicateChat.isPending}
               onClick={() => duplicateChat.mutate(chat.id)}
             >
@@ -104,7 +104,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
             </Menu.Item>
             <Menu.Item
               c="red.9"
-              leftSection={<IconTrash className="h-4 w-4" />}
+              leftSection={<IconTrash size={16} />}
               disabled={removeChat.isPending}
               onClick={() => removeChat.mutate(chat.id)}
             >

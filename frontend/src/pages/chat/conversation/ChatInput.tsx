@@ -1,5 +1,6 @@
 import { ActionIcon, Button, Portal, Tooltip } from '@mantine/core';
 import { IconArrowUp, IconFilter, IconPaperclip } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
@@ -14,6 +15,7 @@ import { Language, SpeechRecognitionButton } from 'src/pages/chat/conversation/S
 import { TranscribeButton } from 'src/pages/chat/conversation/TranscribeButton';
 import { texts } from 'src/texts';
 import { useChatDropzone } from '../useChatDropzone';
+import classes from './ChatInput.module.css';
 import { Suggestions } from './Suggestions';
 import {
   getDefault,
@@ -193,16 +195,16 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
 
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <div className={classes.root}>
         {fullFileSlots?.map((slot, index) => (
-          <div className="text-sm text-gray-500" key={index}>
+          <div className={classes.uploadLimit} key={index}>
             {texts.common.uploadLimit(slot.maxFiles, slot.extensionTitle)}
           </div>
         ))}
 
         {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={setInput} />}
 
-        <div className="flex flex-wrap gap-2">
+        <div className={classes.wrap}>
           {chatFiles.map((file) => (
             <FileItemComponent key={file.id} file={file} onRemove={remove} />
           ))}
@@ -214,14 +216,10 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
         {extensionFilterChips.map(
           (x, index) =>
             x.filterChips?.length > 0 && (
-              <div key={index} className="">
-                <div className="flex flex-wrap gap-2">
+              <div key={index}>
+                <div className={classes.wrap}>
                   {x.filterChips.map((item) => (
-                    <div
-                      className="cursor-pointer rounded-lg bg-gray-100 px-2 py-1 font-mono text-[0.7rem] hover:opacity-60"
-                      onClick={() => setShowFilter(true)}
-                      key={item}
-                    >
+                    <div className={classes.filterChip} onClick={() => setShowFilter(true)} key={item}>
                       {item}
                     </div>
                   ))}
@@ -230,9 +228,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
             ),
         )}
         <form onSubmit={doSubmit}>
-          <div className="box-border rounded-2xl border border-gray-200 p-4 pb-3 shadow-2xl shadow-gray-100 focus-within:ring-1 focus-within:ring-black">
+          <div className={classes.inputBox}>
             <TextareaAutosize
-              className={`w-full resize-none bg-transparent pb-4 outline-none`}
+              className={classes.textarea}
               maxRows={15}
               minRows={1}
               value={input}
@@ -243,8 +241,8 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
               ref={textareaRef}
               aria-label={texts.accessibility.chatMessageInput}
             />
-            <div className="flex w-full justify-between gap-2">
-              <div className="flex items-center gap-2">
+            <div className={classes.toolbar}>
+              <div className={classes.actions}>
                 {userBucket?.extensions && userBucket.extensions.length > 0 && (
                   <>
                     <input
@@ -252,7 +250,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                       id="file-upload"
                       data-testid="file-upload"
                       ref={fileInputRef}
-                      className="hidden"
+                      className={classes.fileInput}
                       multiple={multiple}
                       onChange={handleUploadFileFromInput}
                       accept={allowedFileNameExtensions?.join(', ') ?? undefined}
@@ -260,7 +258,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                     />
                     <label
                       htmlFor="file-upload"
-                      className={`cursor-pointer ${uploadLimitReached ? 'pointer-events-none opacity-50' : ''}`}
+                      className={clsx(classes.attachLabel, uploadLimitReached && classes.attachDisabled)}
                     >
                       <Tooltip label={texts.common.attachFile}>
                         <ActionIcon
@@ -270,9 +268,9 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                           color="black"
                           disabled={uploadLimitReached}
                           aria-label={texts.common.attachFile}
-                          className={`cursor-pointer border-gray-200 ${uploadLimitReached ? 'pointer-events-none opacity-50' : ''}`}
+                          className={clsx(uploadLimitReached && classes.attachDisabled)}
                         >
-                          <IconPaperclip className="w-4" />
+                          <IconPaperclip size={16} />
                         </ActionIcon>
                       </Tooltip>
                     </label>
@@ -280,17 +278,16 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
                 )}
                 {configuration?.extensions?.some(isExtensionWithUserArgs) && (
                   <Button
-                    leftSection={<IconFilter className="w-4" />}
+                    leftSection={<IconFilter size={16} />}
                     variant="outline"
                     type="button"
                     onClick={() => setShowFilter(true)}
-                    className="border-gray-200"
                   >
                     Filters
                   </Button>
                 )}
               </div>
-              <div className="flex items-center gap-1">
+              <div className={classes.submitActions}>
                 {showSpeechToText ? (
                   <SpeechRecognitionButton
                     listening={listening}
@@ -318,7 +315,7 @@ export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEm
           </div>
         </form>
 
-        {footer && <Markdown className={'mx-auto text-center text-xs text-gray-400'}>{footer}</Markdown>}
+        {footer && <Markdown className={classes.footer}>{footer}</Markdown>}
       </div>
       {showFilter && (
         <Portal>

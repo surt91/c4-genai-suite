@@ -12,6 +12,7 @@ import {
 } from '@tabler/icons-react';
 import { Dispatch, SetStateAction } from 'react';
 import { texts } from 'src/texts';
+import classes from './PdfControlBar.module.css';
 
 interface IconConfigurationProps {
   style?: CSSProperties | undefined;
@@ -47,7 +48,6 @@ const PdfControlBar = ({
     style: { width: '75%', height: '75%' },
     stroke: 1.5,
   };
-  const inputStylingRules = 'mx-2 h-9 w-15  p-0 pl-1';
 
   const zoomConfigurationParams: PdfZoomLevelProps = {
     minZoomLvl: 0.6,
@@ -104,8 +104,8 @@ const PdfControlBar = ({
   };
 
   return (
-    <div className="control-panel m-3 flex items-baseline justify-between p-3">
-      <div className="flex items-baseline justify-between">
+    <div className={`control-panel ${classes.root}`}>
+      <div className={classes.inner}>
         <Group className="pdf-ctrl-bar" gap="s">
           <Group className="show-viewer">
             <ActionIcon
@@ -132,7 +132,7 @@ const PdfControlBar = ({
               </ActionIcon>
             </div>
             <NumberInput
-              className={inputStylingRules}
+              className={classes.input}
               value={pageNumber}
               min={1}
               max={numPages ?? 1}
@@ -153,12 +153,12 @@ const PdfControlBar = ({
             </div>
           </Group>
           <Divider orientation="vertical" />
-          <Group className="zoom-level-ctrl flex justify-center" gap="xs">
+          <Group className={`zoom-level-ctrl ${classes.zoom}`} gap="xs">
             <ActionIcon onClick={zoomOut} variant="filled" aria-label="zoom out" disabled={isMinZoom}>
               <IconZoomOut {...iconConfigurationParams} />
             </ActionIcon>
             <NumberInput
-              className={inputStylingRules}
+              className={classes.input}
               value={scale}
               min={zoomConfigurationParams.minZoomLvl}
               max={zoomConfigurationParams.maxZoomLvl}

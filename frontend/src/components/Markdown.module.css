@@ -1,0 +1,276 @@
+/*
+ * Typography for rendered markdown, modelled on the previous Tailwind `prose` styles
+ * (with `prose-headings:font-semibold prose-headings:text-base`).
+ * Root level defaults use :where() so that a className passed by the caller always wins.
+ */
+:where(.root) {
+  width: 100%;
+  max-width: 65ch;
+  color: var(--mantine-color-black);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.root > :first-child {
+  margin-top: 0;
+}
+
+.root > :last-child {
+  margin-bottom: 0;
+}
+
+.root :where(p) {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.root :where(a) {
+  color: var(--mantine-color-gray-9);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.root :where(strong) {
+  color: var(--mantine-color-gray-9);
+  font-weight: 600;
+}
+
+.root :where(a strong, blockquote strong, thead th strong) {
+  color: inherit;
+}
+
+.root :where(ol, ul) {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-inline-start: 1.625em;
+}
+
+.root :where(ol) {
+  list-style-type: decimal;
+}
+
+.root :where(ul) {
+  list-style-type: disc;
+}
+
+.root :where(ol > li)::marker {
+  font-weight: 400;
+  color: var(--mantine-color-dark-3);
+}
+
+.root :where(ul > li)::marker {
+  color: var(--mantine-color-gray-4);
+}
+
+.root :where(li) {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.root :where(ol > li, ul > li) {
+  padding-inline-start: 0.375em;
+}
+
+.root :where(ul ul, ul ol, ol ul, ol ol) {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.root :where(hr) {
+  border: 0;
+  border-top: 1px solid var(--mantine-color-gray-2);
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.root :where(blockquote) {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--mantine-color-gray-9);
+  border-inline-start: 0.25rem solid var(--mantine-color-gray-2);
+  quotes: '\201C' '\201D' '\2018' '\2019';
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+  padding-inline-start: 1em;
+}
+
+.root :where(blockquote p:first-of-type)::before {
+  content: open-quote;
+}
+
+.root :where(blockquote p:last-of-type)::after {
+  content: close-quote;
+}
+
+.root :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--mantine-color-gray-9);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.root :where(h1) {
+  margin-top: 0;
+  margin-bottom: 0.8888889em;
+}
+
+.root :where(h2) {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.root :where(h3) {
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+}
+
+.root :where(h4) {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.root :where(h2 + *, h3 + *, h4 + *, hr + *) {
+  margin-top: 0;
+}
+
+.root :where(img, video, figure) {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.root :where(code) {
+  color: var(--mantine-color-gray-9);
+  font-weight: 600;
+  font-size: 0.875em;
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.root :where(code)::before,
+.root :where(code)::after {
+  content: '`';
+}
+
+.root :where(a code, h1 code, h2 code, h3 code, h4 code, blockquote code, th code) {
+  color: inherit;
+}
+
+/* Code blocks: dark background on which the highlight.js theme sits. */
+.root :where(pre) {
+  color: var(--mantine-color-gray-2);
+  background-color: #1e2939;
+  overflow-x: auto;
+  font-weight: 400;
+  font-size: 0.875em;
+  line-height: 1.7142857;
+  margin-top: 1.7142857em;
+  margin-bottom: 1.7142857em;
+  border-radius: 0.375rem;
+  padding: 0.8571429em 1.1428571em;
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.root > pre {
+  display: grid;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.root :where(pre code) {
+  background-color: transparent;
+  border-width: 0;
+  border-radius: 0;
+  padding: 0;
+  font-weight: inherit;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.root :where(pre code)::before,
+.root :where(pre code)::after {
+  content: none;
+}
+
+/* The surrounding <pre> provides the background of code blocks. */
+.root pre code:global(.hljs) {
+  background: transparent;
+  padding: 0;
+}
+
+.root :where(table) {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  font-size: 0.875em;
+  line-height: 1.7142857;
+}
+
+.root :where(thead) {
+  border-bottom: 1px solid var(--mantine-color-gray-4);
+}
+
+.root :where(thead th) {
+  color: var(--mantine-color-gray-9);
+  font-weight: 600;
+  vertical-align: bottom;
+  text-align: start;
+  padding: 0 0.5714286em 0.5714286em;
+}
+
+.root :where(tbody tr) {
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.root :where(tbody tr:last-child) {
+  border-bottom-width: 0;
+}
+
+.root :where(tbody td) {
+  vertical-align: baseline;
+  padding: 0.5714286em;
+}
+
+.root :where(thead th:first-child, tbody td:first-child) {
+  padding-inline-start: 0;
+}
+
+.root :where(thead th:last-child, tbody td:last-child) {
+  padding-inline-end: 0;
+}
+
+/* Code block with copy button */
+.codeBlock {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.copyButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  background-color: var(--mantine-color-gray-9);
+  padding: 0.25rem;
+  color: var(--mantine-color-white);
+  opacity: 0;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.codeBlock:hover .copyButton {
+  opacity: 1;
+}
+
+.inlineCode {
+  overflow: auto;
+}
+
+.externalIcon {
+  display: inline-block;
+  vertical-align: baseline;
+  margin-bottom: -1px;
+}

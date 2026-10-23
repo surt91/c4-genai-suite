@@ -1,0 +1,35 @@
+/* Shared by FilterModal and ConfigurationUserValuesModal. */
+.footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footerEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+}
+
+.legendTitle {
+  margin-right: 0.625rem;
+  font-weight: 700;
+}
+
+.legendDescription {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}

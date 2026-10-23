@@ -1,4 +1,6 @@
+import { Loader } from '@mantine/core';
 import { Markdown } from 'src/components';
+import classes from './ChatItemDetails.module.css';
 
 interface ChatItemToolsProps {
   // The tool that are currently running.
@@ -15,11 +17,11 @@ export function ChatItemTools(props: ChatItemToolsProps) {
   }
 
   return (
-    <div className="mb-1 flex gap-2">
+    <div className={classes.tools}>
       {Object.entries(tools).map(([name, state]) => (
-        <div className="flex items-center gap-1 rounded border-[1px] border-gray-200 px-2 py-1" key={name}>
+        <div className={classes.tool} key={name}>
           <Markdown>{name}</Markdown>
-          {state === 'Started' && <span className="loading loading-spinner loading-xs"></span>}
+          {state === 'Started' && <Loader size={16} color="gray.7" />}
         </div>
       ))}
     </div>

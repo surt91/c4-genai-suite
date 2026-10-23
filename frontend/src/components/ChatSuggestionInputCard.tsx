@@ -1,6 +1,7 @@
 import { ActionIcon, Card, Textarea, TextareaProps, TextInput, TextInputProps } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { texts } from 'src/texts';
+import classes from './ChatSuggestionInputCard.module.css';
 
 type ChatSuggestionInputCardProps = {
   titleProps: TextInputProps;
@@ -15,7 +16,7 @@ export const ChatSuggestionInputCard = ({
   suggestionProps,
   onDeleteClick,
 }: ChatSuggestionInputCardProps) => (
-  <Card withBorder radius="md" className="group relative">
+  <Card withBorder radius="md" className={classes.card}>
     <TextInput mb="xs" label={texts.common.title} placeholder={texts.common.title} {...titleProps} />
     <TextInput mb="xs" label={texts.common.subtitle} placeholder={texts.common.subtitle} {...subtitleProps} />
     <Textarea
@@ -27,13 +28,8 @@ export const ChatSuggestionInputCard = ({
       maxRows={15}
       {...suggestionProps}
     />
-    <ActionIcon
-      color="red"
-      className="absolute top-0 right-0 m-2 opacity-0 group-hover:opacity-100"
-      variant="light"
-      onClick={onDeleteClick}
-    >
-      <IconTrash className="w-5" />
+    <ActionIcon color="red" className={classes.delete} variant="light" onClick={onDeleteClick}>
+      <IconTrash size={20} />
     </ActionIcon>
   </Card>
 );

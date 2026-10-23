@@ -1,0 +1,18 @@
+.error {
+  margin-top: 1rem;
+}
+
+.loader {
+  margin: 8rem auto;
+}
+
+.viewerSection {
+  padding: 0 1rem 1rem;
+}
+
+.viewport {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--mantine-color-gray-3);
+}

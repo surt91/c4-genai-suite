@@ -1,0 +1,180 @@
+/* AI chat item */
+.aiItem {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.aiHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.assistantStatus {
+  color: var(--mantine-color-dark-3);
+}
+
+.error {
+  margin-top: 0.25rem;
+}
+
+.markdown {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.loadingDot {
+  margin-top: 1rem;
+  height: 0.75rem;
+  width: 0.75rem;
+  border-radius: 9999px;
+}
+
+.avatar {
+  max-height: 1rem;
+  min-height: 1rem;
+  max-width: 1rem;
+  min-width: 1rem;
+  padding: 0;
+}
+
+/* Action buttons below a message, revealed on hover/focus of the chat item */
+.actions {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.actions[data-always] {
+  opacity: 1;
+}
+
+.aiItem:hover .actions,
+.aiItem:focus-within .actions,
+.humanItem:hover .actions,
+.humanItem:focus-within .actions {
+  opacity: 1;
+}
+
+.humanActions {
+  justify-content: flex-end;
+}
+
+.tokenCount {
+  margin-inline-start: 0.5rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+  color: var(--mantine-color-gray-7);
+}
+
+/* Rating selector */
+.rating {
+  position: relative;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--mantine-color-gray-4);
+  padding: 1rem;
+}
+
+.ratingClose {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.ratingHint {
+  margin-bottom: 0.5rem;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.25rem;
+}
+
+.ratingOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ratingOptions[data-pending] {
+  opacity: 0.5;
+}
+
+.ratingOption {
+  border-color: var(--mantine-color-gray-4);
+}
+
+.ratingOption[data-selected] {
+  background-color: var(--mantine-color-gray-2);
+}
+
+.successText {
+  color: var(--mantine-color-green-9);
+}
+
+.errorText {
+  color: var(--mantine-color-red-9);
+}
+
+/* Human chat item */
+.humanItem {
+  justify-self: end;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding-left: 8rem;
+}
+
+.humanItem[data-editing] {
+  width: 100%;
+  max-width: none;
+  padding-left: 0;
+}
+
+.editor {
+  border-radius: 0.75rem;
+  background-color: var(--mantine-color-gray-1);
+  padding: 0.75rem;
+}
+
+.editorActions {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.humanText {
+  max-width: 100%;
+  border-radius: 0.75rem;
+  background-color: var(--mantine-color-gray-1);
+  padding: 0.75rem 1rem;
+  white-space: pre-wrap;
+}
+
+/* User input requested by the AI */
+.userInput {
+  margin: 0.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--mantine-color-gray-3);
+  padding: 0.75rem;
+}
+
+.userInputFields {
+  display: flex;
+  flex-direction: column;
+}
+
+.userInputFooter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.userInputButtons {
+  display: flex;
+  gap: 0.5rem;
+}

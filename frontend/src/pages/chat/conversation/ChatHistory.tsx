@@ -1,7 +1,9 @@
+import { clsx } from 'clsx';
 import { useCallback } from 'react';
 import { FileDto } from 'src/api';
 import { useSidebarState } from 'src/hooks/stored';
 import { useStateOfMessages, useStateOfSelectedChatId, useStateOfSelectedDocument } from '../state/chat';
+import classes from './ChatHistory.module.css';
 import { ChatItem } from './ChatItem/ChatItem';
 
 type ChatHistoryProps = {
@@ -14,7 +16,6 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
   const allMessagesButLastTwo = messages.slice(0, -2);
   const lastTwoMessages = messages.slice(-2);
   const chatId = useStateOfSelectedChatId();
-  const autoScrollContainerForLastMessageExchange = 'grid min-h-full min-w-full max-w-full grid-rows-[max-content_1fr]';
 
   const [_, setSidebarRight] = useSidebarState('sidebar-right');
 
@@ -29,9 +30,9 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
 
   return (
     <>
-      <div className={'grid'}>
+      <div className={classes.grid}>
         {allMessagesButLastTwo.map((message, i) => (
-          <div className="chat-history-deferred grid" data-testid="deferred-chat-item" key={`${i}_${chatId}`}>
+          <div className={clsx('chat-history-deferred', classes.grid)} data-testid="deferred-chat-item" key={`${i}_${chatId}`}>
             <ChatItem
               agentName={agentName}
               isLast={false}
@@ -43,7 +44,7 @@ export function ChatHistory({ agentName, editMessage }: ChatHistoryProps) {
           </div>
         ))}
       </div>
-      <div className={autoScrollContainerForLastMessageExchange}>
+      <div className={classes.lastMessageExchange}>
         {lastTwoMessages.map((message, i) => (
           <ChatItem
             key={`${i + messages.length - 2}_${chatId}`}

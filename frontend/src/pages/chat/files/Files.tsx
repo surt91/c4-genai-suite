@@ -1,4 +1,4 @@
-import { Button, Card, Group, Text } from '@mantine/core';
+import { Button, Card, Flex, Group, Stack, Text } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -10,6 +10,7 @@ import { useConversationBucketAvailabilities } from 'src/hooks/api/extensions';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 import { FileCard } from './FileCard';
+import classes from './Files.module.css';
 import { useFileIdSelector } from './useFileIdSelector';
 
 type FileProps = {
@@ -111,11 +112,8 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
           <Text fw={500}>{texts.files.headlineSearchable}</Text>
         </Group>
       </Card.Section>
-      <div className="my-4 flex flex-col gap-4">
-        <div
-          className="flex min-h-24 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-4 text-center text-sm text-gray-600 transition-all hover:border-gray-400"
-          {...getRootProps()}
-        >
+      <Stack my={16} gap={16}>
+        <div className={classes.dropzone} {...getRootProps()}>
           <input
             {...getInputProps()}
             accept={allowedFileNameExtensions.length > 0 ? allowedFileNameExtensions.join(', ') : undefined}
@@ -125,9 +123,9 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
         </div>
 
         <Pagination page={page} pageSize={pageSize} total={total} onPage={setPage} />
-      </div>
+      </Stack>
       {loadedFiles && loadedFiles.items?.length > 0 ? (
-        <div className="flex justify-between gap-2 pb-2">
+        <Flex justify="space-between" gap={8} pb={8}>
           <Button
             size="compact-sm"
             type="button"
@@ -149,26 +147,20 @@ export function Files({ conversationId, userBucket, configurationId }: FileProps
           >
             {texts.files.deselectAll}
           </Button>
-        </div>
+        </Flex>
       ) : null}
-      <div className="flex flex-col overflow-auto">
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-2">
+      <div className={classes.list}>
+        <div className={classes.listInner}>
+          <div className={classes.grid}>
             {filesInUploadState.map((fileDto) => (
-              <div
-                key={`upload-${fileDto.id}`}
-                className="rounded-box flex h-20 flex-col items-center justify-center gap-2 bg-gray-200 text-sm text-gray-500"
-              >
+              <div key={`upload-${fileDto.id}`} className={classes.pending}>
                 {texts.files.uploading}
 
                 <div>{fileDto.fileName}</div>
               </div>
             ))}
             {filesInDeleteState.map((fileDto) => (
-              <div
-                key={`delete-${fileDto.id}`}
-                className="rounded-box flex h-20 flex-col items-center justify-center gap-2 bg-gray-200 text-sm text-gray-500"
-              >
+              <div key={`delete-${fileDto.id}`} className={classes.pending}>
                 {texts.files.deleting}
 
                 <div>{fileDto.fileName}</div>

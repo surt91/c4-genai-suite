@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 import { SourceDto } from 'src/api';
 import Source from 'src/pages/chat/conversation/Source';
 import { texts } from 'src/texts';
+import classes from './ChatItemDetails.module.css';
 
 const ChatItemSources: React.FC<{ sources: SourceDto[]; selectDocument: (documentUri: string) => void }> = ({
   sources,
@@ -15,8 +16,8 @@ const ChatItemSources: React.FC<{ sources: SourceDto[]; selectDocument: (documen
   if (!uniqueSources || uniqueSources.length === 0) return null;
 
   return (
-    <div className="mt-2 mb-2 rounded-2xl border-2 p-4 break-all" data-testid="sources-section">
-      <h2 className="mb-4 text-xl font-bold">{texts.chat.sources.sources}</h2>
+    <div className={classes.sources} data-testid="sources-section">
+      <h2 className={classes.sourcesTitle}>{texts.chat.sources.sources}</h2>
       <ul>
         {uniqueSources.map((source, index) => (
           <Source key={index} source={source} selectDocument={selectDocument} />

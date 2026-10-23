@@ -13,6 +13,7 @@ import { isString } from 'src/lib';
 import { DocumentSource } from 'src/pages/chat/SourcesChunkPreview';
 import { Alert } from './Alert';
 import PdfControlBar from './PdfControlBar';
+import classes from './PdfViewer.module.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
@@ -103,16 +104,16 @@ export function PdfViewer({ selectedDocument, selectedSource, onClose }: PdfView
   );
 
   if (isError) {
-    return container(<Alert text={t('common.errorSourcePdfViewer')} className="mt-4"></Alert>);
+    return container(<Alert text={t('common.errorSourcePdfViewer')} className={classes.error}></Alert>);
   }
 
   if (isPending) {
-    return container(<Loader className="mx-auto my-32" />);
+    return container(<Loader className={classes.loader} />);
   }
 
   return container(
     <>
-      <Card.Section className="input-group" inheritPadding>
+      <Card.Section inheritPadding>
         <div className="viewer-ctrls">
           {data && (
             <PdfControlBar
@@ -128,8 +129,8 @@ export function PdfViewer({ selectedDocument, selectedSource, onClose }: PdfView
         </div>
       </Card.Section>
       {pdfFileUrl && displayPdfViewer && (
-        <Card.Section className="pdf-viewer pt-0 pr-4 pb-4 pl-4">
-          <div className="pdf-viewport h-full w-full overflow-auto border-1" style={VIEWPORT_STYLING_RULES}>
+        <Card.Section className={`pdf-viewer ${classes.viewerSection}`}>
+          <div className={`pdf-viewport ${classes.viewport}`} style={VIEWPORT_STYLING_RULES}>
             <Document
               file={pdfFileUrl}
               options={documentOptions}

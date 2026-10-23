@@ -1,11 +1,12 @@
 import { ActionIcon, Alert, Button, Flex, Tooltip } from '@mantine/core';
 import { IconAlertCircle, IconCircleCheck, IconClipboard, IconThumbDown } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { MessageDtoRatingEnum, ProfileDto } from 'src/api';
 import { Icon } from 'src/components';
-import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { useStateMutateMessageRating } from '../../state/chat';
+import classes from './ChatItem.module.css';
 
 interface AIChatItemActionsProps {
   tokenCount?: number;
@@ -51,12 +52,7 @@ export const AIChatItemActions = ({
   }
   return (
     <>
-      <div
-        className={cn(
-          { 'fade-in opacity-100': renderAlways },
-          'flex items-center opacity-0 transition-all group-focus-within:opacity-100 group-hover:opacity-100',
-        )}
-      >
+      <div className={clsx(classes.actions, { 'fade-in': renderAlways })} data-always={renderAlways || undefined}>
         <Tooltip label={texts.common.copy}>
           <ActionIcon
             color="gray"
@@ -66,7 +62,7 @@ export const AIChatItemActions = ({
             onClick={copyTextToClipboard}
             aria-label={texts.common.copy}
           >
-            <IconClipboard className="w-4" />
+            <IconClipboard size={16} />
           </ActionIcon>
         </Tooltip>
         <Tooltip label={texts.chat.rateMessage}>
@@ -78,12 +74,12 @@ export const AIChatItemActions = ({
             variant="subtle"
             aria-label={texts.chat.rateMessage}
           >
-            <IconThumbDown className="w-4" />
+            <IconThumbDown size={16} />
           </ActionIcon>
         </Tooltip>
 
         {user.isAdmin && tokenCount && tokenCount > 0 && (
-          <div className="ms-2 text-sm text-gray-600">
+          <div className={classes.tokenCount}>
             {tokenCount} {texts.common.tokens}
           </div>
         )}
@@ -91,20 +87,24 @@ export const AIChatItemActions = ({
 
       {isRatingSelectorVisible && (
         <>
-          <div className="relative mt-2 mb-8 rounded-xl border border-gray-300 p-4">
+          <div className={classes.rating}>
             <Tooltip label={texts.chat.updateRating.close}>
-              <button
-                className="btn btn-ghost btn-sm absolute top-1 right-1 p-2"
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                c="black"
+                size="lg"
+                className={classes.ratingClose}
                 onClick={setHiddenVisibility}
                 aria-label={texts.chat.updateRating.close}
               >
                 <Icon size={16} icon="close" />
-              </button>
+              </ActionIcon>
             </Tooltip>
 
-            <div className="mb-2 text-sm">{texts.chat.ratingHint}</div>
+            <div className={classes.ratingHint}>{texts.chat.ratingHint}</div>
 
-            <div className={cn('flex flex-wrap gap-2', { 'opacity-50': updateMessageRating.isPending })}>
+            <div className={classes.ratingOptions} data-pending={updateMessageRating.isPending || undefined}>
               {updateMessageRating.isSuccess && (
                 <Alert
                   variant="light"
@@ -113,12 +113,10 @@ export const AIChatItemActions = ({
                   icon={<IconCircleCheck />}
                   p="xs"
                   w="100%"
-                  classNames={{
-                    title: 'text-green-800',
-                  }}
+                  classNames={{ title: classes.successText }}
                   styles={{ root: { outlineOffset: '-2px' } }}
                 >
-                  <p className="text-green-800">{texts.chat.updateRating.thanksForYourValuableFeedback}</p>
+                  <p className={classes.successText}>{texts.chat.updateRating.thanksForYourValuableFeedback}</p>
                   <Flex>
                     <Button
                       variant="light"
@@ -126,7 +124,7 @@ export const AIChatItemActions = ({
                       color="green"
                       mt="xs"
                       onClick={updateMessageRating.reset}
-                      classNames={{ label: 'text-green-800' }}
+                      classNames={{ label: classes.successText }}
                       styles={{ root: { outlineOffset: '-2px' } }}
                     >
                       {texts.chat.updateRating.changeResponse}
@@ -137,7 +135,7 @@ export const AIChatItemActions = ({
                       color="green"
                       mt="xs"
                       onClick={setHiddenVisibility}
-                      classNames={{ label: 'text-green-800' }}
+                      classNames={{ label: classes.successText }}
                       styles={{ root: { outlineOffset: '-2px' } }}
                     >
                       {texts.chat.updateRating.close}
@@ -153,18 +151,16 @@ export const AIChatItemActions = ({
                   icon={<IconAlertCircle />}
                   p="xs"
                   w="100%"
-                  classNames={{
-                    title: 'text-red-800',
-                  }}
+                  classNames={{ title: classes.errorText }}
                 >
-                  <p className="text-red-800">{updateMessageRating.error.message}</p>
+                  <p className={classes.errorText}>{updateMessageRating.error.message}</p>
                   <Button
                     variant="light"
                     size="compact-xs"
                     color="red"
                     mt="xs"
                     onClick={() => updateMessageRating.variables && updateMessageRating.mutate(updateMessageRating.variables)}
-                    classNames={{ label: 'text-red-800' }}
+                    classNames={{ label: classes.errorText }}
                     styles={{ root: { outlineOffset: '-2px' } }}
                   >
                     {texts.chat.updateRating.retry}
@@ -173,13 +169,17 @@ export const AIChatItemActions = ({
               )}
               {['idle', 'pending'].includes(updateMessageRating.status) &&
                 RATINGS.map((ratingOption) => (
-                  <button
+                  <Button
                     key={ratingOption}
-                    className={cn('btn btn-outline btn-sm border-gray-300', { 'bg-gray-200': rating === ratingOption })}
+                    variant="outline"
+                    color="dark"
+                    size="xs"
+                    className={classes.ratingOption}
+                    data-selected={rating === ratingOption || undefined}
                     onClick={() => updateMessageRating.mutate(ratingOption)}
                   >
                     {texts.chat.rating[ratingOption]}
-                  </button>
+                  </Button>
                 ))}
             </div>
           </div>

@@ -1,11 +1,14 @@
+import { Badge, Card } from '@mantine/core';
+import { clsx } from 'clsx';
 import { formatDate } from 'date-fns';
 import { memo } from 'react';
 import { FileDto } from 'src/api';
 import { ConfirmDialog, Icon } from 'src/components';
 import { OverlayDropdown } from 'src/components/Overlay';
-import { cn, formatFileSize } from 'src/lib';
+import { formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
 import { texts } from 'src/texts';
+import classes from './FileCard.module.css';
 import { useFileIdSelector } from './useFileIdSelector';
 
 interface FileCardProps {
@@ -29,14 +32,16 @@ export const FileCard = memo((props: FileCardProps) => {
   };
 
   return (
-    <div className="card bg-base-100 border-2 shadow-sm hover:shadow">
-      <div className="group card-body relative p-4 text-sm">
-        <div className="flex justify-between">
-          <span className="badge bg-gray-200">{extractType(file)}</span>
-          <span className="text-sm">{formatFileSize(file.fileSize)}</span>
+    <Card padding={0} radius="md" className={classes.card}>
+      <div className={classes.body}>
+        <div className={classes.header}>
+          <Badge color="gray.2" c="black" tt="none" fw={400} radius="sm" size="lg">
+            {extractType(file)}
+          </Badge>
+          <span>{formatFileSize(file.fileSize)}</span>
         </div>
 
-        <div className="mt-1 flex gap-2 truncate" title={file.fileName}>
+        <div className={classes.name} title={file.fileName}>
           <input
             type="checkbox"
             checked={selectedIDs.includes(file.id)}
@@ -45,21 +50,17 @@ export const FileCard = memo((props: FileCardProps) => {
           />
           {file.fileName}
         </div>
-        <span className="text-sm">{formatDate(file.uploadedAt, 'Pp')}</span>
+        <span>{formatDate(file.uploadedAt, 'Pp')}</span>
 
         <OverlayDropdown
-          className="invisible absolute top-2 right-2 p-0 group-hover:visible"
+          className={classes.menuTarget}
           button={({ isOpen }) => (
-            <button
-              className={cn('btn btn-ghost btn-sm rounded-none bg-gray-100 hover:bg-gray-100', {
-                'btn-secondary !visible': isOpen,
-              })}
-            >
+            <button className={clsx(classes.menuButton, isOpen && classes.menuButtonOpen)}>
               <Icon size={16} icon="more-horizontal" />
             </button>
           )}
         >
-          <ul tabIndex={0} className="dropdown-menu">
+          <ul tabIndex={0} className={classes.menu}>
             <li>
               <ConfirmDialog
                 title={texts.files.removeBucketConfirmTitle}
@@ -72,6 +73,6 @@ export const FileCard = memo((props: FileCardProps) => {
           </ul>
         </OverlayDropdown>
       </div>
-    </div>
+    </Card>
   );
 });

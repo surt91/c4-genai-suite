@@ -7,6 +7,7 @@ import { useStateOfEnabledAssistants, useStateOfSelectedAssistant } from 'src/pa
 import { isMobile } from 'src/pages/utils';
 import { texts } from 'src/texts';
 import { useStateMutateChat, useStateOfChat } from '../state/chat';
+import classes from './Configuration.module.css';
 
 interface ConfigurationProps {
   canEditConfiguration?: boolean;
@@ -44,10 +45,11 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
   };
 
   return (
-    <div className="flex flex-row gap-x-4">
+    <div className={classes.root}>
       <Select
         aria-label={texts.chat.selectAssistant}
-        className={isMobile() ? 'w-full' : 'max-w-56'}
+        w={isMobile() ? '100%' : undefined}
+        maw={isMobile() ? undefined : 224}
         radius={'md'}
         comboboxProps={{
           radius: 'md',
@@ -56,7 +58,7 @@ export const Configuration = ({ canEditConfiguration }: ConfigurationProps) => {
           width: isMobile() ? '100%' : '280px',
         }}
         classNames={{
-          input: 'outline-none focus-visible:ring-1 focus-visible:ring-black',
+          input: classes.input,
         }}
         maxDropdownHeight={480}
         renderOption={renderSelectOption}

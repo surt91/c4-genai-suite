@@ -5,6 +5,7 @@ import { SourceDto } from 'src/api';
 import { Icon } from 'src/components';
 import { texts } from 'src/texts';
 import { useStateOfSelectedSource } from '../state/chat';
+import classes from './ChatItemDetails.module.css';
 
 const Source: React.FC<{
   source: SourceDto;
@@ -20,11 +21,13 @@ const Source: React.FC<{
   const { setSelectedSource } = useStateOfSelectedSource();
 
   return (
-    <li className="mb-1 cursor-pointer rounded p-2 hover:bg-gray-100" onClick={toggle}>
-      <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center">
+    <li className={classes.source} onClick={toggle}>
+      <div className={classes.sourceRow}>
+        <div className={classes.sourceTitle}>
           {hasMetadata && (
-            <span className={`mr-2 transform text-xs transition-transform ${isExpanded ? 'rotate-90' : 'rotate-0'}`}>▶</span>
+            <span className={classes.expander} data-expanded={isExpanded || undefined}>
+              ▶
+            </span>
           )}
           {sourceChunksAvailable ? (
             <Anchor
@@ -46,22 +49,22 @@ const Source: React.FC<{
             href={source.document.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 hover:text-blue-700"
+            className={classes.externalLink}
             onClick={(e) => e.stopPropagation()}
           >
-            <Icon className="!-mb-[1px] inline-block align-baseline" icon="external-link" size={16} />
+            <Icon className={classes.externalIcon} icon="external-link" size={16} />
           </a>
         )}
       </div>
       {hasMetadata && isExpanded && (
-        <div className="mt-2 pl-6 text-xs text-gray-600">
+        <div className={classes.metadata}>
           <strong>{texts.chat.sources.metadata.metadata}:</strong>
-          <div className="mt-2 mr-4 grid grid-cols-[auto,1fr] gap-x-4 gap-y-0.5">
+          <div className={classes.metadataGrid}>
             {metadataEntries.map(([key, value]) => {
               return (
                 <React.Fragment key={key}>
-                  <div className="font-medium text-gray-800 capitalize">{translateKey(key)}:</div>
-                  <div className="font-light break-all text-gray-800">{value}</div>
+                  <div className={classes.metadataKey}>{translateKey(key)}:</div>
+                  <div className={classes.metadataValue}>{value}</div>
                 </React.Fragment>
               );
             })}

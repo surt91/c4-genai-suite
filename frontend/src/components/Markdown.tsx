@@ -1,5 +1,6 @@
 import { useClipboard } from '@mantine/hooks';
 import { IconClipboard } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import hljs from 'highlight.js/lib/common';
 import dockerfile from 'highlight.js/lib/languages/dockerfile';
 import powershell from 'highlight.js/lib/languages/powershell';
@@ -11,9 +12,9 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 import { useTransientNavigate } from 'src/hooks';
-import { cn } from 'src/lib';
 import { texts } from 'src/texts';
 import { Icon } from './Icon';
+import classes from './Markdown.module.css';
 
 // The common highlight.js bundle (~35 languages) plus a few that are frequent in chats.
 hljs.registerLanguage('dockerfile', dockerfile);
@@ -60,13 +61,7 @@ export function Markdown({ children, animateText, className }: MarkdownProps) {
     ?.replace(/\\\)/g, '$');
 
   return (
-    <div
-      className={cn(
-        'markdown prose prose-headings:font-semibold prose-headings:text-base w-full text-black',
-        animateText && '[&_*]:fade-in',
-        className,
-      )}
-    >
+    <div className={clsx('markdown', classes.root, className)}>
       <ReactMarkdown
         components={{
           a: LinkRenderer,
@@ -94,7 +89,7 @@ function LinkRenderer({ href, children }: React.AnchorHTMLAttributes<HTMLAnchorE
   if (href !== undefined && (href.startsWith('http') || href.startsWith('mailto'))) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer">
-        <Icon className="!-mb-[1px] inline-block align-baseline" icon="external-link" size={12} />
+        <Icon className={classes.externalIcon} icon="external-link" size={12} />
         {children}
       </a>
     );
@@ -132,17 +127,13 @@ function CodeBlock(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLEleme
   };
 
   return typeof children === 'string' ? (
-    <div className="group relative max-w-full overflow-x-auto">
+    <div className={classes.codeBlock}>
       <code
         {...other}
         className={`hljs language-${language}`}
         dangerouslySetInnerHTML={{ __html: highlight(children.replace(/\n$/, ''), language) }}
       />
-      <IconClipboard
-        onClick={handleCopy}
-        data-testid="copy-code-button"
-        className="absolute top-2 right-2 cursor-pointer rounded bg-gray-800 p-1 text-white opacity-0 transition-all group-hover:opacity-100"
-      />
+      <IconClipboard onClick={handleCopy} data-testid="copy-code-button" className={classes.copyButton} />
     </div>
   ) : (
     <Code {...props}>{children}</Code>
@@ -152,7 +143,7 @@ function CodeBlock(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLEleme
 function Code(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
   const { children, className, ref: _, ...other } = props;
   return (
-    <code {...other} className={cn(className, 'overflow-auto')}>
+    <code {...other} className={clsx(className, classes.inlineCode)}>
       {children}
     </code>
   );

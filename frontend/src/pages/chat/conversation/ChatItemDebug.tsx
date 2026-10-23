@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Markdown } from 'src/components';
+import classes from './ChatItemDetails.module.css';
 
 interface ChatItemDebugProps {
   // The debug records.
@@ -12,7 +13,7 @@ export const ChatItemDebug = memo((props: ChatItemDebugProps) => {
   return (
     <>
       {debug.length > 0 && (
-        <div className="relative my-1 rounded-lg border-[1px] border-gray-300 p-4 text-sm" data-testid="chat-item-debug">
+        <div className={classes.box} data-testid="chat-item-debug">
           {debug.map((d, i) => (
             <Markdown key={i}>{d}</Markdown>
           ))}

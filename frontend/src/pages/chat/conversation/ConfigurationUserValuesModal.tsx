@@ -8,6 +8,7 @@ import { ExtensionContext } from 'src/hooks';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { useArgumentObjectSpecResolver } from 'src/pages/admin/extensions/hooks';
 import { texts } from 'src/texts';
+import classes from './ArgumentsModal.module.css';
 
 type JSONValue = string | number | boolean | object | unknown[] | undefined;
 
@@ -88,8 +89,8 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
               header={configuration.name}
               footer={
                 <fieldset>
-                  <div className="flex flex-row justify-end">
-                    <div className="flex gap-2">
+                  <div className={classes.footerEnd}>
+                    <div className={classes.buttons}>
                       <Button type="button" variant="subtle" onClick={onClose}>
                         {texts.common.cancel}
                       </Button>
@@ -99,15 +100,15 @@ export function ConfigurationUserValuesModal(props: JsonFormProps & PropsWithChi
                 </fieldset>
               }
             >
-              <div className="flex flex-col">
+              <div className={classes.fields}>
                 {Object.entries(configuration.configurableArguments?.properties ?? {}).map(([id, x]) => (
                   <div key={id}>
                     {x.type === 'object' && (
                       <Fieldset
                         legend={
-                          <div className="flex items-center">
-                            <h4 className="mr-2.5 font-bold">{x.title}</h4>
-                            <p className="text-xs">{x.description}</p>
+                          <div className={classes.legend}>
+                            <h4 className={classes.legendTitle}>{x.title}</h4>
+                            <p className={classes.legendDescription}>{x.description}</p>
                           </div>
                         }
                       >

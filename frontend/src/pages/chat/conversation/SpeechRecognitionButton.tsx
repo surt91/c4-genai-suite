@@ -1,6 +1,8 @@
 import { ActionIcon, Group, Menu, Tooltip } from '@mantine/core';
 import { IconChevronDown, IconMicrophone } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { texts } from 'src/texts';
+import classes from './VoiceButton.module.css';
 
 export interface Language {
   name: string;
@@ -27,19 +29,19 @@ export function SpeechRecognitionButton({
 
   return (
     <>
-      <div className="flex" style={{ width: 'fit-content' }}>
+      <div className={classes.wrapper}>
         <Group wrap="nowrap" gap={0} align="stretch">
           <Tooltip label={toolTipText}>
             <ActionIcon
               variant={listening ? 'filled' : 'outline'}
               size="lg"
               color={listening ? 'red' : 'black'}
-              className={`border-gray-200 ${listening ? 'animate-pulse' : ''} rounded-r-none border-r-0`}
+              className={clsx(listening && classes.pulse)}
               onClick={toggleSpeechRecognition}
               style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: '36px' }}
               aria-label={toolTipText}
             >
-              <IconMicrophone className="w-4" />
+              <IconMicrophone size={16} />
             </ActionIcon>
           </Tooltip>
           <Menu shadow="md" withInitialFocusPlaceholder={false}>
@@ -47,7 +49,6 @@ export function SpeechRecognitionButton({
               <ActionIcon
                 variant="outline"
                 size="xs"
-                className="rounded-l-none"
                 disabled={listening}
                 aria-label={texts.accessibility.selectLanguage}
                 style={{
@@ -59,7 +60,7 @@ export function SpeechRecognitionButton({
                   height: 'auto',
                 }}
               >
-                <IconChevronDown className="w-3" />
+                <IconChevronDown size={12} />
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown aria-label={texts.accessibility.selectLanguage}>

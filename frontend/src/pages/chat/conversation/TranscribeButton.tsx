@@ -1,7 +1,9 @@
 import { ActionIcon } from '@mantine/core';
 import { IconMicrophone } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 import { DisabledAwareTooltip } from 'src/components/DisabledAwareTooltip';
 import { texts } from 'src/texts';
+import classes from './VoiceButton.module.css';
 
 interface TranscribeButtonProps {
   isRecording: boolean;
@@ -31,13 +33,13 @@ export function TranscribeButton({ isRecording, isTranscribing, onToggle }: Tran
         variant={isRecording ? 'filled' : 'outline'}
         size="lg"
         color={getButtonColor()}
-        className={`border-gray-200 ${isRecording ? 'animate-pulse' : ''}`}
+        className={clsx(isRecording && classes.pulse)}
         onClick={onToggle}
         disabled={isTranscribing}
         loading={isTranscribing}
         aria-label={getButtonText()}
       >
-        <IconMicrophone className="w-4" />
+        <IconMicrophone size={16} />
       </ActionIcon>
     </DisabledAwareTooltip>
   );
