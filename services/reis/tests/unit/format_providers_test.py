@@ -1,4 +1,8 @@
 from itertools import combinations
+from pathlib import Path
+
+import pypdf
+import pytest
 
 from rei_s.config import Config
 from rei_s.services.formats import get_format_providers
@@ -351,6 +355,31 @@ def test_format_providers_unique() -> None:
         for extension in extensions:
             f_extension = SourceFile(path="", mime_type="", file_name=f"x.{extension}")
             assert not i.supports(f_extension) or not j.supports(f_extension)
+
+
+@pytest.mark.parametrize(
+    "file_name,template",
+    [
+        ("evil.md", '# Hi\n\n<link rel="attachment" href="{url}">\n'),
+        ("evil.txt", '<link rel="attachment" href="{url}">\n'),
+        # the content closes the code fence the preview wraps around it
+        ("evil.json", '1\n```\n\n<link rel="attachment" href="{url}">\n\n```\n'),
+    ],
+)
+def test_pdf_preview_does_not_load_external_resources(tmp_path: Path, file_name: str, template: str) -> None:
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOP-SECRET")
+    content = template.format(url=secret.as_uri()).encode()
+
+    with temp_file(buffer=content, file_name=file_name) as source_file:
+        provider = next(p for p in get_format_providers(get_test_config()) if p.supports(source_file))
+        pdf = provider.convert_file_to_pdf(source_file)
+        try:
+            reader = pypdf.PdfReader(pdf.path)
+            assert dict(reader.attachments) == {}
+            assert b"TOP-SECRET" not in pdf.buffer
+        finally:
+            pdf.delete()
 
 
 def assert_pdf_contains_text(file: SourceFile, text: str) -> None:

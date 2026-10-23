@@ -9,6 +9,7 @@ from uuid import uuid4
 import markdown
 from pygments.formatters import HtmlFormatter  # type: ignore[import-untyped]  # ty: ignore[unresolved-import]
 from weasyprint import HTML
+from weasyprint.urls import URLFetcher
 
 from rei_s import logger
 from rei_s.types.source_file import SourceFile
@@ -62,9 +63,12 @@ def generate_pdf_from_md(markdown_text: str, doc_id: str, file_name: str) -> Sou
     pygments_css = formatter.get_style_defs(".codehilite")
     html_doc = f"<html><head><style>{pygments_css}</style></head><body>{html}</body></html>"
 
-    # Convert HTML to PDF
+    # Convert HTML to PDF.
+    # The HTML is derived from user content, so WeasyPrint must not load any external resource: by default it
+    # follows `file://` (e.g. `<link rel="attachment" href="file:///proc/self/environ">` embeds the file into the
+    # pdf) and `http(s)://` URLs (SSRF). Only inline `data:` URLs are allowed.
     path = get_new_file_path(extension="pdf")
-    HTML(string=html_doc).write_pdf(path)
+    HTML(string=html_doc, url_fetcher=URLFetcher(allowed_protocols={"data"})).write_pdf(path)
     return SourceFile(id=doc_id, path=path, mime_type="application/pdf", file_name=file_name)
 
 
