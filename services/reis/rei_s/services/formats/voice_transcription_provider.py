@@ -146,18 +146,18 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
     def may_start_separate_process_for_converting(self) -> bool:
         return self.may_start_separate_process_for_chunking
 
-    @staticmethod
-    def build_ffmpeg_error_message(e: ffmpeg_utils.FfmpegError) -> str:
-        stderr = e.stderr.decode(errors="replace")
-        return f"Error handling audio file for voice transcription\n\nffmpeg stderr:\n{stderr}"
+    ffmpeg_error_message = "Error handling audio file for voice transcription"
+
+    def ffmpeg_error(self, e: ffmpeg_utils.FfmpegError) -> ProcessingError:
+        # the stderr output is only logged: it contains paths of the server and is of no use for the client
+        logger.error(f"{self.ffmpeg_error_message}\n\nffmpeg stderr:\n{e.stderr.decode(errors='replace')}")
+        return ProcessingError(self.ffmpeg_error_message, 400)
 
     def probe_audio_codec(self, input_video_file: str | Path) -> MediaMetadata:
         try:
             metadata = ffmpeg_utils.probe(input_video_file)
         except ffmpeg_utils.FfmpegError as e:
-            message = self.build_ffmpeg_error_message(e)
-            logger.error(message)
-            raise ProcessingError(message, 400) from e
+            raise self.ffmpeg_error(e) from e
 
         audio_codec = None
         for stream in metadata["streams"]:
@@ -208,9 +208,7 @@ class VoiceTranscriptionProvider(AbstractFormatProvider):
                         input_args=["-ss", str(start_time), "-t", str(segment_duration_seconds)],
                     )
                 except ffmpeg_utils.FfmpegError as e:
-                    message = self.build_ffmpeg_error_message(e)
-                    logger.error(message)
-                    raise ProcessingError(message, 400) from e
+                    raise self.ffmpeg_error(e) from e
         except BaseException:
             for segment in segments_files:
                 segment.delete()

@@ -6,7 +6,6 @@ from langchain_core.documents import Document
 from rei_s import logger
 from rei_s.config import Config
 from rei_s.services.formats import ffmpeg_utils
-from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.formats.voice_transcription_provider import VoiceTranscriptionProvider
 from rei_s.types.source_file import SourceFile
 
@@ -34,12 +33,7 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
     ) -> None:
         super().__init__(config=config, chunk_size=chunk_size, chunk_overlap=chunk_overlap, **kwargs)
 
-    @staticmethod
-    def build_ffmpeg_error_message(e: ffmpeg_utils.FfmpegError) -> str:
-        return (
-            "Error extracting audio track from video file for voice transcription with ffmpeg\n\n"
-            f"ffmpeg stderr:\n{e.stderr.decode(errors='replace')}"
-        )
+    ffmpeg_error_message = "Error extracting audio track from video file for voice transcription with ffmpeg"
 
     def extract_audio_to_file(self, input_video_path: str | Path) -> SourceFile:
         metadata = self.probe_audio_codec(input_video_path)
@@ -58,9 +52,7 @@ class VideoTranscriptionProvider(VoiceTranscriptionProvider):
             ffmpeg_utils.convert(input_video_path, audio_only_file.path, ["-vn", *output_args])
         except ffmpeg_utils.FfmpegError as e:  # pragma: no cover
             audio_only_file.delete()
-            message = self.build_ffmpeg_error_message(e)
-            logger.error(message)
-            raise ProcessingError(message, 400) from e
+            raise self.ffmpeg_error(e) from e
 
         return audio_only_file
 

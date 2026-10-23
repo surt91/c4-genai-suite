@@ -149,7 +149,7 @@ def test_audio_transcription_provider_broken_file(mocked_whisper_answer: str) ->
 
     with pytest.raises(ProcessingError) as e:
         provider.process_file(source_file)
-    assert e.value.message.startswith("Error handling audio file for voice transcription")
+    assert e.value.message == "Error handling audio file for voice transcription"
     assert 400 <= e.value.status < 500
 
 
@@ -180,9 +180,8 @@ def test_video_transcription_provider_broken_file(mocked_whisper_answer: str) ->
 
     with pytest.raises(ProcessingError) as e:
         provider.process_file(source_file)
-    assert e.value.message.startswith(
-        "Error extracting audio track from video file for voice transcription with ffmpeg"
-    )
+    # the ffmpeg output (with server paths) is only logged
+    assert e.value.message == "Error extracting audio track from video file for voice transcription with ffmpeg"
     assert 400 <= e.value.status < 500
 
 
