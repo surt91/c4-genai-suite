@@ -9,7 +9,7 @@ import * as request from 'supertest';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../../app.module';
 import { configureCookies, configureSession } from '../../config';
-import { BUILTIN_USER_GROUP_DEFAULT, UserEntity, UserGroupEntity } from '../../domain/database';
+import { BUILTIN_USER_GROUP_DEFAULT, SessionEntity, UserEntity, UserGroupEntity } from '../../domain/database';
 
 const PASSWORD = 'Password1!';
 
@@ -79,5 +79,20 @@ describe('Session handling', () => {
     // The session id known before the (second) login is no longer valid.
     await get('/auth/profile').set('Cookie', first!).expect(HttpStatus.UNAUTHORIZED);
     await get('/auth/profile').set('Cookie', second!).expect(HttpStatus.OK);
+  });
+
+  it('rejects and deletes sessions whose max age has passed (not only enforced by the browser)', async () => {
+    const cookie = getSessionCookie(await login())!;
+    await get('/auth/profile').set('Cookie', cookie).expect(HttpStatus.OK);
+
+    const sessions = dataSource.getRepository(SessionEntity);
+    const id = sessionIdOf(cookie);
+    const session = await sessions.findOneByOrFail({ id });
+    const value = session.value as unknown as { cookie: { expires: string } };
+    value.cookie.expires = new Date(Date.now() - 1000).toISOString();
+    await sessions.save(session);
+
+    await get('/auth/profile').set('Cookie', cookie).expect(HttpStatus.UNAUTHORIZED);
+    expect(await sessions.findOneBy({ id })).toBeNull();
   });
 });
