@@ -31,7 +31,10 @@ def get_all_subclasses(cls: Any) -> set[type[Any]]:
 
 @lru_cache
 def get_format_providers(config: Config) -> list[AbstractFormatProvider]:
-    return [cls(config=config) for cls in get_all_subclasses(AbstractFormatProvider) if cls(config=config).enabled]
+    # sorted for a deterministic order (e.g. of the file types)
+    classes = sorted(get_all_subclasses(AbstractFormatProvider), key=lambda cls: cls.name)
+    providers = [cls(config=config) for cls in classes]
+    return [provider for provider in providers if provider.enabled]
 
 
 @lru_cache

@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Dict, Tuple
+from typing import Any, Optional, Dict
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic.alias_generators import to_camel
 
@@ -28,9 +28,6 @@ class SourceDto(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
-SourceKey = Tuple[Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]]
-
-
 class ResultDocument(BaseModel):
     content: str = Field(description="the text content of the chunk")
     vector: list[float] | None = Field(description="the vector of the chunk", default=None)
@@ -56,13 +53,3 @@ class FileResult(BaseModel):
 
 class FileProcessResult(BaseModel):
     chunks: list[ResultDocument] = Field(description="The chunks which constitute the processed file")
-
-
-class UploadRequest(BaseModel):
-    bucket: str = Field(description="The bucket where the file belongs too")
-    index_name: str = Field(description="The index name")
-    id: str = Field(description="The ID of the file")
-
-
-class DocumentResponse(BaseModel):
-    documents: List[str]
