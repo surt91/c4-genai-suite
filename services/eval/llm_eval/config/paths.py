@@ -6,8 +6,6 @@ BACKEND_CORE_DIR = Path(__file__).parent.parent.absolute()
 
 DATA_DIR = PROJECT_ROOT_DIR / "data"
 
-RESULT_DIR = DATA_DIR / "results"
-
 ALEMBIC_INI = BACKEND_CORE_DIR / "alembic.ini"
 ALEMBIC_DIR = BACKEND_CORE_DIR / "alembic"
 

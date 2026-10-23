@@ -34,4 +34,3 @@ async def get_db() -> AsyncGenerator[AsyncSession, Any]:
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
-NewSessionDep = Annotated[AsyncSession, Depends(get_db, use_cache=False)]

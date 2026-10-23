@@ -1,8 +1,7 @@
 import re
 from typing import Type
 
-from deepeval.models import DeepEvalBaseEmbeddingModel, DeepEvalBaseLLM
-from langchain_core.embeddings import Embeddings
+from deepeval.models import DeepEvalBaseLLM
 from langchain_core.language_models import BaseChatModel
 from openai import BadRequestError, RateLimitError
 from pydantic import BaseModel
@@ -71,37 +70,3 @@ class DeepEvalChatModel(DeepEvalBaseLLM):
 
     def get_model_name(self) -> str:
         return "Custom Deep Eval Chat Model"
-
-
-class DeepEvalCustomEmbeddings(DeepEvalBaseEmbeddingModel):
-    embeddings: Embeddings
-
-    # noinspection PyMissingConstructor
-    def __init__(self, embeddings: Embeddings) -> None:
-        self.embeddings = embeddings
-
-    def load_model(self) -> Embeddings:
-        return self.embeddings
-
-    @retry_on_error((RateLimitError,), SETTINGS.deepeval.max_retries)
-    def embed_text(self, text: str) -> list[float]:
-        embedding_model = self.load_model()
-        return embedding_model.embed_query(text)
-
-    @retry_on_error((RateLimitError,), SETTINGS.deepeval.max_retries)
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        embedding_model = self.load_model()
-        return embedding_model.embed_documents(texts)
-
-    @async_retry_on_error((RateLimitError,), SETTINGS.deepeval.max_retries)
-    async def a_embed_text(self, text: str) -> list[float]:
-        embedding_model = self.load_model()
-        return await embedding_model.aembed_query(text)
-
-    @async_retry_on_error((RateLimitError,), SETTINGS.deepeval.max_retries)
-    async def a_embed_texts(self, texts: list[str]) -> list[list[float]]:
-        embedding_model = self.load_model()
-        return await embedding_model.aembed_documents(texts)
-
-    def get_model_name(self) -> str:
-        return "Custom Deep Eval Embedding Model"
