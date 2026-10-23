@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '../test-utils.tsx';
 import { texts } from 'src/texts';
+import { render, screen } from '../test-utils.tsx';
 import { DashboardPage } from './DashboardPage.tsx';
 
 vi.mock('recharts', async () => {

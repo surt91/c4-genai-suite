@@ -36,7 +36,7 @@ function upsertToolCall(toolCalls: ToolCallState[] | undefined, update: ToolCall
 const responseStatus = (error: unknown) => (error instanceof ResponseError ? error.response.status : undefined);
 
 /** The message shown in the answer when the request of the chat failed (before or while streaming). */
-export function streamErrorMessage(error: unknown) {
+function streamErrorMessage(error: unknown) {
   if (error instanceof SseResponseError) {
     return error.serverMessage ? `${texts.chat.sendFailed}: ${error.serverMessage}` : `${texts.chat.sendFailed}.`;
   }
