@@ -30,14 +30,16 @@ export class GetUsersHandler implements IQueryHandler<GetUsers, GetUsersResponse
   async execute(query: GetUsers): Promise<GetUsersResponse> {
     const { page, pageSize, query: searchQuery } = query;
 
-    const options: FindManyOptions<UserEntity> = {};
+    // A stable order is needed for the pagination.
+    const options: FindManyOptions<UserEntity> = { order: { name: 'ASC', id: 'ASC' } };
 
     if (searchQuery && searchQuery != '') {
-      options.where = {
-        name: Raw((alias) => `LOWER(${alias}) LIKE :userNameQuery`, {
-          userNameQuery: `%${searchQuery.toLowerCase()}%`,
-        }),
-      };
+      const contains = () =>
+        Raw((alias) => `LOWER(${alias}) LIKE :userQuery ESCAPE '\\'`, {
+          userQuery: `%${searchQuery.toLowerCase().replace(/[\\%_]/g, '\\$&')}%`,
+        });
+      // the API documents the query as e-mail search, the UI shows names: search both
+      options.where = [{ name: contains() }, { email: contains() }];
     }
 
     const total = await this.users.count(options);

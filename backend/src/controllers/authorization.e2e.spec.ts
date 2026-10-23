@@ -155,6 +155,18 @@ describe('Authorization', () => {
     });
   });
 
+  it('searches users by name and e-mail', async () => {
+    type Users = { items: { id: string }[] };
+    const byName = await asAdmin(http().get('/users?query=ALIC')).expect(200);
+    expect((byName.body as Users).items.map((x) => x.id)).toEqual([alice.id]);
+
+    const byEmail = await asAdmin(http().get(`/users?query=${encodeURIComponent(bob.email)}`)).expect(200);
+    expect((byEmail.body as Users).items.map((x) => x.id)).toEqual([bob.id]);
+
+    const wildcard = await asAdmin(http().get('/users?query=%25')).expect(200);
+    expect((wildcard.body as Users).items).toEqual([]);
+  });
+
   it('answers non-numeric ids with 400 instead of a database error', async () => {
     await asUser(http().get('/conversations/abc')).expect(400);
     await asAdmin(http().get('/configurations/abc')).expect(400);
