@@ -1,14 +1,8 @@
 import { FormErrors } from '@mantine/form';
-import { type ClassValue, clsx } from 'clsx';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { twMerge } from 'tailwind-merge';
 import { infer as ZodInfer, ZodTypeAny } from 'zod';
 import { ResponseError } from 'src/api';
 import { texts } from 'src/texts';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export function isString(value: unknown): value is string {
   return typeof value === 'string' || value instanceof String;

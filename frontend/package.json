@@ -54,7 +54,6 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
-    "tailwind-merge": "^3.7.0",
     "zod": "^4.6.7",
     "zustand": "^5.0.16"
   },
@@ -64,8 +63,6 @@
     "@eslint/js": "9.39.5",
     "@faker-js/faker": "10.6.0",
     "@openapitools/openapi-generator-cli": "2.42.0",
-    "@tailwindcss/typography": "0.5.20",
-    "@tailwindcss/vite": "4.3.3",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "^16.3.3",
@@ -78,7 +75,6 @@
     "@typescript-eslint/parser": "8.72.0",
     "@vitejs/plugin-react": "6.1.2",
     "@vitest/coverage-v8": "5.0.5",
-    "daisyui": "5.7.50",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
@@ -95,8 +91,6 @@
     "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "7.0.1",
     "prettier": "3.9.10",
-    "prettier-plugin-tailwindcss": "0.8.1",
-    "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vite": "8.3.5",
     "vitest": "5.0.5"

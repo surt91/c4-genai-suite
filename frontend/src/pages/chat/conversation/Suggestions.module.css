@@ -16,8 +16,7 @@
   border: 1px solid var(--mantine-color-gray-4);
   border-radius: 0.5rem;
   background-color: transparent;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  /* No font size: Mantine's global `button { font: inherit }` always overrode the former `text-sm`. */
   text-align: left;
   cursor: pointer;
 }

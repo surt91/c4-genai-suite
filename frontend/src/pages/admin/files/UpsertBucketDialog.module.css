@@ -37,7 +37,6 @@
   border-radius: 0.25rem;
   background-color: var(--mantine-color-white);
   padding: 0 0.75rem;
-  font-size: 0.875rem;
 
   &:focus {
     outline: 2px solid var(--mantine-color-gray-4);

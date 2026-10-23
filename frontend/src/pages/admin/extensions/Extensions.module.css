@@ -50,9 +50,8 @@
   display: block;
   min-width: 0;
   flex-grow: 1;
-  overflow: hidden;
+  /* Long names wrap (the former `truncate` class was dropped by tailwind-merge in favour of `text-ellipsis`). */
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .menuLinkDisabled {
