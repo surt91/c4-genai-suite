@@ -7,7 +7,7 @@ from openai import RateLimitError
 from tenacity import RetryCallState, retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
 
 from rei_s import logger
-from rei_s.services.filestore_adapter import FileStoreAdapter
+from rei_s.services.filestore_adapter import FileStoreAdapter, ReadableStream
 from rei_s.services.formats.utils import ProcessingError
 from rei_s.services.multiprocess_utils import run_in_process
 from rei_s.services.embeddings_provider import get_embeddings
@@ -284,13 +284,13 @@ def get_documents_content(config: Config, ids: List[str], index_name: str | None
     return content
 
 
-def get_document_pdf(config: Config, doc_id: str) -> SourceFile | None:
+def open_document_pdf(config: Config, doc_id: str) -> ReadableStream | None:
     file_store = get_file_store(config=config)
     logger.info(f"get file: {doc_id}")
     if file_store is None:
         return None
 
-    return file_store.get_document(doc_id)
+    return file_store.open_document(doc_id)
 
 
 def delete_file(config: Config, doc_id: str, index_name: str | None = None) -> None:

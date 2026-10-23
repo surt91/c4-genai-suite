@@ -1,42 +1,43 @@
 import os
 from pathlib import Path
+import shutil
+
 from rei_s.config import Config
-from rei_s.services.filestore_adapter import FileStoreAdapter
+from rei_s.services.filestore_adapter import FileStoreAdapter, ReadableStream
 from rei_s.types.source_file import SourceFile
 
 
 def normalized_path(path: Path, base_name: str) -> Path:
-    base_name = Path(base_name).resolve().name
-    joined_path = path / base_name
-    normalized_path = joined_path.resolve()
-    if not str(normalized_path).startswith(str(path.resolve())):
-        raise Exception("Not allowed: path escapes base directory")
-    return normalized_path
+    if base_name in {"", ".", ".."} or "/" in base_name or "\\" in base_name or "\x00" in base_name:
+        raise ValueError(f"Invalid document id: {base_name!r}")
+    return path.resolve() / base_name
 
 
 class FSFileStoreAdapter(FileStoreAdapter):
     path: Path
 
     def add_document(self, document: SourceFile) -> None:
-        path = normalized_path(self.path, document.id)
-        with open(path, "wb") as f:
-            f.write(document.buffer)
+        shutil.copyfile(document.path, normalized_path(self.path, document.id))
+
+    # documents with an invalid id can not have been added, so they are treated like missing documents
 
     def delete(self, doc_id: str) -> None:
-        path = normalized_path(self.path, doc_id)
-        if not path.exists():
-            raise FileNotFoundError()
-        os.remove(path)
+        try:
+            normalized_path(self.path, doc_id).unlink(missing_ok=True)
+        except ValueError:
+            pass
 
-    def get_document(self, doc_id: str) -> SourceFile:
-        path = normalized_path(self.path, doc_id)
-        if not path.exists():
-            raise FileNotFoundError()
-        return SourceFile(id=doc_id, path=path, mime_type="application/pdf", file_name=f"{doc_id}.pdf")
+    def open_document(self, doc_id: str) -> ReadableStream | None:
+        try:
+            return open(normalized_path(self.path, doc_id), "rb")
+        except (FileNotFoundError, ValueError):
+            return None
 
     def exists(self, doc_id: str) -> bool:
-        path = normalized_path(self.path, doc_id)
-        return path.exists()
+        try:
+            return normalized_path(self.path, doc_id).is_file()
+        except ValueError:
+            return False
 
     @classmethod
     def create(cls, config: Config) -> "FSFileStoreAdapter":

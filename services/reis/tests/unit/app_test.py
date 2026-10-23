@@ -6,7 +6,7 @@ from rei_s.services.random_embeddings import RandomEmbeddings
 from langchain_core.documents import Document
 
 from pytest_mock import MockerFixture
-from rei_s.services.filestores.devnull import DevNullFileStoreAdapter
+from rei_s.services.filestore_adapter import FileStoreAdapter
 from rei_s.services.vectorstores.devnull_store import DevNullVectorStoreAdapter
 
 
@@ -235,7 +235,7 @@ def test_add_files_with_filestore(mocker: MockerFixture, client: TestClient) -> 
     mocker.patch("rei_s.services.embeddings_provider.get_embeddings", return_value=RandomEmbeddings(size=1352))
     vector_store_mock = mocker.Mock(spec=DevNullVectorStoreAdapter)
     mocker.patch("rei_s.services.store_service.get_vector_store", return_value=vector_store_mock)
-    file_store_mock = mocker.Mock(spec=DevNullFileStoreAdapter)
+    file_store_mock = mocker.Mock(spec=FileStoreAdapter)
     mocker.patch("rei_s.services.store_service.get_file_store", return_value=file_store_mock)
 
     with open("tests/data/birthdays.yaml", "rb") as f:

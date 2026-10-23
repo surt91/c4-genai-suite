@@ -1,5 +1,6 @@
 from io import BytesIO
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Protocol
 from faker import Faker
@@ -135,6 +136,32 @@ def test_get_document_pdf(file_uploader: FileUploaderFixture, client: TestClient
     pdf_content = PdfProvider().process_file(pdf_file, chunk_overlap=0)
     text = "".join(i.page_content for i in pdf_content)
     assert input_content[:20] in text
+
+
+def test_get_document_pdf_leaves_no_temp_files(
+    file_uploader: FileUploaderFixture, client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    file_uploader(bucket=1, file_id=1, index_name=INDEX_NAME)
+
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    response = client.get("/documents/pdf", params={"doc_id": "1"})
+
+    assert response.status_code == 200
+    assert response.content.startswith(b"%PDF")
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_get_missing_document_pdf_is_404(client: TestClient) -> None:
+    response = client.get("/documents/pdf", params={"doc_id": "missing"})
+
+    assert response.status_code == 404
+
+
+def test_delete_file_without_pdf(client: TestClient) -> None:
+    # e.g. uploaded before the file store was enabled; the backend deletes before every file update
+    response = client.delete("/files/never-uploaded", params={"indexName": INDEX_NAME})
+
+    assert response.status_code == 200
 
 
 def get_config_override_with_stt() -> Config:

@@ -3,10 +3,9 @@ from typing import TYPE_CHECKING
 
 import boto3
 from botocore.exceptions import ClientError
-from fastapi import HTTPException
 
 from rei_s.config import Config
-from rei_s.services.filestore_adapter import FileStoreAdapter
+from rei_s.services.filestore_adapter import FileStoreAdapter, ReadableStream
 from rei_s.types.source_file import SourceFile
 
 if TYPE_CHECKING:
@@ -25,19 +24,17 @@ class S3FileStoreAdapter(FileStoreAdapter):
             self.client.upload_fileobj(f, self.bucket_name, document.id)
 
     def delete(self, doc_id: str) -> None:
-        if not self.exists(doc_id):
-            raise HTTPException(status_code=404, detail="File not found")
-
+        # deleting a missing key is not an error in S3
         self.client.delete_object(Bucket=self.bucket_name, Key=doc_id)
 
-    def get_document(self, doc_id: str) -> SourceFile:
+    def open_document(self, doc_id: str) -> ReadableStream | None:
         try:
             response = self.client.get_object(Bucket=self.bucket_name, Key=doc_id)
         except ClientError as e:
             if e.response["Error"]["Code"] == "NoSuchKey":
-                raise HTTPException(status_code=404, detail="File not found") from e
+                return None
             raise
-        return SourceFile.new_temporary_file(response["Body"].read())
+        return response["Body"]
 
     def exists(self, doc_id: str) -> bool:
         try:

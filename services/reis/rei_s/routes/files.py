@@ -1,5 +1,5 @@
 import re
-from typing import Annotated, List, Optional
+from typing import Annotated, Iterator, List, Optional
 from asyncio import wrap_future
 import uuid
 from urllib.parse import unquote
@@ -8,10 +8,11 @@ import anyio
 from fastapi import APIRouter, Depends, Request, Header, Response, HTTPException
 from fastapi.params import Query
 
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from pydantic import AfterValidator
 from rei_s.services import store_service
 from rei_s.config import Config, get_config
+from rei_s.services.filestore_adapter import ReadableStream
 from rei_s.types.dtos import (
     FileProcessResult,
     ResultDocument,
@@ -115,7 +116,7 @@ def get_documents_content(
     "/documents/pdf",
     tags=["files"],
     operation_id="getDocumentPdf",
-    response_class=FileResponse,
+    response_class=StreamingResponse,
     responses={
         200: {"content": {"application/octet-stream": {"schema": {"type": "string", "format": "binary"}}}},
         404: {
@@ -130,12 +131,20 @@ def get_document_pdf(
     """
     Get the document's pdf by its ID.
     """
-    content = store_service.get_document_pdf(config, doc_id)
+    stream = store_service.open_document_pdf(config, doc_id)
 
-    if content is None:
+    if stream is None:
         raise HTTPException(status_code=404, detail="PDF not found")
 
-    return FileResponse(content.path, media_type="application/octet-stream")
+    return StreamingResponse(_read_and_close(stream), media_type="application/octet-stream")
+
+
+def _read_and_close(stream: ReadableStream, chunk_size: int = 64 * 1024) -> Iterator[bytes]:
+    try:
+        while chunk := stream.read(chunk_size):
+            yield chunk
+    finally:
+        stream.close()
 
 
 @router.post(
