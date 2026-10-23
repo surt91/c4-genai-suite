@@ -880,6 +880,7 @@ export const en = {
     buckets: 'Buckets',
     bucketsEmpty: 'No bucket created yet.',
     createBucket: 'Create Bucket',
+    uploadFiles: 'Upload files',
     createBucketFailed: 'Failed to create bucket.',
     bucketType: 'Bucket Type',
     deleting: 'Deleting File',

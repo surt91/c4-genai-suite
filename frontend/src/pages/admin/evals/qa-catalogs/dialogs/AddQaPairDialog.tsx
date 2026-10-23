@@ -91,7 +91,7 @@ export function AddQaPairDialog({ onClose, onAdd }: AddQaPairDialogProps) {
                 {texts.evals.qaCatalog.contextsLabel}
               </Text>
               <Tooltip label={texts.evals.qaCatalog.addContext}>
-                <ActionIcon variant="light" size="sm" onClick={addContext}>
+                <ActionIcon aria-label={texts.evals.qaCatalog.addContext} variant="light" size="sm" onClick={addContext}>
                   <IconPlus size={16} />
                 </ActionIcon>
               </Tooltip>
@@ -116,7 +116,13 @@ export function AddQaPairDialog({ onClose, onAdd }: AddQaPairDialogProps) {
                       {...form.getInputProps(`contexts.${index}`)}
                     />
                     <Tooltip label={texts.evals.qaCatalog.removeContext}>
-                      <ActionIcon variant="subtle" color="red" mt={4} onClick={() => removeContext(index)}>
+                      <ActionIcon
+                        aria-label={texts.evals.qaCatalog.removeContext}
+                        variant="subtle"
+                        color="red"
+                        mt={4}
+                        onClick={() => removeContext(index)}
+                      >
                         <IconX size={16} />
                       </ActionIcon>
                     </Tooltip>

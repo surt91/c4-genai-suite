@@ -229,7 +229,12 @@ export function TestCaseResultsTable({ results, metrics, isFetching, isFetched }
                     {/* Main QA pair row */}
                     <tr key={row.key} className={tableClasses.clickableRow} onClick={() => toggleRow(row.key)}>
                       <td>
-                        <ActionIcon variant="subtle" size="sm">
+                        <ActionIcon
+                          variant="subtle"
+                          size="sm"
+                          aria-expanded={isExpanded}
+                          aria-label={texts.evals.evaluations.results.iterations}
+                        >
                           {isExpanded ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />}
                         </ActionIcon>
                       </td>

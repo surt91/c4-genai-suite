@@ -58,7 +58,7 @@ export function BucketsPage() {
           <div className={classes.menuHeader}>
             <h3 className={classes.menuTitle}>{texts.files.buckets}</h3>
 
-            <ActionIcon variant="default" size={32} onClick={() => setToCreate(true)}>
+            <ActionIcon variant="default" size={32} onClick={() => setToCreate(true)} aria-label={texts.files.createBucket}>
               <IconPlus size={16} />
             </ActionIcon>
           </div>

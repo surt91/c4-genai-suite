@@ -244,7 +244,13 @@ export function FilesPage() {
             <div className={classes.sectionHeader}>
               <h2 className={classes.sectionTitle}>{texts.files.headlineSearchable}</h2>
               {thisBucket.type !== BucketDtoTypeEnum.User && thisBucket.type !== BucketDtoTypeEnum.Conversation && (
-                <ActionIcon onClick={open} disabled={isDragActive || uploading.length > 0} color="black" size="input-sm">
+                <ActionIcon
+                  onClick={open}
+                  disabled={isDragActive || uploading.length > 0}
+                  color="black"
+                  size="input-sm"
+                  aria-label={texts.files.uploadFiles}
+                >
                   {uploading.length > 0 ? <IconLoader size={20} className={classes.spin} /> : <IconUpload size={20} />}
                 </ActionIcon>
               )}

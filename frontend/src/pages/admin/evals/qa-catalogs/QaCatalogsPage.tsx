@@ -164,6 +164,7 @@ export function QaCatalogsPage() {
                               onClick();
                             }}
                             disabled={deleteMutation.isPending}
+                            aria-label={texts.common.remove}
                           >
                             <IconTrash size={18} />
                           </ActionIcon>

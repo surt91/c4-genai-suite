@@ -69,6 +69,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
                 {pair._pendingStatus === 'deleted' ? (
                   <Tooltip label={texts.evals.qaCatalog.undoChange}>
                     <ActionIcon
+                      aria-label={texts.evals.qaCatalog.undoChange}
                       variant="subtle"
                       size="lg"
                       color="orange"
@@ -83,6 +84,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
                   <>
                     <Tooltip label={texts.common.edit}>
                       <ActionIcon
+                        aria-label={texts.common.edit}
                         variant="subtle"
                         size="lg"
                         color="gray"
@@ -95,6 +97,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
                     </Tooltip>
                     <Tooltip label={texts.common.remove}>
                       <ActionIcon
+                        aria-label={texts.common.remove}
                         variant="subtle"
                         size="lg"
                         color="red"
@@ -108,6 +111,7 @@ export function QaPairsTable({ pairs, pendingChanges, onEdit, onDelete, onUndo }
                     {isPending(pair.id) && (
                       <Tooltip label={texts.evals.qaCatalog.undoChange}>
                         <ActionIcon
+                          aria-label={texts.evals.qaCatalog.undoChange}
                           variant="subtle"
                           size="lg"
                           color="orange"

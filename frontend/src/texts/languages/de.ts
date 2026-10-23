@@ -876,6 +876,7 @@ export const de: typeof en = {
     buckets: 'Buckets',
     bucketsEmpty: 'Noch kein Bucket erstellt.',
     createBucket: 'Bucket erstellen',
+    uploadFiles: 'Dateien hochladen',
     bucketType: 'Bucket-Typ',
     createBucketFailed: 'Erstellen des Buckets fehlgeschlagen.',
     deleting: 'Datei wird gelöscht',

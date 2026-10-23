@@ -902,6 +902,7 @@ function load() {
       buckets: translate('files.buckets'),
       bucketsEmpty: translate('files.bucketsEmpty'),
       createBucket: translate('files.createBucket'),
+      uploadFiles: translate('files.uploadFiles'),
       bucketType: translate('files.bucketType'),
       createBucketFailed: translate('files.createBucketFailed'),
       deleting: translate('files.deleting'),

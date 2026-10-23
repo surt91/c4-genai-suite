@@ -81,6 +81,7 @@ export function LlmEndpointsTable({
                       onEdit(endpoint);
                     }}
                     disabled={isDeleting}
+                    aria-label={texts.common.edit}
                   >
                     <IconPencil size={18} />
                   </ActionIcon>
@@ -93,6 +94,7 @@ export function LlmEndpointsTable({
                       onDelete(endpoint);
                     }}
                     disabled={isDeleting}
+                    aria-label={texts.common.remove}
                   >
                     <IconTrash size={18} />
                   </ActionIcon>
