@@ -28,7 +28,9 @@ export default defineConfig({
   // assertions scoped to their own entities and one mock LLM server per worker.
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  // no retries, also not in CI: a flaky test should fail right away instead of being hidden by a passing retry
+  // (the trace of the failed attempt is kept, see `trace` below)
+  retries: 0,
   // The whole stack runs on the same machine (docker), so do not use too many browsers at once.
   // The GitHub runners have 4 vCPUs. Override with `--workers=<n>`.
   workers: process.env.CI ? 3 : 4,

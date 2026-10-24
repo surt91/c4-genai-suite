@@ -27,7 +27,8 @@ Only the `chromium` project is configured.
 ## How to Add or Debug E2Es
 
 The tests run in parallel (`fullyParallel`, 4 workers locally and 3 in CI, override with `--workers=<n>`) against one
-shared backend and database. To keep them independent of each other and of previous runs:
+shared backend and database. Failed tests are not retried (also not in CI), so a flaky test fails the pipeline right
+away; check a new test for flakiness with e.g. `--repeat-each=5`. To keep them independent of each other and of previous runs:
 
 - Use the `test` from [`tests/utils/fixtures.ts`](tests/utils/fixtures.ts) and log in with the `adminUser` fixture
   (`await login(page, adminUser)`): every test gets a fresh admin user, so per-user state like conversations,
