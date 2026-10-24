@@ -31,18 +31,19 @@ in eigenen `refactor:`-Commits entfernt:
 | Eval | Nie gelesene Settings: `EVALUATION_MAX_RETRIES`, `EVALUATION_PARALLEL_GENERATION_LIMIT`, `RAGAS_*` und `PG_SCHEMA` (das Schema ist im Modell fest `llm_eval`) |
 | Helm, Compose, E2E | `reis.embeddings.openAi.deploymentName`, `VERSION` bei `reis` und `ENV` in den E2E-Tests |
 
-Bewusst **nicht** angefasst wurde Code in `backend/src/domain/chat/**`, `frontend/src/pages/chat/**` und den
-`chat.*`-Texten, weil parallel am Chat-Streaming gearbeitet wird. Dort ist noch übrig:
+Code in `backend/src/domain/chat/**`, `frontend/src/pages/chat/**` und den `chat.*`-Texten wurde zunächst nicht
+angefasst, weil parallel der Chat umgebaut wurde. Nach dem Umbau (Oktober 2026) erneut geprüft:
 
-- `FormActionType.REJECT` in `backend/src/domain/chat/interfaces.ts:53`, ohne Nutzung
-- `export` von `TTLMap` in `backend/src/domain/chat/cache.ts:10`, wird nur in der eigenen Datei verwendet
-- 8 unbenutzte `chat.*`-Texte im Frontend:
-  - `chat.searchAssistants`
-  - `chat.yesterday`
-  - `chat.sourceHuman`
-  - `chat.removeConversationConfirm*`
-  - `chat.updateRating.ratingHint`
-  - `chat.settings.password*`
+- Entfernt: das `export` von `TTLMap` (`backend/src/domain/chat/cache.ts`, nur in der eigenen Datei verwendet) und
+  7 unbenutzte Texte (de + en): `chat.searchAssistants`, `chat.yesterday`, `chat.sourceHuman`,
+  `chat.removeConversationConfirmText`/`…Title`, `chat.settings.password`/`…Confirm`.
+- Nicht mehr tot: `FormActionType.REJECT` (der Chat-Umbau nutzt es für abgelehnte Formulare/MCP-Elicitations, das
+  Frontend sendet `action: 'reject'`) und `chat.ratingHint` (`AIChatItemActions.tsx`; `chat.updateRating.ratingHint`
+  gibt es nicht mehr).
+- Ebenfalls ohne Nutzung, aber nicht entfernt, weil erst mit dem Chat-Umbau eingeführt bzw. nicht Teil der
+  ursprünglichen Liste (vor dem Entfernen klären, ob sie noch gebraucht werden): `chat.chatSettings.open`/`filters`/`saved`,
+  `chat.myFiles.close`, `chat.cards.submitting`, `chat.header.conversations`, `chat.configureAssistant`,
+  `chat.sources.content`/`viewer`, `chat.filterHeadline`/`filterApply`/`filterResetAll`, `chat.settings.language`.
 
 ## 2. Entfernt bzw. umgebaut nach Entscheidung (Oktober 2026)
 

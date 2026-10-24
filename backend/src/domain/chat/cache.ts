@@ -7,7 +7,7 @@ type TTLValue<V> = {
   expiresAt: number;
 };
 
-export class TTLMap<TKey, TValue = any> {
+class TTLMap<TKey, TValue = any> {
   private store = new Map<TKey, TTLValue<TValue>>();
   private readonly ttl: number;
 
