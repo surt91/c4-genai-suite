@@ -10,7 +10,9 @@ from confluence_importer.config import config
 
 confluence_url = config.confluence_url
 
-confluence_api = Confluence(url=confluence_url, token=config.confluence_token)  # type: ignore[no-untyped-call]
+# The importer uses the REST API v1 (content with expansions, paginated by offset) of the Server/Data Center client.
+# Since atlassian-python-api 5 the client is chosen by the URL and the Cloud client lacks these methods.
+confluence_api = Confluence(url=confluence_url, token=config.confluence_token, cloud=False)  # type: ignore[no-untyped-call]
 
 
 @dataclass
@@ -33,7 +35,7 @@ def get_page(page_id: int) -> ConfluencePage:
     Returns:
         A ConfluencePage dataclass containing the page information and content as HTML
     """
-    page = confluence_api.get_page_by_id(page_id, expand="body.storage,history.lastUpdated")  # type: ignore[no-untyped-call]
+    page = confluence_api.get_page_by_id(page_id, expand="body.storage,history.lastUpdated")
 
     return ConfluencePage(
         page_id,
@@ -69,7 +71,7 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
             content_type="page",
             expand="body.storage,history.lastUpdated",
             status="current",
-        )  # type: ignore[no-untyped-call]
+        )
 
         len_result = 0
         try:
