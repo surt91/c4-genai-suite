@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLogModule } from '../audit-log/index.js';
@@ -8,6 +9,7 @@ import {
   CreateBucketHandler,
   DeleteBucketHandler,
   DeleteFileHandler,
+  GetBucketDefaultsHandler,
   GetBucketHandler,
   GetBucketsHandler,
   GetDocumentContentHandler,
@@ -24,6 +26,7 @@ import {
 @Module({
   imports: [
     AuditLogModule,
+    ConfigModule,
     CqrsModule,
     TypeOrmModule.forFeature([BucketEntity, FileEntity, ExtensionEntity, BlobEntity, ConversationFileEntity]),
   ],
@@ -32,6 +35,7 @@ import {
     DeleteBucketHandler,
     DeleteFileHandler,
     RenameFileHandler,
+    GetBucketDefaultsHandler,
     GetBucketHandler,
     GetBucketsHandler,
     GetDocumentContentHandler,

@@ -90,10 +90,28 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
 
   const [{ endpoint, headers }, setConnection] = useState(target ?? { endpoint: '', headers: '' });
 
+  // new buckets: the default REI-S endpoint is prefilled and its file types are loaded until the endpoint is edited
+  const [endpointEdited, setEndpointEdited] = useState(!!target);
+  const { data: defaults } = useQuery({
+    queryKey: ['bucketDefaults'],
+    queryFn: () => api.files.getBucketDefaults(),
+    enabled: !target,
+    retry: false,
+  });
+  const defaultEndpoint = endpointEdited ? undefined : defaults?.endpoint;
+  const fileTypesEndpoint = defaultEndpoint || endpoint;
+
+  useEffect(() => {
+    if (defaultEndpoint && !form.getValues().endpoint) {
+      form.setFieldValue('endpoint', defaultEndpoint);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultEndpoint]);
+
   const { data: fileTypes, error: fileTypesFetchError } = useQuery({
-    queryKey: [`fileTypes:${endpoint}:${headers}`],
-    queryFn: () => api.files.getFileTypes({ endpoint, headers }),
-    enabled: !!endpoint,
+    queryKey: [`fileTypes:${fileTypesEndpoint}:${headers}`],
+    queryFn: () => api.files.getFileTypes({ endpoint: fileTypesEndpoint, headers }),
+    enabled: !!fileTypesEndpoint,
     retry: false,
   });
 
@@ -109,6 +127,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
   }
 
   function handleEndpointChange(newValue: string) {
+    setEndpointEdited(true);
     form.setFieldValue('endpoint', newValue);
     debounceFn('endpoint', newValue);
   }

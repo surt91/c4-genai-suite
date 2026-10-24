@@ -36,6 +36,8 @@ import {
   DeleteBucket,
   DeleteFile,
   GetBucket,
+  GetBucketDefaults,
+  GetBucketDefaultsResponse,
   GetBucketResponse,
   GetBuckets,
   GetBucketsResponse,
@@ -50,6 +52,7 @@ import {
 import { GetFileTypes, GetFileTypesResponse } from '../../domain/files/use-cases/get-file-types.js';
 import { ParseOptionalPagingPipe } from '../shared.js';
 import {
+  BucketDefaultsDto,
   BucketDto,
   BucketsDto,
   FileDto,
@@ -105,6 +108,18 @@ export class FilesController {
   async getFileTypes(@Query() { endpoint, headers }: GetFileTypesQueryDto) {
     const result: GetFileTypesResponse = await this.queryBus.execute(new GetFileTypes(endpoint, headers));
     return FileTypesDto.fromDomain(result.fileTypes);
+  }
+
+  @Get('/defaults')
+  @ApiOperation({ operationId: 'getBucketDefaults', description: 'Gets the defaults for new buckets.' })
+  @ApiOkResponse({ type: BucketDefaultsDto })
+  // Admin only: the default endpoint is an internal URL.
+  @Role(BUILTIN_USER_GROUP_ADMIN)
+  @UseGuards(RoleGuard)
+  async getBucketDefaults() {
+    const result: GetBucketDefaultsResponse = await this.queryBus.execute(new GetBucketDefaults());
+
+    return BucketDefaultsDto.fromDomain(result);
   }
 
   @Get('')

@@ -1,20 +1,25 @@
 import { useForm } from '@mantine/form';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-import { UpsertBucketDto } from 'src/api';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { BucketDto, UpsertBucketDto } from 'src/api';
 import { render } from 'src/pages/admin/test-utils';
 import { texts } from 'src/texts';
 import { FileSizeDynamicFields, UpsertBucketDialog } from './UpsertBucketDialog';
 
 const getFileTypes = vi.fn(() => Promise.resolve({ items: [{ value: '.pdf', label: 'PDF' }] }));
+const getBucketDefaults = vi.fn(() => Promise.resolve<{ endpoint?: string }>({}));
 
 vi.mock('src/api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('src/api')>()),
-  useApi: () => ({ files: { getFileTypes } }),
+  useApi: () => ({ files: { getFileTypes, getBucketDefaults } }),
 }));
 
 describe('UpsertBucketDialog', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('loads the file types with the endpoint and the headers', async () => {
     render(<UpsertBucketDialog onClose={vi.fn()} onCreate={vi.fn()} onUpdate={vi.fn()} />);
 
@@ -23,6 +28,38 @@ describe('UpsertBucketDialog', () => {
     fireEvent.change(screen.getByLabelText(texts.common.headers, { exact: false }), { target: { value: 'x-api-key=secret' } });
 
     await waitFor(() => expect(getFileTypes).toHaveBeenLastCalledWith({ endpoint: 'http://reis', headers: 'x-api-key=secret' }));
+  });
+
+  it('prefills the default endpoint for new buckets and loads its file types', async () => {
+    getBucketDefaults.mockResolvedValueOnce({ endpoint: 'http://reis:3201' });
+
+    render(<UpsertBucketDialog onClose={vi.fn()} onCreate={vi.fn()} onUpdate={vi.fn()} />);
+
+    const endpoint = screen.getByLabelText(texts.common.endpoint, { exact: false });
+    await waitFor(() => expect(endpoint).toHaveValue('http://reis:3201'));
+    await waitFor(() => expect(getFileTypes).toHaveBeenCalledWith({ endpoint: 'http://reis:3201', headers: '' }));
+    expect(await screen.findAllByText('PDF')).not.toHaveLength(0);
+  });
+
+  it('does not prefill the endpoint when updating a bucket', async () => {
+    const target = {
+      id: 1,
+      name: 'Bucket',
+      type: 'general',
+      endpoint: 'http://existing',
+      headers: '',
+      indexName: '',
+      isDefault: false,
+      perUserQuota: 20,
+      allowedFileNameExtensions: ['.pdf'],
+      fileSizeLimits: { general: 1 },
+    } as unknown as BucketDto;
+
+    render(<UpsertBucketDialog target={target} onClose={vi.fn()} onCreate={vi.fn()} onUpdate={vi.fn()} />);
+
+    await waitFor(() => expect(getFileTypes).toHaveBeenCalledWith({ endpoint: 'http://existing', headers: '' }));
+    expect(screen.getByLabelText(texts.common.endpoint, { exact: false })).toHaveValue('http://existing');
+    expect(getBucketDefaults).not.toHaveBeenCalled();
   });
 });
 

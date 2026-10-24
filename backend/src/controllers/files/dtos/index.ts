@@ -352,3 +352,18 @@ export class RenameFileDto {
   @IsString()
   fileName!: string;
 }
+
+export class BucketDefaultsDto {
+  @ApiProperty({
+    description: 'The default REI-S endpoint for new buckets, if known.',
+    required: false,
+  })
+  endpoint?: string;
+
+  static fromDomain(source: { endpoint?: string }) {
+    const result = new BucketDefaultsDto();
+    result.endpoint = source.endpoint;
+
+    return result;
+  }
+}

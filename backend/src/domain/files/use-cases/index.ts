@@ -4,6 +4,7 @@ export * from './delete-bucket.js';
 export * from './delete-file.js';
 export * from './rename-file.js';
 export * from './get-bucket.js';
+export * from './get-bucket-defaults.js';
 export * from './get-buckets.js';
 export * from './get-files.js';
 export * from './get-file-types.js';

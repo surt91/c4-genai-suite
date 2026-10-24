@@ -30,3 +30,25 @@ tests:
       - equal:
           path: metadata.name
           value: RELEASE-NAME-my-custom-name-backend
+
+  - it: does not set a default REI-S endpoint when REI-S is disabled
+    asserts:
+      - notExists:
+          path: data.REIS_DEFAULT_ENDPOINT
+
+  - it: uses the REI-S service of the chart as default REI-S endpoint when REI-S is enabled
+    set:
+      reis.enabled: true
+    asserts:
+      - equal:
+          path: data.REIS_DEFAULT_ENDPOINT
+          value: http://RELEASE-NAME-gaible-reis
+
+  - it: uses the configured default REI-S endpoint
+    set:
+      reis.enabled: true
+      backend.reisDefaultEndpoint: http://external-reis:3201
+    asserts:
+      - equal:
+          path: data.REIS_DEFAULT_ENDPOINT
+          value: http://external-reis:3201

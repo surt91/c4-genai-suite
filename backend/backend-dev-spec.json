@@ -1327,6 +1327,27 @@
         "tags": ["files"]
       }
     },
+    "/api/buckets/defaults": {
+      "get": {
+        "description": "Gets the defaults for new buckets.",
+        "operationId": "getBucketDefaults",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BucketDefaultsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
     "/api/buckets": {
       "get": {
         "description": "Gets the buckets.",
@@ -4526,6 +4547,15 @@
           }
         },
         "required": ["items"]
+      },
+      "BucketDefaultsDto": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "The default REI-S endpoint for new buckets, if known."
+          }
+        }
       },
       "BucketDto": {
         "type": "object",
