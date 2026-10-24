@@ -9,6 +9,8 @@ export class FileDto {
     description: 'The ID of the file.',
     required: true,
   })
+  // validated when the files are sent with a message (the ids are used to look up the files)
+  @IsInt()
   id!: number;
 
   @ApiProperty({

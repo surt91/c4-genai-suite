@@ -1,9 +1,8 @@
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
-import { configureCookies, configureLogger, configureSession, configureSwagger } from './config/index.js';
+import { configureCookies, configureLogger, configureSession, configureSwagger, configureValidation } from './config/index.js';
 import { PrometheusModule } from './metrics/prometheus.module.js';
 
 async function bootstrap() {
@@ -14,7 +13,7 @@ async function bootstrap() {
   configureCookies(app);
   configureSwagger(app);
 
-  app.useGlobalPipes(new ValidationPipe());
+  configureValidation(app);
   app.useBodyParser('json', { limit: '50mb' });
   app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
 

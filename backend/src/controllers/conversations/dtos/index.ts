@@ -1,5 +1,17 @@
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { IsBoolean, IsDefined, IsEnum, IsIn, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsDefined,
+  IsEnum,
+  IsIn,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import {
   ChatInteractionKind,
   ChatInteractionStatus,
@@ -260,6 +272,10 @@ export class SendMessageDto {
     isArray: true,
     type: FileDto,
   })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FileDto)
   files?: FileDto[];
 }
 

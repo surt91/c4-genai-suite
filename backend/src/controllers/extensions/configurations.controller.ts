@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseBoolPipe,
+  ParseEnumPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -64,6 +65,9 @@ import {
   UpdateExtensionDto,
   UpsertConfigurationDto,
 } from './dtos/index.js';
+
+/** The bucket types that can be checked for availability (an unknown type would be an invalid enum value in the query). */
+const AVAILABILITY_BUCKET_TYPES = { user: 'user', conversation: 'conversation' } as const;
 
 @Controller('configurations')
 @ApiTags('extensions')
@@ -303,7 +307,7 @@ export class ConfigurationsController {
   @ApiOkResponse({ type: BucketAvailabilityDto })
   async getBucketAvailability(
     @Param('id', ParseIntPipe) configurationId: number,
-    @Param('type') bucketType: 'user' | 'conversation',
+    @Param('type', new ParseEnumPipe(AVAILABILITY_BUCKET_TYPES)) bucketType: 'user' | 'conversation',
   ) {
     const query = new GetBucketAvailability(configurationId, bucketType);
     const result: GetBucketAvailabilityResponse = await this.queryBus.execute(query);

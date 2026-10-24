@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsDefined, IsNotEmpty, IsString } from 'class-validator';
 import { AuthConfig } from '../../../domain/auth/interfaces.js';
 import { BUILTIN_USER_GROUP_ADMIN } from '../../../domain/database/index.js';
 import { User } from '../../../domain/users/index.js';
@@ -83,12 +84,18 @@ export class LoginDto {
     description: 'The email address.',
     required: true,
   })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
   email!: string;
 
   @ApiProperty({
     description: 'The password.',
     required: true,
   })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
   password!: string;
 }
 

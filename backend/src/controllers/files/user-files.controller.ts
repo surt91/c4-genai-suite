@@ -89,7 +89,7 @@ export class UserFilesController {
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
     @Query('query') query?: string,
-    @Query('conversationId') conversationId?: number,
+    @Query('conversationId', new ParseIntPipe({ optional: true })) conversationId?: number,
   ) {
     const result: GetFilesResponse = await this.queryBus.execute(
       new GetFiles({
