@@ -12,7 +12,8 @@ extrahiert, konvertiert (LibreOffice, ffmpeg, Whisper), chunkt, embeddet und spe
 das Minuten. Ziel: Upload bestätigt sofort, Verarbeitung im Hintergrund mit Status (wartet, läuft, fertig,
 fehlgeschlagen), Retries und Abbruch. Konzept: [concepts/async-ingestion.md](concepts/async-ingestion.md).
 
-Empfehlung des Konzepts: Job-Queue in Postgres innerhalb von REI-S, das Backend fragt den Status gebündelt ab.
+Entschieden: Job-Queue in Postgres innerhalb von REI-S, das Backend fragt den Status gebündelt ab (alle
+Entscheidungen im Konzept, Abschnitt 9).
 Aufwand etwa 15–18 Personentage in 7 PRs. Löst nebenbei die Backend-Findings P2-21 und P2-28, die doppelte
 Verarbeitung von Chat-Dateien und liegen bleibende Chunks, wenn eine Datei während der Verarbeitung gelöscht wird.
 

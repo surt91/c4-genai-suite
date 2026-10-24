@@ -288,12 +288,12 @@ Summe: **ca. 15–18 PT**. PR 1–3 lassen sich ohne Verhaltensänderung mergen.
   Worker-Deployments erlauben außerdem eigene Ressourcen bzw. Node-Pools für Docling. Die Bewertung lässt sich über die
   Eval-Kataloge parallel vorbereiten.
 
-## 9. Offene Entscheidungen
+## 9. Entscheidungen (24.10.2026)
 
-1. Option A bestätigen (vs. B als schnellere Zwischenlösung).
-2. Polling (empfohlen) oder zusätzlich ein Webhook für geringere Latenz?
-3. Postgres-Pflicht für REI-S auch bei Azure AI Search (`JOBS_DB_URL`) akzeptabel?
-4. Fehlgeschlagene Dateien behalten (empfohlen, mit „Neu hochladen“) oder automatisch nach N Tagen löschen? Eigener
-   Retry-Endpoint ja/nein?
-5. Chat-UX: „Warten und senden“ automatisch (Nachricht wird zurückgehalten) oder nur Hinweis plus gesperrter Button?
-6. Wie lange bleibt der synchrone REI-S-Pfad bestehen (eine Major-Version)?
+1. **Architektur:** Option A, Job-Queue in Postgres innerhalb von REI-S.
+2. **Status:** nur Polling durch das Backend, kein Webhook.
+3. **Jobs-Datenbank:** Postgres ist für REI-S Pflicht (`JOBS_DB_URL`), auch mit Azure AI Search als Vector-Store.
+4. **Fehlgeschlagene Dateien:** bleiben mit Status und Grund sichtbar; „Erneut versuchen“ und ein Retry-Endpunkt.
+5. **Senden mit Datei in Verarbeitung:** „Warten und senden“ hält die Nachricht zurück und sendet sie automatisch,
+   sobald die Datei fertig ist (abbrechbar); alternativ „Ohne diese Datei senden“.
+6. **Alter synchroner Pfad:** entfällt sofort mit der Umstellung (BREAKING für externe Clients der REI-S-API).
