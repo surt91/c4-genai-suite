@@ -93,7 +93,7 @@ Legende: Aufwand S = klein (Stunden), M = mittel (1–2 Tage).
   - `generate-specs-reis` in `package.json` ruft `rei_s/generate_open_api.py` auf, das es nicht gibt (richtig wäre `uv run generate-api-spec`).
   - Der Fehler wird durch `|| echo …` verdeckt.
   - *Behoben:* das Skript ruft `uv run generate-api-spec` auf, ohne `|| echo`.
-  - `generate-apis` generiert weder die Eval-Spec noch den Eval-Client.
+  - `generate-apis` generiert weder die Eval-Spec noch den Eval-Client. *Teilweise behoben:* `generate-api` im Frontend generiert auch den Eval-Client.
 - **Nicht deklarierte Abhängigkeiten im Backend.** `express` (nur Typen) und `@ai-sdk/provider` (`extensions/models/model-tools.ts`) werden nur transitiv aufgelöst. *Behoben:* beide sind in `backend/package.json` deklariert.
 - **Veraltete Doku.**
   - `backend/docs/plantuml/context.puml` und die daraus erzeugten PNGs zeigen LangChain-Klassen (`AgentExecutor`, `ChatVertexAI`, …); das Backend nutzt das AI SDK. *Behoben:* Diagramm und PNG aktualisiert.

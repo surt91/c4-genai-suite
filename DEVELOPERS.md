@@ -5,7 +5,6 @@
 - **Docker** with Compose v2 – runs the whole stack and the infrastructure (Postgres/pgvector, S3Mock).
 - **Node.js** in the version from `.nvmrc` (we recommend `nvm install`).
 - **uv** (>= 0.5) for the Python services ([installation guide](https://docs.astral.sh/uv/getting-started/installation/)); uv manages the Python version itself.
-- **JRE** – only needed when changing APIs, to run the OpenAPI generator.
 
 Run `npm install` in the repository root once. It installs the git hooks (husky + lint-staged);
 `npm run install-all` additionally installs the dependencies of backend, frontend and REI-S.
@@ -82,7 +81,7 @@ The basic interaction between the frontend, backend, and REI-S service is as fol
 2. **Backend**: The backend processes these requests, handles user authentication, and communicates with the REI-S service for file indexing and retrieval.
 3. **REI-S Service**: The REI-S service indexes files and provides search capabilities, returning results to the backend, which then feeds them to the LLM and sends the generated answer to the frontend for display.
 
-The interfaces between the Frontend > Backend > REI-S service are defined using OpenAPI specifications. The specs are generated using OpenAPI generators. These specifications itself allow for automatic generation of TypeScript API files ensuring type safety and consistency across the application.
+The interfaces between the Frontend > Backend > REI-S service (and Frontend > eval service) are defined using OpenAPI specifications, which are generated from the code. The TypeScript API clients are generated from these specifications with [`@hey-api/openapi-ts`](https://heyapi.dev) (pure Node.js, configured in `frontend/openapi-ts.config.ts` and `backend/openapi-ts.config.ts`). The generated code is committed; CI checks that it is up to date.
 
 For convenience you can run the following command in the root to regenerate all specs and apis (Frontend->Backend and Backend->REI-S)
 
@@ -100,7 +99,7 @@ Some more details on the OpenAPI specifications and how to regenerate them are p
 The frontend communicates with the backend using TypeScript API files generated from the OpenAPI specification. If you change the backend API, you need to regenerate
 
 1. the OpenAPI specification for the backend and
-2. the TypeScript API files in the frontend.
+2. the TypeScript API clients in the frontend.
 
 Within the `/backend` folder:
 
@@ -112,21 +111,22 @@ npm run generate-openapi-dev
 ... and then in `/frontend` folder:
 
 ```bash
+# re-generates src/api/generated (backend) and src/api/generated-eval (eval service)
 npm run generate-api
 ```
 
 ### REI-S REST-API
 
-The backend communicates with the REI-S service using Python client files generated from the OpenAPI specification. If you change the REI-S API, you need to regenerate
+The backend communicates with the REI-S service using a TypeScript API client generated from the OpenAPI specification. If you change the REI-S API, you need to regenerate
 
 1. the OpenAPI specification for the REI-S service and
-2. the TypeScript API files in the frontend.
+2. the TypeScript API client in the backend.
 
 Within the `/services/reis` folder:
 
 ```bash
 # re-generate reis-dev-spec.json
-uv run python rei_s/generate_open_api.py
+uv run generate-api-spec
 ```
 
 ... and then in `/backend` folder:
