@@ -20,7 +20,7 @@ interface ToolCall {
   };
 }
 
-interface MockResponse {
+export interface MockResponse {
   // Pattern to match in the last user message
   match: RegExp;
   // Optional pattern to match in system messages (for testing system prompt delivery)
@@ -589,6 +589,11 @@ function handleChatCompletions(body: string, res: http.ServerResponse) {
       });
     }
   }
+}
+
+/** Adds responses that take precedence over the default ones (in this worker), e.g. for the README screenshots. */
+export function addMockResponses(...responses: MockResponse[]) {
+  DEFAULT_RESPONSES.unshift(...responses);
 }
 
 export async function startMockLLMServer(port = 4100): Promise<{ server: http.Server; close: () => void; url: string }> {
