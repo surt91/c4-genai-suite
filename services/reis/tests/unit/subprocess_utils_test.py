@@ -16,7 +16,8 @@ def is_running(pid: int) -> bool:
         with open(f"/proc/{pid}/stat") as f:
             # zombies are dead, they only wait to be reaped
             return f.read().rsplit(") ", 1)[1][0] not in {"Z", "X"}
-    except FileNotFoundError:
+    except (FileNotFoundError, ProcessLookupError):
+        # the process can vanish between opening and reading its stat file
         return False
 
 

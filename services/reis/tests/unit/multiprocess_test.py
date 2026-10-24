@@ -18,6 +18,8 @@ from rei_s.types.source_file import SourceFile, temp_file
 
 
 class TestOnlyProvider(PlainProvider):
+    __test__ = False  # not a pytest test class
+
     @property
     def enabled(self) -> bool:
         # every subclass is registered as format provider, so we need to disable them for the other tests

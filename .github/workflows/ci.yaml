@@ -120,7 +120,7 @@ jobs:
           uv run generate-api-spec --no-dev
           uv run ruff format reis-spec.json reis-dev-spec.json
           diff reis-dev-spec.json reis-spec.json
-      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress ffmpeg
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress ffmpeg libharfbuzz-subset0
       - run: uv run pytest -rs --error-for-skips
 
   eval:
