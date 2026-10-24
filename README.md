@@ -228,7 +228,7 @@ See the [eval service README](services/eval/README.md) for details.
 Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and
 [DEVELOPERS.md](DEVELOPERS.md) for the setup with hot reload, the tests and the code generation.
 Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/), they drive the changelog and the
-releases. Planned work and a comparison with other chat suites are in the [roadmap](docs/roadmap.md) (German).
+releases.
 
 ## License
 

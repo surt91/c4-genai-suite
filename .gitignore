@@ -20,3 +20,6 @@ output/*.log
 /reports/
 
 services/data/
+
+# local planning notes (open points, reviews, concepts), not part of the repository
+notes/
