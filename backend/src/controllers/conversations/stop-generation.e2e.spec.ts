@@ -3,9 +3,7 @@ import { AddressInfo, Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { DataSource } from 'typeorm';
 import { AppModule } from '../../app.module.js';
-import { UserEntity } from '../../domain/database/index.js';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 import { ConversationDto, MessagesDto } from './dtos/index.js';
 
@@ -76,8 +74,8 @@ function startSlowLlm() {
 
 describe('Stop generation', () => {
   let app: INestApplication<Server>;
-  let dataSource: DataSource;
   let llm: Awaited<ReturnType<typeof startSlowLlm>>;
+  let configurationId: number;
   let conversationId: number;
 
   beforeAll(async () => {
@@ -87,13 +85,8 @@ describe('Stop generation', () => {
       imports: [AppModule],
     }).compile();
 
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
-    dataSource = initialized.dataSource;
-    app = initialized.app;
+    ({ app } = await initAppWithDataBaseAndValidUser(module));
     await app.listen(0, '127.0.0.1');
-
-    // the user of initAppWithDataBaseAndValidUser
-    await dataSource.getRepository(UserEntity).save({ id: '1', name: 'test-user', email: 'test@example.com' });
 
     const server = app.getHttpServer();
     const configuration = (
@@ -107,14 +100,18 @@ describe('Stop generation', () => {
         values: { apiKey: 'key', baseUrl: llm.url, modelName: 'mock' },
       })
       .expect(201);
-    const conversation = (await request(server).post('/conversations').send({ configurationId: configuration.id }).expect(201))
+    configurationId = configuration.id;
+  });
+
+  // every test has its own conversation, so that the tests do not depend on each other
+  beforeEach(async () => {
+    const conversation = (await request(app.getHttpServer()).post('/conversations').send({ configurationId }).expect(201))
       .body as ConversationDto;
     conversationId = conversation.id;
   });
 
   afterAll(async () => {
     llm.close();
-    await dataSource.destroy();
     await app.close();
   });
 
@@ -157,6 +154,7 @@ describe('Stop generation', () => {
   }
 
   it('stops the LLM request and persists the partial answer as stopped', async () => {
+    const llmRequest = llm.requests.length;
     const chunks = await sendAndStop('Please answer slow', 3);
 
     // reading the history waits until the stopped answer has been persisted
@@ -171,7 +169,7 @@ describe('Stop generation', () => {
     expect(messages[messages.length - 2]).toMatchObject({ type: 'human', stopped: false });
 
     // the request to the LLM has been closed
-    await waitFor(() => llm.requests[0]?.aborted === true);
+    await waitFor(() => llm.requests[llmRequest]?.aborted === true);
   });
 
   it('answers a new message right after stopping', async () => {
@@ -188,11 +186,9 @@ describe('Stop generation', () => {
       ['human', false],
       ['ai', true],
       ['human', false],
-      ['ai', true],
-      ['human', false],
       ['ai', false],
     ]);
-    expect(messages[5].content).toEqual([{ type: 'text', text: 'Done ' }]);
+    expect(messages[3].content).toEqual([{ type: 'text', text: 'Done ' }]);
   });
 });
 

@@ -39,7 +39,7 @@ describe('DeleteConversationsHandler', () => {
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     (buildClient as Mock).mockReturnValue({ deleteFile });
     blobs.find.mockResolvedValue([]);
     getRawOne.mockResolvedValue(undefined);

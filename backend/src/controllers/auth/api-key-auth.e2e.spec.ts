@@ -1,4 +1,4 @@
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { Server } from 'net';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -6,10 +6,18 @@ import { getDataSourceToken } from '@nestjs/typeorm';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../../app.module.js';
-import { BUILTIN_USER_GROUP_ADMIN, UserEntity, UserGroupEntity } from '../../domain/database/index.js';
+import {
+  BUILTIN_USER_GROUP_ADMIN,
+  BUILTIN_USER_GROUP_DEFAULT,
+  UserEntity,
+  UserGroupEntity,
+} from '../../domain/database/index.js';
 
-const ADMIN_API_KEY = 'admin-secret-key-12345';
-const USER_API_KEY = 'user-secret-key-67890';
+// unique per test file run, as the API keys and emails of the users are unique
+const ADMIN_API_KEY = `admin-secret-key-${randomUUID()}`;
+const USER_API_KEY = `user-secret-key-${randomUUID()}`;
+const ADMIN_EMAIL = `admin-${randomUUID()}@test.com`;
+const USER_EMAIL = `user-${randomUUID()}@test.com`;
 const INVALID_API_KEY = 'invalid-key';
 
 function hashApiKey(key: string): string {
@@ -30,7 +38,7 @@ async function seedTestData(dataSource: DataSource) {
 
   // Create default user group
   const defaultGroup = new UserGroupEntity();
-  defaultGroup.id = 'default';
+  defaultGroup.id = BUILTIN_USER_GROUP_DEFAULT;
   defaultGroup.name = 'Default';
   defaultGroup.isAdmin = false;
   defaultGroup.isBuiltIn = true;
@@ -38,18 +46,18 @@ async function seedTestData(dataSource: DataSource) {
 
   // Create admin user with API key
   const adminUser = new UserEntity();
-  adminUser.id = 'admin-user-id';
+  adminUser.id = randomUUID();
   adminUser.name = 'Admin User';
-  adminUser.email = 'admin@test.com';
+  adminUser.email = ADMIN_EMAIL;
   adminUser.apiKey = hashApiKey(ADMIN_API_KEY);
   adminUser.userGroups = [adminGroup];
   await userRepo.save(adminUser);
 
   // Create regular user with API key
   const regularUser = new UserEntity();
-  regularUser.id = 'regular-user-id';
+  regularUser.id = randomUUID();
   regularUser.name = 'Regular User';
-  regularUser.email = 'user@test.com';
+  regularUser.email = USER_EMAIL;
   regularUser.apiKey = hashApiKey(USER_API_KEY);
   regularUser.userGroups = [defaultGroup];
   await userRepo.save(regularUser);
@@ -71,7 +79,6 @@ describe('API Key Authentication', () => {
   }, 30000);
 
   afterAll(async () => {
-    await dataSource.destroy();
     await app.close();
   }, 30000);
 
@@ -98,7 +105,7 @@ describe('API Key Authentication', () => {
 
       const body = response.body as { isAdmin: boolean; email: string };
       expect(body.isAdmin).toBe(true);
-      expect(body.email).toBe('admin@test.com');
+      expect(body.email).toBe(ADMIN_EMAIL);
     });
 
     it('should return regular user profile with isAdmin=false', async () => {
@@ -109,7 +116,7 @@ describe('API Key Authentication', () => {
 
       const body = response.body as { isAdmin: boolean; email: string };
       expect(body.isAdmin).toBe(false);
-      expect(body.email).toBe('user@test.com');
+      expect(body.email).toBe(USER_EMAIL);
     });
   });
 });

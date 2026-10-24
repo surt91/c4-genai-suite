@@ -20,7 +20,6 @@ import {
   MessageEntity,
   UserEntity,
 } from '../domain/database/index.js';
-import { schema } from '../domain/database/typeorm.helper.js';
 import { buildClient } from '../domain/files/use-cases/utils.js';
 import { initAppWithDataBaseAndValidUser } from '../utils/testUtils.js';
 
@@ -38,18 +37,15 @@ describe('Deletion of the data of conversations and users', () => {
   let conversationBucket: BucketEntity;
   let userBucket: BucketEntity;
   let configurationId: number;
+  let userId: string;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
+    const initialized = await initAppWithDataBaseAndValidUser(module);
     dataSource = initialized.dataSource;
     app = initialized.app;
+    userId = initialized.user.id;
 
-    for (const entity of dataSource.entityMetadatas) {
-      await dataSource.query(`TRUNCATE TABLE ${schema}."${entity.tableName}" RESTART IDENTITY CASCADE`);
-    }
-
-    await dataSource.getRepository(UserEntity).save({ id: '1', name: 'test-user', email: 'test@example.com' });
     const configuration = await dataSource
       .getRepository(ConfigurationEntity)
       .save({ name: 'Assistant', status: ConfigurationStatus.ENABLED });
@@ -64,7 +60,6 @@ describe('Deletion of the data of conversations and users', () => {
   });
 
   afterAll(async () => {
-    await dataSource.destroy();
     await app.close();
   });
 
@@ -79,25 +74,30 @@ describe('Deletion of the data of conversations and users', () => {
     });
   }
 
-  async function createConversation(userId = '1', deletedAt?: Date) {
+  async function createConversation(owner = userId, deletedAt?: Date) {
     return dataSource
       .getRepository(ConversationEntity)
-      .save({ name: 'Conversation', configurationId, userId, deletedAt: deletedAt ?? null });
+      .save({ name: 'Conversation', configurationId, userId: owner, deletedAt: deletedAt ?? null });
   }
 
-  async function createFile(userId: string, bucket?: BucketEntity, conversationIds: number[] = []) {
+  async function createUser(name: string) {
+    const id = randomUUID();
+    return dataSource.getRepository(UserEntity).save({ id, name, email: `${name}-${id}@example.com` });
+  }
+
+  async function createFile(owner: string, bucket?: BucketEntity, conversationIds: number[] = []) {
     const file = await dataSource.getRepository(FileEntity).save({
       fileName: 'file.pdf',
       fileSize: 10,
       mimeType: 'application/pdf',
       uploadStatus: FileUploadStatus.Successful,
-      userId,
+      userId: owner,
       bucketId: bucket?.id,
     });
     await dataSource.getRepository(BlobEntity).save({
       id: `blob-${file.id}`,
       fileId: file.id,
-      userId,
+      userId: owner,
       type: 'application/pdf',
       buffer: 'AA==',
       category: BlobCategory.FILE_ORIGINAL,
@@ -142,7 +142,7 @@ describe('Deletion of the data of conversations and users', () => {
 
   it('keeps the files of a softly deleted conversation, so that it can be restored', async () => {
     const conversation = await createConversation();
-    const file = await createFile('1', conversationBucket, [conversation.id]);
+    const file = await createFile(userId, conversationBucket, [conversation.id]);
 
     await request(app.getHttpServer()).delete(`/conversations/${conversation.id}`).expect(200);
 
@@ -152,12 +152,12 @@ describe('Deletion of the data of conversations and users', () => {
   });
 
   it('deletes the conversation files and their REI-S documents when the conversation is purged', async () => {
-    const old = await createConversation('1', expired());
+    const old = await createConversation(userId, expired());
     const duplicate = await createConversation();
-    const conversationFile = await createFile('1', conversationBucket, [old.id]);
-    const image = await createFile('1', undefined, [old.id]);
-    const personalFile = await createFile('1', userBucket, [old.id]);
-    const sharedFile = await createFile('1', conversationBucket, [old.id, duplicate.id]);
+    const conversationFile = await createFile(userId, conversationBucket, [old.id]);
+    const image = await createFile(userId, undefined, [old.id]);
+    const personalFile = await createFile(userId, userBucket, [old.id]);
+    const sharedFile = await createFile(userId, conversationBucket, [old.id, duplicate.id]);
 
     const next = await createConversation();
     await request(app.getHttpServer()).delete(`/conversations/${next.id}`).expect(200);
@@ -175,19 +175,19 @@ describe('Deletion of the data of conversations and users', () => {
   });
 
   it('deletes the generated images of a purged conversation, unless a duplicate of the same user shows them', async () => {
-    const other = await dataSource.getRepository(UserEntity).save({ id: randomUUID(), name: 'o', email: 'o2@example.com' });
-    const old = await createConversation('1', expired());
+    const other = await createUser('o');
+    const old = await createConversation(userId, expired());
     const duplicate = await createConversation();
     const ofOtherUser = await createConversation(other.id);
-    const image = await createGeneratedImage({ userId: '1', conversationId: old.id });
-    const sharedImage = await createGeneratedImage({ userId: '1', conversationId: old.id });
+    const image = await createGeneratedImage({ userId, conversationId: old.id });
+    const sharedImage = await createGeneratedImage({ userId, conversationId: old.id });
     await showImage(duplicate.id, sharedImage.id);
     // another user cannot take over the image by sending its URL
-    const pastedImage = await createGeneratedImage({ userId: '1', conversationId: old.id });
+    const pastedImage = await createGeneratedImage({ userId, conversationId: old.id });
     await showImage(ofOtherUser.id, pastedImage.id);
     // generated before the owner was recorded
     const imageWithoutOwner = await createGeneratedImage();
-    const imageOfDuplicate = await createGeneratedImage({ userId: '1', conversationId: duplicate.id });
+    const imageOfDuplicate = await createGeneratedImage({ userId, conversationId: duplicate.id });
 
     const next = await createConversation();
     await request(app.getHttpServer()).delete(`/conversations/${next.id}`).expect(200);
@@ -196,7 +196,7 @@ describe('Deletion of the data of conversations and users', () => {
     expect(await imageExists(image.id)).toBe(false);
     expect(await imageExists(pastedImage.id)).toBe(false);
     expect(await dataSource.getRepository(BlobEntity).findOneBy({ id: sharedImage.id })).toMatchObject({
-      userId: '1',
+      userId,
       conversationId: duplicate.id,
     });
     expect(await imageExists(imageWithoutOwner.id)).toBe(true);
@@ -210,8 +210,8 @@ describe('Deletion of the data of conversations and users', () => {
   });
 
   it('fails without deleting anything when REI-S is not reachable and can be retried', async () => {
-    const old = await createConversation('1', expired());
-    const file = await createFile('1', conversationBucket, [old.id]);
+    const old = await createConversation(userId, expired());
+    const file = await createFile(userId, conversationBucket, [old.id]);
     const next = await createConversation();
     deleteFile.mockRejectedValue(new TypeError('fetch failed'));
 
@@ -230,13 +230,13 @@ describe('Deletion of the data of conversations and users', () => {
   });
 
   it('deletes the files of all conversations when all conversations are deleted', async () => {
-    const other = await dataSource.getRepository(UserEntity).save({ id: 'other', name: 'other', email: 'o@example.com' });
+    const other = await createUser('other');
     const ofOther = await createConversation(other.id);
     const fileOfOther = await createFile(other.id, conversationBucket, [ofOther.id]);
     const conversation = await createConversation();
-    const softlyDeleted = await createConversation('1', new Date());
-    const file = await createFile('1', conversationBucket, [conversation.id]);
-    const fileOfSoftlyDeleted = await createFile('1', conversationBucket, [softlyDeleted.id]);
+    const softlyDeleted = await createConversation(userId, new Date());
+    const file = await createFile(userId, conversationBucket, [conversation.id]);
+    const fileOfSoftlyDeleted = await createFile(userId, conversationBucket, [softlyDeleted.id]);
 
     await request(app.getHttpServer()).delete('/conversations').expect(200);
 
@@ -249,16 +249,16 @@ describe('Deletion of the data of conversations and users', () => {
   });
 
   it('deletes all files of a deleted user and their REI-S documents and keeps the user when REI-S fails', async () => {
-    const user = await dataSource.getRepository(UserEntity).save({ id: 'leaving', name: 'leaving', email: 'l@example.com' });
+    const user = await createUser('leaving');
     const conversation = await createConversation(user.id);
     const conversationFile = await createFile(user.id, conversationBucket, [conversation.id]);
     const personalFile = await createFile(user.id, userBucket);
     // e.g. uploaded with the responses API
     const unlinkedFile = await createFile(user.id, conversationBucket);
     const image = await createFile(user.id, undefined, [conversation.id]);
-    const fileOfOtherUser = await createFile('1', userBucket);
+    const fileOfOtherUser = await createFile(userId, userBucket);
     const generatedImage = await createGeneratedImage({ userId: user.id, conversationId: conversation.id });
-    const imageOfOtherUser = await createGeneratedImage({ userId: '1', conversationId: (await createConversation()).id });
+    const imageOfOtherUser = await createGeneratedImage({ userId, conversationId: (await createConversation()).id });
 
     deleteFile.mockRejectedValueOnce(new TypeError('fetch failed'));
     await request(app.getHttpServer()).delete(`/users/${user.id}`).expect(503);

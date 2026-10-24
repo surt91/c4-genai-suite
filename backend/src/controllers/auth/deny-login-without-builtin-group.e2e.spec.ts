@@ -118,8 +118,10 @@ async function seedAllowedUser(dataSource: DataSource): Promise<{ email: string;
 // Stable identity for the forbidden OAuth user — must match between the guard
 // stub and the seeded DB record so that saveAndReloadUser() does an UPDATE,
 // not an INSERT (which would fail on the unique email constraint).
-const OAUTH_FORBIDDEN_EMAIL = 'oauth-forbidden@example.com';
-const OAUTH_FORBIDDEN_ID = 'oauth-forbidden-fixed-id-000000000000';
+// Unique per test file run, so that the file does not depend on users of other files.
+const RUN_ID = randomUUID();
+const OAUTH_FORBIDDEN_EMAIL = `oauth-forbidden-${RUN_ID}@example.com`;
+const OAUTH_FORBIDDEN_ID = `oauth-forbidden-${RUN_ID}`;
 
 // ---------------------------------------------------------------------------
 // A minimal Passport-guard stub that places a pre-built user profile on
@@ -149,7 +151,7 @@ class AllowedOAuthGuardStub implements CanActivate {
     const req = context.switchToHttp().getRequest<Record<string, unknown>>();
     req.user = {
       id: `oauth-allowed-${randomUUID()}`,
-      email: `oauth-allowed@example.com`,
+      email: `oauth-allowed-${RUN_ID}@example.com`,
       name: 'OAuth Allowed',
       userGroupIds: [],
     };
@@ -167,7 +169,7 @@ class BuiltInGroupOAuthGuardStub implements CanActivate {
     const req = context.switchToHttp().getRequest<Record<string, unknown>>();
     req.user = {
       id: `oauth-builtin-${randomUUID()}`,
-      email: `oauth-builtin@example.com`,
+      email: `oauth-builtin-${RUN_ID}@example.com`,
       name: 'OAuth BuiltIn',
       userGroupIds: [BUILTIN_USER_GROUP_DEFAULT],
     };
@@ -281,7 +283,6 @@ describe('acceptUserGroupsFromAuthProvider: groups from IdP overwrite DB groups 
     delete process.env['AUTH_LOGIN_ALLOWED_GROUPS'];
     delete process.env['AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER'];
     await cleanupNonBuiltInData(dataSource);
-    await dataSource.destroy();
     await app.close();
   }, 30_000);
 
@@ -381,7 +382,6 @@ describe('Allow login when AUTH_LOGIN_ALLOWED_GROUPS is empty', () => {
 
   afterAll(async () => {
     await cleanupNonBuiltInData(dataSource);
-    await dataSource.destroy();
     await app.close();
   }, 30_000);
 
@@ -463,7 +463,6 @@ describe('Allow login with a built-in group', () => {
   afterAll(async () => {
     delete process.env['AUTH_LOGIN_ALLOWED_GROUPS'];
     await cleanupNonBuiltInData(dataSource);
-    await dataSource.destroy();
     await app.close();
   }, 30_000);
 
@@ -558,7 +557,6 @@ describe('Deny login without built-in group', () => {
     delete process.env['AUTH_LOGIN_ALLOWED_GROUPS'];
     delete process.env['AUTH_USE_USER_GROUPS_FROM_AUTH_PROVIDER'];
     await cleanupNonBuiltInData(dataSource);
-    await dataSource.destroy();
     await app.close();
   }, 30_000);
 
