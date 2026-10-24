@@ -703,7 +703,7 @@ Kapitel 7 (je Schritt ein oder mehrere Commits). Die Screenshots `img/after-*.pn
 | E7 | Hilfe im Inspector | `InAppDocsProvider` kennt einen „Docs-Host“; im Chat öffnet das Hilfe-Icon die Hilfe im Inspector (`public/docs/chat/index.md`). Der Admin-Bereich behält sein Panel. |
 | E8 | Allowlist optional | Feld „Allowed domains for pages to open“ je MCP-Extension (inkl. Subdomains). Ohne Liste mit deutlicher Warnung, nicht erlaubte Domains werden blockiert (die Adresse wird dann nicht gezeigt). |
 | E9 | Löschen mit Rückgängig | Soft-Delete (`conversations.deletedAt`), `POST /conversations/:id/restore` für 5 min, ältere werden beim nächsten Löschen endgültig entfernt; Benachrichtigung mit „Undo“. |
-| E10 | Chips + Popover | Assistent, Assistenten-Einstellungen und Optionen der Extensions als Chips im Composer, ein gemeinsames Popover „Chat settings“ (`[Reset all] [Cancel] [Apply]`). Die Auswahl oben und beide Modals entfallen. |
+| E10 | Chips + Popover | Assistenten-Einstellungen und Optionen der Extensions als Chips im Composer, ein gemeinsames Popover „Chat settings“ (`[Reset all] [Cancel] [Apply]`), ohne Optionen kein Chip. Beide Modals entfallen. Der Assistent wird in der Kopfzeile gewählt (siehe Nachtrag). |
 | E11 | Kopfzeile | `useIsCompact`/`useIsPhone` (`useMediaQuery`) statt `isMobile()`. Kopfzeile der Konversation mit Chatliste/Burger, Neuer Chat und Details; unter `md` Drawer, Popovers als Bottom-Sheet. Shortcuts Ctrl/Cmd+. und Ctrl/Cmd+Shift+O. |
 | E12 | Mantine Notifications | `src/lib/notifications.tsx` (`notify` mit Aktion, `toast`-Kurzformen), `react-toastify` entfernt. |
 | E13 | Profil für alle | Menüpunkt immer da, Daten des Identitätsanbieters schreibgeschützt, Passwort nur mit lokalem Login (`ProfileDto.hasPassword`). |
@@ -712,6 +712,14 @@ Außerdem behoben: Knopfregeln im Bestätigungsdialog (sekundär links, nur prim
 neutrale Knöpfe bei der Chat-Bewertung, hart codierte Texte, Aria-Labels im PDF-Viewer, Umbenennen mit Mantine-Input
 (Esc bricht ab), Menü des aktiven Chats immer sichtbar, `OverlayDropdown` entfernt, abgelaufene Formulare bleiben
 nicht stehen, fokussierbarer Datei-Upload, Error-Boundary im Inspector.
+
+**Nachtrag Assistentenauswahl:** Die Auswahl als erster Chip im Composer (Chip → Popover → `Select`, drei Ebenen,
+Fokusprobleme, stark gekürzte Namen) ist ersetzt durch einen Picker oben links in der Kopfzeile
+(`conversation/AssistantPicker.tsx`, Mantine `Combobox`): Knopf mit dem Namen (Ellipse nur bei sehr langen Namen,
+voller Name als `title`), ein Klick öffnet die Liste mit Name, zweizeiliger Beschreibung und Häkchen, ab sechs
+Assistenten mit Suche; Pfeiltasten/Enter/Esc, `combobox`/`listbox`, Fokus zurück auf den Knopf. Auf dem Telefon ist
+der Knopf kürzer und die Liste so breit wie der Bildschirm. Das Wechseln verhält sich wie vorher (auch in einem
+bestehenden Chat, wird für neue Chats gemerkt). Die Screenshots unten zeigen noch den Stand davor.
 
 **E2E:** Neuer Test-MCP-Server je Worker (`e2e/tests/utils/test-mcp-server.ts`) mit Formular, URL-Anfrage und
 fehlschlagendem Tool; neue Tests in `interactions.spec.ts` (Formular, URL inkl. „kein Popup ohne Zustimmung“,

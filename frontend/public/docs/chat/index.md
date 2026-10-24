@@ -6,6 +6,12 @@
 - **Esc** closes the details panel and stops a running answer.
 - **Ctrl/Cmd+Shift+O** starts a new chat, **Ctrl/Cmd+.** shows or hides the details panel.
 
+## Choosing the assistant
+
+The name of the assistant at the top left of the chat opens the list of all assistants with a short description (and
+a search when there are many). Switching the assistant also works in an existing chat: the next answers come from the
+new assistant, and it is preselected for new chats.
+
 ## Context of the next message
 
 Everything above and below the message input goes into your next message:
@@ -13,7 +19,8 @@ Everything above and below the message input goes into your next message:
 - **Attachments** (📎) are files for this chat only.
 - **My files** are your personal files. Select the files the assistant may search in this chat, upload new ones or
   manage them via "Manage…".
-- **Chat settings** (the chips with the assistant and its options) choose the assistant and its settings and filters.
+- **Options** (and the chips with their current values) are the settings of the assistant and its filters. They are
+  only shown when the assistant has some.
 
 ## Answers
 

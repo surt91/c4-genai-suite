@@ -561,9 +561,16 @@ export const de: typeof en = {
     },
   },
   chat: {
+    assistantPicker: {
+      label: 'Assistent',
+      select: 'Assistent auswählen',
+      search: 'Assistenten suchen...',
+      empty: 'Kein Assistent gefunden',
+      saveFailed: 'Der Assistent konnte nicht gewechselt werden',
+    },
     chatSettings: {
       title: 'Chat-Einstellungen',
-      assistant: 'Assistent',
+      options: 'Optionen',
       assistantSettings: 'Einstellungen des Assistenten',
       apply: 'Übernehmen',
       resetAll: 'Alle zurücksetzen',
@@ -678,7 +685,6 @@ export const de: typeof en = {
     },
     assistantDeleted: 'Assistent gelöscht',
     assistantDisabled: 'deaktiviert',
-    filters: 'Filter',
     dragAndDrop: {
       invalidFileType: 'Dateityp wird nicht unterstützt.',
       acceptedFormats: 'Erlaubte Formate:',
@@ -705,8 +711,6 @@ export const de: typeof en = {
     generationStopped: 'Generierung abgebrochen',
     rateConversation: 'War dieser Chat bisher hilfreich?',
     rateMessage: 'Antwort bewerten',
-    selectAssistant: 'Assistent auswählen',
-    searchAssistantsPlaceholder: 'Assistenten suchen...',
     reasoning: 'Reasoning',
     chunksInformation: 'Chunks-Informationen',
     rating: {

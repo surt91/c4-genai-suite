@@ -20,6 +20,11 @@
   margin-bottom: 0.5rem;
 }
 
+/* no options and no personal files */
+.context:empty {
+  display: none;
+}
+
 .inputBox {
   box-sizing: border-box;
   padding: 1rem 1rem 0.75rem;

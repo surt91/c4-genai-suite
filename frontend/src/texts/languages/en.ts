@@ -568,9 +568,16 @@ export const en = {
     },
   },
   chat: {
+    assistantPicker: {
+      label: 'Assistant',
+      select: 'Select assistant',
+      search: 'Search assistants...',
+      empty: 'No assistant found',
+      saveFailed: 'Failed to change the assistant',
+    },
     chatSettings: {
       title: 'Chat settings',
-      assistant: 'Assistant',
+      options: 'Options',
       assistantSettings: 'Settings of the assistant',
       apply: 'Apply',
       resetAll: 'Reset all',
@@ -685,7 +692,6 @@ export const en = {
     },
     assistantDeleted: 'assistant deleted',
     assistantDisabled: 'disabled',
-    filters: 'Filters',
     dragAndDrop: {
       invalidFileType: 'File type not supported.',
       acceptedFormats: 'Accepted formats:',
@@ -712,8 +718,6 @@ export const en = {
     generationStopped: 'Generation stopped',
     rateConversation: 'Was this conversation helpful so far?',
     rateMessage: 'Rate response',
-    selectAssistant: 'Select assistant',
-    searchAssistantsPlaceholder: 'Search assistants...',
     reasoning: 'Reasoning',
     chunksInformation: 'Chunks information',
     rating: {
