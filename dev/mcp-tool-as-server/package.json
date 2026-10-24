@@ -1,7 +1,8 @@
 {
   "name": "mcp-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
@@ -17,7 +18,8 @@
     "typescript": "5.9.3"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.32.1",
-    "mcp-proxy": "^2.14.3"
+    "@modelcontextprotocol/client": "^2.4.0",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "mcp-proxy": "^6.7.21"
   }
 }

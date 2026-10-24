@@ -11,9 +11,8 @@
 
 import { randomUUID } from 'crypto';
 import * as http from 'http';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
+import { CallToolResult, Server } from '@modelcontextprotocol/server';
 import { config } from './config';
 
 export const TEST_MCP_TOOLS = {
@@ -36,7 +35,7 @@ export async function startTestMcpServer(port: number): Promise<{ close: () => v
   const createServer = () => {
     const server = new Server({ name: 'e2e-test-mcp', version: '1.0.0' }, { capabilities: { tools: {} } });
 
-    server.setRequestHandler(ListToolsRequestSchema, () =>
+    server.setRequestHandler('tools/list', () =>
       Promise.resolve({
         tools: [
           {
@@ -58,23 +57,18 @@ export async function startTestMcpServer(port: number): Promise<{ close: () => v
       }),
     );
 
-    server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
-      const options = { relatedRequestId: extra.requestId };
-
+    server.setRequestHandler('tools/call', async (request, ctx) => {
       switch (request.params.name) {
         case TEST_MCP_TOOLS.confirm: {
-          const result = await server.elicitInput(
-            {
-              mode: 'form',
-              message: 'Book the meeting room **Galaxy**?',
-              requestedSchema: {
-                type: 'object',
-                properties: { title: { type: 'string', title: 'Title' } },
-                required: ['title'],
-              },
+          const result = await ctx.mcpReq.elicitInput({
+            mode: 'form',
+            message: 'Book the meeting room **Galaxy**?',
+            requestedSchema: {
+              type: 'object',
+              properties: { title: { type: 'string', title: 'Title' } },
+              required: ['title'],
             },
-            options,
-          );
+          });
           return result.action === 'accept'
             ? text(`Booked: ${String((result.content as { title?: string })?.title)}`)
             : text(`Booking ${result.action}`);
@@ -85,20 +79,17 @@ export async function startTestMcpServer(port: number): Promise<{ close: () => v
             logins.set(elicitationId, resolve);
             setTimeout(resolve, 60_000);
           });
-          const result = await server.elicitInput(
-            {
-              mode: 'url',
-              message: 'Please log in at the calendar service.',
-              elicitationId,
-              url: `${loginBase}/${elicitationId}?token=e2e-secret`,
-            },
-            options,
-          );
+          const result = await ctx.mcpReq.elicitInput({
+            mode: 'url',
+            message: 'Please log in at the calendar service.',
+            elicitationId,
+            url: `${loginBase}/${elicitationId}?token=e2e-secret`,
+          });
           if (result.action !== 'accept') {
             return text(`Login ${result.action}`);
           }
           await completed;
-          await server.createElicitationCompletionNotifier(elicitationId, options)();
+          await server.createElicitationCompletionNotifier(elicitationId, { relatedRequestId: ctx.mcpReq.id })();
           return text('Logged in at the calendar service');
         }
         case TEST_MCP_TOOLS.failing:
@@ -111,7 +102,7 @@ export async function startTestMcpServer(port: number): Promise<{ close: () => v
     return server;
   };
 
-  const transports = new Map<string, StreamableHTTPServerTransport>();
+  const transports = new Map<string, NodeStreamableHTTPServerTransport>();
 
   const readBody = (req: http.IncomingMessage) =>
     new Promise<unknown>((resolve) => {
@@ -147,7 +138,7 @@ export async function startTestMcpServer(port: number): Promise<{ close: () => v
           res.writeHead(400).end();
           return;
         }
-        transport = new StreamableHTTPServerTransport({
+        transport = new NodeStreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
           onsessioninitialized: (id) => {
             transports.set(id, transport!);

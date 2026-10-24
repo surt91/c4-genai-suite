@@ -43,7 +43,9 @@ WORKDIR /mcp-server
 
 COPY --from=mcp_server_dependencies /src/mcp-server/node_modules /mcp-server/node_modules
 COPY --from=mcp_server /src/mcp-server/dist /mcp-server/dist
+# the package is an ES module
+COPY package.json /mcp-server/
 
 EXPOSE 80
 
-CMD ["node", "/mcp-server/dist/index"]
+CMD ["node", "/mcp-server/dist/index.js"]

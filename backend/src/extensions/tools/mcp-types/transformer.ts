@@ -1,4 +1,4 @@
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { CallToolResult } from '@modelcontextprotocol/client';
 import { Source } from '../../../domain/chat/index.js';
 import { convertGaibleJsonToSource, convertGaibleJsonToText, GaibleJsonType } from './gaible-json.type.js';
 

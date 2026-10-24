@@ -1,19 +1,15 @@
 import { isDeepStrictEqual } from 'util';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import {
   CallToolRequest,
-  CallToolResultSchema,
-  ElicitationCompleteNotificationSchema,
-  ElicitRequestSchema,
+  Client,
   ElicitRequestURLParams,
   ListToolsResult,
-  ListToolsResultSchema,
-  McpError,
+  ProtocolError,
   ReadResourceRequest,
-  ReadResourceResultSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+  SSEClientTransport,
+  StreamableHTTPClientTransport,
+  UrlElicitationRequiredError,
+} from '@modelcontextprotocol/client';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { jsonSchema, JSONSchema7 } from 'ai';
 import {
@@ -54,9 +50,6 @@ export function toLlmInputSchema(inputSchema: JSONSchema7, isLlmAttribute: (key:
     ...(required ? { required } : {}),
   });
 }
-
-// The error code of a tool call that needs the user to open a page first (`ErrorCode.UrlElicitationRequired`).
-const URL_ELICITATION_REQUIRED = -32042;
 
 // The timeout of a tool call: longer than the timeouts of forms and pages to open (the user can stop it anytime).
 const TOOL_CALL_TIMEOUT = 15 * 60 * 1000;
@@ -413,7 +406,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
     const { client } = await this.getTools(configuration);
     let res;
     try {
-      res = await client.request(req, ReadResourceResultSchema);
+      res = await client.request(req);
     } finally {
       await this.closeClient(client);
     }
@@ -510,12 +503,12 @@ export class MCPToolsExtension implements Extension<Configuration> {
 
   private enableElicitRequests(client: Client, context: ChatContext, configuration: Configuration) {
     // The server reports the completion of the interaction outside (e.g. the login) asynchronously.
-    client.setNotificationHandler(ElicitationCompleteNotificationSchema, (notification) => {
+    client.setNotificationHandler('notifications/elicitation/complete', (notification) => {
       context.ui.completeUrl(notification.params.elicitationId);
       return Promise.resolve();
     });
 
-    client.setRequestHandler(ElicitRequestSchema, async (request) => {
+    client.setRequestHandler('elicitation/create', async (request) => {
       if (request.params.mode === 'url') {
         // Accept means that the user has agreed to open the page, the server waits for the result itself.
         const { action } = await this.openUrl(context, configuration, request.params);
@@ -576,7 +569,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
               displayName,
               name: `${extension.externalId}_${name}`,
               description: params.description || description || name,
-              schema: toLlmInputSchema(inputSchema, (key) => params.attributes?.[key]?.source === 'llm'),
+              schema: toLlmInputSchema(inputSchema as JSONSchema7, (key) => params.attributes?.[key]?.source === 'llm'),
               func: async (args: Record<string, any>) => {
                 const attributes = params.attributes ?? {};
                 const adminArgs = this.applyTemplates(context, this.getTemplateArgs(attributes, 'admin'));
@@ -591,8 +584,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
                   };
                   // Aborting the request also notifies the server that the tool call has been cancelled.
                   // A tool may wait for the user (forms, pages to open), so allow more than the default of 60s.
-                  const call = () =>
-                    client.request(req, CallToolResultSchema, { signal: context.abort.signal, timeout: TOOL_CALL_TIMEOUT });
+                  const call = () => client.request(req, { signal: context.abort.signal, timeout: TOOL_CALL_TIMEOUT });
                   let res;
                   try {
                     res = await call();
@@ -619,7 +611,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
                     type: 'debug',
                     content: this.i18n.t('texts.extensions.mcpTools.errorToolCall', { tool: name }),
                   });
-                  if (err instanceof McpError) {
+                  if (err instanceof ProtocolError) {
                     this.logger.error('mcpError during tool call', err);
                   } else {
                     this.logger.error('error during tool call', err);
@@ -650,13 +642,11 @@ export class MCPToolsExtension implements Extension<Configuration> {
    * @returns true if the tool call should be retried.
    */
   private async handleUrlElicitationRequired(err: unknown, context: ChatContext, configuration: Configuration) {
-    if (!(err instanceof McpError) || err.code !== URL_ELICITATION_REQUIRED) {
+    if (!(err instanceof UrlElicitationRequiredError)) {
       return false;
     }
 
-    const elicitations = ((err.data as { elicitations?: ElicitRequestURLParams[] } | undefined)?.elicitations ?? []).filter(
-      (x) => x?.mode === 'url' && typeof x.url === 'string',
-    );
+    const elicitations = err.elicitations.filter((x) => x?.mode === 'url' && typeof x.url === 'string');
     if (elicitations.length === 0) {
       return false;
     }
@@ -702,7 +692,7 @@ export class MCPToolsExtension implements Extension<Configuration> {
           });
     try {
       await client.connect(transport);
-      const { tools } = await client.request({ method: 'tools/list' }, ListToolsResultSchema);
+      const { tools } = await client.request({ method: 'tools/list' });
       return { tools, client };
     } catch (err) {
       await this.closeClient(client);

@@ -1,4 +1,4 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { Client } from '@modelcontextprotocol/client';
 import { asSchema, JSONSchema7 } from 'ai';
 import { ChatContext } from '../../domain/chat/interfaces.js';
 import { User } from '../../domain/users/index.js';

@@ -1,8 +1,8 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { startSSEServer, proxyServer } from "mcp-proxy";
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { spawn } from "child_process";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
+import { Server } from "@modelcontextprotocol/server";
+import { proxyServer, startHTTPServer } from "mcp-proxy";
+import { spawn } from "node:child_process";
 
 type MultipleServerConfig = {
   mcpServers: {
@@ -79,22 +79,16 @@ async function startServers(config: MultipleServerConfig) {
 async function start(port: number, stdioClient: Client, stdioTransport: StdioClientTransport) {
   await stdioClient.connect(stdioTransport);
 
-  const serverVersion = stdioClient.getServerVersion() as {
-    name: string;
-    version: string;
-  };
+  const serverVersion = stdioClient.getServerVersion() ?? { name: "mcp-proxy", version: "1.0.0" };
+  const serverCapabilities = stdioClient.getServerCapabilities() ?? {};
 
-  const serverCapabilities = stdioClient.getServerCapabilities() as {};
-
-  await startSSEServer({
+  await startHTTPServer({
     createServer: async () => {
-      const mcpServer = new Server(serverVersion, {
-        // mcp-proxy always registers a completion handler, which the MCP SDK only allows
-        // if the server advertises the completions capability
-        capabilities: { ...serverCapabilities, completions: {} },
-      });
+      // mcp-proxy only forwards (and registers handlers for) the capabilities of the proxied server,
+      // e.g. completions only if the server offers them
+      const mcpServer = new Server(serverVersion, { capabilities: serverCapabilities });
 
-      proxyServer({
+      await proxyServer({
         server: mcpServer,
         client: stdioClient,
         serverCapabilities,
@@ -103,10 +97,12 @@ async function start(port: number, stdioClient: Client, stdioTransport: StdioCli
       return mcpServer;
     },
     port,
-    endpoint: "/sse"
+    // SSE (the default transport of the backend) and streamable HTTP
+    sseEndpoint: "/sse",
+    streamEndpoint: "/mcp",
   });
 }
 
 const { CONFIG, PATH } = process.env as Record<string, any> & { CONFIG: string, PATH: string };
 const config: MultipleServerConfig = JSON.parse(CONFIG);
-startServers(config);
+void startServers(config);
