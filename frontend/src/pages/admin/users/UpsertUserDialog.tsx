@@ -149,6 +149,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
         >
           <fieldset disabled={isPending}>
             <FormAlert common={texts.users.updateFailed} error={userUpsert.error} />
+            <FormAlert common={texts.users.removeFailed} error={userDelete.error} />
 
             <TextInput
               id="name"

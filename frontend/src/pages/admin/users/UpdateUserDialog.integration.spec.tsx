@@ -93,4 +93,18 @@ describe('UpdateUserDialog', () => {
 
     expect(await screen.findAllByRole('alert')).toHaveLength(1);
   });
+  it('should display the reason when the user cannot be deleted', async () => {
+    const message = 'The deletion failed because the files could not be deleted from the RAG server (REI-S).';
+    server.use(http.delete(`${apiBaseUrl}/users/*`, () => Response.json({ statusCode: 503, message }, { status: 503 })));
+    render(<UpdateUserDialog {...defaultProps} />);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: texts.common.remove }));
+    await user.click(screen.getByRole('button', { name: texts.common.remove }));
+    await user.click(screen.getByRole('button', { name: texts.common.confirm }));
+
+    expect(await screen.findByText(`${texts.users.removeFailed}: ${message}`)).toBeInTheDocument();
+    expect(defaultProps.onDelete).not.toHaveBeenCalled();
+    expect(defaultProps.onClose).not.toHaveBeenCalled();
+  });
 });

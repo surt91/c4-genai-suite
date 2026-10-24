@@ -109,9 +109,10 @@ export const useStateMutateRemoveChat = () => {
         autoClose: 8000,
       });
     },
-    onError: async () => {
+    onError: async (error) => {
       refetchChatsList();
-      toast.error(await buildError(texts.chat.removeConversationFailed, texts.common.reloadAndTryAgain));
+      // e.g. the RAG server is not reachable to delete the files of older deleted chats
+      toast.error(await buildError(texts.chat.removeConversationFailed, error));
     },
   });
 };

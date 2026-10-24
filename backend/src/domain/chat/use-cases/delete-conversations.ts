@@ -1,7 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ConversationEntity, ConversationRepository } from '../../database/index.js';
+import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
+import { ConversationEntity, ConversationRepository, FileEntity, FileRepository } from '../../database/index.js';
 import { User } from '../../users/index.js';
+import { purgeConversations } from './delete-conversation.js';
 
 export class DeleteConversations {
   constructor(public readonly user: User) {}
@@ -9,18 +11,32 @@ export class DeleteConversations {
 
 export class DeleteConversationsResponse {}
 
+/** Deletes all conversations of the user permanently (they cannot be restored). */
 @CommandHandler(DeleteConversations)
 export class DeleteConversationsHandler implements ICommandHandler<DeleteConversations, DeleteConversationsResponse> {
   constructor(
     @InjectRepository(ConversationEntity)
     private readonly conversations: ConversationRepository,
+    @InjectRepository(ConversationFileEntity)
+    private readonly conversationFiles: ConversationFileRepository,
+    @InjectRepository(FileEntity)
+    private readonly files: FileRepository,
   ) {}
 
   async execute(command: DeleteConversations): Promise<DeleteConversationsResponse> {
     const { user } = command;
 
     if (user?.id != null) {
-      await this.conversations.delete({ userId: user.id });
+      // including the softly deleted ones, together with their files (see purgeConversations)
+      const conversations = await this.conversations.find({
+        where: { userId: user.id },
+        withDeleted: true,
+        select: { id: true },
+      });
+      await purgeConversations(
+        { conversations: this.conversations, conversationFiles: this.conversationFiles, files: this.files },
+        conversations.map((x) => x.id),
+      );
     }
 
     return new DeleteConversationsResponse();

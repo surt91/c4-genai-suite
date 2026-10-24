@@ -177,7 +177,7 @@ The executor feature (P1-3, P2-14) has since been removed completely (`feat!: re
 | P2-23, P2-24 | fixed | `8c12107` UPLOAD_MAX_FILE_SIZE_MB (default 512), only `files*` extensions, bucketless uploads only with matching file types and ≤ 20 MB, conversation ownership (**larger/other uploads rejected**) |
 | P2-25 | fixed | `74af62c` duplicate numbering scoped to the user (transaction: deferred, low risk) |
 | P2-26 | fixed | `19cb2a8` eval proxy streams non-JSON bodies, keeps the query string, drops hop-by-hop headers |
-| P2-27 | deferred | Needs a decision on the cleanup strategy (delete in the use cases incl. REI-S calls vs. a periodic orphan sweep) and tests against REI-S; no quick safe fix. |
+| P2-27 | fixed | `fix(backend): delete the files and REI-S documents of purged conversations and deleted users` – synchronous: conversation files (conversation bucket, files without bucket, unless a duplicate still uses them) when a deleted conversation is purged or all conversations are deleted, all files of a deleted user; REI-S first, **503 and nothing deleted when REI-S fails** (retryable). Generated images (`llm_image` blobs) have no owner and stay. |
 | P2-28 | deferred | Fixing it needs a protocol change for the upload response (e.g. a JSON error object after the keep-alive newlines) and the matching frontend handling, which is being refactored on another branch. |
 | P2-29 | mitigated | `58700c6` warning at startup and documentation; restricting the e-mail matching (e.g. by provider + subject) changes the account linking and needs a migration of existing users |
 | P2-30 | deferred | Needs a product decision (reject the import, drop masked values and require re-entry, or a warning in the UI). |

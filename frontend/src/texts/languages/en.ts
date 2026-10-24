@@ -966,6 +966,7 @@ export const en = {
     empty: 'No users found.',
     removeConfirmText: 'Do you really want to remove the user?',
     removeConfirmTitle: 'Remove User',
+    removeFailed: 'Failed to remove user',
     generateAPIKey: 'generate api key',
     headline: 'Users',
     update: 'Update User',

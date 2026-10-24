@@ -13,3 +13,4 @@ export * from './update-bucket.js';
 export * from './upload-file.js';
 export * from './get-document-content.js';
 export * from './get-document-pdf.js';
+export * from './purge-files.js';

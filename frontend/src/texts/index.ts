@@ -986,6 +986,7 @@ function load() {
       empty: translate('users.empty'),
       removeConfirmText: translate('users.removeConfirmText'),
       removeConfirmTitle: translate('users.removeConfirmTitle'),
+      removeFailed: translate('users.removeFailed'),
       generateAPIKey: translate('users.generateAPIKey'),
       headline: translate('users.headline'),
       update: translate('users.update'),

@@ -963,6 +963,7 @@ export const de: typeof en = {
     empty: 'Keine Benutzer gefunden.',
     removeConfirmText: 'Möchtest du den Benutzer wirklich löschen?',
     removeConfirmTitle: 'Benutzer löschen',
+    removeFailed: 'Löschen fehlgeschlagen',
     generateAPIKey: 'API-Key generieren',
     headline: 'Benutzer',
     update: 'Benutzer aktualisieren',
