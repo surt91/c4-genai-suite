@@ -109,6 +109,10 @@ test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
     const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
 
     await expect(duplicatedConversation).toBeVisible();
+    // exactly one copy must be created
+    await expect(
+      page.getByTestId('conversation-item').filter({ hasText: `${originalConversationWithChatWithFiles} (3)` }),
+    ).toHaveCount(0);
   });
 
   await test.step('should navigate to duplicated conversation with chat with files extension', async () => {

@@ -116,7 +116,7 @@ export const ConversationItem = memo(({ chat }: ChatProps) => {
             <Menu.Item
               leftSection={<IconCopy size={16} />}
               disabled={duplicateChat.isPending}
-              onClick={() => duplicateChat.mutate(chat.id)}
+              onClick={() => !duplicateChat.isPending && duplicateChat.mutate(chat.id)}
             >
               {texts.common.duplicate}
             </Menu.Item>
