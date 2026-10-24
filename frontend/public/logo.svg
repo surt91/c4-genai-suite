@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-  <title>Gaible</title>
-  <path d="M9 27 L32 7 L55 27" stroke="#1E293B"/>
-  <path d="M20 26 V37 Q20 45 32 45 Q44 45 44 37 V26" stroke="#4F46E5"/>
-  <path d="M32 26 V58" stroke="#4F46E5"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><title>Gaible</title><path d="M8 27 L32 7 L56 27 V46 Q56 51 51 51 H26 L15 59 V51 H13 Q8 51 8 46 Z" fill="none" stroke="#1E293B" stroke-width="5" stroke-linejoin="round"/><path d="M32 43 V36 L23 27 M32 36 L41 27" fill="none" stroke="#4F46E5" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><g fill="#4F46E5"><circle cx="23" cy="27" r="4"/><circle cx="41" cy="27" r="4"/><circle cx="32" cy="43" r="4"/></g></svg>

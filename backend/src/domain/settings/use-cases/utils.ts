@@ -6,8 +6,8 @@ export function buildSettings(source: SettingEntity): Settings {
   let { name, language, primaryColor, primaryContentColor, ...other } = source;
 
   name ??= 'Gaible';
-  primaryColor ||= '#555555';
-  primaryContentColor ||= '#F4F4F4';
+  primaryColor ||= '#4F46E5';
+  primaryContentColor ||= '#FFFFFF';
 
   return {
     name,
