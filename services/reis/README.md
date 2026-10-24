@@ -111,8 +111,12 @@ In Gaible, the configuration is a multi step process.
 First, a bucket needs to be created: `Administration > Files > "+"`
 
 Choose a sensible name and the REI-S instance as the Endpoint.
-For local development it is by default `http://localhost:3201`.
-If you want to use the REI-S started with the docker compose, use `http://reis:3201`.
+The Endpoint is prefilled with the backend's `REIS_DEFAULT_ENDPOINT` (see
+[the backend configuration](../../backend/docs/Configuration.md)): the docker compose setup sets it to `http://reis:3201`,
+the Helm chart to its REI-S service (when REI-S is enabled). Without it, the Endpoint of the existing buckets is
+prefilled if they all use the same one.
+For a natively started backend and REI-S it is by default `http://localhost:3201` (set `REIS_DEFAULT_ENDPOINT` in
+`backend/.env` to prefill it).
 
 For a detailled explanation about all the option, see [the administrator documentation.](../../frontend/public/docs/admin/files/index.md)
 

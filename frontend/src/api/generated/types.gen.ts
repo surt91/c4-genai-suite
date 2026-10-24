@@ -1466,6 +1466,13 @@ export type FileTypesDto = {
     items: Array<FileTypeDto>;
 };
 
+export type BucketDefaultsDto = {
+    /**
+     * The default REI-S endpoint for new buckets, if known.
+     */
+    endpoint?: string;
+};
+
 export type BucketDto = {
     /**
      * The ID of the bucket.
@@ -2625,6 +2632,19 @@ export type GetFileTypesResponses = {
 };
 
 export type GetFileTypesResponse = GetFileTypesResponses[keyof GetFileTypesResponses];
+
+export type GetBucketDefaultsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/buckets/defaults';
+};
+
+export type GetBucketDefaultsResponses = {
+    200: BucketDefaultsDto;
+};
+
+export type GetBucketDefaultsResponse = GetBucketDefaultsResponses[keyof GetBucketDefaultsResponses];
 
 export type GetBucketsData = {
     body?: never;

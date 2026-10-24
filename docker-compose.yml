@@ -58,6 +58,7 @@ services:
       EVAL_SERVICE_ENABLED: ${EVAL_SERVICE_ENABLED:-false}
       EVAL_SERVICE_URL: http://eval:3202
       EVAL_SERVICE_ACCOUNT_API_KEY: ${EVAL_SERVICE_ACCOUNT_API_KEY:-}
+      REIS_DEFAULT_ENDPOINT: ${REIS_DEFAULT_ENDPOINT:-http://reis:3201}
     extra_hosts:
       # lets the backend reach services on the host, e.g. the mock LLM of the E2E tests
       - host.docker.internal:host-gateway

@@ -260,6 +260,34 @@ describe('Authorization', () => {
     });
   });
 
+  describe('bucket defaults (contain the internal REI-S endpoint)', () => {
+    beforeAll(() => {
+      process.env.REIS_DEFAULT_ENDPOINT = 'http://reis.default:3201';
+    });
+
+    afterAll(() => {
+      delete process.env.REIS_DEFAULT_ENDPOINT;
+    });
+
+    it('are not readable by regular users', async () => {
+      await asUser(http().get('/buckets/defaults')).expect(403);
+    });
+
+    it('contain the configured endpoint for admins', async () => {
+      const response = await asAdmin(http().get('/buckets/defaults')).expect(200);
+      expect(response.body).toEqual({ endpoint: 'http://reis.default:3201' });
+    });
+
+    it('contain the endpoint of the existing buckets when not configured and they all use the same one', async () => {
+      delete process.env.REIS_DEFAULT_ENDPOINT;
+      const endpoints = new Set((await dataSource.getRepository(BucketEntity).find()).map((x) => x.endpoint));
+      const expected = endpoints.size === 1 ? { endpoint: [...endpoints][0] } : {};
+
+      const response = await asAdmin(http().get('/buckets/defaults')).expect(200);
+      expect(response.body).toEqual(expected);
+    });
+  });
+
   describe('extensions of a configuration (contain headers/endpoints)', () => {
     it('are not readable by regular users', async () => {
       await asUser(http().get(`/configurations/${configuration.id}/extensions`)).expect(403);

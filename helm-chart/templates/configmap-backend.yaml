@@ -20,6 +20,11 @@ data:
   {{- end }}
   AUTH_LOGIN_ALLOWED_GROUPS: "{{ .Values.backend.auth.loginAllowedGroups }}"
   METRICS_PORT: "{{ .Values.backend.metrics.port }}"
+  {{- if .Values.backend.reisDefaultEndpoint }}
+  REIS_DEFAULT_ENDPOINT: "{{ .Values.backend.reisDefaultEndpoint }}"
+  {{- else if .Values.reis.enabled }}
+  REIS_DEFAULT_ENDPOINT: "http://{{ include "gaible.fullname" . }}-reis"
+  {{- end }}
   {{- if and .Values.backend.ssl.rootCertificateConfigMapName .Values.backend.ssl.rootCertificateConfigMapKey }}
   NODE_EXTRA_CA_CERTS: "/etc/ssl/certs/{{ .Values.backend.ssl.rootCertificateConfigMapKey }}"
   {{- end }}

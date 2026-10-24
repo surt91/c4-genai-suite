@@ -30,6 +30,8 @@ The minimum requirements for a bucket are a valid Endpoint URL, a name and a buc
 
 Your infrastructure team will be able to let you know the Endpoint to use, if the REI-Server, that comes with Gaible was installed during the initial setup of Gaible. This server should be listed among the kubernetes pods with port 3201, and have a name ending in "-reis" (e.g. `http://YOUR-Gaible-reis:3201`). **If a bucket with a working Endpoint is setup you can reuse its address for new buckets.**
 
+When creating a bucket, the Endpoint is prefilled with the default REI-S endpoint of the installation (`REIS_DEFAULT_ENDPOINT`, set by the docker compose setup and the Helm chart), or else with the Endpoint of the existing buckets if they all use the same one. The allowed file types are then loaded automatically. You can still change the Endpoint.
+
 **If your are configuring a bucket of type general, you must upload files as an admin.** Just click the bucket, you want to upload to, and an upload-area, which you can click to select files will appear on the right. You can also drag and drop files into the upload-area.
 
 ## 2. Add a Tool to use the Bucket

@@ -89,6 +89,12 @@ Microsoft Entra tenant: the backend refuses to start without it or with a multi-
 | AUTH_OAUTH_USER_INFO_URL     | No        | None      |             |
 
 
+## Files (REI-S)
+
+| Env Variable          | Required | Default | Description                                                                                                   |
+|-----------------------|----------|---------|---------------------------------------------------------------------------------------------------------------|
+| REIS_DEFAULT_ENDPOINT | No       | None    | REI-S endpoint prefilled when an admin creates a bucket (only shown to admins), e.g. `http://reis:3201`. When not set, the endpoint of the existing buckets is used if they all use the same one. |
+
 ## Langfuse
 
 Tracing is enabled when both keys are set. The AI SDK spans are exported via OTLP to `<base url>/api/public/otel`.
