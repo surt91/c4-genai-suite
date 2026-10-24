@@ -65,8 +65,8 @@ Use `npx playwright test --ui` or the Playwright VS Code extension to debug sing
 ### CI
 
 All changes land on `main` via pull requests. GitHub Actions ([`.github/workflows/ci.yaml`](.github/workflows/ci.yaml))
-runs one job per component (lint, build, tests) plus the E2E tests on every pull request; `main` is protected and only
-accepts pull requests whose checks passed and that are up to date with `main`, so `main` itself is not tested again.
+runs one job per component (lint, build, tests) plus the E2E tests on every pull request. The job `ci-passed` sums
+them up and is the only required status check: `main` is protected and only accepts pull requests whose checks passed and that are up to date with `main`, so `main` itself is not tested again.
 [`release.yaml`](.github/workflows/release.yaml) publishes container images (`main`, `commit-<sha>`) on every push to
 `main` and maintains a release pull request via release-please. Merging that pull request creates the GitHub release,
 the versioned multi-arch images (`1.2.3`, `v1.2.3`, `latest`) and pushes the Helm chart.
