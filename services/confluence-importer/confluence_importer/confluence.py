@@ -52,51 +52,42 @@ def get_pages_for_space(space_key: str) -> Generator[ConfluencePage]:
     Args:
         space_key: The key identifier of the Confluence space to retrieve pages from
 
-    Returns:
-        A list of ConfluencePage dataclasses containing the page information and content as HTML
+    Yields:
+        ConfluencePage dataclasses containing the page information and content as HTML, each page exactly once
     """
-    crawling_done = False
-    batch_size = 100  # Don't change. See comment regarding `get_all_pages_from_space_as_generator()` below.
-    offset = 0
+    # `get_all_pages_from_space_as_generator()` paginates internally: it requests batches of `limit` pages and stops
+    # as soon as a batch contains fewer than `limit` pages. So `limit` must not exceed the page size the server
+    # actually returns (the server caps it), otherwise crawling stops after the first batch. 100 is known to work.
+    batch_size = 100
+    logger.debug("Fetch Pages for Confluence Space", space_key=space_key, limit=batch_size)
 
-    while not crawling_done:
-        logger.debug("Fetch Pages for Confluence Space", space_key=space_key, offset=offset, limit=batch_size)
+    result = confluence_api.get_all_pages_from_space_as_generator(
+        space_key,
+        start=0,
+        limit=batch_size,
+        content_type="page",
+        expand="body.storage,history.lastUpdated",
+        status="current",
+    )
 
-        # It seems that the `limit` parameter is broken and is always 100.
-        # This is fine as long as we keep our `batch_size` at 100.
-        result = confluence_api.get_all_pages_from_space_as_generator(
-            space_key,
-            start=offset,
-            limit=batch_size,
-            content_type="page",
-            expand="body.storage,history.lastUpdated",
-            status="current",
-        )
-
-        len_result = 0
-        try:
-            for r in result:
-                len_result += 1
-                yield ConfluencePage(
-                    r.get("id"),
-                    r.get("history").get("lastUpdated").get("when"),
-                    f"{confluence_url}{r.get('_links').get('webui')}",
-                    r.get("body").get("storage").get("value"),
-                    r.get("title"),
-                )
-        except Exception as e:
-            logger.error(
-                "Error fetching pages for Confluence Space. Abort further crawling of this space.",
-                error=str(e),
-                space_key=space_key,
-                offset=offset,
-                limit=batch_size,
+    fetched = 0
+    try:
+        for r in result:
+            fetched += 1
+            yield ConfluencePage(
+                r.get("id"),
+                r.get("history").get("lastUpdated").get("when"),
+                f"{confluence_url}{r.get('_links').get('webui')}",
+                r.get("body").get("storage").get("value"),
+                r.get("title"),
             )
-            break
+    except Exception as e:
+        logger.error(
+            "Error fetching pages for Confluence Space. Abort further crawling of this space.",
+            error=str(e),
+            space_key=space_key,
+            fetched=fetched,
+        )
+        return
 
-        if len_result < batch_size:
-            crawling_done = True
-        else:
-            offset += batch_size
-
-    logger.info("All Pages for Confluence Space fetched", space_key=space_key)
+    logger.info("All Pages for Confluence Space fetched", space_key=space_key, count=fetched)

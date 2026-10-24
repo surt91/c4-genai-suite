@@ -1,8 +1,10 @@
 """Tests for the Confluence API interaction functionality."""
 
+from typing import Any
+
 from pytest_mock import MockerFixture
 
-from confluence_importer.confluence import get_page, get_pages_for_space, ConfluencePage, confluence_url
+from confluence_importer.confluence import get_page, get_pages_for_space, ConfluencePage, confluence_api, confluence_url
 
 
 class TestConfluence:
@@ -103,15 +105,17 @@ class TestConfluence:
         assert results[1].title == "Test Page 2"
 
     def test_get_pages_for_space_pagination(self, mocker: MockerFixture) -> None:
-        """Test that get_pages_for_space correctly handles pagination of results.
+        """Test that every page of a space spanning several API result pages is yielded exactly once.
+
+        The REST endpoint is mocked, so the pagination of the atlassian client is exercised as well.
 
         Args:
             mocker: Pytest fixture for mocking
         """
         # arrange
         space_key = "TEST"
-
-        first_batch = [
+        total_pages = 250
+        all_pages = [
             {
                 "id": i,
                 "history": {"lastUpdated": {"when": "2025-07-29T13:56:00.000Z"}},
@@ -119,24 +123,20 @@ class TestConfluence:
                 "body": {"storage": {"value": f"<h1>Page {i}</h1>"}},
                 "title": f"Page {i}",
             }
-            for i in range(100)
+            for i in range(total_pages)
         ]
 
-        second_batch = [
-            {
-                "id": i + 100,
-                "history": {"lastUpdated": {"when": "2025-07-30T10:15:00.000Z"}},
-                "_links": {"webui": f"/rest/api/content/{i + 100}"},
-                "body": {"storage": {"value": f"<h1>Page {i + 100}</h1>"}},
-                "title": f"Page {i + 100}",
-            }
-            for i in range(50)
-        ]
+        def fake_get(path: str, params: dict[str, Any] | None = None, **kwargs: Any) -> dict[str, Any]:
+            assert path == "rest/api/content"
+            assert params is not None
+            assert params["spaceKey"] == space_key
+            start = params.get("start", 0)
+            limit = min(params.get("limit", 25), 100)  # the server caps the page size
+            results = all_pages[start : start + limit]
+            return {"results": results, "start": start, "limit": limit, "size": len(results)}
 
-        mock_generator = mocker.patch(
-            "confluence_importer.confluence.confluence_api.get_all_pages_from_space_as_generator",
-            side_effect=[first_batch, second_batch],
-        )
+        # `Confluence` delegates to the Server client, which sends the requests via its `get` method.
+        mock_get = mocker.patch.object(confluence_api._impl, "get", side_effect=fake_get)
 
         mocker.patch("confluence_importer.confluence.logger.debug")
         mocker.patch("confluence_importer.confluence.logger.info")
@@ -145,27 +145,5 @@ class TestConfluence:
         results = list(get_pages_for_space(space_key))
 
         # assert
-        assert mock_generator.call_count == 2
-        assert mock_generator.call_args_list[0][0] == (space_key,)
-        assert mock_generator.call_args_list[0][1] == {
-            "start": 0,
-            "limit": 100,
-            "content_type": "page",
-            "expand": "body.storage,history.lastUpdated",
-            "status": "current",
-        }
-
-        assert mock_generator.call_args_list[1][0] == (space_key,)
-        assert mock_generator.call_args_list[1][1] == {
-            "start": 100,
-            "limit": 100,
-            "content_type": "page",
-            "expand": "body.storage,history.lastUpdated",
-            "status": "current",
-        }
-
-        assert len(results) == 150
-        assert results[0].id == 0
-        assert results[99].id == 99
-        assert results[100].id == 100
-        assert results[149].id == 149
+        assert [page.id for page in results] == list(range(total_pages))
+        assert [call.kwargs["params"].get("start", 0) for call in mock_get.call_args_list] == [0, 100, 200]
