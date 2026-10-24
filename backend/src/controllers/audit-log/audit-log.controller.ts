@@ -4,6 +4,7 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, A
 import { GetAuditLogById, GetAuditLogByIdResponse, GetAuditLogs, GetAuditLogsResponse } from '../../domain/audit-log/index.js';
 import { LocalAuthGuard, Role, RoleGuard } from '../../domain/auth/index.js';
 import { AuditEntityType, BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
+import { ParseOptionalPagingPipe } from '../shared.js';
 import { AuditLogDetailDto, AuditLogsDto } from './dtos/index.js';
 
 @Controller('audit-logs')
@@ -51,8 +52,8 @@ export class AuditLogController {
     @Query('entityType') entityType?: AuditEntityType,
     @Query('entityId') entityId?: string,
     @Query('configurationId', new ParseIntPipe({ optional: true })) configurationId?: number,
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', ParseOptionalPagingPipe) page?: number,
+    @Query('pageSize', ParseOptionalPagingPipe) pageSize?: number,
   ) {
     const result: GetAuditLogsResponse = await this.queryBus.execute(
       new GetAuditLogs({ entityType, entityId, configurationId, page, pageSize }),

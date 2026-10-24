@@ -1,9 +1,10 @@
+import { BadRequestException } from '@nestjs/common';
 import { Agent, RequestInfo, RequestInit, fetch as undiciFetch } from 'undici';
 import { parseHeaders } from '../../../lib/index.js';
 import { BlobCategory, BucketEntity, FileEntity } from '../../database/index.js';
 import { User } from '../../users/index.js';
 import { Bucket, UploadedFile } from '../interfaces.js';
-import { Configuration, FilesApi, HTTPHeaders } from './generated/index.js';
+import { Configuration, FetchError, FilesApi, HTTPHeaders, ResponseError } from './generated/index.js';
 
 export function buildBucket(source: BucketEntity): Bucket {
   return source;
@@ -56,6 +57,27 @@ export function getBucketId(bucket: BucketEntity, user?: User, conversationId?: 
   }
 
   return ragBucket;
+}
+
+/**
+ * Calls the RAG server at an endpoint that has been entered by an admin (e.g. to test it before saving the bucket). As the
+ * endpoint is part of the input, a failing request is reported as 400 (with the reason) instead of 500.
+ */
+export async function callEnteredEndpoint<T>(endpoint: string, call: () => Promise<T>): Promise<T> {
+  try {
+    return await call();
+  } catch (error) {
+    if (error instanceof FetchError) {
+      const reason = error.cause.message;
+      throw new BadRequestException(`The RAG server at '${endpoint}' could not be reached: ${reason}`, { cause: error });
+    }
+    if (error instanceof ResponseError) {
+      throw new BadRequestException(`The RAG server at '${endpoint}' responded with status ${error.response.status}.`, {
+        cause: error,
+      });
+    }
+    throw error;
+  }
 }
 
 export function buildClient(bucket: Pick<BucketEntity, 'headers' | 'endpoint'>) {

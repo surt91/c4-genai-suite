@@ -6,10 +6,12 @@ import {
   IsDefined,
   IsEnum,
   IsIn,
+  IsInt,
   IsNumber,
   IsObject,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import {
@@ -284,8 +286,9 @@ export class UpdateConversationDto {
     description: 'The ID of the configuration.',
     required: false,
   })
-  @IsOptional()
-  @IsNumber()
+  // optional, but not nullable (unlike `@IsOptional()`): a conversation always has an assistant
+  @ValidateIf((_, value) => value !== undefined)
+  @IsInt()
   configurationId?: number;
 
   @ApiProperty({
@@ -300,7 +303,7 @@ export class UpdateConversationDto {
     description: 'Indicates whether the name of the conversation has been set manually by the user.',
     required: false,
   })
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsBoolean()
   isNameSetManually?: boolean;
 

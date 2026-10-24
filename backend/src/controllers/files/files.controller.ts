@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -47,7 +48,17 @@ import {
   UploadFileResponse,
 } from '../../domain/files/index.js';
 import { GetFileTypes, GetFileTypesResponse } from '../../domain/files/use-cases/get-file-types.js';
-import { BucketDto, BucketsDto, FileDto, FilesDto, FileTypesDto, TestBucketDto, UpsertBucketDto } from './dtos/index.js';
+import { ParseOptionalPagingPipe } from '../shared.js';
+import {
+  BucketDto,
+  BucketsDto,
+  FileDto,
+  FilesDto,
+  FileTypesDto,
+  GetFileTypesQueryDto,
+  TestBucketDto,
+  UpsertBucketDto,
+} from './dtos/index.js';
 import { keepAlive } from './keep-alive.js';
 
 @Controller('buckets')
@@ -71,16 +82,17 @@ export class FilesController {
   }
 
   @Get('/fileTypes')
-  @ApiQuery({
-    name: 'endpoint',
-    description: 'The rag endpoint.',
-    required: true,
-    type: String,
-  })
+  // listed in reverse order (with the query DTO), so that the generated clients keep the parameters `endpoint, headers`
   @ApiQuery({
     name: 'headers',
     description: 'The rag headers.',
     required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'endpoint',
+    description: 'The rag endpoint.',
+    required: true,
     type: String,
   })
   @ApiOperation({ operationId: 'getFileTypes', description: 'Gets the file types.' })
@@ -90,7 +102,7 @@ export class FilesController {
   // check any authenticated user could point it at arbitrary internal hosts.
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async getFileTypes(@Query('endpoint') endpoint: string, @Query('headers') headers?: string) {
+  async getFileTypes(@Query() { endpoint, headers }: GetFileTypesQueryDto) {
     const result: GetFileTypesResponse = await this.queryBus.execute(new GetFileTypes(endpoint, headers));
     return FileTypesDto.fromDomain(result.fileTypes);
   }
@@ -201,8 +213,8 @@ export class FilesController {
   async getFiles(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', ParseOptionalPagingPipe) page?: number,
+    @Query('pageSize', ParseOptionalPagingPipe) pageSize?: number,
     @Query('query') query?: string,
   ) {
     const result: GetFilesResponse = await this.queryBus.execute(
@@ -229,7 +241,15 @@ export class FilesController {
   @ApiOkResponse({ type: FileDto })
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
-  async postFile(@Param('id', ParseIntPipe) bucketId: number, @Res() res: Response, @UploadedFile() file: Express.Multer.File) {
+  async postFile(
+    @Param('id', ParseIntPipe) bucketId: number,
+    @Res() res: Response,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    if (!file) {
+      throw new BadRequestException('The file is missing (expected as multipart/form-data field "file").');
+    }
+
     const command = new UploadFile({
       buffer: file.buffer,
       mimeType: file.mimetype,

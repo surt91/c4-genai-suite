@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Bucket } from '../interfaces.js';
-import { buildClient } from './utils.js';
+import { buildClient, callEnteredEndpoint } from './utils.js';
 
 export class TestBucket {
   constructor(
@@ -19,6 +19,6 @@ export class TestBucketHandler implements ICommandHandler<TestBucket, TestBucket
     const client = buildClient(command);
 
     //TODO add indexName here
-    await client.getFiles('Test Query', 10, 'test');
+    await callEnteredEndpoint(command.endpoint, () => client.getFiles('Test Query', 10, 'test'));
   }
 }

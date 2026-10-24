@@ -42,6 +42,7 @@ import {
   UploadFileResponse,
 } from '../../domain/files/index.js';
 import { I18nService } from '../../localization/i18n.service.js';
+import { ParseOptionalPagingPipe } from '../shared.js';
 import { FileDto, FilesDto, RenameFileDto } from './dtos/index.js';
 import { keepAlive } from './keep-alive.js';
 
@@ -86,8 +87,8 @@ export class UserFilesController {
   @ApiOkResponse({ type: FilesDto })
   async getUserFiles(
     @Req() req: Request,
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', ParseOptionalPagingPipe) page?: number,
+    @Query('pageSize', ParseOptionalPagingPipe) pageSize?: number,
     @Query('query') query?: string,
     @Query('conversationId', new ParseIntPipe({ optional: true })) conversationId?: number,
   ) {

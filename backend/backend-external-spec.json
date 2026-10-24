@@ -162,7 +162,8 @@
         "type": "object",
         "properties": {
           "model": {
-            "type": "string"
+            "type": "string",
+            "description": "The model, by default the model of the assistant."
           },
           "input": {
             "oneOf": [
@@ -191,7 +192,7 @@
           }
         },
         "x-external": true,
-        "required": ["model", "input"]
+        "required": ["input"]
       }
     }
   }

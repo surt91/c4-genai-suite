@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDefined, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsDefined, IsInt, IsNotEmpty, IsOptional, IsString, Length, Max, Min } from 'class-validator';
 import { User, UserGroup } from '../../../domain/users/index.js';
+import { MAX_INT } from '../../shared.js';
 
 export class UpsertUserDto {
   @ApiProperty({
@@ -169,12 +170,20 @@ export class UpsertUserGroupDto {
     description: 'The monthly allowed tokens for all users in the group.',
     required: false,
   })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(MAX_INT)
   monthlyTokens?: number;
 
   @ApiProperty({
     description: 'The monthly allowed tokens per user in the group.',
     required: false,
   })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(MAX_INT)
   monthlyUserTokens?: number;
 }
 

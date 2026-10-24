@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDefined, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsDefined, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 import { BucketType, FileSizeLimits, FileUploadStatus } from '../../../domain/database/index.js';
 import { Bucket, FileType, UploadedFile } from '../../../domain/files/index.js';
 
@@ -101,6 +101,18 @@ export class TestBucketDto {
     description: 'The optional headers.',
     required: true,
   })
+  @IsOptional()
+  @IsString()
+  headers?: string;
+}
+
+/** The query of `GET /buckets/fileTypes` (documented with `@ApiQuery`). */
+export class GetFileTypesQueryDto {
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  endpoint!: string;
+
   @IsOptional()
   @IsString()
   headers?: string;

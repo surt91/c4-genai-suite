@@ -980,6 +980,8 @@ export class ImportConfigurationDto {
     type: ExportedConfigurationDto,
   })
   @IsDefined()
+  // an array would pass the nested validation (of each item)
+  @IsObject()
   @ValidateNested()
   @Type(() => ExportedConfigurationDto)
   data!: ExportedConfigurationDto;

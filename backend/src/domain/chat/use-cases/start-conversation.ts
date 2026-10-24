@@ -1,7 +1,7 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { assignDefined, InternalError } from '../../../lib/index.js';
+import { assignDefined } from '../../../lib/index.js';
 import { ConversationEntity, ConversationRepository } from '../../database/index.js';
 import { GetConfigurations, GetConfigurationsResponse } from '../../extensions/index.js';
 import { User } from '../../users/index.js';
@@ -44,9 +44,10 @@ export class StartConversationHandler implements ICommandHandler<StartConversati
 
       entity.configurationId = configurationId;
     } else {
-      // Choose the first configuration as default if nothing configured.
+      // Choose the first configuration as default if nothing configured. Without any (accessible and enabled) assistant
+      // a conversation cannot be started until an admin has created one (the frontend shows an empty state instead).
       if (configurations.length === 0) {
-        throw new InternalError('No configuration configured.');
+        throw new ConflictException('There is no assistant to start a conversation with.');
       }
 
       entity.configurationId = configurations[0].id;

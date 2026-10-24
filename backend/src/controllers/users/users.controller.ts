@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -13,6 +13,7 @@ import {
   UpdateUser,
   UpdateUserResponse,
 } from '../../domain/users/index.js';
+import { ParseOptionalPagingPipe } from '../shared.js';
 import { ChangePasswordDto, UpsertUserDto, UserDto, UsersDto } from './dtos/index.js';
 
 @Controller('users')
@@ -47,8 +48,8 @@ export class UsersController {
   @Role(BUILTIN_USER_GROUP_ADMIN)
   @UseGuards(RoleGuard)
   async getUsers(
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', ParseOptionalPagingPipe) page?: number,
+    @Query('pageSize', ParseOptionalPagingPipe) pageSize?: number,
     @Query('query') query?: string,
   ) {
     const result: GetUsersResponse = await this.queryBus.execute(new GetUsers(page || 0, pageSize || 20, query));

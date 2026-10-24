@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, BadRequestException, Injectable, ParseIntPipe, PipeTransform } from '@nestjs/common';
 import { ApiProperty, getSchemaPath, SchemaObject } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDefined, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
@@ -224,5 +224,22 @@ export class ParseDatePipe implements PipeTransform {
     }
 
     return parsedDate;
+  }
+}
+
+/** The maximum of an `integer` column (and of the paging parameters, so that the offset fits into a `bigint`). */
+export const MAX_INT = 2_147_483_647;
+
+/** Parses an optional query parameter for the paging (`page`, `pageSize`): it must be a non-negative integer (else 400). */
+@Injectable()
+export class ParseOptionalPagingPipe implements PipeTransform {
+  private readonly parseInt = new ParseIntPipe({ optional: true });
+
+  async transform(value: string | undefined, metadata: ArgumentMetadata): Promise<number | undefined> {
+    const result = await this.parseInt.transform(value, metadata);
+    if (result != null && (result < 0 || result > MAX_INT)) {
+      throw new BadRequestException(`Validation failed (${metadata.data} must be between 0 and ${MAX_INT})`);
+    }
+    return result ?? undefined;
   }
 }
