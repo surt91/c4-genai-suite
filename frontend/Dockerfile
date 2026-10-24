@@ -1,11 +1,12 @@
 FROM node:26.12.1-alpine3.24 AS build
-ARG VERSION
 WORKDIR /src
 
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
+# after `npm ci`: a build argument invalidates the cache of all following RUN instructions
+ARG VERSION
 RUN VITE_VERSION="$VERSION" npm run build
 
 
