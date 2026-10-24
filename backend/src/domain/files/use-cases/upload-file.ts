@@ -18,8 +18,7 @@ import {
 } from '../../database/index.js';
 import { User } from '../../users/index.js';
 import { UploadedFile } from '../interfaces.js';
-import { ResponseError } from './generated/index.js';
-import { buildClient, buildFile, getBucketId } from './utils.js';
+import { buildClient, buildFile, getBucketId, rawBody, ResponseError } from './utils.js';
 
 export interface UploadFileParams {
   user?: User;
@@ -136,14 +135,14 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       );
     }
 
-    const supportedFileNameExtensions = fileTypes.items.find((x) => matchExtension(fileName, x.fileNameExtension));
+    const supportedFileNameExtensions = fileTypes.items.find((x) => matchExtension(fileName, x.file_name_extension));
     if (!supportedFileNameExtensions) {
       throw new BadRequestException(this.i18n.t('texts.extensions.files.errorNotSupportedFileType'));
     }
 
     if (
       bucket.allowedFileNameExtensions?.length &&
-      !bucket.allowedFileNameExtensions.includes(supportedFileNameExtensions.fileNameExtension)
+      !bucket.allowedFileNameExtensions.includes(supportedFileNameExtensions.file_name_extension)
     ) {
       throw new BadRequestException(this.i18n.t('texts.extensions.files.errorNotAllowedFileType'));
     }
@@ -203,17 +202,25 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       // Use the save method otherwise we would not get previous values.
       if (embedType === 'vector' || embedType === 'vector_and_text') {
         const bucketPath = getBucketId(bucket, user, conversationId);
-        await api.uploadFile(encodeURIComponent(fileName), mimeType, bucketPath, created.id.toString(), bucket.indexName, {
-          body: blob,
-        });
+        await api.uploadFile(
+          {
+            fileName: encodeURIComponent(fileName),
+            fileMimeType: mimeType,
+            bucket: bucketPath,
+            id: created.id.toString(),
+            indexName: bucket.indexName,
+          },
+          rawBody(blob),
+        );
         uploadedToVectorStore = true;
         await this.files.update({ id: entity.id }, { uploadStatus: FileUploadStatus.Successful });
       }
 
       if (embedType === 'vector_and_text' || embedType === 'text') {
-        const fileContent = await api.processFile(encodeURIComponent(fileName), mimeType, 100000, {
-          body: blob,
-        });
+        const fileContent = await api.processFile(
+          { fileName: encodeURIComponent(fileName), fileMimeType: mimeType, chunkSize: 100000 },
+          rawBody(blob),
+        );
         await this.blob.delete({ fileId: entity.id });
         await this.blob.save({
           id: randomUUID(),
@@ -238,7 +245,7 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       if (result?.id) {
         if (uploadedToVectorStore) {
           // Otherwise the chunks would stay in the vector store without a file that references (and deletes) them.
-          await api.deleteFile(result.id.toString(), bucket.indexName).catch((deleteError) => {
+          await api.deleteFile({ file_id: result.id.toString(), indexName: bucket.indexName }).catch((deleteError) => {
             this.logger.error('Failed to delete the partially uploaded file from the RAG server.', deleteError);
           });
         }
@@ -246,13 +253,13 @@ export class UploadFileHandler implements ICommandHandler<UploadFile, UploadFile
       }
 
       this.logger.error('Failed to upload file to RAG server.', err);
-      if (err instanceof ResponseError && err.response.status === 400) {
+      if (err instanceof ResponseError && err.status === 400) {
         throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorUploadingFileDamaged'));
-      } else if (err instanceof ResponseError && err.response.status === 413) {
+      } else if (err instanceof ResponseError && err.status === 413) {
         throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorFileTooLarge'));
-      } else if (err instanceof ResponseError && err.response.status === 415) {
+      } else if (err instanceof ResponseError && err.status === 415) {
         throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorNotSupportedFileType'));
-      } else if (err instanceof ResponseError && err.response.status === 422) {
+      } else if (err instanceof ResponseError && err.status === 422) {
         throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorUploadingREISConfiguration'));
       }
       throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorUploadingFile'));

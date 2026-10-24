@@ -7,8 +7,7 @@ import { Source } from '../../chat/index.js';
 import { BucketEntity, BucketRepository } from '../../database/index.js';
 import { User } from '../../users/index.js';
 import { SearchResult } from '../interfaces.js';
-import { ResponseError } from './generated/index.js';
-import { buildClient } from './utils.js';
+import { buildClient, ResponseError } from './utils.js';
 
 export class SearchFiles {
   constructor(
@@ -58,10 +57,16 @@ export class SearchFilesHandler implements IQueryHandler<SearchFiles, SearchFile
 
     const api = buildClient(bucket);
     try {
-      const result = await api.getFiles(search, take, ragBucket, bucket.indexName, externalDocumentIds?.join(','));
+      const result = await api.getFiles({
+        query: search,
+        take,
+        bucket: ragBucket,
+        indexName: bucket.indexName,
+        files: externalDocumentIds?.join(','),
+      });
       return new SearchFilesResponse(result.files, result.debug, result.sources);
     } catch (err) {
-      if (err instanceof ResponseError && err.response.status === 422) {
+      if (err instanceof ResponseError && err.status === 422) {
         throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorREISConfiguration'));
       }
       throw new InternalServerErrorException(this.i18n.t('texts.extensions.files.errorSearchingFile'));

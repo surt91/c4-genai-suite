@@ -62,7 +62,8 @@ export class WholeFilesExtension implements Extension<WholeFilesExtensionConfigu
         if (value === null) {
           continue;
         }
-        openTag += ` ${key}="${value}"`;
+        const text = typeof value === 'string' ? value : JSON.stringify(value);
+        openTag += ` ${key}="${text}"`;
       }
       openTag += '>';
       content += openTag + file.content + '</source>';

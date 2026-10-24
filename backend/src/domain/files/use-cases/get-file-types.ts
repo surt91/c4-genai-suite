@@ -19,7 +19,7 @@ export class GetFileTypesHandler implements IQueryHandler<GetFileTypes, GetFileT
     const api = buildClient(query);
     const result = await callEnteredEndpoint(query.endpoint, () => api.getFileTypes());
     return new GetFileTypesResponse(
-      result.items.map(({ fileNameExtension }) => ({ value: fileNameExtension, label: fileNameExtension })),
+      result.items.map(({ file_name_extension }) => ({ value: file_name_extension, label: file_name_extension })),
     );
   }
 }

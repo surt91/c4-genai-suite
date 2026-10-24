@@ -4,8 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JsonContains } from 'typeorm';
 import { AuditLogService, PerformedBy } from '../../audit-log/index.js';
 import { BucketEntity, BucketRepository, ExtensionEntity, ExtensionRepository } from '../../database/index.js';
-import { ResponseError } from './generated/index.js';
-import { buildBucket, buildBucketSnapshot, buildClient } from './utils.js';
+import { buildBucket, buildBucketSnapshot, buildClient, ResponseError } from './utils.js';
 
 export class DeleteBucket {
   constructor(
@@ -54,9 +53,9 @@ export class DeleteBucketHandler implements ICommandHandler<DeleteBucket, Delete
     const files = await bucket.files;
     for (const file of files) {
       try {
-        await api.deleteFile(file.id.toString(), bucket.indexName);
+        await api.deleteFile({ file_id: file.id.toString(), indexName: bucket.indexName });
       } catch (error) {
-        if ((error as ResponseError)?.response.status === 404) {
+        if (error instanceof ResponseError && error.status === 404) {
           // if the file is not found, we can ignore the error trying to delete it
           this.logger.warn(`File ${file.id} not found in remote storage, assuming it was already deleted.`);
           continue;

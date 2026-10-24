@@ -46,7 +46,7 @@ export class GetDocumentPdfHandler implements IQueryHandler<GetDocumentPdf, GetD
     }
 
     const api = buildClient(bucket);
-    const result = await api?.getDocumentPdf(docId);
+    const result = await api?.getDocumentPdf({ doc_id: docId });
     return new GetDocumentPdfResponse(result ?? null);
   }
 }

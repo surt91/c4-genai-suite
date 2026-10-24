@@ -136,7 +136,7 @@ describe('Deletion of the data of conversations and users', () => {
 
     expect(await conversationExists(old.id)).toBe(false);
     expect(deleteFile).toHaveBeenCalledTimes(1);
-    expect(deleteFile).toHaveBeenCalledWith(String(conversationFile.id), 'conversation-index');
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: String(conversationFile.id), indexName: 'conversation-index' });
     expect(await fileExists(conversationFile.id)).toBe(false);
     expect(await blobExists(conversationFile.id)).toBe(false);
     expect(await fileExists(image.id)).toBe(false);
@@ -181,7 +181,7 @@ describe('Deletion of the data of conversations and users', () => {
     expect(await conversationExists(softlyDeleted.id)).toBe(false);
     expect(await fileExists(file.id)).toBe(false);
     expect(await fileExists(fileOfSoftlyDeleted.id)).toBe(false);
-    expect(deleteFile).toHaveBeenCalledWith(String(file.id), 'conversation-index');
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: String(file.id), indexName: 'conversation-index' });
     expect(await fileExists(fileOfOther.id)).toBe(true);
   });
 
@@ -209,9 +209,9 @@ describe('Deletion of the data of conversations and users', () => {
       expect(await fileExists(file.id)).toBe(false);
       expect(await blobExists(file.id)).toBe(false);
     }
-    expect(deleteFile).toHaveBeenCalledWith(String(conversationFile.id), 'conversation-index');
-    expect(deleteFile).toHaveBeenCalledWith(String(personalFile.id), 'user-index');
-    expect(deleteFile).toHaveBeenCalledWith(String(unlinkedFile.id), 'conversation-index');
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: String(conversationFile.id), indexName: 'conversation-index' });
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: String(personalFile.id), indexName: 'user-index' });
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: String(unlinkedFile.id), indexName: 'conversation-index' });
     expect(await fileExists(fileOfOtherUser.id)).toBe(true);
   });
 });

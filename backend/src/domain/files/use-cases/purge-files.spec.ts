@@ -1,10 +1,12 @@
 import type { Mock } from 'vitest';
 import { FileRepository } from '../../database/index.js';
-import { ResponseError } from './generated/index.js';
 import { purgeFiles, purgeFilesOfUser, RagServerDeletionFailedException } from './purge-files.js';
-import { buildClient } from './utils.js';
+import { buildClient, ResponseError } from './utils.js';
 
-vi.mock('./utils.js', () => ({ buildClient: vi.fn() }));
+vi.mock('./utils.js', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  buildClient: vi.fn(),
+}));
 
 describe('purgeFiles', () => {
   const deleteFile = vi.fn();
@@ -28,10 +30,7 @@ describe('purgeFiles', () => {
     await purgeFiles(repository, [1, 2, 3]);
 
     expect(buildClient).toHaveBeenCalledTimes(1);
-    expect(deleteFile.mock.calls).toEqual([
-      ['1', 'my-index'],
-      ['3', 'my-index'],
-    ]);
+    expect(deleteFile.mock.calls).toEqual([[{ file_id: '1', indexName: 'my-index' }], [{ file_id: '3', indexName: 'my-index' }]]);
     expect(files.delete.mock.calls).toEqual([[{ id: 1 }], [{ id: 2 }], [{ id: 3 }]]);
     expect(deleteFile.mock.invocationCallOrder[0]).toBeLessThan(files.delete.mock.invocationCallOrder[0]);
   });
@@ -66,7 +65,7 @@ describe('purgeFiles', () => {
     await purgeFilesOfUser(repository, 'user');
 
     expect(files.find).toHaveBeenNthCalledWith(1, { where: { userId: 'user' }, select: { id: true } });
-    expect(deleteFile).toHaveBeenCalledWith('5', 'my-index');
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: '5', indexName: 'my-index' });
     expect(files.delete).toHaveBeenCalledWith({ id: 5 });
   });
 });

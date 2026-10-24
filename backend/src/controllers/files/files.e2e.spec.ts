@@ -14,13 +14,13 @@ import {
 } from '../../domain/database/index.js';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 
-vi.mock('../../domain/files/use-cases/generated/apis/index.js', () => {
+vi.mock('../../domain/files/use-cases/generated/sdk.gen.js', () => {
   return {
     FilesApi: vi.fn().mockImplementation(function () {
       return {
         uploadFile: vi.fn(),
         getFileTypes: vi.fn(() => {
-          return { items: [{ fileNameExtension: 'txt' }] };
+          return { items: [{ file_name_extension: 'txt' }] };
         }),
         deleteFile: vi.fn(),
       };

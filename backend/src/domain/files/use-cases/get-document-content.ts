@@ -37,7 +37,7 @@ export class GetDocumentContentHandler implements IQueryHandler<GetDocumentConte
     }
 
     const api = buildClient(bucket);
-    const result = await api?.getDocumentsContent(chunkIds, bucket?.indexName);
+    const result = await api?.getDocumentsContent({ chunk_ids: chunkIds, indexName: bucket?.indexName });
     return new GetDocumentContentResponse(result ?? []);
   }
 }

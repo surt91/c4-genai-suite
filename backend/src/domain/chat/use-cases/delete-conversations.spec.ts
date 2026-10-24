@@ -7,7 +7,10 @@ import { buildClient } from '../../files/use-cases/utils.js';
 import { User } from '../../users/index.js';
 import { DeleteConversationsHandler } from './delete-conversations.js';
 
-vi.mock('../../files/use-cases/utils.js', () => ({ buildClient: vi.fn() }));
+vi.mock('../../files/use-cases/utils.js', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  buildClient: vi.fn(),
+}));
 
 describe('DeleteConversationsHandler', () => {
   let handler: DeleteConversationsHandler;
@@ -48,7 +51,7 @@ describe('DeleteConversationsHandler', () => {
     await handler.execute({ user: { id: '1' } as User });
 
     expect(conversations.find).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: '1' }, withDeleted: true }));
-    expect(deleteFile).toHaveBeenCalledWith('1', 'index');
+    expect(deleteFile).toHaveBeenCalledWith({ file_id: '1', indexName: 'index' });
     expect(files.delete).toHaveBeenCalledWith({ id: 1 });
     expect(files.delete).toHaveBeenCalledTimes(1);
     expect(conversations.delete).toHaveBeenCalledWith({ id: 10 });

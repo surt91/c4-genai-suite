@@ -19,6 +19,6 @@ export class TestBucketHandler implements ICommandHandler<TestBucket, TestBucket
     const client = buildClient(command);
 
     //TODO add indexName here
-    await callEnteredEndpoint(command.endpoint, () => client.getFiles('Test Query', 10, 'test'));
+    await callEnteredEndpoint(command.endpoint, () => client.getFiles({ query: 'Test Query', take: 10, bucket: 'test' }));
   }
 }

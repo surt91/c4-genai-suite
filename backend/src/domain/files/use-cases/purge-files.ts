@@ -1,8 +1,7 @@
 import { Logger, ServiceUnavailableException } from '@nestjs/common';
 import { In } from 'typeorm';
 import { FileRepository } from '../../database/index.js';
-import { ResponseError } from './generated/index.js';
-import { buildClient } from './utils.js';
+import { buildClient, ResponseError } from './utils.js';
 
 const logger = new Logger('PurgeFiles');
 
@@ -39,9 +38,9 @@ export async function purgeFiles(files: FileRepository, ids: number[]): Promise<
       }
 
       try {
-        await api.deleteFile(entity.id.toString(), bucket.indexName);
+        await api.deleteFile({ file_id: entity.id.toString(), indexName: bucket.indexName });
       } catch (error) {
-        if (error instanceof ResponseError && error.response.status === 404) {
+        if (error instanceof ResponseError && error.status === 404) {
           logger.warn(`File ${entity.id} not found in the RAG server, assuming it was already deleted.`);
         } else {
           logger.error(`Failed to delete file ${entity.id} from the RAG server.`, error);

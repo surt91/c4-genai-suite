@@ -38,7 +38,7 @@ describe('Upload File', () => {
 
     function createHandler() {
       api = {
-        getFileTypes: vi.fn().mockResolvedValue({ items: [{ fileNameExtension: '.pdf' }] }),
+        getFileTypes: vi.fn().mockResolvedValue({ items: [{ file_name_extension: '.pdf' }] }),
         uploadFile: vi.fn().mockResolvedValue({}),
         processFile: vi.fn().mockResolvedValue({}),
         deleteFile: vi.fn().mockResolvedValue({}),
@@ -72,7 +72,7 @@ describe('Upload File', () => {
       );
 
       expect(api.uploadFile).toHaveBeenCalled();
-      expect(api.deleteFile).toHaveBeenCalledWith('7', 'custom-index');
+      expect(api.deleteFile).toHaveBeenCalledWith({ file_id: '7', indexName: 'custom-index' });
       expect(files.delete).toHaveBeenCalledWith({ id: 7 });
     });
   });

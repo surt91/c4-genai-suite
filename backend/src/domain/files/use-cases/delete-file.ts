@@ -66,7 +66,7 @@ export class DeleteFileHandler implements ICommandHandler<DeleteFile, DeleteFile
         }
       }
 
-      await api?.deleteFile(entity.id.toString(), entity.bucket?.indexName);
+      await api?.deleteFile({ file_id: entity.id.toString(), indexName: entity.bucket?.indexName });
       await this.files.remove(entity);
     } catch (err) {
       this.logger.error('Failed to delete file from RAG server.', err);
