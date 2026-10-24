@@ -26,6 +26,9 @@ export const useListOfEnabledAssistantsInit = () => {
     if (initialQueryGetAssistants.data) setAssistants(initialQueryGetAssistants.data.items);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQueryGetAssistants.data]);
+
+  // Only true once loaded: while loading, the list in the store is empty as well.
+  return { hasNoAssistants: initialQueryGetAssistants.data?.items.length === 0 };
 };
 
 export const useStateOfEnabledAssistants = () => useListOfEnabledAssistantsStore((s) => s.assistants);

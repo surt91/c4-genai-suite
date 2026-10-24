@@ -41,7 +41,7 @@ export function ChatPage() {
   const { theme } = useTheme();
   const isCompact = useIsCompact();
 
-  useListOfEnabledAssistantsInit();
+  const { hasNoAssistants } = useListOfEnabledAssistantsInit();
   useListOfAllAssistantsInit();
   useListOfChatsInit();
 
@@ -159,7 +159,7 @@ export function ChatPage() {
       />
       <div className={classes.conversation}>
         <Routes>
-          <Route path="" element={<NewChatRedirect />} />
+          <Route path="" element={<NewChatRedirect hasNoAssistants={hasNoAssistants} />} />
           <Route path=":id" element={<ConversationPage textareaRef={textareaRef} />} />
         </Routes>
       </div>

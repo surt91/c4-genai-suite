@@ -698,6 +698,14 @@ export const de: typeof en = {
     errorLoadingMessagesOrConversation: 'Fehler beim Laden der Konversation oder ihrer Nachrichten.',
     newChat: 'Neuer Chat',
     welcomeText: 'Wie kann ich dir helfen?',
+    noAssistants: {
+      title: 'Noch kein Assistent verfügbar',
+      adminText:
+        'Zum Chatten brauchst du einen Assistenten: Er legt das Modell und die Werkzeuge fest. Lege in der Administration einen an und füge ihm eine Modell-Extension hinzu.',
+      createAssistant: 'Ersten Assistenten anlegen',
+      quickstart: 'Zum Schnellstart',
+      userText: 'Für dich ist noch kein Assistent verfügbar. Bitte wende dich an einen Administrator.',
+    },
     placeholder: 'Nachricht an {{configuration}}',
     stopGeneration: 'Generierung abbrechen',
     generationStopped: 'Generierung abgebrochen',

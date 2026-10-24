@@ -732,6 +732,13 @@ function load() {
       errorLoadingMessagesOrConversation: translate('chat.errorLoadingMessagesOrConversation'),
       newChat: translate('chat.newChat'),
       welcomeText: translate('chat.welcomeText'),
+      noAssistants: {
+        title: translate('chat.noAssistants.title'),
+        adminText: translate('chat.noAssistants.adminText'),
+        createAssistant: translate('chat.noAssistants.createAssistant'),
+        quickstart: translate('chat.noAssistants.quickstart'),
+        userText: translate('chat.noAssistants.userText'),
+      },
       placeholder: (configuration: string) => translate('chat.placeholder', { configuration }),
       stopGeneration: translate('chat.stopGeneration'),
       generationStopped: translate('chat.generationStopped'),

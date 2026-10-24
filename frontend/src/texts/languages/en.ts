@@ -705,6 +705,14 @@ export const en = {
     errorLoadingMessagesOrConversation: 'Failed to load the conversation or its messages.',
     newChat: 'New chat',
     welcomeText: 'How may I help you?',
+    noAssistants: {
+      title: 'No assistant available yet',
+      adminText:
+        'Before you can chat, you need an assistant: it defines the model and the tools to use. Create one in the administration and add a model extension to it.',
+      createAssistant: 'Create your first assistant',
+      quickstart: 'Read the quickstart',
+      userText: 'There is no assistant available for you yet. Please contact an administrator.',
+    },
     placeholder: 'Message {{configuration}}',
     stopGeneration: 'Stop generating',
     generationStopped: 'Generation stopped',
