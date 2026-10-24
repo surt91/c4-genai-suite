@@ -1,21 +1,14 @@
 import { ActionIcon, Box, Button, Checkbox, Group, NativeSelect } from '@mantine/core';
 import { IconEdit, IconLoader, IconTrash, IconUpload } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  ColumnDef,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { ColumnDef, useTable } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { formatDate } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
-import { BucketDto, BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
-import { ConfirmDialog, FilterableTable, InfoByte, Search, TablePagination, TData } from 'src/components';
+import { BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
+import { ConfirmDialog, fileTableFeatures, FilterableTable, InfoByte, Search, TablePagination } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { formatFileSize } from 'src/lib';
 import { extractType } from 'src/pages/utils';
@@ -40,7 +33,6 @@ export function FilesPage() {
 
   const navigate = useTransientNavigate();
   const [toUpdate, setToUpdate] = useState<boolean>();
-  const [thisBucket, setThisBucket] = useState<BucketDto | null>(null);
   const { buckets, removeBucket, setBucket } = useBucketstore();
 
   //Tanstack Table
@@ -56,14 +48,8 @@ export function FilesPage() {
     queryFn: () => api.files.getBucket(bucketId),
   });
 
-  useEffect(() => {
-    if (bucket) {
-      const updatedBucket = buckets.find((b) => b.id == bucket.id);
-      if (updatedBucket) {
-        setThisBucket(updatedBucket);
-      }
-    }
-  }, [bucket, buckets]);
+  // the bucket from the store, so that it shows the changes after editing
+  const thisBucket = (bucket && buckets.find((b) => b.id == bucket.id)) || null;
 
   const deletingBucket = useDeletingBucket({
     apiCall: (id) => api.files.deleteBucket(id),
@@ -111,7 +97,7 @@ export function FilesPage() {
     noClick: true,
   });
 
-  const columns = useMemo<ColumnDef<FileDto, unknown>[]>(
+  const columns = useMemo<ColumnDef<typeof fileTableFeatures, FileDto>[]>(
     () => [
       {
         id: 'select',
@@ -121,7 +107,8 @@ export function FilesPage() {
             color="blue"
             {...{
               checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
+              // "some" includes "all" since TanStack Table 9
+              indeterminate: table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected(),
               onChange: table.getToggleAllRowsSelectedHandler(),
             }}
           />
@@ -167,12 +154,8 @@ export function FilesPage() {
     [],
   );
 
-  // @tanstack/react-table v8 hasn't declared React 19 compatibility yet (v9 is still in alpha).
-  // The rule flags useReactTable as incompatible with React Compiler memoization, which is
-  // irrelevant here since we don't use React Compiler. Safe to suppress until TanStack v9 stable.
-  // See: https://github.com/TanStack/table/issues/6137
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable<TData>({
+  const table = useTable({
+    features: fileTableFeatures,
     data: files,
     columns: columns,
     state: {
@@ -188,25 +171,18 @@ export function FilesPage() {
     },
     // the selection must stay with the file, not with the row index
     getRowId: (file) => String(file.id),
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(), //client-side filtering
-    getSortedRowModel: getSortedRowModel(),
     onPaginationChange: setPagination,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
-    columnResizeDirection: 'ltr',
-    columnResizeMode: 'onChange',
     autoResetPageIndex: false,
   });
 
-  // e.g. after the last files of the last page have been deleted
+  // Go to the last page when the current one does not exist anymore, e.g. after its files have been deleted
+  // (adjusting the state while rendering instead of in an effect).
   const pageCount = table.getPageCount();
-  useEffect(() => {
-    if (pagination.pageIndex > 0 && pagination.pageIndex >= pageCount) {
-      setPagination((p) => ({ ...p, pageIndex: Math.max(pageCount - 1, 0) }));
-    }
-  }, [pageCount, pagination.pageIndex]);
+  if (pagination.pageIndex > 0 && pagination.pageIndex >= pageCount) {
+    setPagination((p) => ({ ...p, pageIndex: Math.max(pageCount - 1, 0) }));
+  }
 
   return (
     <>
@@ -264,7 +240,7 @@ export function FilesPage() {
                 size="sm"
                 data={['10', '15', '20', '25', '30']}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
-                value={String(table.getState().pagination.pageSize)}
+                value={String(table.state.pagination.pageSize)}
               />
             </Group>
 

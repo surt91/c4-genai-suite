@@ -49,6 +49,44 @@ describe('BucketsPage', () => {
     expect(screen.getByText(texts.common.page(1, 1))).toBeInTheDocument();
   });
 
+  it('sorts the files and selects all of them', async () => {
+    new mockedAPI()
+      .withGet<JsonBodyType>('/api/buckets', { items: [bucket(1, 'Bucket A')] })
+      .withGet<JsonBodyType>('/api/buckets/1', bucket(1, 'Bucket A'))
+      .withGet<JsonBodyType>('/api/buckets/1/files', {
+        items: [file(1, 'c.pdf'), file(2, 'a.pdf'), file(3, 'b.pdf')],
+        total: 3,
+      })
+      .run();
+    window.history.pushState({}, '', '/admin/files/1');
+
+    render(
+      <Routes>
+        <Route path="/admin/files/*" element={<BucketsPage />} />
+      </Routes>,
+    );
+
+    await screen.findByText('c.pdf');
+    const fileNames = () => screen.getAllByText(/^[abc]\.pdf$/).map((element) => element.textContent);
+    expect(fileNames()).toEqual(['c.pdf', 'a.pdf', 'b.pdf']);
+
+    const sortByName = screen.getByText(texts.files.properties.fileName).closest('th')!.querySelector('svg')!.parentElement!;
+    fireEvent.click(sortByName);
+    expect(fileNames()).toEqual(['a.pdf', 'b.pdf', 'c.pdf']);
+    fireEvent.click(sortByName);
+    expect(fileNames()).toEqual(['c.pdf', 'b.pdf', 'a.pdf']);
+
+    const [selectAll, firstRow] = screen.getAllByRole('checkbox');
+    fireEvent.click(firstRow);
+    expect(screen.getByText(texts.common.rowsSelected(1))).toBeInTheDocument();
+    expect(selectAll).toHaveAttribute('data-indeterminate');
+
+    fireEvent.click(selectAll);
+    expect(screen.getByText(texts.common.rowsSelected(3))).toBeInTheDocument();
+    expect(selectAll).toBeChecked();
+    expect(selectAll).not.toHaveAttribute('data-indeterminate');
+  });
+
   it('does not keep the selection of files when another bucket is shown', async () => {
     new mockedAPI()
       .withGet<JsonBodyType>('/api/buckets', { items: [bucket(1, 'Bucket A'), bucket(2, 'Bucket B')] })

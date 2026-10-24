@@ -1,10 +1,9 @@
 import { Button } from '@mantine/core';
 import { IconChevronLeft, IconChevronLeftPipe, IconChevronRight, IconChevronRightPipe } from '@tabler/icons-react';
-import { Table as TanTable } from '@tanstack/react-table';
 import { texts } from 'src/texts';
-import { TData } from './FilterableTable';
+import { FileTable } from './file-table';
 
-export function TablePagination({ table }: { table: TanTable<TData> }) {
+export function TablePagination({ table }: { table: FileTable }) {
   const labels = texts.accessibility.pdf;
   return (
     <Button.Group>
@@ -15,7 +14,7 @@ export function TablePagination({ table }: { table: TanTable<TData> }) {
         <IconChevronLeft size={18} />
       </Button>
       <Button.GroupSection variant="subtle">
-        {texts.common.page(table.getState().pagination.pageIndex + 1, table.getPageCount() ? table.getPageCount() : 1)}
+        {texts.common.page(table.state.pagination.pageIndex + 1, table.getPageCount() ? table.getPageCount() : 1)}
       </Button.GroupSection>
       <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} aria-label={labels.nextPage}>
         <IconChevronRight size={18} />

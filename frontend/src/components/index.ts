@@ -4,6 +4,7 @@ export * from './ChatSuggestions';
 export * from './ChatSuggestionsScheme';
 export * from './CollapseButton';
 export * from './ConfirmDialog';
+export * from './file-table';
 export * from './FilterableTable';
 export * from './FormAlert';
 export * from './Icon';

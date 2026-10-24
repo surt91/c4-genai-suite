@@ -1,12 +1,10 @@
 import { IconSortAscending, IconSortDescending } from '@tabler/icons-react';
-import { flexRender, Table as TanTable } from '@tanstack/react-table';
-import { FileDto } from 'src/api';
+import { flexRender } from '@tanstack/react-table';
 import classes from './FilterableTable.module.css';
-
-export type TData = FileDto;
+import { FileTable } from './file-table';
 
 type FilterableTableProps = {
-  table: TanTable<TData>;
+  table: FileTable;
 };
 
 export function FilterableTable({ table }: FilterableTableProps) {
@@ -53,7 +51,7 @@ export function FilterableTable({ table }: FilterableTableProps) {
           {table.getRowModel().rows.map((row) => {
             return (
               <tr key={row.id} className={classes.row}>
-                {row.getVisibleCells().map((cell) => {
+                {row.getAllCells().map((cell) => {
                   return (
                     <td key={cell.id} className={classes.td}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
