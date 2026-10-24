@@ -111,7 +111,7 @@ export class AuthService implements OnModuleInit {
   private configureMicrosoft(configService: ConfigService, config: AuthConfig) {
     const clientId = configService.get<string>('AUTH_MICROSOFT_CLIENTID');
     const clientSecret = configService.get<string>('AUTH_MICROSOFT_CLIENTSECRET');
-    const tenant = configService.get<string>('AUTH_MICROSOFT_TENANT');
+    const tenant = configService.get<string>('AUTH_MICROSOFT_TENANT')?.trim();
 
     if (clientId && clientSecret) {
       config.microsoft = {
@@ -120,11 +120,12 @@ export class AuthService implements OnModuleInit {
         tenant,
       };
 
-      if (!tenant || ['common', 'organizations', 'consumers'].includes(tenant.toLowerCase())) {
-        // Users are matched by e-mail, and the `mail` attribute can be set freely by the admins of any tenant.
-        this.logger.warn(
-          'AUTH_MICROSOFT_TENANT is not set to a specific tenant: users of any Microsoft tenant can log in, and accounts ' +
-            'are matched by their (unverified) e-mail address. Configure your tenant id.',
+      if (!isSpecificMicrosoftTenant(tenant)) {
+        // Users are matched by e-mail, and the `mail` attribute can be set freely by the admins of any tenant ("nOAuth").
+        throw new Error(
+          'The Microsoft login (AUTH_MICROSOFT_CLIENTID, AUTH_MICROSOFT_CLIENTSECRET) needs AUTH_MICROSOFT_TENANT set to the ' +
+            "ID of your Microsoft Entra tenant. Multi-tenant values ('common', 'organizations', 'consumers') are not allowed: " +
+            'users of any tenant could log in, and accounts are matched by their (unverified) e-mail address.',
         );
       }
     }
@@ -360,4 +361,11 @@ export class AuthService implements OnModuleInit {
       .where('userGroup.id = :adminId', { adminId: BUILTIN_USER_GROUP_ADMIN })
       .getCount();
   }
+}
+
+const MULTI_TENANT_VALUES = ['common', 'organizations', 'consumers'];
+
+/** Whether the value identifies one Microsoft Entra tenant (an ID or a domain), not a multi-tenant endpoint. */
+export function isSpecificMicrosoftTenant(tenant: string | undefined): tenant is string {
+  return !!tenant?.trim() && !MULTI_TENANT_VALUES.includes(tenant.trim().toLowerCase());
 }

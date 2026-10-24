@@ -1,5 +1,4 @@
 import { createHash } from 'crypto';
-import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -83,17 +82,26 @@ describe('AuthService', () => {
   }
 
   describe('Microsoft login', () => {
-    afterEach(() => vi.restoreAllMocks());
+    it.each([undefined, '', ' ', 'common', 'Organizations', 'consumers'])('refuses to start with tenant %p', async (tenant) => {
+      await expect(
+        buildModule({ AUTH_MICROSOFT_CLIENTID: 'id', AUTH_MICROSOFT_CLIENTSECRET: 'secret', AUTH_MICROSOFT_TENANT: tenant }),
+      ).rejects.toThrow(/AUTH_MICROSOFT_TENANT/);
+    });
 
-    it.each([
-      [undefined, true],
-      ['common', true],
-      ['0b5c0e4c-1111-2222-3333-444455556666', false],
-    ])('warns about tenant %p: %p', async (tenant, warns) => {
-      const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
-      await buildModule({ AUTH_MICROSOFT_CLIENTID: 'id', AUTH_MICROSOFT_CLIENTSECRET: 'secret', AUTH_MICROSOFT_TENANT: tenant });
+    it.each(['0b5c0e4c-1111-2222-3333-444455556666', 'contoso.onmicrosoft.com'])('starts with tenant %p', async (tenant) => {
+      const { service } = await buildModule({
+        AUTH_MICROSOFT_CLIENTID: 'id',
+        AUTH_MICROSOFT_CLIENTSECRET: 'secret',
+        AUTH_MICROSOFT_TENANT: tenant,
+      });
 
-      expect(warn.mock.calls.some(([message]) => String(message).includes('AUTH_MICROSOFT_TENANT'))).toBe(warns);
+      expect(service.config.microsoft?.tenant).toBe(tenant);
+    });
+
+    it('does not need a tenant when the Microsoft login is disabled', async () => {
+      const { service } = await buildModule({});
+
+      expect(service.config.microsoft).toBeUndefined();
     });
   });
 

@@ -22,7 +22,8 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
         clientID: authService.config.microsoft?.clientId || 'INVALID',
         clientSecret: authService.config.microsoft?.clientSecret || 'INVALID',
         scope: ['user.read'],
-        tenant: authService.config.microsoft?.tenant || 'common',
+        // always a specific tenant when the login is enabled (see AuthService)
+        tenant: authService.config.microsoft?.tenant || 'INVALID',
       }),
     );
   }

@@ -160,7 +160,7 @@
                         },
                         "microsoftTenant": {
                             "type": "string",
-                            "description": "The Microsoft Entra ID tenant",
+                            "description": "The ID of your Microsoft Entra ID tenant. Required when the Microsoft login is enabled; `common`, `organizations` and `consumers` are rejected (users of any tenant could log in)",
                             "default": "\"\""
                         },
                         "existingMicrosoftClientId": {

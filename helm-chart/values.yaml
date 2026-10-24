@@ -63,7 +63,7 @@ backend:
     microsoftClientId: ""
     ## @param backend.auth.microsoftClientSecret [string] The Microsoft Entra ID clientSecret
     microsoftClientSecret: ""
-    ## @param backend.auth.microsoftTenant [string] The Microsoft Entra ID tenant
+    ## @param backend.auth.microsoftTenant [string] The ID of your Microsoft Entra ID tenant. Required when the Microsoft login is enabled; `common`, `organizations` and `consumers` are rejected (users of any tenant could log in)
     microsoftTenant: ""
     ## @param backend.auth.existingMicrosoftClientId [string] The name of the existing k8s secret. `backend.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`
     existingMicrosoftClientId: ""

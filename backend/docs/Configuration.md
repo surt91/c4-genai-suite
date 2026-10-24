@@ -65,11 +65,15 @@
 
 ### Microsoft
 
-| Env Variable                | Required  | Default   | Description |
-|-----------------------------|-----------|-----------|-------------|
-| AUTH_MICROSOFT_CLIENTID     | No        | None      |             |
-| AUTH_MICROSOFT_CLIENTSECRET | No        | None      |             |
-| AUTH_MICROSOFT_TENANT       | No        | common    | Set it to your tenant id: with `common` users of every tenant can log in and are matched by their (unverified) e-mail. |
+The Microsoft login is enabled when the client id and secret are set. It then needs the ID (or a verified domain) of your
+Microsoft Entra tenant: the backend refuses to start without it or with a multi-tenant value (`common`, `organizations`,
+`consumers`), because users of any tenant could log in and accounts are matched by their (unverified) e-mail address.
+
+| Env Variable                | Required                     | Default   | Description |
+|-----------------------------|------------------------------|-----------|-------------|
+| AUTH_MICROSOFT_CLIENTID     | No                           | None      |             |
+| AUTH_MICROSOFT_CLIENTSECRET | No                           | None      |             |
+| AUTH_MICROSOFT_TENANT       | If the Microsoft login is used | None    | The ID of your Microsoft Entra tenant, e.g. `0b5c0e4c-1111-2222-3333-444455556666`. `common`, `organizations` and `consumers` are rejected. |
 
 
 ### OAuth
