@@ -22,3 +22,25 @@ export function configureClient(client: Client, onUnauthorized: () => void) {
   client.interceptors.error.use((error, response) => (response && !response.ok ? new ResponseError(response, error) : error));
   return client;
 }
+
+function dropNull(this: unknown, key: string, value: unknown) {
+  return value === null && key !== '' && !Array.isArray(this) ? undefined : value;
+}
+
+/**
+ * Removes the properties with `null` values from the JSON responses. The backend sends `null` for optional properties,
+ * which its OpenAPI specification declares as `T | undefined` (the old generated client converted them as well).
+ */
+export function dropNullProperties(client: Client) {
+  client.interceptors.response.use(async (response) => {
+    if (!response.ok || !response.headers.get('content-type')?.startsWith('application/json')) {
+      return response;
+    }
+    const text = await response.text();
+    const headers = new Headers(response.headers);
+    headers.delete('content-length');
+    const body = text ? JSON.stringify(JSON.parse(text, dropNull)) : null;
+    return new Response(body, { status: response.status, statusText: response.statusText, headers });
+  });
+  return client;
+}

@@ -131,6 +131,15 @@ describe('AppClient', () => {
     expect(result.items[0].uploadedAt).toEqual(new Date('2024-01-02T03:04:05.000Z'));
   });
 
+  it('removes properties with null values, but keeps nulls in arrays', async () => {
+    mockFetch(json({ id: 1, name: 'a', chatFooter: null, values: { a: null, b: [null, 1] } }));
+    const client = new AppClient('http://server');
+
+    const result = await client.extensions.getConfiguration({ id: 1 });
+
+    expect(result).toEqual({ id: 1, name: 'a', values: { b: [null, 1] } });
+  });
+
   it('throws a ResponseError with the message of the server on error responses', async () => {
     mockFetch(json({ statusCode: 400, message: ['name should not be empty', 'name must be a string'] }, 400));
     const client = new AppClient('http://server');

@@ -15,7 +15,7 @@ import { createClient } from 'src/api/generated/client';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
 import { StreamEventDto } from '../types';
-import { configureClient } from './client';
+import { configureClient, dropNullProperties } from './client';
 import { fetchEventStream } from './sse';
 import { useAppClientStore } from './zustand/appClientStore';
 
@@ -45,7 +45,7 @@ export class AppClient {
     public readonly url: string,
     onUnauthorized: () => void = () => {},
   ) {
-    const client = configureClient(createClient({ baseUrl: url }), onUnauthorized);
+    const client = dropNullProperties(configureClient(createClient({ baseUrl: url }), onUnauthorized));
 
     this.stream = new StreamApi(url);
     this.auditLogs = new AuditLogsApi({ client });
