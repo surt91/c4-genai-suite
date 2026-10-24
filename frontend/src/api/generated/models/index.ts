@@ -48,6 +48,7 @@ export * from './FilesDto';
 export * from './ImageUrlDto';
 export * from './ImportConfigurationDto';
 export * from './ImportConfigurationResponseDto';
+export * from './ImportedExtensionWithoutSecretsDto';
 export * from './LoginDto';
 export * from './MessageContentDto';
 export * from './MessageContentImageUrlDto';

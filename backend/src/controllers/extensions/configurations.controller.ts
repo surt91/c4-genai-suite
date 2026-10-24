@@ -358,6 +358,7 @@ export class ConfigurationsController {
     const response = new ImportConfigurationResponseDto();
     response.configuration = ConfigurationDto.fromDomain(result.configuration);
     response.warnings = result.warnings;
+    response.missingSecrets = result.missingSecrets;
     return response;
   }
 }

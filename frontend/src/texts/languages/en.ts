@@ -845,6 +845,8 @@ export const en = {
       'Assistant configuration imported successfully. The assistant is disabled by default. Please configure API keys before enabling.',
     importConfigurationFailed: 'Failed to import assistant configuration',
     importConfigurationInvalidJson: 'Invalid JSON file. Please upload a valid configuration file.',
+    importConfigurationMissingSecrets:
+      'The credentials (e.g. API keys) of the following extensions are not part of the export. The extensions have been imported disabled: enter the credentials again and enable the extensions.',
     headline: 'Extensions',
     noTools: 'There are currently no tools configured for this assistant.',
     noOthers: 'There are currently no other extensions configured for this assistant.',

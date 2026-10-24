@@ -180,7 +180,7 @@ The executor feature (P1-3, P2-14) has since been removed completely (`feat!: re
 | P2-27 | fixed | `fix(backend): delete the files and REI-S documents of purged conversations and deleted users` – synchronous: conversation files (conversation bucket, files without bucket, unless a duplicate still uses them) when a deleted conversation is purged or all conversations are deleted, all files of a deleted user; REI-S first, **503 and nothing deleted when REI-S fails** (retryable). Generated images (`llm_image` blobs) have no owner and stay. |
 | P2-28 | deferred | Fixing it needs a protocol change for the upload response (e.g. a JSON error object after the keep-alive newlines) and the matching frontend handling, which is being refactored on another branch. |
 | P2-29 | mitigated | `58700c6` warning at startup and documentation; restricting the e-mail matching (e.g. by provider + subject) changes the account linking and needs a migration of existing users |
-| P2-30 | deferred | Needs a product decision (reject the import, drop masked values and require re-entry, or a warning in the UI). |
+| P2-30 | fixed | `fix: do not store the masked secrets of an imported configuration` – masked fields are left empty, the extension is imported disabled, the response lists them (`missingSecrets`, **API: new field**) and the admin UI shows a notice; missing secrets are not masked anymore, so the form shows them empty |
 | P2-31 | fixed | `1745066` rebuild masks secrets; rebuild/test check the extension type |
 | P3-1 | fixed | `7e8ec54` same login error for unknown users and wrong passwords (**message changed**) |
 | P3-2 | fixed | `c0ceee2` 400 for password changes of users without password |

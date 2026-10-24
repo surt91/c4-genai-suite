@@ -117,6 +117,23 @@ export function maskArgumentDefault(argument: ExtensionArgument) {
   }
 }
 
+/**
+ * Removes the masked secrets (e.g. of an exported configuration) from the values and returns their paths (e.g.
+ * `apiKey` or `nested.secretKey`).
+ */
+export function removeMaskedValues(values: ExtensionConfiguration, path: string[] = []): string[][] {
+  const removed: string[][] = [];
+  Object.entries(values).forEach(([key, value]) => {
+    if (value === keyMask) {
+      delete values[key];
+      removed.push([...path, key]);
+    } else if (value != null && typeof value === 'object' && !Array.isArray(value)) {
+      removed.push(...removeMaskedValues(value as ExtensionConfiguration, [...path, key]));
+    }
+  });
+  return removed;
+}
+
 export function unmaskExtensionValues(values: ExtensionConfiguration) {
   Object.entries(values).forEach(([key, value]) => {
     if (value == null) {
@@ -135,7 +152,8 @@ export function unmaskExtensionValues(values: ExtensionConfiguration) {
 
 export function maskKeyValues(extension: ConfiguredExtension) {
   Object.entries(extension.spec.arguments).forEach(([key, value]) => {
-    if (value.type === 'string' && value.format === 'password') {
+    // secrets that are not set (e.g. after an import) are not masked, so that the admin UI shows them as missing
+    if (value.type === 'string' && value.format === 'password' && extension.values[key] != null && extension.values[key] !== '') {
       extension.values[key] = keyMask;
     }
   });

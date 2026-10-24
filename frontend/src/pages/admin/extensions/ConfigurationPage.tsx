@@ -9,7 +9,7 @@ import { Icon, Page } from 'src/components';
 import { RemountOnParam } from 'src/components/RemountOnParam';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { buildError } from 'src/lib';
-import { toast } from 'src/lib/notifications';
+import { notify, toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
 import { Configuration } from './Configuration.tsx';
 import { EmptyPage } from './EmptyPage';
@@ -77,6 +77,22 @@ export function ConfigurationPage() {
       toast.success(texts.extensions.importConfigurationSuccess);
       for (const warning of result.warnings) {
         toast.warn(warning);
+      }
+      if (result.missingSecrets.length > 0) {
+        // stays open: the admin needs the list to enter the credentials again
+        notify(
+          <div>
+            {texts.extensions.importConfigurationMissingSecrets}
+            <ul>
+              {result.missingSecrets.map((extension, i) => (
+                <li key={i}>
+                  {extension.title}: {extension.fields.join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>,
+          { type: 'warning', autoClose: false },
+        );
       }
       navigate(`/admin/assistants/${configuration.id}`);
     },

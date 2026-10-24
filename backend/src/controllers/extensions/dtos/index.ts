@@ -985,6 +985,27 @@ export class ImportConfigurationDto {
   data!: ExportedConfigurationDto;
 }
 
+export class ImportedExtensionWithoutSecretsDto {
+  @ApiProperty({
+    description: 'The name of the extension type.',
+    required: true,
+  })
+  name!: string;
+
+  @ApiProperty({
+    description: 'The title of the extension type.',
+    required: true,
+  })
+  title!: string;
+
+  @ApiProperty({
+    description: 'The titles (or paths) of the secret fields that must be entered again.',
+    required: true,
+    type: [String],
+  })
+  fields!: string[];
+}
+
 export class ImportConfigurationResponseDto {
   @ApiProperty({
     description: 'The imported configuration.',
@@ -999,4 +1020,13 @@ export class ImportConfigurationResponseDto {
     type: [String],
   })
   warnings!: string[];
+
+  @ApiProperty({
+    description:
+      'The extensions whose secrets (API keys, passwords) were masked in the export. They have been imported ' +
+      'disabled and without these secrets, which must be entered again.',
+    required: true,
+    type: [ImportedExtensionWithoutSecretsDto],
+  })
+  missingSecrets!: ImportedExtensionWithoutSecretsDto[];
 }

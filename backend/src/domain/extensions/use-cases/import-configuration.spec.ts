@@ -628,7 +628,7 @@ describe(ImportConfiguration.name, () => {
     delete process.env.VERSION;
   });
 
-  it('should preserve all values including masked ones during import', async () => {
+  it('should not store masked secrets and disable the extension until they are entered again', async () => {
     const savedConfiguration: Partial<ConfigurationEntity> = {
       id: 9,
       name: 'Config with masked nested values',
@@ -663,9 +663,10 @@ describe(ImportConfiguration.name, () => {
         arguments: {
           apiKey: {
             type: 'string',
+            title: 'API Key',
             format: 'password',
             required: false,
-          } as ExtensionStringArgument,
+          },
           nested: {
             type: 'object',
             title: 'Nested Object',
@@ -683,7 +684,7 @@ describe(ImportConfiguration.name, () => {
             required: false,
           },
         },
-        title: 'Test',
+        title: 'Test Extension',
         description: 'Test',
         type: 'tool',
       },
@@ -700,25 +701,34 @@ describe(ImportConfiguration.name, () => {
           name: 'test-extension',
           enabled: true,
           values: {
-            apiKey: '********************', // Masked - preserved as-is (user must re-enter)
+            apiKey: '********************',
             endpoint: 'https://api.example.com',
             nested: {
-              secretKey: '********************', // Masked - preserved as-is (user must re-enter)
+              secretKey: '********************',
               publicValue: 'public',
             },
           },
+        },
+        {
+          name: 'test-extension',
+          enabled: true,
+          values: { apiKey: 'not-masked', endpoint: 'https://other.example.com' },
         },
       ],
     };
 
     const result = await handler.execute(new ImportConfiguration(importData));
 
-    // All values are preserved as-is during import - user must manually update secrets
-    expect(savedExtensions[0].values.apiKey).toBe('********************');
-    expect(savedExtensions[0].values.endpoint).toBe('https://api.example.com');
-    const nestedValues = savedExtensions[0].values.nested as Record<string, unknown>;
-    expect(nestedValues.secretKey).toBe('********************');
-    expect(nestedValues.publicValue).toBe('public');
+    // the masks are not stored as secrets
+    expect(savedExtensions[0].values).toEqual({ endpoint: 'https://api.example.com', nested: { publicValue: 'public' } });
+    expect(savedExtensions[0].enabled).toBe(false);
+    expect(savedExtensions[1].values.apiKey).toBe('not-masked');
+    expect(savedExtensions[1].enabled).toBe(true);
+    // the import data is not changed
+    expect(importData.extensions[0].values.apiKey).toBe('********************');
+    expect(result.missingSecrets).toEqual([
+      { name: 'test-extension', title: 'Test Extension', fields: ['API Key', 'nested.secretKey'] },
+    ]);
     expect(result.warnings).toEqual([]);
   });
 

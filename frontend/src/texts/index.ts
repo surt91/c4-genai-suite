@@ -867,6 +867,7 @@ function load() {
       importConfigurationSuccess: translate('extensions.importConfigurationSuccess'),
       importConfigurationFailed: translate('extensions.importConfigurationFailed'),
       importConfigurationInvalidJson: translate('extensions.importConfigurationInvalidJson'),
+      importConfigurationMissingSecrets: translate('extensions.importConfigurationMissingSecrets'),
       headline: translate('extensions.headline'),
       noOthers: translate('extensions.noOthers'),
       noTools: translate('extensions.noTools'),

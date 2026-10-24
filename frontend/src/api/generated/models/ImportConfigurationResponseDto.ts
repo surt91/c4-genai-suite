@@ -14,6 +14,12 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ImportedExtensionWithoutSecretsDto } from './ImportedExtensionWithoutSecretsDto';
+import {
+    ImportedExtensionWithoutSecretsDtoFromJSON,
+    ImportedExtensionWithoutSecretsDtoFromJSONTyped,
+    ImportedExtensionWithoutSecretsDtoToJSON,
+} from './ImportedExtensionWithoutSecretsDto';
 import type { ConfigurationDto } from './ConfigurationDto';
 import {
     ConfigurationDtoFromJSON,
@@ -39,6 +45,12 @@ export interface ImportConfigurationResponseDto {
      * @memberof ImportConfigurationResponseDto
      */
     warnings: Array<string>;
+    /**
+     * The extensions whose secrets (API keys, passwords) were masked in the export. They have been imported disabled and without these secrets, which must be entered again.
+     * @type {Array<ImportedExtensionWithoutSecretsDto>}
+     * @memberof ImportConfigurationResponseDto
+     */
+    missingSecrets: Array<ImportedExtensionWithoutSecretsDto>;
 }
 
 /**
@@ -47,6 +59,7 @@ export interface ImportConfigurationResponseDto {
 export function instanceOfImportConfigurationResponseDto(value: object): value is ImportConfigurationResponseDto {
     if (!('_configuration' in value) || value['_configuration'] === undefined) return false;
     if (!('warnings' in value) || value['warnings'] === undefined) return false;
+    if (!('missingSecrets' in value) || value['missingSecrets'] === undefined) return false;
     return true;
 }
 
@@ -62,6 +75,7 @@ export function ImportConfigurationResponseDtoFromJSONTyped(json: any, ignoreDis
         
         '_configuration': ConfigurationDtoFromJSON(json['configuration']),
         'warnings': json['warnings'],
+        'missingSecrets': ((json['missingSecrets'] as Array<any>).map(ImportedExtensionWithoutSecretsDtoFromJSON)),
     };
 }
 
@@ -73,6 +87,7 @@ export function ImportConfigurationResponseDtoToJSON(value?: ImportConfiguration
         
         'configuration': ConfigurationDtoToJSON(value['_configuration']),
         'warnings': value['warnings'],
+        'missingSecrets': ((value['missingSecrets'] as Array<any>).map(ImportedExtensionWithoutSecretsDtoToJSON)),
     };
 }
 

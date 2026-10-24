@@ -840,6 +840,8 @@ export const de: typeof en = {
       'Assistentenkonfiguration erfolgreich importiert. Der Assistent ist standardmäßig deaktiviert. Bitte konfigurieren Sie die API-Schlüssel vor der Aktivierung.',
     importConfigurationFailed: 'Importieren der Assistentenkonfiguration fehlgeschlagen',
     importConfigurationInvalidJson: 'Ungültige JSON-Datei. Bitte laden Sie eine gültige Konfigurationsdatei hoch.',
+    importConfigurationMissingSecrets:
+      'Die Zugangsdaten (z. B. API-Schlüssel) der folgenden Erweiterungen sind nicht im Export enthalten. Die Erweiterungen wurden deaktiviert importiert: Bitte geben Sie die Zugangsdaten erneut ein und aktivieren Sie die Erweiterungen.',
     headline: 'Erweiterungen',
     noTools: 'Es sind aktuell keine Tools für diesen Assitenten konfiguriert',
     noOthers: 'Es sind aktuell keine anderen Erweiterungen für diesen Assistenten konfiguriert',

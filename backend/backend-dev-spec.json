@@ -4407,6 +4407,27 @@
         },
         "required": ["data"]
       },
+      "ImportedExtensionWithoutSecretsDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the extension type."
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the extension type."
+          },
+          "fields": {
+            "description": "The titles (or paths) of the secret fields that must be entered again.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "title", "fields"]
+      },
       "ImportConfigurationResponseDto": {
         "type": "object",
         "properties": {
@@ -4424,9 +4445,16 @@
             "items": {
               "type": "string"
             }
+          },
+          "missingSecrets": {
+            "description": "The extensions whose secrets (API keys, passwords) were masked in the export. They have been imported disabled and without these secrets, which must be entered again.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportedExtensionWithoutSecretsDto"
+            }
           }
         },
-        "required": ["configuration", "warnings"]
+        "required": ["configuration", "warnings", "missingSecrets"]
       },
       "EvalServiceStatusDto": {
         "type": "object",
