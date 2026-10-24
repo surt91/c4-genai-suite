@@ -49,7 +49,7 @@ export function useUsage(filterInterval: FilterInterval) {
   const since = mapFilterIntervalToStartDate(filterInterval);
   const { data: loadedUsage } = useQuery({
     queryKey: ['usage', filterInterval],
-    queryFn: () => api.usages.getTokenUsage(since, mapFilterIntervalToGroupBy(filterInterval)),
+    queryFn: () => api.usages.getTokenUsage({ since, groupBy: mapFilterIntervalToGroupBy(filterInterval) }),
   });
 
   const items = useMemo(() => {
@@ -93,7 +93,7 @@ export function useRatings(filterInterval: FilterInterval) {
 
   const { data } = useQuery({
     queryKey: ['ratings', filterInterval],
-    queryFn: () => api.usages.getRatings(since, mapFilterIntervalToGroupBy(filterInterval)),
+    queryFn: () => api.usages.getRatings({ since, groupBy: mapFilterIntervalToGroupBy(filterInterval) }),
   });
 
   const items = useMemo(() => {
@@ -137,7 +137,7 @@ export function useAssistantsCount(filterInterval: FilterInterval) {
 
   const { data } = useQuery({
     queryKey: ['assistantsCount', filterInterval],
-    queryFn: () => api.usages.getAssistantsCount(since, mapFilterIntervalToGroupBy(filterInterval)),
+    queryFn: () => api.usages.getAssistantsCount({ since, groupBy: mapFilterIntervalToGroupBy(filterInterval) }),
   });
 
   const items = useMemo(() => {
@@ -170,7 +170,7 @@ export function useMessagesCount(filterInterval: FilterInterval) {
   const api = useApi();
   const { data } = useQuery({
     queryKey: ['messagesCount', filterInterval],
-    queryFn: () => api.usages.getMessagesCount(since, mapFilterIntervalToGroupBy(filterInterval)),
+    queryFn: () => api.usages.getMessagesCount({ since, groupBy: mapFilterIntervalToGroupBy(filterInterval) }),
   });
 
   return useMemo(() => {
@@ -183,7 +183,7 @@ export function useUsersCount(filterInterval: FilterInterval) {
   const since = mapFilterIntervalToStartDate(filterInterval);
   const { data } = useQuery({
     queryKey: ['usersCount', filterInterval],
-    queryFn: () => api.usages.getUsersCount(since, mapFilterIntervalToGroupBy(filterInterval)),
+    queryFn: () => api.usages.getUsersCount({ since, groupBy: mapFilterIntervalToGroupBy(filterInterval) }),
   });
 
   return useMemo(() => {

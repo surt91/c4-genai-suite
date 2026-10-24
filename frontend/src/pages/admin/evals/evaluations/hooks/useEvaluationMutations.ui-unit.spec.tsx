@@ -3,8 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Dto, EvaluationDelete, EvaluationUpdate } from 'src/api/generated-eval';
+import { ResponseError } from 'src/api';
+import type { EvaluationDelete, EvaluationsPostData, EvaluationUpdate } from 'src/api/generated-eval';
 import { useEvalApi } from 'src/api/state/apiEvalClient';
+
+vi.mock('src/api/state/apiEvalClient');
+import { toast } from 'src/lib/notifications';
+import { texts } from 'src/texts';
 import {
   useCreateEvaluation,
   useDeleteEvaluation,
@@ -12,7 +17,6 @@ import {
   useUpdateEvaluation,
 } from './useEvaluationMutations';
 
-vi.mock('src/api/state/apiEvalClient');
 vi.mock('src/lib/notifications', () => ({
   toast: {
     success: vi.fn(),
@@ -61,7 +65,7 @@ describe('useEvaluationMutations', () => {
 
       const { result } = renderHook(() => useCreateEvaluation(), { wrapper });
 
-      const createDto: Dto = {
+      const createDto: EvaluationsPostData['body'] = {
         name: 'New Evaluation',
         catalogId: 'catalog-1',
         gaibleAssistantId: 1,
@@ -75,7 +79,7 @@ describe('useEvaluationMutations', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsPost).toHaveBeenCalledWith(createDto, undefined, undefined, undefined);
+      expect(mockEvaluationsApi.evaluationsPost).toHaveBeenCalledWith({ body: createDto });
       expect(result.current.data).toEqual(mockResult);
     });
 
@@ -87,7 +91,7 @@ describe('useEvaluationMutations', () => {
 
       const { result } = renderHook(() => useCreateEvaluation(), { wrapper });
 
-      const createDto: Dto = {
+      const createDto: EvaluationsPostData['body'] = {
         name: 'Test',
         catalogId: 'catalog-1',
         gaibleAssistantId: 1,
@@ -126,7 +130,19 @@ describe('useEvaluationMutations', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsPatch).toHaveBeenCalledWith('1', updateData, undefined, undefined, undefined);
+      expect(mockEvaluationsApi.evaluationsPatch).toHaveBeenCalledWith({ evaluation_id: '1', evaluationUpdate: updateData });
+    });
+
+    it('should report a version conflict', async () => {
+      mockEvaluationsApi.evaluationsPatch.mockRejectedValue(new ResponseError(new Response(null, { status: 409 })));
+
+      const { result } = renderHook(() => useUpdateEvaluation(), { wrapper });
+
+      result.current.mutate({ id: '1', data: { name: 'Updated', version: 1 } });
+
+      await waitFor(() => expect(result.current.isError).toBe(true));
+
+      expect(toast.error).toHaveBeenCalledWith(texts.evals.evaluations.versionConflict);
     });
 
     it('should invalidate related queries on success', async () => {
@@ -160,7 +176,7 @@ describe('useEvaluationMutations', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsDelete).toHaveBeenCalledWith('1', deleteData);
+      expect(mockEvaluationsApi.evaluationsDelete).toHaveBeenCalledWith({ evaluation_id: '1', evaluationDelete: deleteData });
     });
 
     it('should invalidate evaluations queries on success', async () => {
@@ -189,7 +205,7 @@ describe('useEvaluationMutations', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGetResultsExport).toHaveBeenCalledWith('1');
+      expect(mockEvaluationsApi.evaluationsGetResultsExport).toHaveBeenCalledWith({ evaluation_id: '1' });
       expect(result.current.data).toBe(mockCsvData);
     });
   });

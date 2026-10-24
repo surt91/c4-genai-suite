@@ -74,7 +74,7 @@ export function useTranscribe({ extensionId, onTranscriptReceived, maxDurationMs
           }
 
           const audioFile = new File([audioBlob], 'recording.webm', { type: mimeTypeRef.current });
-          const result = await transcription.transcribeAudio(extensionId, audioFile);
+          const result = await transcription.transcribeAudio({ extensionId, audio: audioFile });
 
           if (!result.text || result.text.trim() === '') {
             toast.error(texts.chat.transcribe.transcriptionFailed);

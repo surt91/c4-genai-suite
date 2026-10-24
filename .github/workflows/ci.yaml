@@ -35,7 +35,6 @@ jobs:
       - name: Check generated API clients are up to date
         run: |
           npm run generate-api
-          npm run generate-eval-api
           git add -N . && git diff --exit-code .
       - run: npm test
       - run: npm run build

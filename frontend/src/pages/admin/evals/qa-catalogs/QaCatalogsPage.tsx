@@ -38,13 +38,13 @@ export function QaCatalogsPage() {
     refetch,
   } = useQuery({
     queryKey: ['qaCatalogs', page, query],
-    queryFn: () => evalApi.qaCatalog.qaCatalogGetAll(query || undefined, page * PAGE_SIZE, PAGE_SIZE),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGetAll({ name: query || undefined, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
   });
   // e.g. after the last item of the last page has been deleted
   useStepBackFromEmptyPage(page, setPage, isFetched, catalogs?.length ?? 0);
 
   const deleteMutation = useMutation({
-    mutationFn: (catalogId: string) => evalApi.qaCatalog.qaCatalogDelete(catalogId),
+    mutationFn: (catalogId: string) => evalApi.qaCatalog.qaCatalogDelete({ catalog_id: catalogId }),
     onSuccess: () => {
       toast.success(texts.evals.qaCatalog.deleteSuccess);
       void queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });

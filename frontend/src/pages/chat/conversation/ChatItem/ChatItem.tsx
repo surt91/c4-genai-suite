@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { FileDto, MessageDtoRatingEnum } from 'src/api';
+import { FileDto, MessageDto } from 'src/api';
 import { ChatMessage } from '../../state/types';
 import { AIChatItem } from './AIChatItem';
 import { HumanChatItem } from './HumanChatItem';
@@ -9,7 +9,7 @@ export interface ChatItemProps {
   message: ChatMessage;
   isLast: boolean;
   isBeforeLast: boolean;
-  rating?: MessageDtoRatingEnum;
+  rating?: MessageDto['rating'];
   llmLogo?: string;
   editMessage: (input: string, files?: FileDto[], editMessageId?: number) => void;
 }

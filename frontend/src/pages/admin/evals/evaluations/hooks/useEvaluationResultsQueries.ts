@@ -13,7 +13,7 @@ export function useGroupedResults(evaluationId?: string, page: number = 1, limit
 
   return useQuery({
     queryKey: ['groupedResults', evaluationId, page, limit],
-    queryFn: () => evalApi.evaluationResults.evaluationResultsGetGrouped(evaluationId, offset, limit),
+    queryFn: () => evalApi.evaluationResults.evaluationResultsGetGrouped({ evaluation_id: evaluationId, offset, limit }),
     enabled: !!evaluationId,
     refetchInterval: pollInterval ?? false,
   });
@@ -28,7 +28,7 @@ export function useEvaluationResultDetail(resultId?: string) {
 
   return useQuery({
     queryKey: ['evaluationResultDetail', resultId],
-    queryFn: () => evalApi.evaluationResults.evaluationResultsGet(resultId!),
+    queryFn: () => evalApi.evaluationResults.evaluationResultsGet({ result_id: resultId! }),
     enabled: !!resultId,
   });
 }

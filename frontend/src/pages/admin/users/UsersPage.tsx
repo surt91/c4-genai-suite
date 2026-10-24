@@ -31,7 +31,7 @@ export function UsersPage() {
 
   const { data: loadedUsers, isFetched } = useQuery({
     queryKey: ['users', page, query],
-    queryFn: () => api.users.getUsers(page, 20, query),
+    queryFn: () => api.users.getUsers({ page, pageSize: 20, query }),
   });
 
   const { data: loadedGroups } = useQuery({

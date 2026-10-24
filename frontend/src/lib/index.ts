@@ -8,10 +8,6 @@ export function isString(value: unknown): value is string {
   return typeof value === 'string' || value instanceof String;
 }
 
-function isArray<T>(value: unknown): value is T[] {
-  return Array.isArray(value);
-}
-
 export function formatFileSize(value: number, factor = 1024) {
   let u = 0;
 
@@ -45,22 +41,13 @@ export function sanitizeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9\-_ ]/g, '_');
 }
 
-export async function buildError(common: string, details?: string | Error | null) {
+/** Builds the message of an error toast. Returns a promise as the message of the server used to be read from the response. */
+export function buildError(common: string, details?: string | Error | null): Promise<string> {
   let detailString: string | null = null;
   if (isString(details)) {
     detailString = details;
   } else if (details instanceof ResponseError) {
-    try {
-      const response = (await details.response.json()) as { message: string | string[] };
-
-      if (isArray(response.message)) {
-        detailString = response.message.join(', ');
-      } else if (isString(response.message)) {
-        detailString = response.message;
-      }
-    } catch {
-      console.error('Server response is an not a JSON object.');
-    }
+    detailString = details.serverMessage ?? null;
   }
 
   let result = common;
@@ -76,7 +63,7 @@ export async function buildError(common: string, details?: string | Error | null
     result = `${result}.`;
   }
 
-  return result;
+  return Promise.resolve(result);
 }
 
 export function formatBoolean(value: boolean) {

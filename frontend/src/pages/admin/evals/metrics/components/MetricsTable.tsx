@@ -52,13 +52,13 @@ export function MetricsTable({ metrics, isFetching, isFetched, onRowClick, onEdi
         {isFetched &&
           metrics.map((metric) => (
             <Table.Tr className={classes.clickableRow} key={metric.id} onClick={() => onRowClick(metric)}>
-              <Table.Td className={classes.nameCell}>{metric._configuration.name}</Table.Td>
+              <Table.Td className={classes.nameCell}>{metric.configuration.name}</Table.Td>
               <Table.Td className={classes.cell}>
-                <MetricTypeChip type={metric._configuration.type} />
+                <MetricTypeChip type={metric.configuration.type} />
               </Table.Td>
-              <Table.Td className={classes.cell}>{metric._configuration.threshold.toFixed(2)}</Table.Td>
+              <Table.Td className={classes.cell}>{metric.configuration.threshold.toFixed(2)}</Table.Td>
               <Table.Td className={classes.truncatedCell} fz="sm">
-                {metric._configuration.chatModelId}
+                {metric.configuration.chatModelId}
               </Table.Td>
               <Table.Td className={classes.cell}>{formatDate(metric.createdAt)}</Table.Td>
               <Table.Td className={classes.cell}>

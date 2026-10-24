@@ -30,7 +30,7 @@ export function ThemeForm() {
 
   const updating = useMutation({
     mutationFn: (request: SettingsDto) => {
-      return api.settings.postSettings(request);
+      return api.settings.postSettings({ settingsDto: request });
     },
     onSuccess: async (settings) => {
       if (settings.language != null) {
@@ -43,7 +43,7 @@ export function ThemeForm() {
   });
 
   const form = useForm<SettingsDto>({
-    validate: zod4Resolver(createScheme()) as (values: SettingsDto) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()),
     initialValues: settings ?? {
       chatSuggestions: [],
       siteLinks: [],

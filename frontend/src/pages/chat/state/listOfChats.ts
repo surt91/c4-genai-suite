@@ -45,7 +45,7 @@ export const useStateMutateDuplicateChat = () => {
   const navigate = useTransientNavigate();
 
   return useMutation({
-    mutationFn: (id: number) => api.conversations.duplicateConversation(id),
+    mutationFn: (id: number) => api.conversations.duplicateConversation({ id }),
     onSuccess: (duplicated) => {
       refetchChatsList();
       notify(texts.chat.duplicateConversationSuccess, {
@@ -65,7 +65,7 @@ export const useStateMutateRenameChat = () => {
 
   return useMutation({
     mutationFn: ({ chat, name }: { chat: ConversationDto; name: string }) =>
-      api.conversations.patchConversation(chat.id, { name, isNameSetManually: true }),
+      api.conversations.patchConversation({ id: chat.id, updateConversationDto: { name, isNameSetManually: true } }),
     onSuccess: upsertChat,
     onError: async () => toast.error(await buildError(texts.chat.renameConversationFailed, texts.common.reloadAndTryAgain)),
   });
@@ -86,7 +86,7 @@ export const useStateMutateRemoveChat = () => {
 
   const restore = async (id: number) => {
     try {
-      await api.conversations.restoreConversation(id);
+      await api.conversations.restoreConversation({ id });
       refetchChatsList();
       navigate(`/chat/${id}`);
     } catch (error) {
@@ -95,7 +95,7 @@ export const useStateMutateRemoveChat = () => {
   };
 
   return useMutation({
-    mutationFn: (conversation: ConversationDto) => api.conversations.deleteConversation(conversation.id),
+    mutationFn: (conversation: ConversationDto) => api.conversations.deleteConversation({ id: conversation.id }),
     onMutate: (conversation) => {
       removeChat(conversation.id);
     },
@@ -150,8 +150,10 @@ export const useMutateNewChat = () => {
       // Use the provided assistantId, then lastSelectedAssistantId, then fallback to first assistant
       const configurationId = assistantId || persistentAssistantId || assistants?.[0]?.id;
       return api.conversations.postConversation({
-        configurationId,
-        context,
+        createConversationDto: {
+          configurationId,
+          context,
+        },
       });
     },
     onSuccess: (chat) => navigate(`/chat/${chat.id}`),
@@ -167,7 +169,7 @@ export const useStateOfChats = () => useListOfChatsStore((s) => s.chats);
 export const useStateOfChatEmptiness = () => {
   const api = useApi();
   return async (id: number) => {
-    const { items } = await api.conversations.getMessages(id);
+    const { items } = await api.conversations.getMessages({ id });
     return items.length === 0;
   };
 };

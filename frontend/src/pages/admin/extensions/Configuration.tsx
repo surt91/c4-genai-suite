@@ -28,7 +28,7 @@ export const Configuration = memo((props: ConfigurationProps) => {
 
   const handleExport = async () => {
     try {
-      const exportedData = await api.extensions.exportConfiguration(configuration.id);
+      const exportedData = await api.extensions.exportConfiguration({ id: configuration.id });
       downloadJson(exportedData, `${sanitizeFilename(configuration.name)}_config.json`);
       toast.success(texts.extensions.exportConfigurationSuccess);
     } catch (error) {

@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
-import { BucketDto, BucketDtoFileSizeLimits, BucketDtoTypeEnum, UpsertBucketDto, useApi } from 'src/api';
+import { BUCKET_TYPES, BucketDto, BucketDtoFileSizeLimits, UpsertBucketDto, useApi } from 'src/api';
 import { FormAlert, Icon, Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { TestButton } from './TestButton';
@@ -52,7 +52,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
 
   const creating = useMutation({
     mutationFn: (request: UpsertBucketDto) => {
-      return api.files.postBucket(request);
+      return api.files.postBucket({ upsertBucketDto: request });
     },
     onSuccess: (response) => {
       onCreate(response);
@@ -62,7 +62,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
 
   const updating = useMutation({
     mutationFn: (request: UpsertBucketDto) => {
-      return api.files.putBucket(target!.id, request);
+      return api.files.putBucket({ id: target!.id, upsertBucketDto: request });
     },
     onSuccess: (response) => {
       onUpdate(response);
@@ -72,7 +72,7 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
   });
 
   const form = useForm<UpsertBucketDto>({
-    validate: zod4Resolver(createScheme()) as unknown as (values: UpsertBucketDto) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()),
     initialValues: (target as UpsertBucketDto) ?? {
       name: '',
       endpoint: '',
@@ -92,12 +92,12 @@ export function UpsertBucketDialog(props: UpsertBucketDialogProps) {
 
   const { data: fileTypes, error: fileTypesFetchError } = useQuery({
     queryKey: [`fileTypes:${endpoint}:${headers}`],
-    queryFn: () => api.files.getFileTypes(endpoint, headers),
+    queryFn: () => api.files.getFileTypes({ endpoint, headers }),
     enabled: !!endpoint,
     retry: false,
   });
 
-  const bucketTypeOptions = Object.values(BucketDtoTypeEnum).map((value) => ({ label: value, value }));
+  const bucketTypeOptions = BUCKET_TYPES.map((value) => ({ label: value, value }));
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceFn = useMemo(() => debounce(handleDebounceFn, 500), []);

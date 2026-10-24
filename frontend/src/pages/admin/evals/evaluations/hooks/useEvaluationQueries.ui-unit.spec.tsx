@@ -67,7 +67,13 @@ describe('useEvaluationQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith(undefined, undefined, undefined, 0, 10);
+      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith({
+        query: undefined,
+        from_date: undefined,
+        to_date: undefined,
+        offset: 0,
+        limit: 10,
+      });
       expect(result.current.data).toEqual(mockEvaluations);
     });
 
@@ -78,7 +84,13 @@ describe('useEvaluationQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith('test', undefined, undefined, 0, 10);
+      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith({
+        query: 'test',
+        from_date: undefined,
+        to_date: undefined,
+        offset: 0,
+        limit: 10,
+      });
     });
 
     it('should fetch evaluations with date range', async () => {
@@ -91,7 +103,13 @@ describe('useEvaluationQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith(undefined, fromDate, toDate, 0, 10);
+      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith({
+        query: undefined,
+        from_date: fromDate,
+        to_date: toDate,
+        offset: 0,
+        limit: 10,
+      });
     });
 
     it('should calculate offset from page number', async () => {
@@ -101,13 +119,13 @@ describe('useEvaluationQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith(
-        undefined,
-        undefined,
-        undefined,
-        40, // (page 3 - 1) * 20
-        20,
-      );
+      expect(mockEvaluationsApi.evaluationsGetAll).toHaveBeenCalledWith({
+        query: undefined,
+        from_date: undefined,
+        to_date: undefined,
+        offset: 40, // (page 3 - 1) * 20
+        limit: 20,
+      });
     });
   });
 
@@ -130,7 +148,7 @@ describe('useEvaluationQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGet).toHaveBeenCalledWith('1');
+      expect(mockEvaluationsApi.evaluationsGet).toHaveBeenCalledWith({ evaluation_id: '1' });
       expect(result.current.data).toEqual(mockEvaluation);
     });
 
@@ -169,7 +187,7 @@ describe('useEvaluationQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(mockEvaluationsApi.evaluationsGetEvaluationDetailSummary).toHaveBeenCalledWith('1');
+      expect(mockEvaluationsApi.evaluationsGetEvaluationDetailSummary).toHaveBeenCalledWith({ evaluation_id: '1' });
       expect(result.current.data).toEqual(mockSummary);
     });
 

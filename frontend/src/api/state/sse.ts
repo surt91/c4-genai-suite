@@ -3,8 +3,10 @@
  *
  * Unlike the browser's `EventSource` it supports arbitrary methods, bodies and headers. It does not reconnect:
  * the returned promise resolves when the server closes the stream (or the request is aborted via `signal`) and
- * rejects on network errors, error responses (`SseResponseError`), non-SSE responses or errors thrown by `onMessage`.
+ * rejects on network errors, error responses (`ResponseError`), non-SSE responses or errors thrown by `onMessage`.
  */
+
+import { readErrorBody, ResponseError } from './errors';
 
 export interface SseMessage {
   id: string;
@@ -20,31 +22,6 @@ export interface SseRequestInit extends Omit<RequestInit, 'headers'> {
 
 const EVENT_STREAM_CONTENT_TYPE = 'text/event-stream';
 
-/** The server answered with an error status instead of a stream (e.g. 401, a validation error or a proxy error). */
-export class SseResponseError extends Error {
-  override name = 'SseResponseError';
-
-  constructor(
-    public readonly status: number,
-    // The message of the server, if it sent one (NestJS: `{ message: string | string[] }`).
-    public readonly serverMessage?: string,
-  ) {
-    super(serverMessage ?? `Request failed with status ${status}`);
-  }
-}
-
-async function readServerMessage(response: Response) {
-  try {
-    const body = (await response.json()) as { message?: unknown };
-    if (Array.isArray(body.message)) {
-      return body.message.join(', ');
-    }
-    return typeof body.message === 'string' ? body.message : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 export async function fetchEventStream(url: string, { onMessage, headers, signal, ...init }: SseRequestInit): Promise<void> {
   if (signal?.aborted) {
     return;
@@ -55,7 +32,7 @@ export async function fetchEventStream(url: string, { onMessage, headers, signal
     const response = await fetch(url, { ...init, signal, headers: { Accept: EVENT_STREAM_CONTENT_TYPE, ...headers } });
 
     if (!response.ok) {
-      throw new SseResponseError(response.status, await readServerMessage(response));
+      throw new ResponseError(response, await readErrorBody(response));
     }
 
     const contentType = response.headers.get('content-type');

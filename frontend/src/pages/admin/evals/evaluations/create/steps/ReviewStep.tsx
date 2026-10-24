@@ -26,13 +26,13 @@ export function ReviewStep() {
   // Fetch selected resources for display (use preview to get length)
   const { data: catalog } = useQuery({
     queryKey: ['qaCatalogPreview', catalogId],
-    queryFn: () => evalApi.qaCatalog.qaCatalogGetPreview(catalogId!),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGetPreview({ catalog_id: catalogId! }),
     enabled: !!catalogId && mode === 'catalog',
   });
 
   const { data: metrics = [] } = useQuery({
     queryKey: ['metrics', 'all'],
-    queryFn: () => evalApi.metrics.metricsGetAll(0, 100),
+    queryFn: () => evalApi.metrics.metricsGetAll({ offset: 0, limit: 100 }),
   });
 
   const selectedMetrics = metrics.filter((m) => metricIds.includes(m.id));
@@ -124,7 +124,7 @@ export function ReviewStep() {
           <Group gap="xs">
             {selectedMetrics.map((metric) => (
               <Badge key={metric.id} variant="light">
-                {metric._configuration.name}
+                {metric.configuration.name}
               </Badge>
             ))}
           </Group>

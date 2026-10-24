@@ -8,7 +8,7 @@ import { QaCatalogDetailPage } from './QaCatalogDetailPage';
 import { useQaCatalogsStore } from './state';
 
 const qaCatalog = {
-  qaCatalogGet: vi.fn((id: string) =>
+  qaCatalogGet: vi.fn(({ catalog_id: id }: { catalog_id: string }) =>
     Promise.resolve({ id, name: `Catalog ${id}`, status: 'READY', revision: 1, createdAt: new Date(), updatedAt: new Date() }),
   ),
   qaCatalogGetCatalogQaPairs: vi.fn(() => Promise.resolve([])),

@@ -63,7 +63,7 @@ export function LlmEndpointsTable({
             <Table.Tr className={classes.clickableRow} key={endpoint.id} onClick={() => onRowClick(endpoint)}>
               <Table.Td className={classes.nameCell}>{endpoint.name}</Table.Td>
               <Table.Td className={classes.cell}>
-                <LlmEndpointTypeChip type={endpoint._configuration.type} />
+                <LlmEndpointTypeChip type={endpoint.configuration.type} />
               </Table.Td>
               <Table.Td className={classes.cell}>
                 <LlmEndpointFeaturesBadge features={endpoint.supportedFeatures} />

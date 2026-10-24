@@ -2,7 +2,7 @@ import { Button, Divider, Flex, Group, Portal, Select, Text } from '@mantine/cor
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
-import type { Configuration1, Configuration2, Metric, MetricCreate, MetricUpdate } from 'src/api/generated-eval';
+import type { Metric, MetricCreate, MetricUpdate } from 'src/api/generated-eval';
 import { ConfirmDialog, FormAlert, Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { GEvalMetricFields } from '../forms/GEvalMetricFields';
@@ -10,9 +10,8 @@ import { SimpleMetricFields } from '../forms/SimpleMetricFields';
 import type { MetricFormValues } from '../forms/types';
 import { useCreateMetric, useDeleteMetric, useUpdateMetric } from '../hooks/useMetricMutations';
 
-// Alias for clarity
-type MetricConfigurationCreate = Configuration1;
-type MetricConfigurationUpdate = Configuration2;
+type MetricConfigurationCreate = MetricCreate['configuration'];
+type MetricConfigurationUpdate = MetricUpdate['configuration'];
 
 // Created when used, so that the messages are in the language of the installation
 const createScheme = () =>
@@ -123,7 +122,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
     }
 
     // Update mode - initialize from existing metric
-    const config = props.target._configuration;
+    const config = props.target.configuration;
     const base = {
       type: config.type,
       name: config.name,
@@ -196,7 +195,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
 
     if (isCreating) {
       const payload: MetricCreate = {
-        _configuration: configuration as MetricConfigurationCreate,
+        configuration: configuration as MetricConfigurationCreate,
       };
       createMutation.mutate(payload, {
         onSuccess: () => {
@@ -207,7 +206,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
     } else {
       const payload: MetricUpdate = {
         version: props.target.version,
-        _configuration: configuration as MetricConfigurationUpdate,
+        configuration: configuration as MetricConfigurationUpdate,
       };
       updateMutation.mutate(
         { id: props.target.id, data: payload },
@@ -287,7 +286,7 @@ function UpsertMetricDialog(props: UpsertMetricDialogProps) {
                   </Text>
                   <ConfirmDialog
                     title={texts.evals.metric.deleteConfirmTitle}
-                    text={texts.evals.metric.deleteConfirmText(props.target._configuration.name)}
+                    text={texts.evals.metric.deleteConfirmText(props.target.configuration.name)}
                     onPerform={handleDelete}
                   >
                     {({ onClick }) => (

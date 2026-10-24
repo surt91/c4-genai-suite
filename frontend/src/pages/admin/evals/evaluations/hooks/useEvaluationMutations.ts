@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ResponseError } from 'src/api';
 import type {
-  Dto,
   EvaluationDelete,
+  EvaluationsPostData,
   EvaluationUpdate,
   LlmEvalEvalEvaluationsModelsEvaluationResult,
 } from 'src/api/generated-eval';
@@ -18,7 +19,7 @@ export function useCreateEvaluation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Dto) => evalApi.evaluations.evaluationsPost(data, undefined, undefined, undefined),
+    mutationFn: (data: EvaluationsPostData['body']) => evalApi.evaluations.evaluationsPost({ body: data }),
     onSuccess: (_evaluation: LlmEvalEvalEvaluationsModelsEvaluationResult) => {
       // Note: The API returns EvaluationResult, but we need GetAllEvaluationResult for the list
       // We'll rely on query invalidation to fetch the updated list
@@ -42,7 +43,7 @@ export function useUpdateEvaluation() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: EvaluationUpdate }) =>
-      evalApi.evaluations.evaluationsPatch(id, data, undefined, undefined, undefined),
+      evalApi.evaluations.evaluationsPatch({ evaluation_id: id, evaluationUpdate: data }),
     onSuccess: (evaluation: LlmEvalEvalEvaluationsModelsEvaluationResult) => {
       toast.success(texts.evals.evaluations.updateSuccess);
       // Invalidate both the single evaluation and the summary
@@ -54,7 +55,7 @@ export function useUpdateEvaluation() {
       console.error('Failed to update evaluation:', error);
 
       // Handle version conflict (409)
-      if (error && typeof error === 'object' && 'status' in error && error.status === 409) {
+      if (error instanceof ResponseError && error.status === 409) {
         toast.error(texts.evals.evaluations.versionConflict);
       } else {
         toast.error(texts.evals.evaluations.updateFailed);
@@ -71,7 +72,8 @@ export function useDeleteEvaluation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: EvaluationDelete }) => evalApi.evaluations.evaluationsDelete(id, data),
+    mutationFn: ({ id, data }: { id: string; data: EvaluationDelete }) =>
+      evalApi.evaluations.evaluationsDelete({ evaluation_id: id, evaluationDelete: data }),
     onSuccess: () => {
       toast.success(texts.evals.evaluations.deleteSuccess);
       void queryClient.invalidateQueries({ queryKey: ['evaluations'] });
@@ -80,7 +82,7 @@ export function useDeleteEvaluation() {
       console.error('Failed to delete evaluation:', error);
 
       // Handle version conflict (409)
-      if (error && typeof error === 'object' && 'status' in error && error.status === 409) {
+      if (error instanceof ResponseError && error.status === 409) {
         toast.error(texts.evals.evaluations.versionConflict);
       } else {
         toast.error(texts.evals.evaluations.deleteFailed);
@@ -96,7 +98,8 @@ export function useExportEvaluationResults() {
   const evalApi = useEvalApi();
 
   return useMutation({
-    mutationFn: (evaluationId: string) => evalApi.evaluations.evaluationsGetResultsExport(evaluationId),
+    mutationFn: async (evaluationId: string) =>
+      (await evalApi.evaluations.evaluationsGetResultsExport({ evaluation_id: evaluationId })) as string,
     onSuccess: (csvData: string, evaluationId: string) => {
       // Create a blob from the CSV data and trigger download
       const blob = new Blob([csvData], { type: 'text/csv' });

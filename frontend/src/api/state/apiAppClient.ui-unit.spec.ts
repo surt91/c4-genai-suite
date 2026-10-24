@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Configuration } from 'src/api/generated';
 import { AppClient } from './apiAppClient';
+import { ResponseError } from './errors';
 
 describe('StreamApi.streamPrompt', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  const client = new AppClient(new Configuration({ basePath: 'http://server' }), {});
+  const client = new AppClient('http://server');
 
   function mockSse(body: string) {
     const fetchMock = vi.fn(() => Promise.resolve(new Response(body, { headers: { 'content-type': 'text/event-stream' } })));
@@ -99,5 +99,61 @@ describe('StreamApi.streamPrompt', () => {
     expect(signal?.aborted).toBe(true);
     expect(handlers.error).not.toHaveBeenCalled();
     expect(handlers.complete).not.toHaveBeenCalled();
+  });
+});
+
+describe('AppClient', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function mockFetch(response: Response | Error) {
+    const fetchMock = vi.fn((_: Request) => (response instanceof Error ? Promise.reject(response) : Promise.resolve(response)));
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+
+  it('sends cookies and the language, passes the parameters and converts dates', async () => {
+    const fetchMock = mockFetch(
+      json({ items: [{ id: 1, fileName: 'a.txt', uploadedAt: '2024-01-02T03:04:05.000Z' }], total: 1 }),
+    );
+    const client = new AppClient('http://server');
+
+    const result = await client.files.getUserFiles({ page: 2, conversationId: 3 });
+
+    const request = fetchMock.mock.calls[0][0];
+    expect(request.url).toBe('http://server/api/user-files?page=2&conversationId=3');
+    expect(request.credentials).toBe('include');
+    expect(request.headers.get('Accept-Language')).toBeTruthy();
+    expect(result.items[0].uploadedAt).toEqual(new Date('2024-01-02T03:04:05.000Z'));
+  });
+
+  it('throws a ResponseError with the message of the server on error responses', async () => {
+    mockFetch(json({ statusCode: 400, message: ['name should not be empty', 'name must be a string'] }, 400));
+    const client = new AppClient('http://server');
+
+    const error = await client.users.getUserGroups().catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ResponseError);
+    expect(error).toMatchObject({ status: 400, serverMessage: 'name should not be empty, name must be a string' });
+  });
+
+  it('calls onUnauthorized on 401 responses', async () => {
+    mockFetch(json({ statusCode: 401, message: 'Unauthorized' }, 401));
+    const onUnauthorized = vi.fn();
+    const client = new AppClient('http://server', onUnauthorized);
+
+    await expect(client.auth.getProfile()).rejects.toMatchObject({ status: 401 });
+    expect(onUnauthorized).toHaveBeenCalledOnce();
+  });
+
+  it('rethrows network errors', async () => {
+    mockFetch(new TypeError('Failed to fetch'));
+    const client = new AppClient('http://server');
+
+    await expect(client.auth.getProfile()).rejects.toEqual(new TypeError('Failed to fetch'));
   });
 });

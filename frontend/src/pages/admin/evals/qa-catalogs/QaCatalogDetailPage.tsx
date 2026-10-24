@@ -66,7 +66,7 @@ export function QaCatalogDetailPage() {
     refetch: refetchCatalog,
   } = useQuery({
     queryKey: ['qaCatalog', catalogId],
-    queryFn: () => evalApi.qaCatalog.qaCatalogGet(catalogId!),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGet({ catalog_id: catalogId! }),
     enabled: !!catalogId,
     refetchInterval: (query) => {
       // Poll while generating
@@ -85,7 +85,8 @@ export function QaCatalogDetailPage() {
     refetch: refetchPairs,
   } = useQuery({
     queryKey: ['qaPairs', catalogId, page],
-    queryFn: () => evalApi.qaCatalog.qaCatalogGetCatalogQaPairs(catalogId!, page * PAGE_SIZE, PAGE_SIZE),
+    queryFn: () =>
+      evalApi.qaCatalog.qaCatalogGetCatalogQaPairs({ catalog_id: catalogId!, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
     enabled: !!catalogId,
   });
 
@@ -102,7 +103,7 @@ export function QaCatalogDetailPage() {
   // Fetch version history
   const { data: historyData } = useQuery({
     queryKey: ['qaCatalogHistory', catalogId],
-    queryFn: () => evalApi.qaCatalog.qaCatalogGetHistory(catalogId!),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGetHistory({ catalog_id: catalogId! }),
     enabled: !!catalogId,
   });
 
@@ -121,10 +122,9 @@ export function QaCatalogDetailPage() {
         .filter((c): c is Extract<PendingChange, { type: 'deletion' }> => c.type === 'deletion')
         .map((c) => c.id);
 
-      return evalApi.qaCatalog.qaCatalogEditQaCatalog(catalogId!, {
-        additions,
-        updates,
-        deletions,
+      return evalApi.qaCatalog.qaCatalogEditQaCatalog({
+        catalog_id: catalogId!,
+        qaCatalogUpdateRequest: { additions, updates, deletions },
       });
     },
     onSuccess: (newCatalog) => {
@@ -147,7 +147,7 @@ export function QaCatalogDetailPage() {
 
   // Delete catalog
   const deleteMutation = useMutation({
-    mutationFn: () => evalApi.qaCatalog.qaCatalogDelete(catalogId!),
+    mutationFn: () => evalApi.qaCatalog.qaCatalogDelete({ catalog_id: catalogId! }),
     onSuccess: () => {
       toast.success(texts.evals.qaCatalog.deleteSuccess);
       void queryClient.invalidateQueries({ queryKey: ['qaCatalogs'] });

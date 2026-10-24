@@ -22,13 +22,13 @@ export const useExtensionContext = (conversationId: number) => {
 
   const query = useQuery({
     queryKey,
-    queryFn: () => api.conversations.getConversation(conversationId).then((data) => data?.extensionUserArguments || {}),
+    queryFn: () => api.conversations.getConversation({ id: conversationId }).then((data) => data?.extensionUserArguments || {}),
     enabled: !!conversationId,
   });
 
   const mutation = useMutation({
     mutationFn: (context: ExtensionContext) =>
-      api.conversations.patchConversation(conversationId, { extensionUserArguments: context }),
+      api.conversations.patchConversation({ id: conversationId, updateConversationDto: { extensionUserArguments: context } }),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKey, () => data?.extensionUserArguments);
     },

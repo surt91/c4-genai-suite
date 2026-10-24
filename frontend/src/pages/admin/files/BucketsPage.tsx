@@ -37,7 +37,7 @@ export function BucketsPage() {
   }, [loadedBuckets, setBuckets]);
 
   const deleting = useDeletingBucket({
-    apiCall: (id) => api.files.deleteBucket(id),
+    apiCall: (id) => api.files.deleteBucket({ id }),
     removeBucket,
     navigation: () => navigate('/admin/files/'),
   });

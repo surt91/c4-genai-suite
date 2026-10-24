@@ -13,7 +13,7 @@ export function CatalogSelectionStep() {
   // Fetch QA catalogs (only READY ones)
   const { data: catalogs = [], isLoading } = useQuery({
     queryKey: ['qaCatalogs', 'all'],
-    queryFn: () => evalApi.qaCatalog.qaCatalogGetAll(undefined, 0, 100),
+    queryFn: () => evalApi.qaCatalog.qaCatalogGetAll({ offset: 0, limit: 100 }),
   });
 
   // Filter only READY catalogs

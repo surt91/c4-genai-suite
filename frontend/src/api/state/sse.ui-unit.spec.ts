@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createSseParser, fetchEventStream, SseMessage, SseResponseError } from './sse';
+import { ResponseError } from './errors';
+import { createSseParser, fetchEventStream, SseMessage } from './sse';
 
 function parse(...chunks: string[]) {
   const messages: SseMessage[] = [];
@@ -125,7 +126,7 @@ describe('fetchEventStream', () => {
 
     const error = await fetchEventStream('/sse', { onMessage: vi.fn() }).catch((e: unknown) => e);
 
-    expect(error).toBeInstanceOf(SseResponseError);
+    expect(error).toBeInstanceOf(ResponseError);
     expect(error).toMatchObject({ status: 400, serverMessage: 'query should not be empty, files must be an array' });
   });
 

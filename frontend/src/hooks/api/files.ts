@@ -8,7 +8,7 @@ import { texts } from 'src/texts';
 export const useDocumentContent = (conversationId: number, messageId: number, documentUri: string) => {
   const { conversations } = useApi();
   return useQuery({
-    queryFn: () => conversations.getDocumentChunks(conversationId, messageId, documentUri),
+    queryFn: () => conversations.getDocumentChunks({ id: conversationId, messageId, documentUri }),
     queryKey: ['files', 'document-content', { messageId }, { documentUri }],
     enabled: !!documentUri,
   });
@@ -18,7 +18,7 @@ export const useDocument = (conversationId: number, messageId: number, documentU
   const { conversations } = useApi();
 
   return useQuery({
-    queryFn: () => conversations.getDocument(conversationId, messageId, documentUri),
+    queryFn: () => conversations.getDocument({ id: conversationId, messageId, documentUri }),
     queryKey: ['files', 'document', { conversationId }, { messageId }, { documentUri }],
     enabled: !!documentUri,
   });
@@ -30,13 +30,13 @@ export const useConversationFiles = (conversationId: number) => {
 
   const { data: conversationFiles, refetch } = useQuery({
     queryKey: ['files', 'conversation-files', { conversationId }],
-    queryFn: () => api.files.getUserFiles(undefined, undefined, undefined, conversationId),
+    queryFn: () => api.files.getUserFiles({ conversationId }),
     select: (data) => data.items,
   });
 
   const deleteFile = useMutation({
     mutationFn: async (file: FileDto) => {
-      return api.files.deleteUserFile(file.id, conversationId);
+      return api.files.deleteUserFile({ fileId: file.id, conversationId });
     },
     onSuccess: (_, file) => {
       userFilesFunctions.remove(file);

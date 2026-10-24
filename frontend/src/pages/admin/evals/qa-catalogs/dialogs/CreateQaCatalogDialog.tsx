@@ -57,7 +57,7 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
 
   const createEmptyMutation = useMutation({
     mutationFn: async (values: EmptyFormValues) => {
-      return await evalApi.qaCatalog.qaCatalogCreateEmpty(values.name);
+      return await evalApi.qaCatalog.qaCatalogCreateEmpty({ name: values.name });
     },
     onSuccess: (catalog) => {
       toast.success(texts.evals.qaCatalog.createSuccess);
@@ -69,7 +69,9 @@ export function CreateQaCatalogDialog({ onClose, onCreated }: CreateQaCatalogDia
 
   const uploadMutation = useMutation({
     mutationFn: async (values: UploadFormValues) => {
-      return await evalApi.qaCatalog.qaCatalogUpload(values.file, values.name);
+      return await evalApi.qaCatalog.qaCatalogUpload({
+        bodyUploadV1QaCatalogUploadPost: { file: values.file, name: values.name },
+      });
     },
     onSuccess: (catalog) => {
       toast.success(texts.evals.qaCatalog.createSuccess);

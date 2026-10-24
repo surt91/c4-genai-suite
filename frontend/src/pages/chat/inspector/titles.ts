@@ -5,7 +5,7 @@ import { useStateOfMessage } from '../state/chat';
 import { InspectorSourceEntry, InspectorToolEntry } from '../state/inspector';
 
 export function sourceName(source: SourceDto) {
-  const title = source.metadata?.title as unknown;
+  const title = source.metadata?.title;
   return typeof title === 'string' && title ? title : source.title;
 }
 

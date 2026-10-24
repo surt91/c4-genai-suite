@@ -1,7 +1,6 @@
 import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FetchError, ResponseError, StreamEventDto, StreamObserver } from 'src/api';
-import { SseResponseError } from 'src/api/state/sse';
+import { ResponseError, StreamEventDto, StreamObserver } from 'src/api';
 import { toast } from 'src/lib/notifications';
 import { renderHook } from 'src/pages/admin/test-utils';
 import { texts } from 'src/texts';
@@ -38,7 +37,7 @@ describe('useChatStream', () => {
   });
 
   it('reports a network error when loading the chat instead of crashing', async () => {
-    api.conversations.getConversation.mockRejectedValue(new FetchError(new TypeError('Failed to fetch'), 'The request failed'));
+    api.conversations.getConversation.mockRejectedValue(new TypeError('Failed to fetch'));
     api.conversations.getMessages.mockResolvedValue({ items: [] });
 
     vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -76,7 +75,7 @@ describe('useChatStream', () => {
         ?.messages.find((m) => m.type === 'ai');
 
     it('shows the message of the server for error responses', async () => {
-      await sendAndFail(new SseResponseError(403, 'Forbidden resource'));
+      await sendAndFail(new ResponseError(new Response(null, { status: 403 }), { message: 'Forbidden resource' }));
 
       await waitFor(() => expect(answer()?.error).toBe(`${texts.chat.sendFailed}: Forbidden resource`));
       expect(useChatStore.getState().chatDataMap.get(1)?.isAiWriting).toBe(false);
@@ -90,7 +89,7 @@ describe('useChatStream', () => {
 
     it('goes to the login when the session expired', async () => {
       window.history.pushState({}, '', '/chat/1');
-      await sendAndFail(new SseResponseError(401, 'Unauthorized'));
+      await sendAndFail(new ResponseError(new Response(null, { status: 401 }), { message: 'Unauthorized' }));
 
       await waitFor(() => expect(window.location.pathname).toBe('/login'));
       expect(document.cookie).toContain('post-login-redirect=%2Fchat%2F1');

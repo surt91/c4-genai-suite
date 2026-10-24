@@ -17,7 +17,7 @@ export const useListOfEnabledAssistantsInit = () => {
   const initialQueryGetAssistants = useQuery({
     queryKey: ['enabled-configurations'],
     queryFn: () => {
-      return api.extensions.getConfigurations(true);
+      return api.extensions.getConfigurations({ enabled: true });
     },
     refetchOnWindowFocus: false,
   });

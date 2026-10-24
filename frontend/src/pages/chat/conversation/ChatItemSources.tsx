@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import React, { useMemo } from 'react';
 
 import { SourceDto } from 'src/api';

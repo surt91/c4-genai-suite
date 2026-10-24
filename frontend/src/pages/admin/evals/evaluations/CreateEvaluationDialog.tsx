@@ -1,7 +1,7 @@
 import { Button, Group, Portal, Stack, Stepper } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
-import type { Dto } from 'src/api/generated-eval';
+import type { EvaluationsPostData } from 'src/api/generated-eval';
 import { FormAlert, Modal } from 'src/components';
 import { texts } from 'src/texts';
 import { AssistantSelectionStep } from './create/steps/AssistantSelectionStep';
@@ -64,7 +64,7 @@ export function CreateEvaluationDialog({ onClose, onCreate }: CreateEvaluationDi
       testCases: mode === 'catalog' ? [] : testCases,
       ...(description ? { description } : {}),
       ...(mode === 'catalog' ? { catalogId: catalogId!, testCasesPerQaPair: testCasesPerQaPair || 1 } : {}),
-    } as Dto;
+    } as EvaluationsPostData['body'];
 
     createEvaluationMutation.mutate(dto, {
       onSuccess: (evaluation) => {

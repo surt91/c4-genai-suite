@@ -1,4 +1,4 @@
-import { ChatInteractionDtoStatusEnum, MessageDto, SourceDto, StreamUIRequestDto } from 'src/api';
+import { ChatInteractionDto, MessageDto, SourceDto, StreamUIRequestDto } from 'src/api';
 
 type ToolCallStatus = 'running' | 'success' | 'error' | 'cancelled';
 
@@ -12,7 +12,7 @@ export type ToolCallState = {
   error?: string;
 };
 
-export type InteractionStatus = ChatInteractionDtoStatusEnum;
+export type InteractionStatus = ChatInteractionDto['status'];
 
 /** A request of the AI (form, confirmation or URL to open) shown in the answer while it is generated. */
 export type UIRequestState = {

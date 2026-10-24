@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { FileDto, FileDtoUploadStatusEnum } from 'src/api';
+import { FileDto } from 'src/api';
 import { render } from 'src/pages/admin/test-utils';
 import { Files } from 'src/pages/chat/files/Files';
 import { useFileIdSelector } from 'src/pages/chat/files/useFileIdSelector';
@@ -117,7 +117,7 @@ describe('The user files sidebar', () => {
       uploadedAt: new Date(),
       fileSize: 100,
       mimeType: 'text/plain',
-      uploadStatus: 'successful' as FileDtoUploadStatusEnum,
+      uploadStatus: 'successful' as const,
       externalDocumentId: 1,
     },
     {
@@ -126,7 +126,7 @@ describe('The user files sidebar', () => {
       uploadedAt: new Date(),
       fileSize: 100,
       mimeType: 'text/plain',
-      uploadStatus: 'successful' as FileDtoUploadStatusEnum,
+      uploadStatus: 'successful' as const,
       externalDocumentId: 2,
     },
   ];
@@ -138,7 +138,7 @@ describe('The user files sidebar', () => {
       uploadedAt: new Date(),
       fileSize: 100,
       mimeType: 'text/plain',
-      uploadStatus: 'successful' as FileDtoUploadStatusEnum,
+      uploadStatus: 'successful' as const,
       externalDocumentId: 1,
     },
     {
@@ -147,7 +147,7 @@ describe('The user files sidebar', () => {
       uploadedAt: new Date(),
       fileSize: 100,
       mimeType: 'text/plain',
-      uploadStatus: 'inProgress' as FileDtoUploadStatusEnum,
+      uploadStatus: 'inProgress' as const,
       externalDocumentId: 2,
     },
   ];

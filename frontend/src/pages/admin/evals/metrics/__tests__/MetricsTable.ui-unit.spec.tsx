@@ -12,7 +12,7 @@ const mockMetrics: Metric[] = [
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-02'),
     version: 1,
-    _configuration: {
+    configuration: {
       type: 'ANSWER_RELEVANCY',
       name: 'Test Metric 1',
       threshold: 0.7,
@@ -26,7 +26,7 @@ const mockMetrics: Metric[] = [
     createdAt: new Date('2024-01-03'),
     updatedAt: new Date('2024-01-04'),
     version: 1,
-    _configuration: {
+    configuration: {
       type: 'G_EVAL',
       name: 'Test Metric 2',
       threshold: 0.8,

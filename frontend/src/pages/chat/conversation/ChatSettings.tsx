@@ -26,12 +26,12 @@ type JSONValue = string | number | boolean | object | unknown[] | undefined;
 function getDefault(spec: ExtensionArgumentObjectSpecDtoPropertiesValue): JSONValue {
   switch (spec.type) {
     case 'array':
-      return spec._default ?? [];
+      return spec.default ?? [];
     case 'string':
-      return spec._default ?? '';
+      return spec.default ?? '';
     case 'number':
     case 'boolean':
-      return spec._default;
+      return spec.default;
     case 'object':
       return getInitialValuesFromSpec(spec);
   }
@@ -117,7 +117,7 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
   const valuesQueryKey = [`configuration:${configuration.id}:user-values:default`];
   const { data: fetchedValues } = useQuery({
     queryKey: valuesQueryKey,
-    queryFn: () => api.extensions.getConfigurationUserValues(configuration.id),
+    queryFn: () => api.extensions.getConfigurationUserValues({ id: configuration.id }),
     enabled: !!configurable,
   });
 
@@ -134,7 +134,7 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
 
   useEffect(() => {
     if (fetchedValues) {
-      valuesForm.setValues(fetchedValues.values);
+      valuesForm.setValues(fetchedValues.values as ExtensionContext);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedValues]);
@@ -142,7 +142,10 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
   const save = useMutation({
     mutationFn: async () => {
       if (configurable) {
-        await api.extensions.updateConfigurationUserValues(configuration.id, { values: valuesForm.getValues() });
+        await api.extensions.updateConfigurationUserValues({
+          id: configuration.id,
+          configurationUserValuesDto: { values: valuesForm.getValues() },
+        });
         void queryClient.invalidateQueries({ queryKey: valuesQueryKey });
       }
       if (extensionsWithFilter.length > 0) {

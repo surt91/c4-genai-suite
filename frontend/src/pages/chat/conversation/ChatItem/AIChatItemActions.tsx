@@ -2,7 +2,7 @@ import { ActionIcon, Alert, Button, Flex, Tooltip } from '@mantine/core';
 import { IconAlertCircle, IconCircleCheck, IconClipboard, IconThumbDown } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 import { useEffect, useRef, useState } from 'react';
-import { MessageDtoRatingEnum, ProfileDto } from 'src/api';
+import { MessageDto, ProfileDto } from 'src/api';
 import { Icon } from 'src/components';
 import { texts } from 'src/texts';
 import { useStateMutateMessageRating } from '../../state/chat';
@@ -12,12 +12,18 @@ interface AIChatItemActionsProps {
   tokenCount?: number;
   messageId: number;
   renderAlways?: boolean;
-  rating?: MessageDtoRatingEnum;
+  rating?: MessageDto['rating'];
   user: ProfileDto;
   copyTextToClipboard: () => void;
 }
 
-const RATINGS: MessageDtoRatingEnum[] = ['incorrect', 'instructions_not_followed', 'insufficient_style', 'lazy', 'refused'];
+const RATINGS: NonNullable<MessageDto['rating']>[] = [
+  'incorrect',
+  'instructions_not_followed',
+  'insufficient_style',
+  'lazy',
+  'refused',
+];
 
 const useVisibilityToggle = () => {
   const [isVisible, setIsVisible] = useState(false);

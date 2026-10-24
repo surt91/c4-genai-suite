@@ -213,8 +213,8 @@ export function Argument({
     );
   }
 
-  if (type === 'string' && argument._enum?.length) {
-    const options = argument._enum.map((x) => ({ value: x, label: x }));
+  if (type === 'string' && argument.enum?.length) {
+    const options = argument.enum.map((x) => ({ value: x, label: x }));
 
     return (
       <FormRow name={fieldName} label={title} hints={hints()}>
@@ -238,8 +238,8 @@ export function Argument({
   }
 
   if (type === 'array' && argument.items && argument.items.type === 'string') {
-    if (argument.items._enum) {
-      const options = argument.items._enum.map((x) => ({ value: x, label: x }));
+    if (argument.items.enum) {
+      const options = argument.items.enum.map((x) => ({ value: x, label: x }));
       return (
         <FormRow name={fieldName} label={title} hints={hints()}>
           <MultiSelect

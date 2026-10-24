@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
-import { AuthApi, ResponseError, useApi } from 'src/api';
+import { AppClient, ResponseError, useApi } from 'src/api';
 
 const useIsLoggedOut = () => {
   const api = useApi();
@@ -8,10 +8,11 @@ const useIsLoggedOut = () => {
     queryKey: ['is-logged-out'],
     queryFn: async () => {
       try {
-        await new AuthApi(api.configuration).getProfile();
+        // without the redirect to the login page of the default client
+        await new AppClient(api.url).auth.getProfile();
         return false;
       } catch (error) {
-        if (error instanceof ResponseError && error.response?.status === 401) {
+        if (error instanceof ResponseError && error.status === 401) {
           return true;
         }
         throw error;

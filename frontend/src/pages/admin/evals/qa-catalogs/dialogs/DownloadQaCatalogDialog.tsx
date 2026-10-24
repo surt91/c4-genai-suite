@@ -52,7 +52,7 @@ export function DownloadQaCatalogDialog({ catalogId, versions, onClose }: Downlo
         includeAll: values.versionSelection === 'all',
       };
 
-      return evalApi.qaCatalog.qaCatalogDownload(options);
+      return evalApi.qaCatalog.qaCatalogDownload({ downloadQaCatalogOptions: options });
     },
     onSuccess: (response) => {
       if (response.downloadUrl) {

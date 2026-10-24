@@ -13,7 +13,7 @@ export function TestButton({ form }: { form: UseFormReturnType<UpsertBucketDto> 
     mutationFn: () => {
       const values = form.getValues();
 
-      return api.files.testBucket(values);
+      return api.files.testBucket({ testBucketDto: values });
     },
     onSuccess: () => {
       toast.success(texts.files.testSuccess);

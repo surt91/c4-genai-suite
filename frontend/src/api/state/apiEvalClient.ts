@@ -1,14 +1,14 @@
 import {
-  Configuration,
   DashboardApi,
   EvaluationResultsApi,
   EvaluationsApi,
   LlmEndpointsApi,
   MetricsApi,
-  Middleware,
   QaCatalogApi,
 } from 'src/api/generated-eval';
+import { createClient } from 'src/api/generated-eval/client';
 import { useTransientNavigate } from 'src/hooks';
+import { configureClient } from './client';
 import { useEvalClientStore } from './zustand/evalClientStore';
 
 export function useEvalApi() {
@@ -24,19 +24,17 @@ export class EvalClient {
   public readonly metrics: MetricsApi;
   public readonly qaCatalog: QaCatalogApi;
 
-  public get url() {
-    return this.configuration.basePath;
-  }
-
   constructor(
-    readonly configuration: Configuration,
-    middleware: Middleware,
+    public readonly url: string,
+    onUnauthorized: () => void = () => {},
   ) {
-    this.dashboard = new DashboardApi(configuration).withMiddleware(middleware);
-    this.evaluationResults = new EvaluationResultsApi(configuration).withMiddleware(middleware);
-    this.evaluations = new EvaluationsApi(configuration).withMiddleware(middleware);
-    this.llmEndpoints = new LlmEndpointsApi(configuration).withMiddleware(middleware);
-    this.metrics = new MetricsApi(configuration).withMiddleware(middleware);
-    this.qaCatalog = new QaCatalogApi(configuration).withMiddleware(middleware);
+    const client = configureClient(createClient({ baseUrl: url }), onUnauthorized);
+
+    this.dashboard = new DashboardApi({ client });
+    this.evaluationResults = new EvaluationResultsApi({ client });
+    this.evaluations = new EvaluationsApi({ client });
+    this.llmEndpoints = new LlmEndpointsApi({ client });
+    this.metrics = new MetricsApi({ client });
+    this.qaCatalog = new QaCatalogApi({ client });
   }
 }

@@ -42,7 +42,7 @@ export function ExtensionsPage() {
 
   const { data: configuration } = useQuery({
     queryKey: ['configuration', configurationId],
-    queryFn: () => api.extensions.getConfiguration(configurationId),
+    queryFn: () => api.extensions.getConfiguration({ id: configurationId }),
   });
 
   /* eslint-disable react-hooks/set-state-in-effect -- Keeping previous value during refetch avoids UI flicker */
@@ -58,7 +58,7 @@ export function ExtensionsPage() {
 
   const deletingConfiguration = useMutation({
     mutationFn: (configuration: ConfigurationDto) => {
-      return api.extensions.deleteConfiguration(configuration.id);
+      return api.extensions.deleteConfiguration({ id: configuration.id });
     },
     onSuccess: (_, configuration) => {
       removeConfiguration(configuration.id);
@@ -71,7 +71,7 @@ export function ExtensionsPage() {
 
   const duplicateConfiguration = useMutation({
     mutationFn: (configuration: ConfigurationDto) => {
-      return api.extensions.duplicateConfiguration(configuration.id);
+      return api.extensions.duplicateConfiguration({ id: configuration.id });
     },
     onSuccess: (configuration) => {
       setConfiguration(configuration);
@@ -93,7 +93,7 @@ export function ExtensionsPage() {
 
   const { data: loadedExtensions, isFetched } = useQuery({
     queryKey: ['extensions', configurationId],
-    queryFn: () => api.extensions.getExtensions(configurationId),
+    queryFn: () => api.extensions.getExtensions({ id: configurationId }),
   });
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export function ExtensionsPage() {
 
   const deleting = useMutation({
     mutationFn: (extension: ExtensionDto) => {
-      return api.extensions.deleteExtension(configurationId, extension.id);
+      return api.extensions.deleteExtension({ id: configurationId, extensionId: extension.id });
     },
     onSuccess: (_, extension) => {
       removeExtension(extension.id);

@@ -4,16 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import {
   ChatUICallbackResultDto,
   ConversationDto,
-  ConversationDtoRatingEnum,
   FileDto,
-  MessageDtoRatingEnum,
+  MessageDto,
   ResponseError,
-  StreamMessageSavedDtoMessageTypeEnum,
+  StreamMessageSavedDto,
   UpdateConversationDto,
   useApi,
 } from 'src/api';
 import { redirectToLogin } from 'src/api/state/redirectToLogin';
-import { SseResponseError } from 'src/api/state/sse';
 import { toast } from 'src/lib/notifications';
 
 import { texts } from 'src/texts';
@@ -33,11 +31,11 @@ function upsertToolCall(toolCalls: ToolCallState[] | undefined, update: ToolCall
   return existing.map((t) => (t.id === update.id ? { ...t, ...update, error: update.error ?? t.error } : t));
 }
 
-const responseStatus = (error: unknown) => (error instanceof ResponseError ? error.response.status : undefined);
+const responseStatus = (error: unknown) => (error instanceof ResponseError ? error.status : undefined);
 
 /** The message shown in the answer when the request of the chat failed (before or while streaming). */
 function streamErrorMessage(error: unknown) {
-  if (error instanceof SseResponseError) {
+  if (error instanceof ResponseError) {
     return error.serverMessage ? `${texts.chat.sendFailed}: ${error.serverMessage}` : `${texts.chat.sendFailed}.`;
   }
   // fetch and the stream reader reject with a TypeError when the connection fails
@@ -47,7 +45,7 @@ function streamErrorMessage(error: unknown) {
   return error instanceof Error && error.message ? `${texts.chat.sendFailed}: ${error.message}` : `${texts.chat.sendFailed}.`;
 }
 
-const getMessagePlaceholderId = (messageType: StreamMessageSavedDtoMessageTypeEnum) => {
+const getMessagePlaceholderId = (messageType: StreamMessageSavedDto['messageType']) => {
   return messageType === 'ai' ? -1 : 0;
 };
 
@@ -74,8 +72,8 @@ export const useChatStream = (chatId: number) => {
     queryKey: ['chat', chatId],
     queryFn: async () => {
       return {
-        chat: await api.conversations.getConversation(chatId),
-        messages: await api.conversations.getMessages(chatId),
+        chat: await api.conversations.getConversation({ id: chatId }),
+        messages: await api.conversations.getMessages({ id: chatId }),
       };
     },
     refetchOnWindowFocus: false,
@@ -222,14 +220,14 @@ export const useChatStream = (chatId: number) => {
           case 'ui_update':
             return chatStore.updateRequest(chatId, msg.update.id, {
               status: msg.update.status,
-              ...(msg.update.data ? { data: msg.update.data as Record<string, unknown> } : {}),
+              ...(msg.update.data ? { data: msg.update.data } : {}),
             });
           case 'summary':
             refetchChats();
         }
       },
       error: (error) => {
-        if (error instanceof SseResponseError && error.status === 401) {
+        if (error instanceof ResponseError && error.status === 401) {
           // the session expired, like for all other requests
           redirectToLogin((to) => void navigate(to));
         }
@@ -254,7 +252,7 @@ export const useChatStream = (chatId: number) => {
   const stopMessage = () => {
     if (useChatStore.getState().stopActiveStream(chatId)) {
       // The server stores the partial answer. Load it to get the real message IDs (e.g. to rate the answer).
-      void loadStoppedMessages(chatId, () => api.conversations.getMessages(chatId));
+      void loadStoppedMessages(chatId, () => api.conversations.getMessages({ id: chatId }));
     }
   };
 
@@ -295,7 +293,7 @@ export const useStateMutateChat = (chatId: number) => {
 
   return useMutation({
     mutationFn: (conversionUpdate: UpdateConversationDto) => {
-      return api.conversations.patchConversation(chatId, conversionUpdate);
+      return api.conversations.patchConversation({ id: chatId, updateConversationDto: conversionUpdate });
     },
     onSuccess: (updatedChat) => {
       setChat(chatId, updatedChat);
@@ -314,12 +312,12 @@ export const useConfirmAiAction = (requestId: string) => {
 
   return useMutation({
     mutationFn: ({ result }: { result: ChatUICallbackResultDto; status: InteractionStatus }) => {
-      return api.conversations.confirm(currentChatId, requestId, result);
+      return api.conversations.confirm({ id: currentChatId, requestId, chatUiCallbackResultDto: result });
     },
     onSuccess: (_, { result, status }) => {
       updateRequest(currentChatId, requestId, {
         status,
-        ...(result.data ? { data: result.data as Record<string, unknown> } : {}),
+        ...(result.data ? { data: result.data } : {}),
       });
     },
   });
@@ -335,8 +333,8 @@ export const useStateOfIsWaitingForUser = (chatId?: number) =>
 export const useStateMutateChatRating = (chatId: number) => {
   const api = useApi();
   return useMutation({
-    mutationFn: (rating: ConversationDtoRatingEnum) => {
-      return api.conversations.patchConversation(chatId, { rating });
+    mutationFn: (rating: NonNullable<ConversationDto['rating']>) => {
+      return api.conversations.patchConversation({ id: chatId, updateConversationDto: { rating } });
     },
   });
 };
@@ -347,9 +345,9 @@ export const useStateMutateMessageRating = (messageId: number) => {
   const updateMessage = useChatStore((s) => s.updateMessage);
 
   return useMutation({
-    mutationFn: async (rating: MessageDtoRatingEnum) => {
+    mutationFn: async (rating: NonNullable<MessageDto['rating']>) => {
       if (chatId) {
-        await api.conversations.rateMessage(chatId, messageId, { rating });
+        await api.conversations.rateMessage({ id: chatId, messageId, rateMessageDto: { rating } });
       }
     },
     onSuccess: (_, rating) => {

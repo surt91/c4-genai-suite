@@ -31,7 +31,6 @@ export function useListValues(spec: ExtensionSpecDto, buckets: BucketDto[], exte
         continue;
       }
 
-      /* eslint-disable @typescript-eslint/no-unsafe-assignment */
       const value = extension.values[name];
 
       if (value) {
@@ -44,7 +43,8 @@ export function useListValues(spec: ExtensionSpecDto, buckets: BucketDto[], exte
         } else if (arg.type === 'boolean') {
           result.push(`${arg.title}: ${value ? texts.common.yes : texts.common.no}`);
         } else {
-          result.push(`${value}`);
+          // the values are not typed in the API, they are shown as they are stringified
+          result.push(`${value as string}`);
         }
       }
     }
@@ -55,7 +55,7 @@ export function useListValues(spec: ExtensionSpecDto, buckets: BucketDto[], exte
 
 function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | undefined {
   if (arg.type === 'number') {
-    const defaultValue = typeof arg._default === 'number' ? arg._default : undefined;
+    const defaultValue = typeof arg.default === 'number' ? arg.default : undefined;
     let baseType = z.number();
 
     if (arg.minimum != null && typeof arg.minimum === 'number') {
@@ -74,7 +74,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 
     return type;
   } else if (arg.type === 'boolean') {
-    const defaultValue = typeof arg._default === 'boolean' ? arg._default : undefined;
+    const defaultValue = typeof arg.default === 'boolean' ? arg.default : undefined;
     const type = defaultValue !== undefined ? z.boolean().default(defaultValue) : z.boolean();
 
     if (!arg.required) {
@@ -83,7 +83,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
 
     return type;
   } else if (arg.type === 'string') {
-    const defaultValue = typeof arg._default === 'string' ? arg._default : undefined;
+    const defaultValue = typeof arg.default === 'string' ? arg.default : undefined;
     let baseType = z.string();
 
     if (arg.format === 'email') {
@@ -109,7 +109,7 @@ function getType(arg: ExtensionUserInfoDtoUserArgumentsValue): z.ZodTypeAny | un
       return;
     }
 
-    const defaultValue = Array.isArray(arg._default) ? arg._default : undefined;
+    const defaultValue = Array.isArray(arg.default) ? arg.default : undefined;
     const arrayType = defaultValue !== undefined ? z.array(itemType).default(defaultValue) : z.array(itemType);
 
     if (!arg.required) {

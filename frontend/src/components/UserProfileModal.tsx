@@ -53,7 +53,7 @@ export function UserProfileModal({ isOpen, onClose, canChangePassword }: UserPro
         password: request.password!,
         currentPassword: request.currentPassword!,
       };
-      return api.users.putMyPassword(payload);
+      return api.users.putMyPassword({ changePasswordDto: payload });
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({

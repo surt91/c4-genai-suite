@@ -46,7 +46,7 @@ export function DeleteMetricDialog({ metric, onClose, onDeleted }: DeleteMetricD
           </fieldset>
         }
       >
-        <Text c="gray.8">{texts.evals.metric.deleteConfirmText(metric._configuration.name)}</Text>
+        <Text c="gray.8">{texts.evals.metric.deleteConfirmText(metric.configuration.name)}</Text>
       </Modal>
     </Portal>
   );

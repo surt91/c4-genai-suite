@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
-import { BucketDto, FileDto, InitOverrideFunction } from 'src/api';
+import { BucketDto, FileDto } from 'src/api';
 import { buildError } from 'src/lib';
 import { toast } from 'src/lib/notifications';
 import { texts } from 'src/texts';
@@ -53,7 +53,7 @@ export function useDeletingFile({ bucketId, apiCall, removeFile, setRowSelection
 }
 
 type UseDeletingBucketProps = {
-  apiCall: (id: number, initOverrides?: RequestInit | InitOverrideFunction) => Promise<void>;
+  apiCall: (id: number) => Promise<unknown>;
   removeBucket: (id: number) => void;
   navigation: () => void;
 };

@@ -34,7 +34,7 @@ export function CreateUserGroupDialog({ onClose, onCreate }: CreateUserGroupDial
 
   const updating = useMutation({
     mutationFn: (request: UpsertUserGroupDto) => {
-      return api.users.postUserGroup(request);
+      return api.users.postUserGroup({ upsertUserGroupDto: request });
     },
     onSuccess: (response) => {
       onCreate(response);

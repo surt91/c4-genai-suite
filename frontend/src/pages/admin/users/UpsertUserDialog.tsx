@@ -100,7 +100,7 @@ function UpsertUserDialog(props: UpsertUserDialogProps) {
   }, [userGroups]);
 
   const form = useForm<UpsertUserDto>({
-    validate: zod4Resolver(createScheme()) as unknown as (values: UpsertUserDto) => Record<string, string | null>,
+    validate: zod4Resolver(createScheme()),
     initialValues: defaultValues,
     mode: 'controlled',
   });

@@ -39,7 +39,10 @@ export function UploadQaCatalogDialog({ catalogId, onClose, onSuccess }: UploadQ
   const uploadMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       // Use the generated API client method directly
-      return await evalApi.qaCatalog.qaCatalogUpdate(catalogId, values.file);
+      return await evalApi.qaCatalog.qaCatalogUpdate({
+        catalog_id: catalogId,
+        bodyUpdateV1QaCatalogCatalogIdUploadPut: { file: values.file },
+      });
     },
     onSuccess: () => {
       toast.success(texts.evals.qaCatalog.uploadSuccess);

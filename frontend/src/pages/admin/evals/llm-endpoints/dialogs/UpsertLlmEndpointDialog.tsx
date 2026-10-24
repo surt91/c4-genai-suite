@@ -166,9 +166,9 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
     }
 
     // Update mode - initialize from existing endpoint
-    const config = props.target._configuration;
+    const config = props.target.configuration;
     const base = {
-      type: config.type as 'OPENAI' | 'AZURE_OPENAI',
+      type: config.type,
       name: props.target.name,
       parallelQueries: config.parallelQueries,
       maxRetries: config.maxRetries,
@@ -198,7 +198,8 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
       endpoint: config.endpoint,
       deployment: config.deployment,
       apiVersion: config.apiVersion,
-      temperature: config.temperature,
+      // not part of the Azure read model of the spec
+      temperature: (config as { temperature?: number | null }).temperature,
       language: config.language,
       // OpenAI defaults (unused)
       baseUrl: '',
@@ -256,7 +257,7 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
     if (isCreating) {
       const payload: LLMEndpointCreate = {
         name,
-        _configuration: configuration as LLMEndpointConfigurationCreate,
+        configuration: configuration as LLMEndpointConfigurationCreate,
       };
       createMutation.mutate(payload, {
         onSuccess: () => {
@@ -268,7 +269,7 @@ function UpsertLlmEndpointDialog(props: UpsertLlmEndpointDialogProps) {
       const payload: LLMEndpointUpdate = {
         name,
         version: props.target.version,
-        _configuration: configuration as LLMEndpointConfigurationUpdate,
+        configuration: configuration as LLMEndpointConfigurationUpdate,
       };
       updateMutation.mutate(
         { id: props.target.id, data: payload },

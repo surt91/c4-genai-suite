@@ -14,7 +14,13 @@ export function useEvaluations(page: number, limit = PAGE_SIZE, query?: string, 
   return useQuery({
     queryKey: ['evaluations', page, limit, query, fromDate, toDate],
     queryFn: () =>
-      evalApi.evaluations.evaluationsGetAll(query || undefined, fromDate || undefined, toDate || undefined, offset, limit),
+      evalApi.evaluations.evaluationsGetAll({
+        query: query || undefined,
+        from_date: fromDate || undefined,
+        to_date: toDate || undefined,
+        offset,
+        limit,
+      }),
   });
 }
 
@@ -26,7 +32,7 @@ export function useEvaluation(id?: string) {
 
   return useQuery({
     queryKey: ['evaluation', id],
-    queryFn: () => evalApi.evaluations.evaluationsGet(id!),
+    queryFn: () => evalApi.evaluations.evaluationsGet({ evaluation_id: id! }),
     enabled: !!id,
   });
 }
@@ -45,7 +51,7 @@ export function useEvaluationSummary(id?: string) {
 
   return useQuery({
     queryKey: ['evaluationSummary', id],
-    queryFn: () => evalApi.evaluations.evaluationsGetEvaluationDetailSummary(id!),
+    queryFn: () => evalApi.evaluations.evaluationsGetEvaluationDetailSummary({ evaluation_id: id! }),
     enabled: !!id,
     // the evaluation runs in the background (also while it waits to be started)
     refetchInterval: (query) => (isEvaluationActive(query.state.data?.status) ? EVALUATION_POLL_INTERVAL : false),

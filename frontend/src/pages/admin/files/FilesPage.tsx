@@ -7,7 +7,7 @@ import { formatDate } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
-import { BucketDtoTypeEnum, FileDto, useApi } from 'src/api';
+import { FileDto, useApi } from 'src/api';
 import { ConfirmDialog, fileTableFeatures, FilterableTable, InfoByte, Search, TablePagination } from 'src/components';
 import { useEventCallback, useTransientNavigate } from 'src/hooks';
 import { formatFileSize } from 'src/lib';
@@ -45,14 +45,14 @@ export function FilesPage() {
 
   const { data: bucket } = useQuery({
     queryKey: ['bucket', bucketId],
-    queryFn: () => api.files.getBucket(bucketId),
+    queryFn: () => api.files.getBucket({ id: bucketId }),
   });
 
   // the bucket from the store, so that it shows the changes after editing
   const thisBucket = (bucket && buckets.find((b) => b.id == bucket.id)) || null;
 
   const deletingBucket = useDeletingBucket({
-    apiCall: (id) => api.files.deleteBucket(id),
+    apiCall: (id) => api.files.deleteBucket({ id }),
     removeBucket,
     navigation: () => navigate('/admin/files/'),
   });
@@ -64,7 +64,7 @@ export function FilesPage() {
   const { data: loadedFiles } = useQuery({
     // we need to requery when the total changed (because we uploaded/deleted one)
     queryKey: ['files', bucketId],
-    queryFn: () => api.files.getFiles(bucketId),
+    queryFn: () => api.files.getFiles({ id: bucketId }),
   });
 
   useEffect(() => {
@@ -75,14 +75,14 @@ export function FilesPage() {
 
   const upload = useUploadingFile({
     bucketId,
-    apiCall: (bucketId, file) => api.files.postFile(bucketId, file),
+    apiCall: (bucketId, file) => api.files.postFile({ id: bucketId, file }),
     setUploading,
     setFile,
   });
 
   const deleting = useDeletingFile({
     bucketId,
-    apiCall: (bucketId, fileId) => api.files.deleteFile(bucketId, fileId),
+    apiCall: (bucketId, fileId) => api.files.deleteFile({ id: bucketId, fileId }),
     removeFile,
     setRowSelection,
   });
@@ -209,17 +209,15 @@ export function FilesPage() {
               </Group>
             </div>
             <div className={classes.infos}>
-              {thisBucket.type === BucketDtoTypeEnum.General && <InfoByte title={texts.files.bucketType} value={'General'} />}
-              {thisBucket.type === BucketDtoTypeEnum.Conversation && <InfoByte title={texts.files.bucketType} value={'Chat'} />}
-              {thisBucket.type === BucketDtoTypeEnum.User && (
-                <InfoByte title={texts.files.bucketType} value={texts.common.userBucketBadge} />
-              )}
+              {thisBucket.type === 'general' && <InfoByte title={texts.files.bucketType} value={'General'} />}
+              {thisBucket.type === 'conversation' && <InfoByte title={texts.files.bucketType} value={'Chat'} />}
+              {thisBucket.type === 'user' && <InfoByte title={texts.files.bucketType} value={texts.common.userBucketBadge} />}
               <InfoByte title={texts.common.endpoint} value={thisBucket.endpoint} />
               {thisBucket.indexName && <InfoByte title={texts.common.indexName} value={thisBucket.indexName} />}
             </div>
             <div className={classes.sectionHeader}>
               <h2 className={classes.sectionTitle}>{texts.files.headlineSearchable}</h2>
-              {thisBucket.type !== BucketDtoTypeEnum.User && thisBucket.type !== BucketDtoTypeEnum.Conversation && (
+              {thisBucket.type !== 'user' && thisBucket.type !== 'conversation' && (
                 <ActionIcon
                   onClick={open}
                   disabled={isDragActive || uploading.length > 0}
@@ -244,7 +242,7 @@ export function FilesPage() {
               />
             </Group>
 
-            {thisBucket?.type !== BucketDtoTypeEnum.User && thisBucket?.type !== BucketDtoTypeEnum.Conversation ? (
+            {thisBucket?.type !== 'user' && thisBucket?.type !== 'conversation' ? (
               <div className={isDragActive ? classes.dropActive : undefined} {...getRootProps()}>
                 <input {...getInputProps()} />
                 <FilterableTable table={table} />

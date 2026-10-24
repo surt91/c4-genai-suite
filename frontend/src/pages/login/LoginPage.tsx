@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { useMutation } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { AuthSettingsDto, useApi } from 'src/api';
-import { LoginDto, ResponseError } from 'src/api/generated';
+import { LoginDto, ResponseError } from 'src/api';
 import { Logo } from 'src/components';
 import { Theme, useLoginUrl, useTheme, useTransientLinkBuilder } from 'src/hooks';
 import { useAuthSettings } from 'src/hooks/useAuthSettings';
@@ -95,7 +95,7 @@ function LoginForm() {
   const buildLink = useTransientLinkBuilder();
   const login = useMutation({
     mutationFn: (request: LoginDto) => {
-      return api.auth.login(request);
+      return api.auth.login({ loginDto: request });
     },
     onSuccess: () => {
       // A full page load: the caches and stores may still contain the data of the previous user (session expired).
@@ -116,7 +116,7 @@ function LoginForm() {
       {/* Error Message Placeholder */}
       {login.isError && (
         <Alert variant="filled" color="red.4" mb={16}>
-          {login.error instanceof ResponseError && login.error.response.status === 403
+          {login.error instanceof ResponseError && login.error.status === 403
             ? texts.common.loginForbidden
             : texts.common.loginFailed}
         </Alert>

@@ -13,7 +13,13 @@ export function useLlmEndpoints(page: number, query?: string, supportedFeatures?
 
   return useQuery({
     queryKey: ['llmEndpoints', page, query, supportedFeatures],
-    queryFn: () => evalApi.llmEndpoints.llmEndpointsGetAll(query || undefined, supportedFeatures || undefined, offset, PAGE_SIZE),
+    queryFn: () =>
+      evalApi.llmEndpoints.llmEndpointsGetAll({
+        q: query || undefined,
+        supported_features: supportedFeatures || undefined,
+        offset,
+        limit: PAGE_SIZE,
+      }),
   });
 }
 
@@ -26,7 +32,7 @@ export function useLlmEndpoint(id?: string) {
 
   return useQuery({
     queryKey: ['llmEndpoint', id],
-    queryFn: () => evalApi.llmEndpoints.llmEndpointsGet(id!),
+    queryFn: () => evalApi.llmEndpoints.llmEndpointsGet({ llm_endpoint_id: id! }),
     enabled: !!id,
   });
 }

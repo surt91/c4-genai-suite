@@ -13,7 +13,7 @@ const mockMetric: Metric = {
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-02'),
   version: 1,
-  _configuration: {
+  configuration: {
     type: 'ANSWER_RELEVANCY',
     name: 'Test Metric',
     threshold: 0.7,

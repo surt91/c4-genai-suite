@@ -7,7 +7,7 @@ import { texts } from 'src/texts';
 export function useDeleteUserGroup(api: AppClient, target: UserGroupDto, onDelete: (id: string) => void, onClose: () => void) {
   const { mutate, error, isPending } = useMutation({
     mutationFn: () => {
-      return api.users.deleteUserGroup(target.id);
+      return api.users.deleteUserGroup({ id: target.id });
     },
     onSuccess: () => {
       onDelete(target.id);

@@ -43,7 +43,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
   const rebuild = useMutation({
     mutationFn: (values: TestExtensionDto) => {
-      return api.extensions.rebuildExtension({ ...values, id: selected?.id });
+      return api.extensions.rebuildExtension({ testExtensionDto: { ...values, id: selected?.id } });
     },
     onSuccess: (extension) => {
       setSpec(extension.spec);
@@ -54,7 +54,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
   const updating = useMutation({
     mutationFn: (request: UpdateExtensionDto) => {
-      return api.extensions.putExtension(configurationId, selected!.id, { ...request });
+      return api.extensions.putExtension({ id: configurationId, extensionId: selected!.id, updateExtensionDto: { ...request } });
     },
     onSuccess: (response) => {
       onUpdate(response);
@@ -65,7 +65,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
   const creating = useMutation({
     mutationFn: (request: CreateExtensionDto) => {
-      return api.extensions.postExtension(configurationId, { ...request, name: spec!.name });
+      return api.extensions.postExtension({ id: configurationId, createExtensionDto: { ...request, name: spec!.name } });
     },
     onSuccess: (response) => {
       onCreate(response);
@@ -76,7 +76,7 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
 
   const deleting = useMutation({
     mutationFn: () => {
-      return selected ? api.extensions.deleteExtension(configurationId, selected.id) : Promise.resolve();
+      return selected ? api.extensions.deleteExtension({ id: configurationId, extensionId: selected.id }) : Promise.resolve();
     },
     onSuccess: () => {
       setSpecChanged(false);
@@ -104,15 +104,15 @@ export function UpsertExtensionDialog(props: UpsertExtensionDialogProps) {
   }, [spec, selected, rebuild, form]);
   // Recursively initialize a value for a given argument spec
   type SchemaArg = {
-    _default?: unknown;
+    default?: unknown;
     type?: string;
     properties?: Record<string, SchemaArg>;
   };
 
   function getInitialValue(arg: SchemaArg): unknown {
     if (typeof arg !== 'object' || arg === null) return undefined;
-    if (Object.prototype.hasOwnProperty.call(arg, '_default') && arg._default !== undefined) {
-      return arg._default;
+    if (Object.prototype.hasOwnProperty.call(arg, 'default') && arg.default !== undefined) {
+      return arg.default;
     }
     if (arg.type === 'object' && arg.properties) {
       const obj: Record<string, unknown> = {};

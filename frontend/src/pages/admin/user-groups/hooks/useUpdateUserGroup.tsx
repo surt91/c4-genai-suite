@@ -10,7 +10,7 @@ export function useUpdateUserGroup(
 ) {
   const { mutate, error, isPending } = useMutation({
     mutationFn: (request: UpsertUserGroupDto) => {
-      return api.users.putUserGroup(target.id, request);
+      return api.users.putUserGroup({ id: target.id, upsertUserGroupDto: request });
     },
     onSuccess: (response) => {
       onUpdate(response);

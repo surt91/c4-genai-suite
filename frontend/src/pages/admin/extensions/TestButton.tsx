@@ -14,7 +14,7 @@ export function TestButton(props: TestButtonProps) {
   const api = useApi();
   const testing = useMutation({
     mutationFn: (values: CreateExtensionDto) => {
-      return api.extensions.testExtension({ ...values, id: extensionId });
+      return api.extensions.testExtension({ testExtensionDto: { ...values, id: extensionId } });
     },
     onSuccess: () => {
       toast.success(texts.extensions.testSuccess);

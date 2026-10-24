@@ -41,7 +41,7 @@ export function ConfigurationPage() {
 
   const deleting = useMutation({
     mutationFn: (configuration: ConfigurationDto) => {
-      return api.extensions.deleteConfiguration(configuration.id);
+      return api.extensions.deleteConfiguration({ id: configuration.id });
     },
     onSuccess: (_, configuration) => {
       removeConfiguration(configuration.id);
@@ -54,7 +54,7 @@ export function ConfigurationPage() {
 
   const duplicate = useMutation({
     mutationFn: (configuration: ConfigurationDto) => {
-      return api.extensions.duplicateConfiguration(configuration.id);
+      return api.extensions.duplicateConfiguration({ id: configuration.id });
     },
     onSuccess: (configuration) => {
       setConfiguration(configuration);
@@ -67,10 +67,10 @@ export function ConfigurationPage() {
 
   const importConfig = useMutation({
     mutationFn: (data: ExportedConfigurationDto) => {
-      return api.extensions.importConfiguration({ data });
+      return api.extensions.importConfiguration({ importConfigurationDto: { data } });
     },
     onSuccess: (result) => {
-      const configuration = result._configuration;
+      const configuration = result.configuration;
       setConfiguration(configuration);
       setToUpdate(configuration);
 

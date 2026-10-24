@@ -18,7 +18,7 @@ export const useChatDropzone = () => {
     mutationKey: ['upload-files-in-chat'],
     mutationFn: async (data: { file: File; extensionId: number }) => {
       const file = data.file;
-      return api.files.postUserFile(data.extensionId, chatId, file);
+      return api.files.postUserFile({ extensionId: data.extensionId, conversationId: chatId, file });
     },
     onError: async (error, uploadedFile) => {
       toast.error(await buildError(`${texts.files.uploadFailed} '${uploadedFile.file.name}'`, error));

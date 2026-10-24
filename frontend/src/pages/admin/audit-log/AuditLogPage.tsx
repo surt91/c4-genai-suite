@@ -5,7 +5,7 @@ import { create } from 'jsondiffpatch';
 import { format as formatHtmlDiff } from 'jsondiffpatch/formatters/html';
 import { useCallback, useMemo, useState } from 'react';
 import { useApi } from 'src/api';
-import { AuditLogDetailDto, AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
+import { AuditLogDetailDto, AuditLogDto, GetAuditLogsData } from 'src/api';
 import { Page, Pagination, RowButton } from 'src/components';
 import { texts } from 'src/texts';
 import classes from './AuditLogPage.module.css';
@@ -200,7 +200,7 @@ function truncateId(id: string, length: number = 6): string {
 export function AuditLogPage() {
   const api = useApi();
   const [page, setPage] = useState(0);
-  const [entityTypeFilter, setEntityTypeFilter] = useState<GetAuditLogsEntityTypeEnum | undefined>(undefined);
+  const [entityTypeFilter, setEntityTypeFilter] = useState<NonNullable<GetAuditLogsData['query']>['entityType']>(undefined);
   const [configurationFilter, setConfigurationFilter] = useState<number | undefined>(undefined);
   const [selectedLog, setSelectedLog] = useState<AuditLogDto | null>(null);
 
@@ -212,19 +212,18 @@ export function AuditLogPage() {
   const { data: auditLogs, isFetched } = useQuery({
     queryKey: ['auditLogs', page, entityTypeFilter, configurationFilter],
     queryFn: () =>
-      api.auditLogs.getAuditLogs(
-        configurationFilter ? undefined : entityTypeFilter,
-        undefined,
-        configurationFilter,
+      api.auditLogs.getAuditLogs({
+        entityType: configurationFilter ? undefined : entityTypeFilter,
+        configurationId: configurationFilter,
         page,
-        PAGE_SIZE,
-      ),
+        pageSize: PAGE_SIZE,
+      }),
   });
 
   // Fetch the selected log with its previous snapshot for diff
   const { data: selectedLogDetail } = useQuery({
     queryKey: ['auditLogDetail', selectedLog?.id],
-    queryFn: () => api.auditLogs.getAuditLogById(selectedLog!.id),
+    queryFn: () => api.auditLogs.getAuditLogById({ id: selectedLog!.id }),
     enabled: !!selectedLog,
   });
 
@@ -235,7 +234,7 @@ export function AuditLogPage() {
   const handleFilterChange = useCallback((value: string | null) => {
     // Normalize '' (the "All Types" sentinel) and null both to undefined so no
     // invalid enum value is kept in state or forwarded to the backend.
-    setEntityTypeFilter((value || undefined) as GetAuditLogsEntityTypeEnum | undefined);
+    setEntityTypeFilter((value || undefined) as NonNullable<GetAuditLogsData['query']>['entityType']);
     setPage(0);
   }, []);
 

@@ -12,7 +12,7 @@ export function useMetrics(page: number, query?: string) {
 
   return useQuery({
     queryKey: ['metrics', page, query],
-    queryFn: () => evalApi.metrics.metricsGetAll(offset, PAGE_SIZE),
+    queryFn: () => evalApi.metrics.metricsGetAll({ offset, limit: PAGE_SIZE }),
   });
 }
 
@@ -24,7 +24,7 @@ export function useMetric(id?: string) {
 
   return useQuery({
     queryKey: ['metric', id],
-    queryFn: () => evalApi.metrics.metricsGet(id!),
+    queryFn: () => evalApi.metrics.metricsGet({ metric_id: id! }),
     enabled: !!id,
   });
 }

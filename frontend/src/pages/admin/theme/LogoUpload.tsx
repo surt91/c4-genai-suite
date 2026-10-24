@@ -21,7 +21,7 @@ export function LogoUpload({ imageType }: LogoUploadProps) {
 
   const updating = useMutation({
     mutationFn: (request: File) => {
-      return api.settings.postImage(imageType, request);
+      return api.settings.postImage({ imageType, file: request });
     },
     onSuccess: () => {
       refetch();
@@ -35,7 +35,7 @@ export function LogoUpload({ imageType }: LogoUploadProps) {
 
   const deleting = useMutation({
     mutationFn: () => {
-      return api.settings.deleteLogo(imageType);
+      return api.settings.deleteLogo({ imageType });
     },
     onSuccess: () => {
       refetch();

@@ -19,10 +19,10 @@ describe('UpsertBucketDialog', () => {
     render(<UpsertBucketDialog onClose={vi.fn()} onCreate={vi.fn()} onUpdate={vi.fn()} />);
 
     fireEvent.change(screen.getByLabelText(texts.common.endpoint, { exact: false }), { target: { value: 'http://reis' } });
-    await waitFor(() => expect(getFileTypes).toHaveBeenCalledWith('http://reis', ''));
+    await waitFor(() => expect(getFileTypes).toHaveBeenCalledWith({ endpoint: 'http://reis', headers: '' }));
     fireEvent.change(screen.getByLabelText(texts.common.headers, { exact: false }), { target: { value: 'x-api-key=secret' } });
 
-    await waitFor(() => expect(getFileTypes).toHaveBeenLastCalledWith('http://reis', 'x-api-key=secret'));
+    await waitFor(() => expect(getFileTypes).toHaveBeenLastCalledWith({ endpoint: 'http://reis', headers: 'x-api-key=secret' }));
   });
 });
 

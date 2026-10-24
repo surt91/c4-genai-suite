@@ -1,21 +1,21 @@
 import {
   AuditLogsApi,
   AuthApi,
-  Configuration,
   ConversationApi,
   EvalApi,
   ExtensionsApi,
   FilesApi,
-  Middleware,
   SendMessageDto,
   SettingsApi,
-  StreamEventDto,
   TranscriptionApi,
   UsagesApi,
   UsersApi,
 } from 'src/api/generated';
+import { createClient } from 'src/api/generated/client';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
+import { StreamEventDto } from '../types';
+import { configureClient } from './client';
 import { fetchEventStream } from './sse';
 import { useAppClientStore } from './zustand/appClientStore';
 
@@ -37,35 +37,27 @@ export class AppClient {
   public readonly usages: UsagesApi;
   public readonly users: UsersApi;
 
-  public get url() {
-    return this.configuration.basePath;
-  }
-
+  /**
+   * @param url The URL of the server (empty for the same origin).
+   * @param onUnauthorized Called on 401 responses (except for the answer stream).
+   */
   constructor(
-    readonly configuration: Configuration,
-    middleware: Middleware,
+    public readonly url: string,
+    onUnauthorized: () => void = () => {},
   ) {
-    this.stream = new StreamApi(configuration);
+    const client = configureClient(createClient({ baseUrl: url }), onUnauthorized);
 
-    this.auditLogs = new AuditLogsApi(configuration).withMiddleware(middleware);
-
-    this.auth = new AuthApi(configuration).withMiddleware(middleware);
-
-    this.conversations = new ConversationApi(configuration).withMiddleware(middleware);
-
-    this.eval = new EvalApi(configuration).withMiddleware(middleware);
-
-    this.extensions = new ExtensionsApi(configuration).withMiddleware(middleware);
-
-    this.files = new FilesApi(configuration).withMiddleware(middleware);
-
-    this.settings = new SettingsApi(configuration).withMiddleware(middleware);
-
-    this.transcription = new TranscriptionApi(configuration).withMiddleware(middleware);
-
-    this.usages = new UsagesApi(configuration).withMiddleware(middleware);
-
-    this.users = new UsersApi(configuration).withMiddleware(middleware);
+    this.stream = new StreamApi(url);
+    this.auditLogs = new AuditLogsApi({ client });
+    this.auth = new AuthApi({ client });
+    this.conversations = new ConversationApi({ client });
+    this.eval = new EvalApi({ client });
+    this.extensions = new ExtensionsApi({ client });
+    this.files = new FilesApi({ client });
+    this.settings = new SettingsApi({ client });
+    this.transcription = new TranscriptionApi({ client });
+    this.usages = new UsagesApi({ client });
+    this.users = new UsersApi({ client });
   }
 }
 
@@ -83,7 +75,7 @@ export interface StreamSubscription {
 }
 
 class StreamApi {
-  constructor(private readonly configuration: Configuration) {}
+  constructor(private readonly url: string) {}
 
   streamPrompt(
     conversationId: number,
@@ -94,7 +86,7 @@ class StreamApi {
     let active = true;
     const abortController = new AbortController();
 
-    const basePath = `${this.configuration.basePath}/api/conversations/${conversationId}`;
+    const basePath = `${this.url}/api/conversations/${conversationId}`;
     const path = messageId ? `${basePath}/messages/${messageId}/sse` : `${basePath}/messages/sse`;
     const method = messageId ? 'PUT' : 'POST';
 

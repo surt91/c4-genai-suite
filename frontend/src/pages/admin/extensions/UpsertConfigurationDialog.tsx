@@ -38,7 +38,7 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
   const api = useApi();
 
   const creating = useMutation({
-    mutationFn: (request: UpsertConfigurationDto) => api.extensions.postConfiguration(request),
+    mutationFn: (request: UpsertConfigurationDto) => api.extensions.postConfiguration({ upsertConfigurationDto: request }),
     onSuccess: (response) => {
       onCreate(response);
       onClose();
@@ -46,7 +46,8 @@ export function UpsertConfigurationDialog(props: UpsertConfigurationDialogProps)
   });
 
   const updating = useMutation({
-    mutationFn: (request: UpsertConfigurationDto) => api.extensions.putConfiguration(target!.id, request),
+    mutationFn: (request: UpsertConfigurationDto) =>
+      api.extensions.putConfiguration({ id: target!.id, upsertConfigurationDto: request }),
     onSuccess: (response) => {
       onUpdate(response);
       onClose();

@@ -12,7 +12,7 @@ export function useDeleteUser(
       if (onDelete === null || target === null) {
         throw new Error('onDelete function or target not present, while running mutate inside useDeleteUser hook.');
       }
-      return api.users.deleteUser(userId);
+      return api.users.deleteUser({ id: userId });
     },
     onSuccess: () => {
       if (onDelete && target) onDelete(target.id);

@@ -86,7 +86,7 @@ export function MetricDetailPage() {
     );
   }
 
-  const config = metric._configuration;
+  const config = metric.configuration;
   const isGEval = config.type === 'G_EVAL';
   const isSimpleMetric = config.type === 'ANSWER_RELEVANCY' || config.type === 'FAITHFULNESS' || config.type === 'HALLUCINATION';
 

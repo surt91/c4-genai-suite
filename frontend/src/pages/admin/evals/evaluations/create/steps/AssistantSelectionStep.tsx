@@ -19,7 +19,7 @@ export function AssistantSelectionStep() {
     isError,
   } = useQuery({
     queryKey: ['configurations', 'all', true],
-    queryFn: () => api.extensions.getConfigurations(true),
+    queryFn: () => api.extensions.getConfigurations({ enabled: true }),
   });
 
   const assistants: ConfigurationDto[] = configurations?.items ?? [];

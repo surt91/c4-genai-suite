@@ -6,9 +6,9 @@ export function useUpsertUser(api: AppClient, target: UserDto | null, onUpsert: 
   const { mutate, error, isPending } = useMutation({
     mutationFn: (request: UpsertUserDto) => {
       if (target) {
-        return api.users.putUser(target.id, request);
+        return api.users.putUser({ id: target.id, upsertUserDto: request });
       } else {
-        return api.users.postUser(request);
+        return api.users.postUser({ upsertUserDto: request });
       }
     },
     onSuccess: (response) => {

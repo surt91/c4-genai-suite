@@ -41,12 +41,12 @@ export const filterFilesByFileNameExtensions = (files: { name?: string; fileName
 export const getDefault = (spec: ExtensionUserInfoDtoUserArgumentsValue): UserArgumentDefaultValue => {
   switch (spec.type) {
     case 'array':
-      return spec._default ?? [];
+      return spec.default ?? [];
     case 'string':
-      return spec._default ?? '';
+      return spec.default ?? '';
     case 'number':
     case 'boolean':
-      return spec._default;
+      return spec.default;
     case 'object':
       return getDefaultValuesFromNestedObject(spec);
   }

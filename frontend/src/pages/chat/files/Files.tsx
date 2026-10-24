@@ -51,13 +51,13 @@ export function Files({ conversationId, userBucket, configurationId, onManage }:
     isPending,
   } = useQuery({
     queryKey: ['user-files', page, pageSize, debouncedSearch],
-    queryFn: () => api.files.getUserFiles(page, pageSize, debouncedSearch || undefined),
+    queryFn: () => api.files.getUserFiles({ page, pageSize, query: debouncedSearch || undefined }),
     refetchInterval: (query) => (query.state.data?.items.some((file) => file.uploadStatus === 'inProgress') ? 1000 : false),
   });
   const { data: conversationBucket } = useConversationBucketAvailabilities(configurationId);
   const upload = useMutation({
     mutationKey: ['upload-user-file'],
-    mutationFn: (file: File) => api.files.postUserFile(userBucket.extensionId, undefined, file),
+    mutationFn: (file: File) => api.files.postUserFile({ extensionId: userBucket.extensionId, file }),
     onSuccess: (file) => fileIdSelector.selectId({ ...file, bucketType: 'user' }),
     onError: async (error, file) => {
       const isImage = file.type.startsWith('image/');

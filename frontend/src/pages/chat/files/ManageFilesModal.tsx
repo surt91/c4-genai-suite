@@ -19,7 +19,7 @@ function FileRow({ file, onDelete }: { file: FileDto; onDelete: (file: FileDto) 
   const [name, setName] = useState(file.fileName);
 
   const rename = useMutation({
-    mutationFn: (fileName: string) => api.files.renameUserFile(file.id, { fileName }),
+    mutationFn: (fileName: string) => api.files.renameUserFile({ fileId: file.id, renameFileDto: { fileName } }),
     onSuccess: () => {
       setEditing(false);
       void queryClient.invalidateQueries({ queryKey: ['user-files'] });
@@ -124,11 +124,11 @@ export function ManageFilesModal({ conversationId, onClose }: { conversationId: 
 
   const { data, refetch } = useQuery({
     queryKey: ['user-files', 'manage', page, pageSize],
-    queryFn: () => api.files.getUserFiles(page, pageSize),
+    queryFn: () => api.files.getUserFiles({ page, pageSize }),
   });
 
   const deleteFile = useMutation({
-    mutationFn: (file: FileDto) => api.files.deleteUserFile(file.id),
+    mutationFn: (file: FileDto) => api.files.deleteUserFile({ fileId: file.id }),
     onError: async (error) => toast.error(await buildError(texts.files.removeFileFailed, error)),
     onSuccess: (_, file) => forget(file),
     onSettled: () => refetch(),

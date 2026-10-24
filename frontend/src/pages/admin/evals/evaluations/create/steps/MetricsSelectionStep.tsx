@@ -18,7 +18,7 @@ export function MetricsSelectionStep() {
     isError,
   } = useQuery({
     queryKey: ['metrics', 'all'],
-    queryFn: () => evalApi.metrics.metricsGetAll(0, 100),
+    queryFn: () => evalApi.metrics.metricsGetAll({ offset: 0, limit: 100 }),
   });
 
   const handleToggleMetric = (metricId: string) => {
@@ -90,18 +90,18 @@ export function MetricsSelectionStep() {
                   checked={isSelected}
                   onChange={() => handleToggleMetric(metric.id)}
                   onClick={(e) => e.stopPropagation()}
-                  aria-label={metric._configuration.name}
+                  aria-label={metric.configuration.name}
                 />
                 <Stack gap="xs" flex={1}>
                   <Group gap="xs">
                     <IconChartBar size={18} color="var(--mantine-color-blue-8)" />
-                    <Text fw={600}>{metric._configuration.name}</Text>
+                    <Text fw={600}>{metric.configuration.name}</Text>
                   </Group>
                   <Badge variant="light" size="sm" color="gray">
-                    {metric._configuration.type}
+                    {metric.configuration.type}
                   </Badge>
                   <Text size="sm" c="dimmed">
-                    {t.threshold(metric._configuration.threshold?.toFixed(2) || t.notAvailable)}
+                    {t.threshold(metric.configuration.threshold?.toFixed(2) || t.notAvailable)}
                   </Text>
                 </Stack>
               </Group>

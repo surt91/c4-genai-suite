@@ -15,12 +15,11 @@
     "lint:fix": "eslint . --fix",
     "find-unused-resources": "knip",
     "preview": "vite preview",
-    "generate-api": "node -e \"fs.rmSync('./src/api/generated', { recursive: true, force: true })\" && npx @openapitools/openapi-generator-cli generate && node gen-helper.mjs",
+    "generate-api": "openapi-ts",
     "copy:pdfjs-wasm": "node copy-pdfjs-wasm.mjs",
     "predev": "npm run copy:pdfjs-wasm",
     "prestart": "npm run copy:pdfjs-wasm",
-    "prebuild": "npm run copy:pdfjs-wasm",
-    "generate-eval-api": "node -e \"fs.rmSync('./src/api/generated-eval', { recursive: true, force: true })\" && npx @openapitools/openapi-generator-cli generate --generator-key eval && node gen-helper.mjs"
+    "prebuild": "npm run copy:pdfjs-wasm"
   },
   "dependencies": {
     "@mantine/colors-generator": "9.7.3",
@@ -60,7 +59,7 @@
     "@eslint-react/eslint-plugin": "5.28.8",
     "@eslint/js": "10.0.1",
     "@faker-js/faker": "10.6.0",
-    "@openapitools/openapi-generator-cli": "2.42.0",
+    "@hey-api/openapi-ts": "0.99.0",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "^16.3.3",
