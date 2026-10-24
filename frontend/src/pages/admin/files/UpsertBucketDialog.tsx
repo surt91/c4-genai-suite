@@ -257,9 +257,6 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
   type DynamicFieldValue = { key: string; value: number }[];
   type FileSizeLimitsValue = { [key: string]: number };
 
-  const [dynamicFields, setDynamicFields] = useState<DynamicFieldValue>([]);
-  const [generalValue, setGeneralValue] = useState<number>(1);
-
   const transformToDynamicField = (fileSizeLimits: FileSizeLimitsValue): { fields: DynamicFieldValue; general: number } => {
     const fields: DynamicFieldValue = Object.entries(fileSizeLimits)
       .filter(([key]) => key !== 'general')
@@ -279,15 +276,12 @@ export function FileSizeDynamicFields({ form, name: _name, label, suffix, classN
   };
 
   // populate the dynamic fields with the prefilled values
-  useEffect(() => {
-    const entries = form.getValues().fileSizeLimits;
-    if (entries) {
-      const { fields, general } = transformToDynamicField(entries);
-      setDynamicFields(fields);
-      setGeneralValue(general);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [dynamicFields, setDynamicFields] = useState<DynamicFieldValue>(
+    () => transformToDynamicField(form.getValues().fileSizeLimits ?? {}).fields,
+  );
+  const [generalValue, setGeneralValue] = useState<number>(
+    () => transformToDynamicField(form.getValues().fileSizeLimits ?? {}).general,
+  );
 
   const updateFormValue = (fields: DynamicFieldValue, general: number) => {
     const fileSizeLimits = transformToFileSizeLimits(fields, general);

@@ -30,9 +30,19 @@ export const useScrollToBottom = (instantScrollTiggers: unknown[], animatedScrol
     });
   };
 
+  // Hide the button when jumping to the bottom (e.g. in another chat), adjusting the state while rendering instead of in
+  // the effect.
+  const [prevInstantScrollTriggers, setPrevInstantScrollTriggers] = useState(instantScrollTiggers);
+  if (
+    prevInstantScrollTriggers.length !== instantScrollTiggers.length ||
+    prevInstantScrollTriggers.some((trigger, i) => !Object.is(trigger, instantScrollTiggers[i]))
+  ) {
+    setPrevInstantScrollTriggers(instantScrollTiggers);
+    setShowButton(false);
+  }
+
   useEffect(() => {
     scrollToBottom(true);
-    setShowButton(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, instantScrollTiggers);
 

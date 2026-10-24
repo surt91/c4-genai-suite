@@ -15,7 +15,14 @@ interface SearchProps {
 export const Search = (props: SearchProps) => {
   const { onSearch, value } = props;
 
-  const [search, setSearch] = useState<string>();
+  const [search, setSearch] = useState(value);
+
+  // Take over the value when it is changed from outside (adjusting the state while rendering instead of in an effect).
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
+    setSearch(value);
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,10 +35,6 @@ export const Search = (props: SearchProps) => {
       clearInterval(timer);
     };
   }, [search, onSearch, value]);
-
-  useEffect(() => {
-    setSearch(value);
-  }, [value]);
 
   const doChange = useEventCallback((event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);

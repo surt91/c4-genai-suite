@@ -54,7 +54,10 @@ export function ChatPage() {
 
   // On wide screens the chat list is a column that can be collapsed (stored), on small screens a drawer (closed).
   const [chatListPinned, setChatListPinned] = useSidebarState('sidebar-left');
-  const [chatListDrawer, setChatListDrawer] = useState(false);
+  // The drawer belongs to the chat it was opened in, so it is closed when another chat is selected.
+  const [chatListDrawerChatId, setChatListDrawerChatId] = useState<typeof selectedChatId | null>(null);
+  const chatListDrawer = chatListDrawerChatId === selectedChatId;
+  const setChatListDrawer = (open: boolean) => setChatListDrawerChatId(open ? selectedChatId : null);
   const isChatListOpen = isCompact ? chatListDrawer : chatListPinned;
   const toggleChatList = () => (isCompact ? setChatListDrawer(!chatListDrawer) : setChatListPinned(!chatListPinned));
 
@@ -87,7 +90,6 @@ export function ChatPage() {
   // The details belong to the conversation, close them when another one is selected.
   useEffect(() => {
     closeInspector();
-    setChatListDrawer(false);
   }, [selectedChatId, closeInspector]);
 
   // The help is shown in the inspector (the one side panel of the chat).

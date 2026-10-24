@@ -1,7 +1,7 @@
 import { ActionIcon, Button, Group, Tooltip } from '@mantine/core';
 import { IconArrowUp, IconPaperclip, IconPlayerStopFilled } from '@tabler/icons-react';
 import { clsx } from 'clsx';
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { ConfigurationDto, FileDto } from 'src/api';
 import { Markdown } from 'src/components';
@@ -54,7 +54,6 @@ export function ChatInput({
 }: ChatInputProps) {
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
-  const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
   const {
     uploadingFiles,
     fullFileSlots,
@@ -83,21 +82,21 @@ export function ChatInput({
     speechRecognitionLanguages[0].code,
   );
 
-  useEffect(() => {
-    const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
-      (prev, extension) => {
-        prev[extension.id] = {};
-        Object.keys(extension.userArguments).forEach((name) => {
-          prev[extension.id][name] = getDefault(extension.userArguments[name]);
-        });
+  const defaultValues = useMemo<UserArgumentDefaultValueByExtensionIDAndName>(
+    () =>
+      configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
+        (prev, extension) => {
+          prev[extension.id] = {};
+          Object.keys(extension.userArguments).forEach((name) => {
+            prev[extension.id][name] = getDefault(extension.userArguments[name]);
+          });
 
-        return prev;
-      },
-      {} as Record<string, JSONObject>,
-    );
-
-    setDefaultValues(defaultValues ?? {});
-  }, [configuration?.extensions]);
+          return prev;
+        },
+        {} as Record<string, JSONObject>,
+      ) ?? {},
+    [configuration?.extensions],
+  );
 
   const { theme } = useTheme();
   const [input, setInput] = useState('');
