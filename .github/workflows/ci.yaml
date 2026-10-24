@@ -1,9 +1,8 @@
 name: CI
 
+# main is protected: changes only land via pull requests that passed this workflow
 on:
   pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

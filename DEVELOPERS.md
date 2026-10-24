@@ -37,13 +37,13 @@ which has no authentication) is not reachable from other hosts.
 
 ## Tests
 
-| Component  | Command (from the component directory)                 | Needs                        |
-| ---------- | ------------------------------------------------------ | ---------------------------- |
-| frontend   | `npm test`                                             | –                            |
-| backend    | `npm test`                                             | Postgres (`DB_URL`)          |
-| REI-S      | `uv run pytest`                                        | Postgres + S3 (S3Mock) for some tests |
-| eval       | `uv run pytest`                                        | Postgres                     |
-| e2e        | `npx playwright test`                                  | running stack (see below)    |
+| Component | Command (from the component directory) | Needs                                 |
+| --------- | -------------------------------------- | ------------------------------------- |
+| frontend  | `npm test`                             | –                                     |
+| backend   | `npm test`                             | Postgres (`DB_URL`)                   |
+| REI-S     | `uv run pytest`                        | Postgres + S3 (S3Mock) for some tests |
+| eval      | `uv run pytest`                        | Postgres                              |
+| e2e       | `npx playwright test`                  | running stack (see below)             |
 
 The Postgres/S3 tests use the Compose services (`docker compose up -d postgres s3`); the backend takes the server from
 `DB_URL` (environment or `backend/.env`) and creates one database per vitest worker.
@@ -64,10 +64,13 @@ Use `npx playwright test --ui` or the Playwright VS Code extension to debug sing
 
 ### CI
 
-GitHub Actions ([`.github/workflows/ci.yaml`](.github/workflows/ci.yaml)) runs one job per component (lint, build, tests)
-plus the E2E tests on every pull request and on `main`. [`release.yaml`](.github/workflows/release.yaml) publishes
-container images on every push to `main` and, via release-please, versioned releases and the Helm chart.
-Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/).
+All changes land on `main` via pull requests. GitHub Actions ([`.github/workflows/ci.yaml`](.github/workflows/ci.yaml))
+runs one job per component (lint, build, tests) plus the E2E tests on every pull request; `main` is protected and only
+accepts pull requests whose checks passed and that are up to date with `main`, so `main` itself is not tested again.
+[`release.yaml`](.github/workflows/release.yaml) publishes container images (`main`, `commit-<sha>`) on every push to
+`main` and maintains a release pull request via release-please. Merging that pull request creates the GitHub release,
+the versioned multi-arch images (`1.2.3`, `v1.2.3`, `latest`) and pushes the Helm chart.
+Commit messages (and squash-merged pull request titles) must follow [Conventional Commits](https://www.conventionalcommits.org/).
 
 ## Main Building Blocks
 
