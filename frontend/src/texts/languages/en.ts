@@ -570,13 +570,10 @@ export const en = {
   chat: {
     chatSettings: {
       title: 'Chat settings',
-      open: 'Chat settings',
       assistant: 'Assistant',
       assistantSettings: 'Settings of the assistant',
-      filters: 'Filters and options',
       apply: 'Apply',
       resetAll: 'Reset all',
-      saved: 'Settings applied',
       saveFailed: 'Failed to save the settings',
       chipLabel: '{{label}} (open chat settings)',
     },
@@ -601,7 +598,6 @@ export const en = {
       personalFile: 'My file',
       chatFile: 'Attachment of this chat',
       deselect: 'Remove {{fileName}} from this chat',
-      close: 'Close',
     },
     tools: {
       details: 'Details',
@@ -614,7 +610,6 @@ export const en = {
       expiresIn: 'Expires in {{time}}',
       confirm: 'Confirm',
       decline: 'Decline',
-      submitting: 'Sending...',
       resultAccepted: 'Confirmed',
       resultDeclined: 'Declined',
       resultCancelled: 'Cancelled',
@@ -667,7 +662,6 @@ export const en = {
       help: 'Help',
     },
     header: {
-      conversations: 'Chats',
       newChat: 'New chat',
     },
     sourcesQuote: {
@@ -720,7 +714,6 @@ export const en = {
     rateMessage: 'Rate response',
     selectAssistant: 'Select assistant',
     searchAssistantsPlaceholder: 'Search assistants...',
-    configureAssistant: 'Configure assistant settings',
     reasoning: 'Reasoning',
     chunksInformation: 'Chunks information',
     rating: {
@@ -749,9 +742,7 @@ export const en = {
     sourceAI: 'Friendly AI',
     sources: {
       pdfLoadFailed: 'Something went wrong while loading the PDF source document. Please try again.',
-      content: 'Source Content',
       sources: 'Sources',
-      viewer: 'Source Viewer',
       metadata: {
         metadata: 'Metadata',
         fileName: 'File name',
@@ -790,15 +781,11 @@ export const en = {
     thisMonth: 'Previous 30 Days',
     thisWeek: 'Previous 7 Days',
     today: 'Today',
-    filterHeadline: 'Select filter',
-    filterApply: 'Apply filter',
-    filterResetAll: 'Reset all',
     deleteFile: 'Delete {{fileName}}',
     duplicateConversationSuccess: 'Conversation duplicated successfully',
     duplicateConversationFailed: 'Failed to duplicate conversation',
     settings: {
       readOnlyHint: 'These values are provided by your identity provider and cannot be changed here.',
-      language: 'Language',
       currentPassword: 'Current Password',
       personalInformation: 'Personal Information',
       security: 'Security',

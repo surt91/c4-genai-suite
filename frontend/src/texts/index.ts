@@ -595,13 +595,10 @@ function load() {
     chat: {
       chatSettings: {
         title: translate('chat.chatSettings.title'),
-        open: translate('chat.chatSettings.open'),
         assistant: translate('chat.chatSettings.assistant'),
         assistantSettings: translate('chat.chatSettings.assistantSettings'),
-        filters: translate('chat.chatSettings.filters'),
         apply: translate('chat.chatSettings.apply'),
         resetAll: translate('chat.chatSettings.resetAll'),
-        saved: translate('chat.chatSettings.saved'),
         saveFailed: translate('chat.chatSettings.saveFailed'),
         chipLabel: (label: string | number) => translate('chat.chatSettings.chipLabel', { label }),
       },
@@ -626,7 +623,6 @@ function load() {
         personalFile: translate('chat.myFiles.personalFile'),
         chatFile: translate('chat.myFiles.chatFile'),
         deselect: (fileName: string | number) => translate('chat.myFiles.deselect', { fileName }),
-        close: translate('chat.myFiles.close'),
       },
       tools: {
         details: translate('chat.tools.details'),
@@ -639,7 +635,6 @@ function load() {
         expiresIn: (time: string | number) => translate('chat.cards.expiresIn', { time }),
         confirm: translate('chat.cards.confirm'),
         decline: translate('chat.cards.decline'),
-        submitting: translate('chat.cards.submitting'),
         resultAccepted: translate('chat.cards.resultAccepted'),
         resultDeclined: translate('chat.cards.resultDeclined'),
         resultCancelled: translate('chat.cards.resultCancelled'),
@@ -692,7 +687,6 @@ function load() {
         help: translate('chat.inspector.help'),
       },
       header: {
-        conversations: translate('chat.header.conversations'),
         newChat: translate('chat.header.newChat'),
       },
       sourcesQuote: {
@@ -746,7 +740,6 @@ function load() {
       rateMessage: translate('chat.rateMessage'),
       selectAssistant: translate('chat.selectAssistant'),
       searchAssistantsPlaceholder: translate('chat.searchAssistantsPlaceholder'),
-      configureAssistant: translate('chat.configureAssistant'),
       rating: {
         incorrect: translate('chat.rating.incorrect'),
         instructions_not_followed: translate('chat.rating.instructions_not_followed'),
@@ -773,9 +766,7 @@ function load() {
       sourceAI: translate('chat.sourceAI'),
       sources: {
         pdfLoadFailed: translate('chat.sources.pdfLoadFailed'),
-        content: translate('chat.sources.content'),
         sources: translate('chat.sources.sources'),
-        viewer: translate('chat.sources.viewer'),
         metadata: {
           metadata: translate('chat.sources.metadata.metadata'),
           fileName: translate('chat.sources.metadata.fileName'),
@@ -813,15 +804,11 @@ function load() {
       thisMonth: translate('chat.thisMonth'),
       thisWeek: translate('chat.thisWeek'),
       today: translate('chat.today'),
-      filterHeadline: translate('chat.filterHeadline'),
-      filterApply: translate('chat.filterApply'),
-      filterResetAll: translate('chat.filterResetAll'),
       deleteFile: (fileName: string) => translate('chat.deleteFile', { fileName }),
       duplicateConversationSuccess: translate('chat.duplicateConversationSuccess'),
       duplicateConversationFailed: translate('chat.duplicateConversationFailed'),
       settings: {
         readOnlyHint: translate('chat.settings.readOnlyHint'),
-        language: translate('chat.settings.language'),
         currentPassword: translate('chat.settings.currentPassword'),
         personalInformation: translate('chat.settings.personalInformation'),
         security: translate('chat.settings.security'),

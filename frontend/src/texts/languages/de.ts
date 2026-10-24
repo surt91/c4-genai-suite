@@ -563,13 +563,10 @@ export const de: typeof en = {
   chat: {
     chatSettings: {
       title: 'Chat-Einstellungen',
-      open: 'Chat-Einstellungen',
       assistant: 'Assistent',
       assistantSettings: 'Einstellungen des Assistenten',
-      filters: 'Filter und Optionen',
       apply: 'Übernehmen',
       resetAll: 'Alle zurücksetzen',
-      saved: 'Einstellungen übernommen',
       saveFailed: 'Die Einstellungen konnten nicht gespeichert werden',
       chipLabel: '{{label}} (Chat-Einstellungen öffnen)',
     },
@@ -594,7 +591,6 @@ export const de: typeof en = {
       personalFile: 'Meine Datei',
       chatFile: 'Anhang dieses Chats',
       deselect: '{{fileName}} aus diesem Chat entfernen',
-      close: 'Schließen',
     },
     tools: {
       details: 'Details',
@@ -607,7 +603,6 @@ export const de: typeof en = {
       expiresIn: 'Läuft ab in {{time}}',
       confirm: 'Bestätigen',
       decline: 'Ablehnen',
-      submitting: 'Wird gesendet...',
       resultAccepted: 'Bestätigt',
       resultDeclined: 'Abgelehnt',
       resultCancelled: 'Abgebrochen',
@@ -660,7 +655,6 @@ export const de: typeof en = {
       help: 'Hilfe',
     },
     header: {
-      conversations: 'Chats',
       newChat: 'Neuer Chat',
     },
     sourcesQuote: {
@@ -713,7 +707,6 @@ export const de: typeof en = {
     rateMessage: 'Antwort bewerten',
     selectAssistant: 'Assistent auswählen',
     searchAssistantsPlaceholder: 'Assistenten suchen...',
-    configureAssistant: 'Assistenten-Einstellungen konfigurieren',
     reasoning: 'Reasoning',
     chunksInformation: 'Chunks-Informationen',
     rating: {
@@ -742,9 +735,7 @@ export const de: typeof en = {
     sourceAI: 'KI',
     sources: {
       pdfLoadFailed: 'Beim Laden des PDF-Dokuments ist ein Fehler aufgetreten. Bitte versuche es erneut.',
-      content: 'Quelleninhalt',
       sources: 'Quellen',
-      viewer: 'Quell-Viewer',
       metadata: {
         metadata: 'Metadaten',
         fileName: 'Dateiname',
@@ -785,15 +776,11 @@ export const de: typeof en = {
     thisMonth: 'Letzte 30 Tage',
     thisWeek: 'Letzte 7 Tage',
     today: 'Heute',
-    filterHeadline: 'Filter auswählen',
-    filterApply: 'Filter anwenden',
-    filterResetAll: 'Alles zurücksetzen',
     deleteFile: 'Lösche {{fileName}}',
     duplicateConversationSuccess: 'Konversation erfolgreich dupliziert',
     duplicateConversationFailed: 'Duplizieren der Konversation fehlgeschlagen',
     settings: {
       readOnlyHint: 'Diese Angaben stammen von deinem Identitätsanbieter und können hier nicht geändert werden.',
-      language: 'Sprache',
       currentPassword: 'Aktuelles Passwort',
       personalInformation: 'Persönliche Informationen',
       security: 'Sicherheit',

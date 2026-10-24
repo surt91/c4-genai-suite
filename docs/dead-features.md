@@ -40,8 +40,8 @@ angefasst, weil parallel der Chat umgebaut wurde. Nach dem Umbau (Oktober 2026) 
 - Nicht mehr tot: `FormActionType.REJECT` (der Chat-Umbau nutzt es für abgelehnte Formulare/MCP-Elicitations, das
   Frontend sendet `action: 'reject'`) und `chat.ratingHint` (`AIChatItemActions.tsx`; `chat.updateRating.ratingHint`
   gibt es nicht mehr).
-- Ebenfalls ohne Nutzung, aber nicht entfernt, weil erst mit dem Chat-Umbau eingeführt bzw. nicht Teil der
-  ursprünglichen Liste (vor dem Entfernen klären, ob sie noch gebraucht werden): `chat.chatSettings.open`/`filters`/`saved`,
+- Ebenfalls entfernt (zunächst zurückgestellt, weil erst mit dem Chat-Umbau eingeführt bzw. nicht Teil der
+  ursprünglichen Liste; danach erneut geprüft, auch auf dynamische Zugriffe) 13 unbenutzte Texte (de + en): `chat.chatSettings.open`/`filters`/`saved`,
   `chat.myFiles.close`, `chat.cards.submitting`, `chat.header.conversations`, `chat.configureAssistant`,
   `chat.sources.content`/`viewer`, `chat.filterHeadline`/`filterApply`/`filterResetAll`, `chat.settings.language`.
 
