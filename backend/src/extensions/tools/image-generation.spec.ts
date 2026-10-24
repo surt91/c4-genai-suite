@@ -6,6 +6,7 @@ import { UploadBlob } from '../../domain/settings/index.js';
 import { User } from '../../domain/users/index.js';
 import { I18nService } from '../../localization/i18n.service.js';
 import { AzureGPTImage1Extension } from './azure-gpt-image-1.js';
+import { GeminiImageExtension } from './gemini-image.js';
 import { GPTImage1Extension } from './gpt-image-1.js';
 
 // 1x1 transparent PNG
@@ -32,10 +33,16 @@ describe('image generation tools', () => {
     fetchMock.mockRestore();
   });
 
-  async function callTool(extension: GPTImage1Extension, values: Record<string, unknown>, args: Record<string, string>) {
+  async function callTool(
+    extension: GPTImage1Extension | GeminiImageExtension,
+    values: Record<string, unknown>,
+    args: Record<string, string>,
+  ) {
     const context = {
       tools: [] as NamedStructuredTool[],
       cache: { get: (_key: string, _values: unknown, factory: () => Promise<unknown>) => factory() },
+      user: { id: 'user-1' },
+      conversationId: 42,
     } as unknown as ChatContext;
     const [middleware] = await extension.getMiddlewares({} as User, { values } as never);
     await middleware.invoke(
@@ -63,6 +70,8 @@ describe('image generation tools', () => {
     expect(upload.mimeType).toBe('image/png');
     expect(upload.fileName).toBe(`${upload.id}.png`);
     expect(upload.buffer).toEqual(Buffer.from(PNG_BASE64, 'base64'));
+    // owned by the user and conversation of the chat (deleted with them, only readable by the user)
+    expect(upload.owner).toEqual({ userId: 'user-1', conversationId: 42 });
     expect(result).toBe(`https://gaible.example/blobs/${upload.id}`);
   }
 
@@ -90,6 +99,30 @@ describe('image generation tools', () => {
     expect(url).toBe(
       'https://my-instance.openai.azure.com/openai/deployments/img/images/generations?api-version=2024-02-15-preview',
     );
+    expectUploadedPng(result);
+  });
+
+  it('gemini-image generates an image via the Gemini API', async () => {
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            candidates: [
+              {
+                content: { role: 'model', parts: [{ inlineData: { mimeType: 'image/png', data: PNG_BASE64 } }] },
+                finishReason: 'STOP',
+              },
+            ],
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      ),
+    );
+    const extension = new GeminiImageExtension(authService, commandBus as unknown as CommandBus, i18n);
+
+    const result = await callTool(extension, { apiKey: 'key', modelName: 'gemini-image' }, { prompt: 'a dog' });
+
+    expect(requestOf(0).url).toContain('gemini-image');
     expectUploadedPng(result);
   });
 

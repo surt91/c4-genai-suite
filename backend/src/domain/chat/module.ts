@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLogModule } from '../audit-log/module.js';
 import { ConversationFileEntity } from '../database/entities/conversation-file.js';
 import {
+  BlobEntity,
   BucketEntity,
   ConfigurationEntity,
   ConversationEntity,
@@ -71,6 +72,7 @@ import {
       BucketEntity,
       FileEntity,
       ConversationFileEntity,
+      BlobEntity,
     ]),
   ],
   exports: [CallbackService],

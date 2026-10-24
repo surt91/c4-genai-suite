@@ -10,7 +10,14 @@ export class UploadBlob {
     public readonly fileName: string,
     public readonly fileSize: number,
     public readonly category: BlobCategory,
+    // The owner of a generated image: only this user can read it and it is deleted with the conversation or the user.
+    public readonly owner?: BlobOwner,
   ) {}
+}
+
+export interface BlobOwner {
+  userId: string;
+  conversationId?: number;
 }
 
 export class UploadBlobResponse {}
@@ -23,11 +30,11 @@ export class UploadBlobHandler implements ICommandHandler<UploadBlob, UploadBlob
   ) {}
 
   async execute(request: UploadBlob): Promise<UploadBlobResponse> {
-    const { id, mimeType: type, category } = request;
+    const { id, mimeType: type, category, owner } = request;
 
     const buffer = request.buffer.toString('base64');
 
-    await this.blobs.save({ id, type, buffer, category });
+    await this.blobs.save({ id, type, buffer, category, userId: owner?.userId, conversationId: owner?.conversationId });
 
     return new UploadBlobResponse();
   }

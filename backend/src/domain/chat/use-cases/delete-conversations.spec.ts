@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { In } from 'typeorm';
 import type { Mock } from 'vitest';
 import { ConversationFileEntity } from '../../database/entities/conversation-file.js';
-import { ConversationEntity, FileEntity } from '../../database/index.js';
+import { BlobCategory, BlobEntity, ConversationEntity, FileEntity } from '../../database/index.js';
 import { buildClient } from '../../files/use-cases/utils.js';
 import { User } from '../../users/index.js';
 import { DeleteConversationsHandler } from './delete-conversations.js';
@@ -18,10 +19,30 @@ describe('DeleteConversationsHandler', () => {
   const conversationFiles = { find: vi.fn() };
   const files = { find: vi.fn(), delete: vi.fn() };
   const deleteFile = vi.fn();
+  // the conversation, whose messages contain the URL of the image (see purgeGeneratedImages)
+  const getRawOne = vi.fn();
+  const queryBuilder = {
+    withDeleted: () => queryBuilder,
+    innerJoin: () => queryBuilder,
+    select: () => queryBuilder,
+    where: vi.fn(() => queryBuilder),
+    andWhere: vi.fn(() => queryBuilder),
+    orderBy: () => queryBuilder,
+    limit: () => queryBuilder,
+    getRawOne,
+  };
+  const blobs = {
+    find: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    manager: { createQueryBuilder: () => queryBuilder },
+  };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     (buildClient as Mock).mockReturnValue({ deleteFile });
+    blobs.find.mockResolvedValue([]);
+    getRawOne.mockResolvedValue(undefined);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -29,6 +50,7 @@ describe('DeleteConversationsHandler', () => {
         { provide: getRepositoryToken(ConversationEntity), useValue: conversations },
         { provide: getRepositoryToken(ConversationFileEntity), useValue: conversationFiles },
         { provide: getRepositoryToken(FileEntity), useValue: files },
+        { provide: getRepositoryToken(BlobEntity), useValue: blobs },
       ],
     }).compile();
 
@@ -57,6 +79,41 @@ describe('DeleteConversationsHandler', () => {
     expect(conversations.delete).toHaveBeenCalledWith({ id: 10 });
   });
 
+  it('should delete the generated images of the conversations', async () => {
+    conversations.find.mockResolvedValue([{ id: 10 }]);
+    conversationFiles.find.mockResolvedValue([]);
+    blobs.find.mockResolvedValue([
+      { id: 'a', userId: '1' },
+      { id: 'b', userId: '1' },
+    ]);
+
+    await handler.execute({ user: { id: '1' } as User });
+
+    expect(blobs.find).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { conversationId: 10, category: BlobCategory.LLM_IMAGE } }),
+    );
+    // only the messages of other conversations of the same user count
+    expect(queryBuilder.where).toHaveBeenCalledWith(expect.any(String), { conversationId: 10 });
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith(expect.any(String), { userId: '1' });
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith(expect.any(String), { url: '%/blobs/a%' });
+    expect(blobs.delete).toHaveBeenCalledWith({ id: In(['a', 'b']) });
+    expect(blobs.update).not.toHaveBeenCalled();
+    expect(conversations.delete).toHaveBeenCalledWith({ id: 10 });
+  });
+
+  it('should hand over a generated image to a duplicate, which shows it', async () => {
+    conversations.find.mockResolvedValue([{ id: 10 }]);
+    conversationFiles.find.mockResolvedValue([]);
+    blobs.find.mockResolvedValue([{ id: 'a', userId: '1' }]);
+    getRawOne.mockResolvedValue({ conversationId: 11 });
+
+    await handler.execute({ user: { id: '1' } as User });
+
+    expect(blobs.update).toHaveBeenCalledWith({ id: 'a' }, { conversationId: 11 });
+    expect(blobs.delete).not.toHaveBeenCalled();
+    expect(conversations.delete).toHaveBeenCalledWith({ id: 10 });
+  });
+
   it('should keep the conversation when REI-S fails', async () => {
     const bucket = { id: 3, type: 'conversation', indexName: 'index' };
     conversations.find.mockResolvedValue([{ id: 10 }]);
@@ -69,6 +126,7 @@ describe('DeleteConversationsHandler', () => {
     await expect(handler.execute({ user: { id: '1' } as User })).rejects.toThrow('RAG server');
 
     expect(files.delete).not.toHaveBeenCalled();
+    expect(blobs.delete).not.toHaveBeenCalled();
     expect(conversations.delete).not.toHaveBeenCalled();
   });
 

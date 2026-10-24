@@ -4,7 +4,11 @@ import { In } from 'typeorm';
 import { BlobCategory, BlobEntity, BlobRepository } from '../../database/index.js';
 
 export class GetBlob {
-  constructor(public readonly id: string) {}
+  constructor(
+    public readonly id: string,
+    // The ID of the requesting user.
+    public readonly userId?: string,
+  ) {}
 }
 
 export class GetBlobResponse {
@@ -19,13 +23,15 @@ export class GetBlobHandler implements IQueryHandler<GetBlob, GetBlobResponse> {
   ) {}
 
   async execute(request: GetBlob): Promise<GetBlobResponse> {
-    const { id } = request;
+    const { id, userId } = request;
 
-    // Only generated images and logos are public by id; file contents (original/processed) are only accessible
+    // Only generated images and logos are readable by id; file contents (original/processed) are only accessible
     // through the (user scoped) file endpoints.
     const entity = await this.blobs.findOneBy({ id, category: In([BlobCategory.LLM_IMAGE, BlobCategory.LOGO]) });
 
-    if (!entity) {
+    // Generated images with an owner are only readable by the owner. Older images without owner stay readable by all
+    // users (like logos), because their owner is unknown.
+    if (!entity || (entity.userId && entity.userId !== userId)) {
       return new GetBlobResponse();
     }
 

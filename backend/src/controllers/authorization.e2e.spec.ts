@@ -182,6 +182,33 @@ describe('Authorization', () => {
     await asUser(http().get(`/blobs/${original.id}`)).expect(404);
   });
 
+  it('serves generated images with an owner only to the owner', async () => {
+    const blobs = dataSource.getRepository(BlobEntity);
+    const conversation = await dataSource
+      .getRepository(ConversationEntity)
+      .save({ name: 'Alice images', configurationId: configuration.id, userId: alice.id });
+    const ofAlice = await blobs.save({
+      id: randomUUID(),
+      type: 'image/png',
+      buffer: 'eA==',
+      category: BlobCategory.LLM_IMAGE,
+      userId: alice.id,
+      conversationId: conversation.id,
+    });
+    const ofBob = await blobs.save({
+      id: randomUUID(),
+      type: 'image/png',
+      buffer: 'eA==',
+      category: BlobCategory.LLM_IMAGE,
+      userId: bob.id,
+    });
+
+    await asUser(http().get(`/blobs/${ofAlice.id}`)).expect(200);
+    // not even admins, the image is only shown in the conversation of the owner
+    await asAdmin(http().get(`/blobs/${ofAlice.id}`)).expect(404);
+    await asUser(http().get(`/blobs/${ofBob.id}`)).expect(404);
+  });
+
   it('answers non-numeric ids with 400 instead of a database error', async () => {
     await asUser(http().get('/conversations/abc')).expect(400);
     await asAdmin(http().get('/configurations/abc')).expect(400);

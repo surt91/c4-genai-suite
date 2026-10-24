@@ -1,6 +1,7 @@
-import { Controller, Get, Header, NotFoundException, Param, StreamableFile, UseGuards } from '@nestjs/common';
+import { Controller, Get, Header, NotFoundException, Param, Req, StreamableFile, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth/index.js';
 import { GetBlob, GetBlobResponse } from '../../domain/settings/index.js';
 
@@ -14,8 +15,8 @@ export class BlobsController {
   @ApiExcludeEndpoint()
   // the stored type must not be guessed differently by the browser (e.g. HTML)
   @Header('X-Content-Type-Options', 'nosniff')
-  async getLogo(@Param('id') id: string) {
-    const result: GetBlobResponse = await this.queryBus.execute(new GetBlob(id));
+  async getBlob(@Param('id') id: string, @Req() req: Request) {
+    const result: GetBlobResponse = await this.queryBus.execute(new GetBlob(id, req.user.id));
 
     if (!result.blob) {
       throw new NotFoundException('Cannot find blob.');

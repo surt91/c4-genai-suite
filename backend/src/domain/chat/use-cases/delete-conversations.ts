@@ -1,7 +1,14 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
-import { ConversationEntity, ConversationRepository, FileEntity, FileRepository } from '../../database/index.js';
+import {
+  BlobEntity,
+  BlobRepository,
+  ConversationEntity,
+  ConversationRepository,
+  FileEntity,
+  FileRepository,
+} from '../../database/index.js';
 import { User } from '../../users/index.js';
 import { purgeConversations } from './delete-conversation.js';
 
@@ -21,6 +28,8 @@ export class DeleteConversationsHandler implements ICommandHandler<DeleteConvers
     private readonly conversationFiles: ConversationFileRepository,
     @InjectRepository(FileEntity)
     private readonly files: FileRepository,
+    @InjectRepository(BlobEntity)
+    private readonly blobs: BlobRepository,
   ) {}
 
   async execute(command: DeleteConversations): Promise<DeleteConversationsResponse> {
@@ -34,7 +43,7 @@ export class DeleteConversationsHandler implements ICommandHandler<DeleteConvers
         select: { id: true },
       });
       await purgeConversations(
-        { conversations: this.conversations, conversationFiles: this.conversationFiles, files: this.files },
+        { conversations: this.conversations, conversationFiles: this.conversationFiles, files: this.files, blobs: this.blobs },
         conversations.map((x) => x.id),
       );
     }

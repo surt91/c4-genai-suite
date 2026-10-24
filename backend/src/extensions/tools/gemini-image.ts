@@ -8,7 +8,7 @@ import { AuthService } from '../../domain/auth/index.js';
 import { ChatContext, ChatMiddleware, ChatNextDelegate, GetContext, NamedStructuredTool } from '../../domain/chat/index.js';
 import { BlobCategory } from '../../domain/database/index.js';
 import { Extension, ExtensionConfiguration, ExtensionEntity, ExtensionSpec } from '../../domain/extensions/index.js';
-import { UploadBlob } from '../../domain/settings/index.js';
+import { BlobOwner, UploadBlob } from '../../domain/settings/index.js';
 import { User } from '../../domain/users/index.js';
 import { I18nService } from '../../localization/i18n.service.js';
 
@@ -67,10 +67,9 @@ export class GeminiImageExtension implements Extension<GeminiImageExtensionConfi
   async getMiddlewares(_user: User, extension: ExtensionEntity<GeminiImageExtensionConfiguration>): Promise<ChatMiddleware[]> {
     const middleware = {
       invoke: async (context: ChatContext, getContext: GetContext, next: ChatNextDelegate): Promise<any> => {
-        const tool = await context.cache.get(this.spec.name, extension.values, () => {
-          return Promise.resolve(new InternalTool(this.authService, this.commandBus, this.spec, extension.values));
-        });
-        context.tools.push(tool);
+        // not cached: the tool stores the images for the current user and conversation
+        const owner = { userId: context.user.id, conversationId: context.conversationId };
+        context.tools.push(new InternalTool(this.authService, this.commandBus, this.spec, extension.values, owner));
         return next(context);
       },
     };
@@ -96,6 +95,7 @@ class InternalTool extends NamedStructuredTool {
     private readonly commandBus: CommandBus,
     spec: ExtensionSpec,
     private readonly configuration: GeminiImageExtensionConfiguration,
+    private readonly owner: BlobOwner,
   ) {
     super();
     this.name = spec.name;
@@ -134,7 +134,7 @@ class InternalTool extends NamedStructuredTool {
       const fileName = `${id}.${extension}`;
 
       await this.commandBus.execute(
-        new UploadBlob(id, imageBuffer, mimeType, fileName, imageBuffer.length, BlobCategory.LLM_IMAGE),
+        new UploadBlob(id, imageBuffer, mimeType, fileName, imageBuffer.length, BlobCategory.LLM_IMAGE, this.owner),
       );
 
       return `${this.authService.config.baseUrl}/blobs/${id}`;

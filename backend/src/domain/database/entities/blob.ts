@@ -1,5 +1,6 @@
 import { Column, Entity, Index, ManyToOne, PrimaryColumn, Relation, Repository } from 'typeorm';
 import { schema } from '../typeorm.helper.js';
+import { ConversationEntity } from './conversation.js';
 import { FileEntity } from './file.js';
 import { UserEntity } from './user.js';
 
@@ -15,6 +16,7 @@ export enum BlobCategory {
 @Entity({ name: 'blobs', schema })
 @Index(['fileId'])
 @Index(['userId'])
+@Index(['conversationId'])
 export class BlobEntity {
   @PrimaryColumn()
   id!: string;
@@ -36,11 +38,20 @@ export class BlobEntity {
   @ManyToOne(() => FileEntity, { onDelete: 'CASCADE' })
   file?: Relation<FileEntity>;
 
+  // The owner: the user of the file or the user who generated the image. Generated images that have been stored before
+  // the owner was recorded have no owner (and stay readable by all users, see GetBlob).
   @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'CASCADE' })
   user!: UserEntity | null;
 
   @Column({ nullable: true })
   userId?: string;
+
+  // The conversation, in which the image has been generated (only for generated images).
+  @ManyToOne(() => ConversationEntity, { nullable: true, onDelete: 'CASCADE' })
+  conversation?: Relation<ConversationEntity> | null;
+
+  @Column({ nullable: true })
+  conversationId?: number | null;
 
   @Column({ nullable: true })
   fileId?: number;

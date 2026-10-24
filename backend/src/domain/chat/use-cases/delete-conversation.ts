@@ -3,7 +3,16 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, LessThan, Not } from 'typeorm';
 import { ConversationFileEntity, ConversationFileRepository } from '../../database/entities/conversation-file.js';
-import { ConversationEntity, ConversationRepository, FileEntity, FileRepository } from '../../database/index.js';
+import {
+  BlobCategory,
+  BlobEntity,
+  BlobRepository,
+  ConversationEntity,
+  ConversationRepository,
+  FileEntity,
+  FileRepository,
+  MessageEntity,
+} from '../../database/index.js';
 import { purgeFiles } from '../../files/use-cases/purge-files.js';
 import { User } from '../../users/index.js';
 
@@ -35,6 +44,8 @@ export class DeleteConversationHandler implements ICommandHandler<DeleteConversa
     private readonly conversationFiles: ConversationFileRepository,
     @InjectRepository(FileEntity)
     private readonly files: FileRepository,
+    @InjectRepository(BlobEntity)
+    private readonly blobs: BlobRepository,
   ) {}
 
   async execute(command: DeleteConversation): Promise<DeleteConversationResponse> {
@@ -54,6 +65,7 @@ export class DeleteConversationHandler implements ICommandHandler<DeleteConversa
       conversations: this.conversations,
       conversationFiles: this.conversationFiles,
       files: this.files,
+      blobs: this.blobs,
     });
     await this.conversations.softDelete({ id: entity.id });
 
@@ -65,6 +77,7 @@ export interface ConversationPurgeRepositories {
   conversations: ConversationRepository;
   conversationFiles: ConversationFileRepository;
   files: FileRepository;
+  blobs: BlobRepository;
 }
 
 /** Deletes the soft deleted conversations permanently, which cannot be restored anymore. */
@@ -84,13 +97,14 @@ export async function purgeDeletedConversations(repositories: ConversationPurgeR
 /**
  * Deletes the conversations permanently together with the files that belong to them: files of the conversation bucket
  * and files without bucket (e.g. images), unless another conversation (e.g. a duplicate) still uses them. Personal
- * files of the user bucket are only unlinked.
+ * files of the user bucket are only unlinked. The images generated in the conversation are deleted, too (see
+ * purgeGeneratedImages).
  *
  * The conversations are purged one after another and a conversation is only deleted after its files, so when the RAG
  * server fails (RagServerDeletionFailedException), the remaining conversations stay and are purged by the next attempt.
  */
 export async function purgeConversations(repositories: ConversationPurgeRepositories, ids: number[]) {
-  const { conversations, conversationFiles, files } = repositories;
+  const { conversations, conversationFiles, files, blobs } = repositories;
 
   for (const conversationId of ids) {
     const links = await conversationFiles.find({
@@ -114,6 +128,47 @@ export async function purgeConversations(repositories: ConversationPurgeReposito
       files,
       candidates.filter((file) => !usedElsewhereIds.has(file.id)).map((file) => file.id),
     );
+    await purgeGeneratedImages(blobs, conversationId);
     await conversations.delete({ id: conversationId });
+  }
+}
+
+/**
+ * Deletes the images generated in the conversation (by the image tools). A duplicate of the conversation shows the same
+ * images (the messages contain their URLs), so another conversation of the same user, whose messages contain the URL,
+ * takes over the image instead. Images generated before their conversation was recorded have no conversation and stay.
+ */
+async function purgeGeneratedImages(blobs: BlobRepository, conversationId: number) {
+  const images = await blobs.find({
+    where: { conversationId, category: BlobCategory.LLM_IMAGE },
+    select: { id: true, userId: true },
+  });
+
+  const deletable: string[] = [];
+  for (const image of images) {
+    const usedBy = image.userId
+      ? await blobs.manager
+          .createQueryBuilder(MessageEntity, 'message')
+          .withDeleted()
+          .innerJoin('message.conversation', 'conversation')
+          .select('message.conversationId', 'conversationId')
+          .where('message.conversationId <> :conversationId', { conversationId })
+          .andWhere('conversation.userId = :userId', { userId: image.userId })
+          // the ID is a UUID, which contains no wildcards of LIKE
+          .andWhere('message.data LIKE :url', { url: `%/blobs/${image.id}%` })
+          .orderBy('message.conversationId')
+          .limit(1)
+          .getRawOne<{ conversationId: number }>()
+      : undefined;
+
+    if (usedBy) {
+      await blobs.update({ id: image.id }, { conversationId: usedBy.conversationId });
+    } else {
+      deletable.push(image.id);
+    }
+  }
+
+  if (deletable.length) {
+    await blobs.delete({ id: In(deletable) });
   }
 }

@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -16,6 +17,7 @@ import {
   ConversationEntity,
   FileEntity,
   FileUploadStatus,
+  MessageEntity,
   UserEntity,
 } from '../domain/database/index.js';
 import { schema } from '../domain/database/typeorm.helper.js';
@@ -106,7 +108,33 @@ describe('Deletion of the data of conversations and users', () => {
     return file;
   }
 
+  /** An image of an image tool, shown in an answer of the conversation (see GPTImage1Extension). */
+  async function createGeneratedImage(owner?: { userId: string; conversationId: number }) {
+    const image = await dataSource.getRepository(BlobEntity).save({
+      id: randomUUID(),
+      type: 'image/png',
+      buffer: 'AA==',
+      category: BlobCategory.LLM_IMAGE,
+      userId: owner?.userId,
+      conversationId: owner?.conversationId,
+    });
+    if (owner) {
+      await showImage(owner.conversationId, image.id);
+    }
+    return image;
+  }
+
+  async function showImage(conversationId: number, imageId: string) {
+    await dataSource.getRepository(MessageEntity).save({
+      type: 'ai',
+      data: { content: `![a dog](https://example.com/blobs/${imageId})` },
+      configurationId,
+      conversationId,
+    });
+  }
+
   const expired = () => new Date(Date.now() - 60 * 60 * 1000);
+  const imageExists = async (id: string) => (await dataSource.getRepository(BlobEntity).countBy({ id })) > 0;
   const fileExists = async (id: number) => (await dataSource.getRepository(FileEntity).countBy({ id })) > 0;
   const blobExists = async (fileId: number) => (await dataSource.getRepository(BlobEntity).countBy({ fileId })) > 0;
   const conversationExists = async (id: number) =>
@@ -144,6 +172,41 @@ describe('Deletion of the data of conversations and users', () => {
     // personal files are only unlinked, files of other conversations (duplicates) are kept
     expect(await fileExists(personalFile.id)).toBe(true);
     expect(await fileExists(sharedFile.id)).toBe(true);
+  });
+
+  it('deletes the generated images of a purged conversation, unless a duplicate of the same user shows them', async () => {
+    const other = await dataSource.getRepository(UserEntity).save({ id: randomUUID(), name: 'o', email: 'o2@example.com' });
+    const old = await createConversation('1', expired());
+    const duplicate = await createConversation();
+    const ofOtherUser = await createConversation(other.id);
+    const image = await createGeneratedImage({ userId: '1', conversationId: old.id });
+    const sharedImage = await createGeneratedImage({ userId: '1', conversationId: old.id });
+    await showImage(duplicate.id, sharedImage.id);
+    // another user cannot take over the image by sending its URL
+    const pastedImage = await createGeneratedImage({ userId: '1', conversationId: old.id });
+    await showImage(ofOtherUser.id, pastedImage.id);
+    // generated before the owner was recorded
+    const imageWithoutOwner = await createGeneratedImage();
+    const imageOfDuplicate = await createGeneratedImage({ userId: '1', conversationId: duplicate.id });
+
+    const next = await createConversation();
+    await request(app.getHttpServer()).delete(`/conversations/${next.id}`).expect(200);
+
+    expect(await conversationExists(old.id)).toBe(false);
+    expect(await imageExists(image.id)).toBe(false);
+    expect(await imageExists(pastedImage.id)).toBe(false);
+    expect(await dataSource.getRepository(BlobEntity).findOneBy({ id: sharedImage.id })).toMatchObject({
+      userId: '1',
+      conversationId: duplicate.id,
+    });
+    expect(await imageExists(imageWithoutOwner.id)).toBe(true);
+    expect(await imageExists(imageOfDuplicate.id)).toBe(true);
+
+    // the duplicate took over the image, so it is deleted with the duplicate
+    await request(app.getHttpServer()).delete('/conversations').expect(200);
+    expect(await imageExists(sharedImage.id)).toBe(false);
+    expect(await imageExists(imageOfDuplicate.id)).toBe(false);
+    expect(await imageExists(imageWithoutOwner.id)).toBe(true);
   });
 
   it('fails without deleting anything when REI-S is not reachable and can be retried', async () => {
@@ -194,11 +257,14 @@ describe('Deletion of the data of conversations and users', () => {
     const unlinkedFile = await createFile(user.id, conversationBucket);
     const image = await createFile(user.id, undefined, [conversation.id]);
     const fileOfOtherUser = await createFile('1', userBucket);
+    const generatedImage = await createGeneratedImage({ userId: user.id, conversationId: conversation.id });
+    const imageOfOtherUser = await createGeneratedImage({ userId: '1', conversationId: (await createConversation()).id });
 
     deleteFile.mockRejectedValueOnce(new TypeError('fetch failed'));
     await request(app.getHttpServer()).delete(`/users/${user.id}`).expect(503);
     expect(await dataSource.getRepository(UserEntity).countBy({ id: user.id })).toBe(1);
     expect(await conversationExists(conversation.id)).toBe(true);
+    expect(await imageExists(generatedImage.id)).toBe(true);
 
     deleteFile.mockClear();
     await request(app.getHttpServer()).delete(`/users/${user.id}`).expect(200);
@@ -213,5 +279,7 @@ describe('Deletion of the data of conversations and users', () => {
     expect(deleteFile).toHaveBeenCalledWith({ file_id: String(personalFile.id), indexName: 'user-index' });
     expect(deleteFile).toHaveBeenCalledWith({ file_id: String(unlinkedFile.id), indexName: 'conversation-index' });
     expect(await fileExists(fileOfOtherUser.id)).toBe(true);
+    expect(await imageExists(generatedImage.id)).toBe(false);
+    expect(await imageExists(imageOfOtherUser.id)).toBe(true);
   });
 });
