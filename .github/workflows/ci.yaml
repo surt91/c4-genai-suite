@@ -1,9 +1,8 @@
 name: CI
 
+# main is protected: changes only land via pull requests that passed this workflow
 on:
   pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -262,3 +261,13 @@ jobs:
       - run: |
           git config --global --add safe.directory "$(pwd)"
           gitleaks git -v --redact=80 --no-color --log-opts=HEAD
+
+  # The single status check required by the branch protection of main, so the protection doesn't have to list every job.
+  ci-passed:
+    if: always()
+    needs: [frontend, backend, reis, eval, confluence-importer, helm-chart, e2e, gitleaks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if a job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1

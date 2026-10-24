@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/surt91/gaible/actions/workflows/ci.yaml"><img src="https://github.com/surt91/gaible/actions/workflows/ci.yaml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/surt91/gaible/actions/workflows/release.yaml"><img src="https://github.com/surt91/gaible/actions/workflows/release.yaml/badge.svg" alt="Build"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache-2.0"></a>
   <a href="https://github.com/surt91/gaible/releases"><img src="https://img.shields.io/github/v/release/surt91/gaible?label=release" alt="Latest release"></a>
 </p>
