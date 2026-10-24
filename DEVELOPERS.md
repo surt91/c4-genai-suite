@@ -18,7 +18,7 @@ There is exactly one way to start Gaible: the root [`docker-compose.yml`](docker
 docker compose up --build          # http://localhost:3333, login admin@example.com / secret
 ```
 
-See the [README](README.md#using-docker-compose) for the optional profiles (`ollama`, `mcp`, `eval`).
+See the [README](README.md#docker-compose) for the optional profiles (`ollama`, `mcp`, `eval`).
 
 ### Hot reload while developing
 

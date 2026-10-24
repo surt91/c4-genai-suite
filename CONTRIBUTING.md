@@ -7,7 +7,7 @@ Help us keep open and inclusive. Please read and follow our [Code of Conduct](CO
 
 ## Got an Idea, Question or Problem?
 
-Just open a new discussion in our [GitHub Discussions][/discussions]
+Just open a new discussion in our [GitHub Discussions](https://github.com/surt91/gaible/discussions).
 
 ## Found a Bug?
 
@@ -117,7 +117,7 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 - All features or bug fixes **must be tested** by one or more specs (unit-tests).
 - For /frontend and /backend packages an automated formatter is available by running `npm run format`, `npm run lint`.
-- For the /reis package, use `uv run ruff format`, `uv run ruff check` to format the code.
+- For the Python services (`/services/*`), use `uv run ruff format`, `uv run ruff check` to format the code.
 - Formatting and linting is done automatically on commit, so you don't have to worry about it.
 
 ## Commit Message Guidelines
@@ -178,6 +178,11 @@ The following is the list of supported scopes:
 - **frontend**: for changes made on `/frontend` directory
 - **backend**: for changes made on `/backend` directory
 - **reis**: for changes made on `/services/reis` directory
+- **eval**: for changes made on `/services/eval` directory
+- **confluence-importer**: for changes made on `/services/confluence-importer` directory
+- **e2e**: for changes made on `/e2e` directory
+- **helm**: for changes made on `/helm-chart` directory
+- **compose**: for changes made on `docker-compose.yml`
 
 If your change affect more than one package, separate the scopes with a comma (e.g. `frontend,backend`).
 
