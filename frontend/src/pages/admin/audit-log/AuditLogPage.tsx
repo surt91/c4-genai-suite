@@ -6,7 +6,7 @@ import { format as formatHtmlDiff } from 'jsondiffpatch/formatters/html';
 import { useCallback, useMemo, useState } from 'react';
 import { useApi } from 'src/api';
 import { AuditLogDetailDto, AuditLogDto, GetAuditLogsEntityTypeEnum } from 'src/api/generated';
-import { Page, Pagination } from 'src/components';
+import { Page, Pagination, RowButton } from 'src/components';
 import { texts } from 'src/texts';
 import classes from './AuditLogPage.module.css';
 
@@ -312,7 +312,9 @@ export function AuditLogPage() {
                   <Table.Td className={classes.entityId} title={log.entityId}>
                     {truncateId(log.entityId)}
                   </Table.Td>
-                  <Table.Td className={classes.truncate}>{getEntityName(log)}</Table.Td>
+                  <Table.Td className={classes.truncate}>
+                    <RowButton onClick={() => setSelectedLog(log)}>{getEntityName(log)}</RowButton>
+                  </Table.Td>
                   <Table.Td>
                     <ActionBadge action={log.action} />
                   </Table.Td>

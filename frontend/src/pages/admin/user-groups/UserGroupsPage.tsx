@@ -3,7 +3,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useApi, UserGroupDto } from 'src/api';
-import { Page } from 'src/components';
+import { Page, RowButton } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { formatBoolean } from 'src/lib';
 import { texts } from 'src/texts';
@@ -60,7 +60,9 @@ export function UserGroupsPage() {
           <tbody>
             {userGroups.map((userGroup) => (
               <tr className={listClasses.row} key={userGroup.id} onClick={() => setToUpdate(userGroup)}>
-                <td className={listClasses.cellStrong}>{userGroup.name}</td>
+                <td className={listClasses.cellStrong}>
+                  <RowButton onClick={() => setToUpdate(userGroup)}>{userGroup.name}</RowButton>
+                </td>
                 <td className={listClasses.cell}>{formatBoolean(userGroup.isAdmin)}</td>
                 <td className={listClasses.cell}>{formatBoolean(userGroup.isBuiltIn)}</td>
               </tr>

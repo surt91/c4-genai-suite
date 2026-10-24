@@ -1,11 +1,15 @@
+import { UnstyledButton } from '@mantine/core';
 import { IconSortAscending, IconSortDescending } from '@tabler/icons-react';
 import { flexRender } from '@tanstack/react-table';
+import { clsx } from 'clsx';
 import classes from './FilterableTable.module.css';
 import { FileTable } from './file-table';
 
 type FilterableTableProps = {
   table: FileTable;
 };
+
+const ARIA_SORT = { asc: 'ascending', desc: 'descending' } as const;
 
 export function FilterableTable({ table }: FilterableTableProps) {
   return (
@@ -15,31 +19,41 @@ export function FilterableTable({ table }: FilterableTableProps) {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const canSort = header.column.getCanSort();
+                const sorted = header.column.getIsSorted();
+
+                const label = (
+                  <div className={classes.headerLabel}>
+                    <div className={classes.headerText}>{flexRender(header.column.columnDef.header, header.getContext())}</div>
+                  </div>
+                );
+
                 return (
-                  <th key={header.id} colSpan={header.colSpan} className={classes.th}>
-                    {header.isPlaceholder ? null : (
-                      <div className={classes.header}>
-                        <div className={classes.headerLabel}>
-                          <div className={classes.headerText}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </div>
-                        </div>
-                        <div
-                          {...{
-                            className: header.column.getCanSort() ? classes.sortable : '',
-                            onClick: header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          {header.column.getCanSort()
-                            ? ({
-                                asc: <IconSortAscending className={classes.sortActive} size={18} />,
-                                desc: <IconSortDescending className={classes.sortActive} size={18} />,
-                              }[header.column.getIsSorted() as string] ?? (
-                                <IconSortAscending className={classes.sortInactive} size={18} />
-                              ))
-                            : null}
-                        </div>
-                      </div>
+                  <th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={classes.th}
+                    aria-sort={canSort ? (sorted ? ARIA_SORT[sorted] : 'none') : undefined}
+                  >
+                    {header.isPlaceholder ? null : canSort ? (
+                      // the whole header is the sort button, so that its label is the accessible name
+                      <UnstyledButton
+                        className={clsx(classes.header, classes.sortable)}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {label}
+                        {sorted === 'desc' ? (
+                          <IconSortDescending className={classes.sortActive} size={18} aria-hidden="true" />
+                        ) : (
+                          <IconSortAscending
+                            className={sorted ? classes.sortActive : classes.sortInactive}
+                            size={18}
+                            aria-hidden="true"
+                          />
+                        )}
+                      </UnstyledButton>
+                    ) : (
+                      <div className={classes.header}>{label}</div>
                     )}
                   </th>
                 );

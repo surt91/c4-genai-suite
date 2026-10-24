@@ -3,7 +3,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { useApi, UserDto, UserGroupDto } from 'src/api';
-import { Page, Pagination, Search } from 'src/components';
+import { Page, Pagination, RowButton, Search } from 'src/components';
 import { useEventCallback } from 'src/hooks';
 import { formatBoolean } from 'src/lib';
 import { texts } from 'src/texts';
@@ -85,7 +85,9 @@ export function UsersPage() {
             <tbody>
               {users.map((user) => (
                 <tr className={listClasses.row} key={user.id} onClick={() => setToUpdate(user)}>
-                  <td className={listClasses.cellStrong}>{user.name}</td>
+                  <td className={listClasses.cellStrong}>
+                    <RowButton onClick={() => setToUpdate(user)}>{user.name}</RowButton>
+                  </td>
                   <td className={listClasses.cellTruncate}>{user.email}</td>
                   <td className={listClasses.cell}>
                     {userGroups

@@ -14,6 +14,7 @@ export * from './Markdown';
 export * from './Modal';
 export * from './Page';
 export * from './Pagination';
+export * from './RowButton';
 export * from './ProfileButton';
 export * from './RouteWhenAdmin';
 export * from './RouteWhenPrivate';
