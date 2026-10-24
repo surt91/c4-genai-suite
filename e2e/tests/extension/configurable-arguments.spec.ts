@@ -1,10 +1,9 @@
 import { expect } from '@playwright/test';
+import { createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
 import {
-  addMockModelToConfiguration,
   addSystemPromptToConfiguration,
   configureAssistantByUser,
-  createConfiguration,
   enterAdminArea,
   enterUserArea,
   login,
@@ -16,24 +15,13 @@ import {
   uniqueName,
 } from '../utils/helper';
 
-test('configurable arguments', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: '', description: '' };
+test('configurable arguments', async ({ page, mockServerUrl, adminUser, adminApi }) => {
+  const configuration = { name: uniqueName('E2E-Test-Configurable-Arguments') };
 
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
     await login(page, adminUser);
-  });
-
-  await test.step('add assistant', async () => {
-    configuration.name = uniqueName('E2E-Test-Configurable-Arguments');
-    configuration.description = `Description for ${configuration.name}`;
     await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-  });
-
-  await test.step('add model', async () => {
-    await addMockModelToConfiguration(page, configuration, {
-      endpoint: mockServerUrl,
-    });
   });
 
   await test.step('add prompt', async () => {

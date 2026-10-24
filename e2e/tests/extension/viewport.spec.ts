@@ -1,36 +1,17 @@
 import { expect } from '@playwright/test';
+import { createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
-import {
-  addMockModelToConfiguration,
-  addSystemPromptToConfiguration,
-  createConfiguration,
-  enterAdminArea,
-  enterUserArea,
-  expectA11yCompliant,
-  expectElementInYRange,
-  login,
-  selectConfiguration,
-  sendMessage,
-  uniqueName,
-} from '../utils/helper';
+import { expectA11yCompliant, expectElementInYRange, login, selectConfiguration, sendMessage, uniqueName } from '../utils/helper';
 
-test('Chat viewport scrolling', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: uniqueName('E2E-Test'), description: '' };
+test('Chat viewport scrolling', async ({ page, mockServerUrl, adminUser, adminApi }) => {
+  const configuration = { name: uniqueName('E2E-Test') };
 
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
     await login(page, adminUser);
   });
 
-  await test.step('should add mock assistant', async () => {
-    configuration.description = `Example for the ${configuration.name}`;
-    await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
-    await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.' });
-  });
-
   await test.step('should reply to questions in the chat', async () => {
-    await enterUserArea(page);
     await selectConfiguration(page, configuration);
     await sendMessage(page, configuration, {
       message: 'Wie sagt man auf Englisch Banane. Antworte ohne Großbuchstaben in einem Wort.',
@@ -97,16 +78,12 @@ test('Chat viewport scrolling', async ({ page, mockServerUrl, adminUser }) => {
   });
 });
 
-test('Mobile navigation via the header', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: uniqueName('E2E-Mobile'), description: '' };
+test('Mobile navigation via the header', async ({ page, mockServerUrl, adminUser, adminApi }) => {
+  const configuration = { name: uniqueName('E2E-Mobile') };
 
-  await test.step('should login and add a mock assistant', async () => {
+  await test.step('should login and chat with a mock assistant', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
     await login(page, adminUser);
-    configuration.description = `Example for the ${configuration.name}`;
-    await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
-    await enterUserArea(page);
     await selectConfiguration(page, configuration);
     await sendMessage(page, configuration, { message: 'What is the capital of Germany?' });
   });

@@ -9,7 +9,6 @@ import {
   enterAdminArea,
   enterUserArea,
   expectA11yCompliant,
-  expectElementInYRange,
   globalUserBucketName,
   login,
   myFileCheckbox,
@@ -22,24 +21,14 @@ import {
 } from '../utils/helper';
 
 test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: uniqueName('E2E-Test'), description: '' };
+  const configuration = { name: uniqueName('E2E-Test'), description: 'chat with file search' };
   const bucket = { name: globalUserBucketName() };
   await test.step('should login', async () => {
     await login(page, adminUser);
   });
 
-  await test.step('should not add Configuration without required fields', async () => {
-    await enterAdminArea(page);
-    await createConfiguration(page, configuration, { detached: false });
-
-    const testoutput = await page.waitForSelector(`:has-text("Too small: expected string to have >=1 characters")`);
-    expect(testoutput).toBeDefined();
-
-    await page.getByText('Cancel').click();
-  });
-
   await test.step('should add Configuration', async () => {
-    configuration.description = `Example for the ${configuration.name}`;
+    await enterAdminArea(page);
     await createConfiguration(page, configuration);
   });
 
@@ -95,14 +84,6 @@ test('chat with file search', async ({ page, mockServerUrl, adminUser }) => {
 
     expect(newChatItemText).toBe('What is the capital of Germany?');
     expect(newChatItemCount).toBe(2);
-  });
-
-  await test.step('should not show previous reply in viewport after sending question', async () => {
-    await sendMessage(page, configuration, {
-      message: 'Write a two-column table with the lower case letters from a to z followed by a random short word in the rows.',
-    });
-    const element = page.getByText(/^What is the capital of Germany.+Friendly AI/);
-    await expectElementInYRange(element, -200, 96);
   });
 
   await test.step('should show the shared user bucket', async () => {

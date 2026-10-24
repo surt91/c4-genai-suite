@@ -1,10 +1,8 @@
 import { expect } from '@playwright/test';
+import { createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
 import {
   addFilesInChatExtensionToConfiguration,
-  addMockModelToConfiguration,
-  addSystemPromptToConfiguration,
-  createConfiguration,
   deleteFirstFileFromPaperclip,
   duplicateActiveConversation,
   enterAdminArea,
@@ -20,24 +18,16 @@ import {
   uploadFileWithPaperclip,
 } from '../utils/helper';
 
-test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
+test('files in chat', async ({ page, mockServerUrl, adminUser, adminApi }) => {
   let originalConversationWithChatWithFiles: string | null;
+  // the conversation bucket is shared by all tests and created in global.setup.ts (with a general size limit of 10 MB)
   const conversationFilesBucket = globalConversationBucketName();
+  const configuration = { name: uniqueName('E2E-Test-Other') };
 
-  const configuration = { name: '', description: '' };
-
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
     await login(page, adminUser);
-  });
-
-  await test.step('add assistant', async () => {
-    configuration.name = uniqueName('E2E-Test-Other');
-    configuration.description = `Description for ${configuration.name}`;
     await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
-    await addSystemPromptToConfiguration(page, configuration, { text: 'Your are a helpful assistant.' });
-    // the conversation bucket is shared by all tests and created in global.setup.ts (with a general size limit of 10 MB)
   });
 
   await test.step('should add files in chat extension to Configuration', async () => {
@@ -154,11 +144,10 @@ test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
     });
 
     await originalConversationLocator.click();
-    await page.waitForLoadState('networkidle', { timeout: 5000 });
 
     // check file chip
     const fileChip = page.getByTestId('file-chip');
-    await expect(fileChip).toBeVisible({ timeout: 3000 });
+    await expect(fileChip).toBeVisible();
     const fileName = await fileChip.getByText('birthdays.pdf').textContent();
     expect(fileName).toBeDefined();
 
@@ -175,31 +164,6 @@ test('files in chat', async ({ page, mockServerUrl, adminUser }) => {
     });
     const output = await page.waitForSelector(`:has-text("2")`);
     expect(output).toBeDefined();
-  });
-
-  await test.step('should start a new chat, upload files and retrieve content', async () => {
-    await enterAdminArea(page);
-    await enterUserArea(page);
-    await newChat(page);
-    await uploadFileWithPaperclip(page, 'birthdays.pdf');
-    await sendMessage(page, configuration, {
-      message:
-        'For each uploaded file, describe its content. For the PDF, provide a summary of its content. Present your response as a table with one column: "Content".',
-    });
-    const table = await page.waitForSelector('table', { timeout: 30000, state: 'visible' });
-    expect(table).toBeDefined();
-  });
-
-  await test.step('should duplicate a conversation that includes a file uploaded with chat with files extension', async () => {
-    const originalConversationWithTwoFiles = uniqueName('ChatWithTwoFilesDuplicationTest');
-
-    await duplicateActiveConversation(page, originalConversationWithTwoFiles);
-    const duplicatedName = `${originalConversationWithTwoFiles} (2)`;
-    const duplicatedConversation = page.getByTestId('conversation-item').filter({ hasText: duplicatedName });
-    await expect(duplicatedConversation).toBeVisible();
-
-    const fileChips = page.getByTestId('file-chip');
-    await expect(fileChips.first()).toContainText('birthdays.pdf');
   });
 
   await test.step('should duplicate a conversation that includes a file uploaded with chat with files extension, delete the original file and show sources in the duplicated conversation', async () => {

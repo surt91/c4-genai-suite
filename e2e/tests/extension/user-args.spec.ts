@@ -1,10 +1,7 @@
 import { expect } from '@playwright/test';
+import { addExtensionViaApi, createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
 import {
-  addMockModelToConfiguration,
-  addSystemPromptToConfiguration,
-  addUserArgsToConfiguration,
-  createConfiguration,
   disableUserArgsInConfiguration,
   enterAdminArea,
   enterUserArea,
@@ -29,8 +26,8 @@ type TUserArgs = {
   };
 };
 
-test('user args', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: '', description: '' };
+test('user args', async ({ page, mockServerUrl, adminUser, adminApi }) => {
+  const configuration = { name: uniqueName('E2E-Test-User-Args') };
   const filter = {
     string: 'Test-String',
     date: '2024-03-12',
@@ -40,31 +37,10 @@ test('user args', async ({ page, mockServerUrl, adminUser }) => {
     multiSelect: ['value3', 'value4', 'value5'],
   };
 
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    const assistant = await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
+    await addExtensionViaApi(adminApi, assistant, 'user-args-test', {});
     await login(page, adminUser);
-  });
-
-  await test.step('add assistant', async () => {
-    configuration.name = uniqueName('E2E-Test-User-Args');
-    configuration.description = `Description for ${configuration.name}`;
-    await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-  });
-
-  await test.step('add model', async () => {
-    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
-  });
-
-  await test.step('add prompt', async () => {
-    await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.' });
-  });
-
-  await test.step('add user args extension', async () => {
-    await addUserArgsToConfiguration(page, configuration);
-  });
-
-  await test.step('create new chat', async () => {
-    await enterUserArea(page);
     await newChat(page);
   });
 

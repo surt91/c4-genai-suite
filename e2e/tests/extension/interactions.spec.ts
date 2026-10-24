@@ -1,35 +1,27 @@
-import { Page } from '@playwright/test';
+import { APIRequestContext, Page } from '@playwright/test';
+import { addExtensionViaApi, createMockAssistantViaApi, TestUser } from '../utils/api';
 import { expect, test } from '../utils/fixtures';
-import {
-  addMCPToConfiguration,
-  addMockModelToConfiguration,
-  createConfiguration,
-  enterAdminArea,
-  enterUserArea,
-  expectA11yCompliant,
-  login,
-  newChat,
-  selectConfiguration,
-  uniqueName,
-} from '../utils/helper';
-import { TEST_MCP_FAILURE } from '../utils/test-mcp-server';
+import { expectA11yCompliant, login, newChat, selectConfiguration, uniqueName } from '../utils/helper';
+import { TEST_MCP_FAILURE, TEST_MCP_TOOLS } from '../utils/test-mcp-server';
 
-/** Creates an assistant with the mock LLM and the test MCP server and starts a chat with it. */
+/** Creates an assistant with the mock LLM and the test MCP server, logs in and starts a chat with the assistant. */
 async function setUp(
   page: Page,
+  adminApi: APIRequestContext,
+  user: TestUser,
   options: { mockServerUrl: string; mcpUrl: string; serverName: string; allowedDomains?: string },
 ) {
-  const configuration = { name: uniqueName('E2E-Interactions'), description: 'Interactions' };
-  await enterAdminArea(page);
-  await createConfiguration(page, configuration);
-  await addMockModelToConfiguration(page, configuration, { endpoint: options.mockServerUrl });
-  await addMCPToConfiguration(page, configuration, {
-    name: options.serverName,
+  const configuration = { name: uniqueName('E2E-Interactions') };
+  const assistant = await createMockAssistantViaApi(adminApi, configuration.name, options.mockServerUrl);
+  // the form of the MCP extension is tested in mcp-server.spec.ts
+  await addExtensionViaApi(adminApi, assistant, 'mcp', {
+    serverName: options.serverName,
     endpoint: options.mcpUrl,
     transport: 'streamableHttp',
     allowedDomains: options.allowedDomains,
+    schema: Object.fromEntries(Object.values(TEST_MCP_TOOLS).map((tool) => [tool, { enabled: true }])),
   });
-  await enterUserArea(page);
+  await login(page, user);
   await newChat(page);
   await selectConfiguration(page, configuration);
   return configuration;
@@ -45,13 +37,18 @@ async function waitForAnswer(page: Page) {
   await expect(page.locator('.animate-loading-dot')).toHaveCount(0);
 }
 
-test('confirms a form of a tool inline and keeps the result', async ({ page, mockServerUrl, adminUser, testMcpServer }) => {
+test('confirms a form of a tool inline and keeps the result', async ({
+  page,
+  mockServerUrl,
+  adminUser,
+  adminApi,
+  testMcpServer,
+}) => {
   const serverName = uniqueName('Calendar');
   let configuration = { name: '' };
 
   await test.step('set up', async () => {
-    await login(page, adminUser);
-    configuration = await setUp(page, { mockServerUrl, mcpUrl: testMcpServer.url, serverName });
+    configuration = await setUp(page, adminApi, adminUser, { mockServerUrl, mcpUrl: testMcpServer.url, serverName });
   });
 
   const card = page.getByTestId('chat-card-form');
@@ -95,13 +92,18 @@ test('confirms a form of a tool inline and keeps the result', async ({ page, moc
   });
 });
 
-test('asks for the consent before opening a page of a tool', async ({ page, mockServerUrl, adminUser, testMcpServer }) => {
+test('asks for the consent before opening a page of a tool', async ({
+  page,
+  mockServerUrl,
+  adminUser,
+  adminApi,
+  testMcpServer,
+}) => {
   const serverName = uniqueName('Calendar');
   let configuration = { name: '' };
 
   await test.step('set up', async () => {
-    await login(page, adminUser);
-    configuration = await setUp(page, { mockServerUrl, mcpUrl: testMcpServer.url, serverName });
+    configuration = await setUp(page, adminApi, adminUser, { mockServerUrl, mcpUrl: testMcpServer.url, serverName });
   });
 
   const card = page.getByTestId('chat-card-url');
@@ -155,12 +157,11 @@ test('asks for the consent before opening a page of a tool', async ({ page, mock
   });
 });
 
-test('blocks pages of domains that are not allowed', async ({ page, mockServerUrl, adminUser, testMcpServer }) => {
+test('blocks pages of domains that are not allowed', async ({ page, mockServerUrl, adminUser, adminApi, testMcpServer }) => {
   let configuration = { name: '' };
 
   await test.step('set up with an allowlist', async () => {
-    await login(page, adminUser);
-    configuration = await setUp(page, {
+    configuration = await setUp(page, adminApi, adminUser, {
       mockServerUrl,
       mcpUrl: testMcpServer.url,
       serverName: uniqueName('Calendar'),
@@ -178,13 +179,18 @@ test('blocks pages of domains that are not allowed', async ({ page, mockServerUr
   });
 });
 
-test('marks failed tools as errors and shows the details', async ({ page, mockServerUrl, adminUser, testMcpServer }) => {
+test('marks failed tools as errors and shows the details', async ({
+  page,
+  mockServerUrl,
+  adminUser,
+  adminApi,
+  testMcpServer,
+}) => {
   const serverName = uniqueName('Calendar');
   let configuration = { name: '' };
 
   await test.step('set up', async () => {
-    await login(page, adminUser);
-    configuration = await setUp(page, { mockServerUrl, mcpUrl: testMcpServer.url, serverName });
+    configuration = await setUp(page, adminApi, adminUser, { mockServerUrl, mcpUrl: testMcpServer.url, serverName });
   });
 
   const toolCard = page.getByTestId('tool-card').filter({ hasText: `${serverName}: failing_tool` });

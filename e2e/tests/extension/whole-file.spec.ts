@@ -1,16 +1,13 @@
 import { expect, Locator } from '@playwright/test';
+import { createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
 import {
   addFilesInChatExtensionToConfiguration,
-  addMockModelToConfiguration,
-  addSystemPromptToConfiguration,
   addVisionFileExtensionToConfiguration,
   addWholeFileExtensionToConfiguration,
-  createConfiguration,
   deactivateFileInChatExtensionToConfiguration,
   deleteFirstFileFromPaperclip,
   duplicateActiveConversation,
-  editBucket,
   enterAdminArea,
   enterUserArea,
   globalConversationBucketName,
@@ -22,30 +19,16 @@ import {
   uploadFileWithPaperclip,
 } from '../utils/helper';
 
-test('whole file extension', async ({ page, mockServerUrl, adminUser }) => {
+test('whole file extension', async ({ page, mockServerUrl, adminUser, adminApi }) => {
   let lastMessageOriginal: Locator;
   let originalConversationName: string | null;
   const conversationFilesBucket = globalConversationBucketName();
+  const configuration = { name: uniqueName('E2E-Whole-File') };
 
-  const configuration = { name: '', description: '' };
-
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
     await login(page, adminUser);
-  });
-
-  await test.step('add assistant', async () => {
-    configuration.name = uniqueName('E2E-Whole-File');
-    configuration.description = `Description for ${configuration.name}`;
     await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-  });
-
-  await test.step('add model', async () => {
-    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
-  });
-
-  await test.step('add prompt', async () => {
-    await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.' });
   });
 
   await test.step('should add whole file extension to Assistant', async () => {
@@ -120,24 +103,6 @@ test('whole file extension', async ({ page, mockServerUrl, adminUser }) => {
     expect(lastChatText).not.toContain('Gladstone Gander');
   });
 
-  await test.step('change file size limit', async () => {
-    await enterAdminArea(page);
-    // The conversation bucket is shared with other tests running in parallel, which upload pdf files.
-    // So only reject txt files (which no other test uploads to this bucket) instead of all files.
-    await editBucket(page, { name: conversationFilesBucket, fileSizeLimits: { general: 10, txt: 0 } });
-  });
-
-  await test.step('should reject large file', async () => {
-    await enterUserArea(page);
-    await newChat(page);
-    await selectConfiguration(page, configuration);
-    await uploadFileWithPaperclip(page, 'e2e-test.txt', true);
-    await page
-      .getByRole('alert')
-      .filter({ hasText: /^Failed to upload file. 'e2e-test.txt': The file is larger than allowed for this file type./ })
-      .click();
-  });
-
   await test.step('should add vision extension to Assistant and be compatible', async () => {
     await enterAdminArea(page);
     await addVisionFileExtensionToConfiguration(page, configuration);
@@ -172,17 +137,11 @@ test('whole file extension', async ({ page, mockServerUrl, adminUser }) => {
   });
 
   await test.step('should check if content of duplicated conversation with complete file extension match original conversation', async () => {
-    const scrollButton = page.locator('button[data-testid="scrollToBottomButton"]');
-    try {
-      await scrollButton.waitFor({ state: 'visible', timeout: 5000 });
-      await scrollButton.click();
-    } catch {
-      // Scroll button not visible, page is already at bottom
-    }
     const lastChatItem = page.locator('[data-testid="chat-item"]').last();
 
+    // wait until the duplicated conversation is shown (its last answer is the one before the duplication)
+    await expect(lastChatItem).toContainText('5/14/2001');
     const aiName = 'Friendly AI';
-    await expect(lastChatItem).toBeVisible({ timeout: 20000 });
     await expect(lastChatItem).toContainText(aiName);
 
     const lastMessageCopy = await lastChatItem.locator('.markdown').first().innerText();

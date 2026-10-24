@@ -47,38 +47,4 @@ test.describe('User management', () => {
 
     await expect(page.getByRole('table').getByRole('row').filter({ hasText: user.email })).toHaveCount(0);
   });
-
-  test('should set user group to default when creating a new user', async ({ page }) => {
-    await navigateToUserAdministration(page);
-
-    await page.getByRole('button', { name: 'Create User' }).click();
-
-    const allPills = page.locator('.mantine-MultiSelect-pill');
-    await expect(allPills).toHaveCount(1);
-    const defaultPill = allPills.getByText('Default');
-    await expect(defaultPill).toBeVisible();
-  });
-
-  test('should alert when username and email is empty', async ({ page }) => {
-    await navigateToUserAdministration(page);
-
-    await page.getByRole('button', { name: 'Create User' }).click();
-    await page.getByRole('button', { name: 'Save' }).click();
-
-    expect(page.getByRole('alert', { name: 'Name is a required field' })).toBeDefined();
-    expect(page.getByRole('alert', { name: 'Email is a required field' })).toBeDefined();
-  });
-
-  test('should alert when password and confirm password do not match', async ({ page }) => {
-    await navigateToUserAdministration(page);
-
-    await page.getByRole('button', { name: 'Create User' }).click();
-    await page.getByLabel('Password', { exact: true }).click();
-    await page.getByLabel('Password', { exact: true }).fill('abc');
-    await page.getByLabel('Confirm Password').click();
-    await page.getByLabel('Confirm Password').fill('abd');
-    await page.getByRole('button', { name: 'Save' }).click();
-
-    expect(page.getByRole('alert', { name: 'Passwords do not match.' })).toBeDefined();
-  });
 });

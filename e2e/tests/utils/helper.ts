@@ -4,10 +4,27 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, Locator, Page } from '@playwright/test';
 import { config } from './config';
 
-export async function login(page: Page, user?: { email: string; password: string }) {
+const INITIAL_ADMIN = { email: 'admin@example.com', password: 'secret' };
+
+/**
+ * Logs in via the API (faster than the login form) and opens the chat. `page.request` shares the cookies with the
+ * page, so the page has the session as well. Use `loginViaUi` in tests about the login itself.
+ */
+export async function login(page: Page, user: { email: string; password: string } = INITIAL_ADMIN) {
+  const response = await page.request.post(`${config.URL}/api/auth/login`, {
+    data: { email: user.email, password: user.password },
+  });
+  expect(response.ok(), `login of ${user.email} via API failed: ${response.status()}`).toBeTruthy();
+  await page.goto(`${config.URL}/chat`);
+  await waitForConversation(page);
+  await page.getByTestId('menu user').waitFor({ state: 'visible' });
+}
+
+/** Logs in with the login form. */
+export async function loginViaUi(page: Page, user: { email: string; password: string } = INITIAL_ADMIN) {
   await page.goto(`${config.URL}/login`);
-  await page.getByPlaceholder('Email').fill(user?.email ?? 'admin@example.com');
-  await page.getByPlaceholder('Password').fill(user?.password ?? 'secret');
+  await page.getByPlaceholder('Email').fill(user.email);
+  await page.getByPlaceholder('Password').fill(user.password);
   await page.getByRole('button', { name: 'Login' }).click();
   await waitForConversation(page);
   await page.getByTestId('menu user').waitFor({ state: 'visible' });
@@ -76,11 +93,7 @@ export async function save(page: Page, expectDetached = true) {
   }
 }
 
-export async function createConfiguration(
-  page: Page,
-  configuration: { name: string; description: string },
-  expect: { detached: boolean } = { detached: true },
-) {
+export async function createConfiguration(page: Page, configuration: { name: string; description: string }) {
   await page.getByRole('link', { name: 'Assistants' }).click();
   await page.getByRole('button', { name: 'Create assistant' }).click();
 
@@ -89,7 +102,7 @@ export async function createConfiguration(
     await page.getByLabel(/^Description/).fill(`Example for the ${configuration.description}`);
   }
 
-  await save(page, expect.detached);
+  await save(page);
 }
 
 export async function disableConfiguration(page: Page, configuration: { name: string; description: string }) {
@@ -117,20 +130,6 @@ export async function clearMessages(page: Page) {
   const confirm = page.getByRole('button', { name: 'Confirm deletion' });
   await confirm.click();
   await confirm.waitFor({ state: 'detached' });
-}
-
-export async function deleteBucket(page: Page, bucket: { name: string }, ifExists = false) {
-  await page.getByRole('link', { name: 'Files' }).click();
-
-  const bucketLink = page.getByRole('link', { name: bucket.name });
-  if (ifExists && (await bucketLink.count()) === 0) {
-    // in the case the bucket does not exist, we are done
-    return;
-  }
-  const bucketMenu = bucketLink.locator('..').getByTestId('more-actions');
-  await bucketMenu.click();
-  await page.click('button:has-text("Delete")');
-  await page.click('button:has-text("Confirm")');
 }
 
 export async function editBucket(
@@ -278,29 +277,6 @@ export async function addWholeFileExtensionToConfiguration(
   await save(page);
 }
 
-export async function editWholeFileExtension(page: Page, configuration: { name: string }) {
-  await openAssistant(page, configuration.name);
-  await page.getByTestId('sidebar-admin').getByRole('tab', { name: 'Tools' }).click();
-  await page.getByRole('heading', { name: 'Complete Files', exact: true }).click();
-
-  await save(page);
-}
-
-export async function addImageToClipboard(page: Page) {
-  await page.evaluate(async () => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx?.fillText('42', 50, 50);
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve));
-    if (blob) {
-      const item = new ClipboardItem({
-        [blob.type]: blob,
-      });
-      await navigator.clipboard.write([item]);
-    }
-  });
-}
-
 export async function addVisionFileExtensionToConfiguration(page: Page, configuration: { name: string }, matchName?: RegExp) {
   const name = matchName ?? configuration.name;
   await openAssistant(page, name);
@@ -436,29 +412,6 @@ export async function addSystemPromptToConfiguration(
   await save(page);
 }
 
-export async function addOllamaModelToConfiguration(page: Page, configuration: { name: string }, ollama: { model: string }) {
-  await openAssistant(page, configuration.name);
-
-  await page.getByRole('button', { name: 'Add Extension' }).click();
-
-  await page
-    .locator('*')
-    .filter({ hasText: /^DEV: OllamaOllama LLM integrationllm$/ })
-    .nth(1)
-    .click();
-  await page.getByLabel('Endpoint').fill('host.docker.internal:11434');
-  await page.getByLabel('Model Name').fill(ollama.model);
-
-  await page.getByRole('button', { name: 'Test' }).click();
-  await page
-    .getByRole('alert')
-    .filter({ hasText: /^Extension is valid./ })
-    .getByRole('button')
-    .click();
-
-  await save(page);
-}
-
 /** The assistant of the chat is shown as the first chip of the composer. */
 export async function checkSelectedConfiguration(page: Page, configuration: { name: string }) {
   await expect(page.getByTestId('chat-settings-button')).toHaveText(configuration.name);
@@ -469,8 +422,8 @@ export async function selectConfiguration(page: Page, configuration: { name: str
   const popover = page.getByTestId('chat-settings-popover');
   const select = popover.getByTestId('chat-assistant-select');
   const element = popover.locator('p').getByText(configuration.name, { exact: true });
-  // While a chat is loading, the app focuses the message input, which closes the popover or the dropdown again. So
-  // reopen them until the assistant could be clicked.
+  // While a chat is loading, the app focuses the message input, which closes the popover or the dropdown again, and a
+  // click may hit the list while it is rendered again. So retry until the assistant is selected.
   await expect(async () => {
     if ((await chip.textContent()) === configuration.name) {
       return;
@@ -482,6 +435,7 @@ export async function selectConfiguration(page: Page, configuration: { name: str
       await select.click();
     }
     await element.click({ timeout: 2_000 });
+    await expect(chip).toHaveText(configuration.name, { timeout: 2_000 });
   }).toPass();
   await expect(chip).toHaveText(configuration.name);
   if (await popover.isVisible()) {

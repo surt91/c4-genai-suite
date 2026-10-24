@@ -1,4 +1,4 @@
-import { resetGlobalSuggestionsViaApi } from '../utils/api';
+import { createAssistantViaApi, resetGlobalSuggestionsViaApi } from '../utils/api';
 import { expect, test } from '../utils/fixtures';
 import {
   enterUserArea,
@@ -19,8 +19,10 @@ test('When using suggestions gaible', async ({ page, adminUser, adminApi }) => {
   const ASSISTANT_NAME = uniqueName('Assistant Suggestions');
   const ASSISTANT_NAME_GLOBAL = uniqueName('Global Suggestions');
 
-  await test.step('will remove global suggestions of previous runs', async () => {
+  await test.step('will remove global suggestions of previous runs and create an assistant without suggestions', async () => {
     await resetGlobalSuggestionsViaApi(adminApi);
+    // an assistant without own suggestions
+    await createAssistantViaApi(adminApi, ASSISTANT_NAME_GLOBAL);
   });
 
   await test.step('will login', async () => {
@@ -38,14 +40,6 @@ test('When using suggestions gaible', async ({ page, adminUser, adminApi }) => {
     await navigateToThemeAdministration(page);
     await selectOption(page, 'language', /^Eng.+/);
     await page.getByRole('group').getByRole('button', { name: 'Save' }).click();
-  });
-
-  await test.step('will create empty assistant for global suggestions check', async () => {
-    await page.getByRole('link', { name: 'Assistants' }).click();
-    await page.getByRole('button', { name: 'Create assistant' }).click();
-    await page.getByLabel(/^Name/).fill(ASSISTANT_NAME_GLOBAL);
-    await page.getByLabel(/^Description/).fill('without llm');
-    await page.getByRole('button', { name: 'Save' }).click();
   });
 
   await test.step('will open create dialog for new assistant', async () => {

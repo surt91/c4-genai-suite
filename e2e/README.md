@@ -33,7 +33,10 @@ away; check a new test for flakiness with e.g. `--repeat-each=5`. To keep them i
 - Use the `test` from [`tests/utils/fixtures.ts`](tests/utils/fixtures.ts) and log in with the `adminUser` fixture
   (`await login(page, adminUser)`): every test gets a fresh admin user, so per-user state like conversations,
   uploaded user files or the password does not collide. `adminApi` is an API context of the initial admin to set up
-  data quickly via the REST API (see [`tests/utils/api.ts`](tests/utils/api.ts)).
+  data quickly via the REST API (see [`tests/utils/api.ts`](tests/utils/api.ts)). `login` logs in via the API as well.
+- Only use the UI for what the test is about: create assistants, extensions, users etc. via the API otherwise (e.g.
+  `createMockAssistantViaApi`). Checks of a single form or component (e.g. validation messages) belong into the unit
+  tests of the frontend.
 - Give everything a test creates a unique name (`uniqueName(...)`), inside the test function (not at module level,
   which is shared by repeated runs in the same worker).
 - Only assert on the entities the test created (filter by their unique names), never on global lists, counts or the

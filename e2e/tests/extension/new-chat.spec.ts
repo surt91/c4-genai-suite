@@ -1,43 +1,18 @@
 import { expect, Page } from '@playwright/test';
+import { createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
-import {
-  addMockModelToConfiguration,
-  checkSelectedConfiguration,
-  createConfiguration,
-  enterAdminArea,
-  enterUserArea,
-  login,
-  newChat,
-  selectConfiguration,
-  sendMessage,
-  uniqueName,
-} from '../utils/helper';
+import { checkSelectedConfiguration, login, newChat, selectConfiguration, sendMessage, uniqueName } from '../utils/helper';
 
-test('Chat workflow with Mock LLM', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: '', description: '' };
+test('Chat workflow with Mock LLM', async ({ page, mockServerUrl, adminUser, adminApi }) => {
+  const configuration = { name: uniqueName('Mock-LLM-Chat') };
   const secondAssistantName = uniqueName('Second Assistant');
 
-  await test.step('should login', async () => {
-    await login(page, adminUser);
-  });
-
-  await test.step('add assistant', async () => {
-    await enterAdminArea(page);
-    configuration.name = uniqueName('Mock-LLM-Chat');
-    configuration.description = `Description for ${configuration.name}`;
-    await createConfiguration(page, configuration);
-    await createConfiguration(page, { ...configuration, name: secondAssistantName });
-  });
-
-  await test.step('add model', async () => {
-    await addMockModelToConfiguration(page, configuration, { endpoint: mockServerUrl });
-    await addMockModelToConfiguration(page, { ...configuration, name: secondAssistantName }, { endpoint: mockServerUrl });
-  });
-
-  await test.step('switch to chat', async () => {
+  await test.step('setup', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
+    await createMockAssistantViaApi(adminApi, secondAssistantName, mockServerUrl);
     // The test asserts on the total number of conversations. This works because `adminUser` is a fresh user
     // without conversations.
-    await enterUserArea(page);
+    await login(page, adminUser);
   });
 
   await test.step('should start chat in new configuration', async () => {
@@ -57,8 +32,7 @@ test('Chat workflow with Mock LLM', async ({ page, mockServerUrl, adminUser }) =
   });
 
   await test.step('should not create conversations before first query', async () => {
-    await page.getByRole('button', { name: 'New chat' }).click();
-    await page.waitForLoadState('networkidle');
+    await newChat(page);
     await expect(page.getByTestId('conversation-item')).toHaveCount(1);
   });
 
