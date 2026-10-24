@@ -1,4 +1,4 @@
-<p align="center"><img src="frontend/public/logo.svg" alt="" width="96"></p>
+<p align="center"><img src="frontend/public/logo-wordmark.svg" alt="Gaible" width="320"></p>
 
 # Gaible
 

@@ -17,6 +17,9 @@ export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
   const { isDocsButtonVisible, toggleDocs } = useDocsContext();
   const content = theme.logoUrl ? (
     <Logo key={theme.key} size={{ height: '60%' }} url={theme.logoUrl} />
+  ) : theme.name === texts.common.appName ? (
+    // the default name is shown as the wordmark with its accent color
+    <img className={classes.wordmark} src="/logo-wordmark.svg" alt={theme.name} />
   ) : (
     <span className={classes.brand}>
       <img className={classes.brandMark} src="/logo.svg" alt="" />
