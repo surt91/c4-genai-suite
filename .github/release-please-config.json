@@ -14,6 +14,5 @@
   },
   "include-v-in-tag": true,
   "separate-pull-requests": false,
-  "pull-request-title-pattern": "chore($component): release ${version}",
   "group-pull-request-title-pattern": "chore: release ${version}"
 }
