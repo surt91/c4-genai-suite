@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { addExtensionViaApi, createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
 import {
+  checkSelectedConfiguration,
   deleteConfiguration,
   disableConfiguration,
   enterAdminArea,
@@ -53,6 +54,18 @@ test('chat', async ({ page, mockServerUrl, adminUser, adminApi }) => {
     expect(secondResponse).toBeDefined();
     const secondResponseAssistantText = await page.waitForSelector(`:has-text("${secondAssistant.name}")`);
     expect(secondResponseAssistantText).toBeDefined();
+  });
+
+  await test.step('should keep the assistant of the chat after a reload', async () => {
+    await page.reload();
+    await checkSelectedConfiguration(page, secondAssistant);
+    const picker = page.getByTestId('assistant-picker');
+    await picker.click();
+    const option = page.getByTestId('assistant-picker-dropdown').getByRole('option', { name: secondAssistant.name, exact: true });
+    await expect(option).toHaveAttribute('aria-selected', 'true');
+    await expect(option).toContainText(secondAssistant.description);
+    await page.keyboard.press('Escape');
+    await expect(picker).toBeFocused();
   });
 
   await test.step('should disable second assistant', async () => {

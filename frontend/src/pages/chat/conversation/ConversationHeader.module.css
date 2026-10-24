@@ -11,3 +11,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* on phones there is only room for the assistant */
+@media (max-width: 47.99em) {
+  .title {
+    visibility: hidden;
+  }
+}

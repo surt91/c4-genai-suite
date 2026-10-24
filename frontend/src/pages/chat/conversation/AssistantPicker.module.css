@@ -1,0 +1,44 @@
+.button {
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 24rem;
+  font-weight: 600;
+}
+
+.buttonLabel {
+  min-width: 0;
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option {
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  align-items: flex-start;
+}
+
+.optionText {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionName {
+  overflow-wrap: anywhere;
+}
+
+.check {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--mantine-primary-color-filled);
+}
+
+@media (max-width: 47.99em) {
+  .button {
+    max-width: 55vw;
+  }
+}
