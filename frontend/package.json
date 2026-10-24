@@ -95,5 +95,8 @@
     "lodash": "^4.18.1",
     "@ai-sdk/provider-utils": "^4.0.62",
     "basic-ftp": "^6.2.3"
+  },
+  "allowScripts": {
+    "unrs-resolver": false
   }
 }
