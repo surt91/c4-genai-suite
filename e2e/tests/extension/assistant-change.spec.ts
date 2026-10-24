@@ -1,9 +1,7 @@
 import { expect } from '@playwright/test';
+import { addExtensionViaApi, createMockAssistantViaApi } from '../utils/api';
 import { test } from '../utils/fixtures';
 import {
-  addMockModelToConfiguration,
-  addSystemPromptToConfiguration,
-  createConfiguration,
   deleteConfiguration,
   disableConfiguration,
   enterAdminArea,
@@ -15,30 +13,22 @@ import {
   uniqueName,
 } from '../utils/helper';
 
-test('chat', async ({ page, mockServerUrl, adminUser }) => {
+test('chat', async ({ page, mockServerUrl, adminUser, adminApi }) => {
   const firstAssistant = { name: uniqueName('E2E-Test-A'), description: 'Bob' };
   const secondAssistant = { name: uniqueName('E2E-Test-B'), description: 'Alice' };
 
-  await test.step('should login', async () => {
+  await test.step('setup two assistants', async () => {
+    for (const { name, description } of [firstAssistant, secondAssistant]) {
+      const assistant = await createMockAssistantViaApi(adminApi, name, mockServerUrl, description);
+      await addExtensionViaApi(adminApi, assistant, 'custom-prompt', {
+        title: 'systemprompt',
+        text: 'Always tell that your name is {{assistant_description}}',
+      });
+    }
     await login(page, adminUser);
   });
 
-  await test.step('should add two assistants', async () => {
-    await enterAdminArea(page);
-    await createConfiguration(page, firstAssistant);
-    await addMockModelToConfiguration(page, firstAssistant, { endpoint: mockServerUrl });
-    await addSystemPromptToConfiguration(page, firstAssistant, {
-      text: 'Always tell that your name is {{assistant_description}}',
-    });
-    await createConfiguration(page, secondAssistant);
-    await addMockModelToConfiguration(page, secondAssistant, { endpoint: mockServerUrl });
-    await addSystemPromptToConfiguration(page, secondAssistant, {
-      text: 'Always tell that your name is {{assistant_description}}',
-    });
-  });
-
   await test.step('should return message for first assistant', async () => {
-    await enterUserArea(page);
     await newChat(page);
     await selectConfiguration(page, firstAssistant);
 

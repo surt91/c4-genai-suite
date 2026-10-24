@@ -19,8 +19,8 @@ setup('create shared buckets and a default assistant', async () => {
       },
       false,
     );
-    // search-file-in-chat.spec.ts and whole-file.spec.ts upload to the conversation bucket. whole-file.spec.ts adds a
-    // `txt` limit of 0 to test rejected uploads; both tests only upload pdf/pptx otherwise.
+    // search-file-in-chat.spec.ts and whole-file.spec.ts upload pdf/pptx files to the conversation bucket. The limits
+    // are enforced, since older versions of the tests changed them.
     await ensureBucketViaApi(
       api,
       {

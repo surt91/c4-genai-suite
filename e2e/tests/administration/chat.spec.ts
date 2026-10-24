@@ -1,58 +1,35 @@
+import { addExtensionViaApi, createAssistantViaApi } from '../utils/api';
 import { expect, test } from '../utils/fixtures';
 import {
-  addVisionFileExtensionToConfiguration,
   checkSelectedConfiguration,
   clearMessages,
-  createConfiguration,
   enterAdminArea,
-  enterUserArea,
   goto,
   login,
-  navigateToConfigurationAdministration,
-  navigateToThemeAdministration,
   newChat,
   selectConfiguration,
   sendMessage,
   uniqueName,
 } from '../utils/helper';
 
-test('Chat', async ({ page, adminUser }) => {
+test('Chat', async ({ page, adminUser, adminApi }) => {
   const assistantWithoutLlmName = uniqueName('Configuration without llm');
   const secondAssistant = uniqueName('Assistant');
   const thirdAssistant = uniqueName('Other Assistant');
 
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    // assistants without LLM, the vision extension allows to paste images
+    const assistantWithoutLlm = await createAssistantViaApi(adminApi, assistantWithoutLlmName);
+    await addExtensionViaApi(adminApi, assistantWithoutLlm, 'files-vision', {
+      fileNameExtensions: ['.png', '.jpg', '.jpeg', '.webp'],
+      maxFiles: 1,
+    });
+    await createAssistantViaApi(adminApi, secondAssistant);
+    await createAssistantViaApi(adminApi, thirdAssistant);
     await login(page, adminUser);
   });
 
-  await test.step('will navigate to configuration administration page', async () => {
-    await navigateToConfigurationAdministration(page);
-  });
-
-  await test.step('should add empty configuration', async () => {
-    await page.getByRole('link', { name: 'Assistants' }).click();
-    await page.getByRole('button', { name: 'Create assistant' }).click();
-    await page.getByLabel(/^Name/).fill(assistantWithoutLlmName);
-    await page.getByLabel(/^Description/).fill('A Simple Configuration without llm');
-    await page.getByRole('button', { name: 'Save' }).click();
-  });
-
-  await test.step('should add empty configuration', async () => {
-    await addVisionFileExtensionToConfiguration(page, { name: assistantWithoutLlmName });
-  });
-
-  await test.step('should upload avatar logo', async () => {
-    await navigateToThemeAdministration(page);
-
-    const parentElement = page.locator('.mantine-Card-root').nth(1);
-    const fileInput = parentElement.locator('input');
-    await fileInput.setInputFiles(__dirname + '/../utils/files/react.svg');
-    const saveButton = parentElement.locator('button:has-text("Save")');
-    await saveButton.click();
-  });
-
   await test.step('should show no-LLM-error', async () => {
-    await enterUserArea(page);
     await selectConfiguration(page, { name: assistantWithoutLlmName });
 
     const userMessage = `Hello`;
@@ -61,13 +38,6 @@ test('Chat', async ({ page, adminUser }) => {
     await page.locator('form').getByTestId('chat-submit-button').click();
     const testoutput = await page.waitForSelector(`:has-text("No llm")`);
     expect(testoutput).toBeDefined();
-  });
-
-  await test.step('should add more configurations', async () => {
-    await navigateToConfigurationAdministration(page);
-    await createConfiguration(page, { name: secondAssistant, description: 'Assistant Description' });
-    await createConfiguration(page, { name: thirdAssistant, description: 'Other Assistant Description' });
-    await enterUserArea(page);
   });
 
   await test.step('should select other assistant', async () => {

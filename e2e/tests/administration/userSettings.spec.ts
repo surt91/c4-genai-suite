@@ -1,6 +1,6 @@
 import { BUILTIN_GROUP_DEFAULT, createUserViaApi } from '../utils/api';
 import { expect, test } from '../utils/fixtures';
-import { changePassword, login } from '../utils/helper';
+import { changePassword, login, loginViaUi } from '../utils/helper';
 
 test('User settings', async ({ page, adminApi }) => {
   // a user of our own, since the test changes the password
@@ -29,6 +29,6 @@ test('User settings', async ({ page, adminApi }) => {
     await page.getByTestId('menu user').click();
     await page.getByRole('menuitem', { name: 'Logout' }).waitFor();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
-    await login(page, { email: user.email, password: 'new-secret' });
+    await loginViaUi(page, { email: user.email, password: 'new-secret' });
   });
 });

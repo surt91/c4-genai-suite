@@ -225,7 +225,8 @@ jobs:
             reis.cache-to=type=gha,scope=reis,mode=max
             mcp-fetch.cache-from=type=gha,scope=mcp-tool-as-server
             mcp-fetch.cache-to=type=gha,scope=mcp-tool-as-server,mode=max
-      - run: docker compose --profile mcp up --no-build --wait --wait-timeout 300
+      # start the stack in the background while the test dependencies are installed, wait for it below
+      - run: docker compose --profile mcp up --no-build --detach
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -237,6 +238,7 @@ jobs:
         working-directory: e2e
       - run: npx playwright install chromium --with-deps
         working-directory: e2e
+      - run: docker compose --profile mcp up --no-build --wait --wait-timeout 300
       - run: npx playwright test
         working-directory: e2e
       - uses: actions/upload-artifact@v7

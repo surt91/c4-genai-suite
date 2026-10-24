@@ -1,11 +1,9 @@
 import { expect } from '@playwright/test';
+import { createMockAssistantViaApi } from '../utils/api';
 import { config } from '../utils/config';
 import { test } from '../utils/fixtures';
 import {
   addMCPToConfiguration,
-  addMockModelToConfiguration,
-  addSystemPromptToConfiguration,
-  createConfiguration,
   enterAdminArea,
   enterUserArea,
   login,
@@ -15,28 +13,13 @@ import {
   uniqueName,
 } from '../utils/helper';
 
-test('mcp', async ({ page, mockServerUrl, adminUser }) => {
-  const configuration = { name: '', description: '' };
+test('mcp', async ({ page, mockServerUrl, adminUser, adminApi }) => {
+  const configuration = { name: uniqueName('E2E-Test-MCP') };
 
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    await createMockAssistantViaApi(adminApi, configuration.name, mockServerUrl);
     await login(page, adminUser);
-  });
-
-  await test.step('add assistant', async () => {
-    configuration.name = uniqueName('E2E-Test-MCP');
-    configuration.description = `Description for ${configuration.name}`;
     await enterAdminArea(page);
-    await createConfiguration(page, configuration);
-  });
-
-  await test.step('add model', async () => {
-    await addMockModelToConfiguration(page, configuration, {
-      endpoint: mockServerUrl,
-    });
-  });
-
-  await test.step('add prompt', async () => {
-    await addSystemPromptToConfiguration(page, configuration, { text: 'You are a helpful assistant.' });
   });
 
   await test.step('add mcp extension', async () => {

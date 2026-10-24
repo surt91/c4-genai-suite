@@ -129,21 +129,39 @@ export async function ensureAssistantViaApi(api: APIRequestContext, name: string
   }
 }
 
-/** Creates an (enabled) assistant that uses the mock LLM server of the worker. */
-export async function createMockAssistantViaApi(api: APIRequestContext, name: string, mockServerUrl: string) {
-  const assistant = await ok<{ id: number; name: string }>(
-    await api.post('/api/configurations', { data: { name, description: `Description of ${name}`, enabled: true } }),
+/** Creates an (enabled) assistant without extensions. */
+export async function createAssistantViaApi(api: APIRequestContext, name: string, description = `Description of ${name}`) {
+  return ok<{ id: number; name: string }>(
+    await api.post('/api/configurations', { data: { name, description, enabled: true } }),
     `creating assistant ${name}`,
   );
+}
+
+/** Adds an (enabled) extension, e.g. `custom-prompt` with `{ title, text }`, to an assistant. */
+export async function addExtensionViaApi(
+  api: APIRequestContext,
+  assistant: { id: number; name: string },
+  name: string,
+  values: Record<string, unknown>,
+) {
   await ok(
-    await api.post(`/api/configurations/${assistant.id}/extensions`, {
-      data: {
-        name: 'open-ai-compatible-model',
-        enabled: true,
-        values: { apiKey: 'mock-api-key', baseUrl: mockServerUrl, modelName: 'mock-gpt-4' },
-      },
-    }),
-    `adding the mock LLM to assistant ${name}`,
+    await api.post(`/api/configurations/${assistant.id}/extensions`, { data: { name, enabled: true, values } }),
+    `adding the extension ${name} to assistant ${assistant.name}`,
   );
+}
+
+/** Creates an (enabled) assistant that uses the mock LLM server of the worker. */
+export async function createMockAssistantViaApi(
+  api: APIRequestContext,
+  name: string,
+  mockServerUrl: string,
+  description?: string,
+) {
+  const assistant = await createAssistantViaApi(api, name, description);
+  await addExtensionViaApi(api, assistant, 'open-ai-compatible-model', {
+    apiKey: 'mock-api-key',
+    baseUrl: mockServerUrl,
+    modelName: 'mock-gpt-4',
+  });
   return assistant;
 }

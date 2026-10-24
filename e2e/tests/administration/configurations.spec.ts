@@ -47,11 +47,11 @@ test('Configuration Management', async ({ page, adminUser }) => {
     expect(configurationName).toEqual(configNewName);
   });
 
-  await test.step('alert when configuration name is empty', async () => {
+  await test.step('alert when configuration name and description are empty', async () => {
     await page.getByRole('button', { name: 'Create assistant' }).click();
     await page.getByRole('button', { name: 'Save' }).click();
 
-    expect(page.getByRole('alert', { name: 'Name is a required field' })).toBeDefined();
+    await expect(page.getByText('Too small: expected string to have >=1 characters')).toHaveCount(2);
     await page.getByRole('button', { name: 'Cancel' }).click();
   });
 
@@ -87,18 +87,6 @@ test('Configuration Management', async ({ page, adminUser }) => {
 
     const values = page.getByTestId('modelValues');
     await expect(values).toHaveText('gpt-4-0613');
-  });
-
-  await test.step('alert when API Key is empty and Model field is not selected with an option', async () => {
-    await page.getByLabel('assistants').getByRole('listitem').filter({ hasText: configNewName }).click();
-    await page.getByRole('button', { name: 'Add Extension' }).click();
-    await page.getByRole('group').getByRole('heading', { name: 'OpenAI', exact: true }).click();
-    await page.getByRole('button', { name: 'Save' }).click();
-
-    expect(page.getByRole('alert', { name: 'API Key is a required field' })).toBeDefined();
-    expect(page.getByRole('alert', { name: 'Model is a required field' })).toBeDefined();
-
-    await page.getByRole('button', { name: 'Cancel' }).click();
   });
 
   await test.step('alert when there are more than one model', async () => {

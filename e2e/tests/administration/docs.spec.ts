@@ -1,10 +1,12 @@
+import { createAssistantViaApi } from '../utils/api';
 import { expect, test } from '../utils/fixtures';
 import { enterAdminArea, login, uniqueName } from '../utils/helper';
 
-test('Documentation on Admin page', async ({ page, adminUser }) => {
+test('Documentation on Admin page', async ({ page, adminUser, adminApi }) => {
   const assistantName = uniqueName('Fake Assistant');
 
-  await test.step('should login', async () => {
+  await test.step('setup', async () => {
+    await createAssistantViaApi(adminApi, assistantName);
     await login(page, adminUser);
   });
 
@@ -70,11 +72,6 @@ test('Documentation on Admin page', async ({ page, adminUser }) => {
   });
 
   await test.step('should still show documentation when an Assistant is selected', async () => {
-    // create Fake Assistant for test
-    await page.getByRole('button', { name: 'Create assistant' }).click();
-    await page.getByRole('textbox', { name: 'Name' }).fill(assistantName);
-    await page.getByRole('textbox', { name: 'Description' }).fill('Test');
-    await page.getByRole('button', { name: 'Save' }).click();
     await page.getByRole('link', { name: assistantName }).click();
     await page.getByRole('heading', { name: 'The Assistants Page' }).click();
   });

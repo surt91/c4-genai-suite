@@ -37,8 +37,10 @@ test('stop the generation of an answer', async ({ page, adminApi, adminUser, moc
     // the backend stopped the request to the LLM
     await expect.poll(() => getStreamState(firstQuestion)?.aborted).toBe(true);
 
-    // the answer does not grow anymore (the stored partial answer replaces the streamed one, so compare the words only)
+    // the answer does not grow anymore. Shortly after stopping, the stored partial answer replaces the streamed one
+    // (it may have a word more than shown before), so wait for that and compare the words only.
     const words = async () => (await answer.textContent())?.match(/word\d+/g) ?? [];
+    await page.waitForTimeout(1_000);
     const partialAnswer = await words();
     await page.waitForTimeout(1_000);
     expect(await words()).toEqual(partialAnswer);
