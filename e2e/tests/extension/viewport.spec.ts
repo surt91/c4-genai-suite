@@ -127,11 +127,15 @@ test('Mobile navigation via the header', async ({ page, mockServerUrl, adminUser
     await expect(page.getByTestId('toggle-inspector')).toHaveCount(0);
   });
 
-  await test.step('should show the chat settings as a bottom sheet', async () => {
-    await page.getByTestId('chat-settings-button').click();
-    const sheet = page.getByRole('dialog', { name: 'Chat settings' });
-    await expect(sheet).toBeVisible();
+  await test.step('should show the assistants as a full-width list from the header', async () => {
+    const picker = page.getByTestId('assistant-picker');
+    await expect(picker).toHaveText(configuration.name);
+    await picker.click();
+    const list = page.getByTestId('assistant-picker-dropdown');
+    await expect(list.getByRole('option', { name: configuration.name, exact: true })).toHaveAttribute('aria-selected', 'true');
+    expect((await list.boundingBox())?.width).toBeGreaterThan(350);
     await page.keyboard.press('Escape');
-    await expect(sheet).toBeHidden();
+    await expect(list).toBeHidden();
+    await expect(picker).toBeFocused();
   });
 });

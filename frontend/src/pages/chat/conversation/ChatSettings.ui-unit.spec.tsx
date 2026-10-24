@@ -26,12 +26,26 @@ const extension = {
 const configuration = { id: 1, name: 'Assistant', extensions: [extension] } as unknown as ConfigurationDto;
 
 describe('ChatSettings', () => {
+  it('shows nothing when there are no settings', () => {
+    render(
+      <ChatSettings
+        configuration={{ ...configuration, extensions: [] }}
+        extensionsWithFilter={[]}
+        defaultValues={{}}
+        onUpdateContext={vi.fn()}
+        chips={[]}
+      />,
+    );
+
+    expect(screen.queryByTestId('chat-settings-button')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('chat-settings-chip')).not.toBeInTheDocument();
+  });
+
   it('reports when the options cannot be saved and stays open', async () => {
     const onUpdateContext = vi.fn().mockRejectedValue(new Error('Bad Request'));
 
     render(
       <ChatSettings
-        chatId={1}
         configuration={configuration}
         extensionsWithFilter={[extension]}
         defaultValues={{ 3: { language: '' } }}
@@ -40,7 +54,7 @@ describe('ChatSettings', () => {
       />,
     );
 
-    fireEvent.click(screen.getByTestId('chat-settings-options'));
+    fireEvent.click(screen.getByTestId('chat-settings-button'));
     fireEvent.change(await screen.findByLabelText('Language'), { target: { value: 'de' } });
     fireEvent.click(screen.getByRole('button', { name: texts.chat.chatSettings.apply, hidden: true }));
 

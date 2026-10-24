@@ -2,10 +2,6 @@
   min-width: 0;
 }
 
-.assistantChip {
-  max-width: 16rem;
-}
-
 .valueChip {
   max-width: 14rem;
   font-family: var(--mantine-font-family-monospace);
@@ -17,9 +13,4 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.check {
-  margin-inline-start: auto;
-  flex-shrink: 0;
 }

@@ -1,6 +1,6 @@
-import { Button, Divider, Fieldset, Group, Select, SelectProps, Stack, Text } from '@mantine/core';
+import { Button, Fieldset, Group, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCheck, IconChevronUp, IconRobot, IconRotate, IconSettings } from '@tabler/icons-react';
+import { IconRotate, IconSettings } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import {
@@ -11,14 +11,12 @@ import {
   useApi,
 } from 'src/api';
 import { ComposerPopover } from 'src/components/ComposerPopover';
-import { ExtensionContext, usePersistentState } from 'src/hooks';
+import { ExtensionContext } from 'src/hooks';
 import { buildError } from 'src/lib';
 import { toast } from 'src/lib/notifications';
 import { Argument } from 'src/pages/admin/extensions/ExtensionForm';
 import { useArgumentObjectSpecResolver, useUserArgumentsSpecResolver } from 'src/pages/admin/extensions/hooks';
-import { useStateOfEnabledAssistants } from 'src/pages/chat/state/listOfAssistants';
 import { texts } from 'src/texts';
-import { useStateMutateChat, useStateOfChat } from '../state/chat';
 import classes from './ChatSettings.module.css';
 
 type JSONValue = string | number | boolean | object | unknown[] | undefined;
@@ -52,53 +50,7 @@ function mergeWithDefaults(values: ExtensionContext | undefined, defaultValues: 
   return result;
 }
 
-function AssistantSelect() {
-  const chat = useStateOfChat();
-  const updateChat = useStateMutateChat(chat.id);
-  const assistants = useStateOfEnabledAssistants();
-  const [, setPersistentAssistantId] = usePersistentState<number | null>('selectedAssistantId', null);
-
-  const renderSelectOption: SelectProps['renderOption'] = ({ option, checked }) => (
-    <Group flex="1" gap="xs" wrap="nowrap">
-      <div>
-        <Text size="sm">{option.label}</Text>
-        <Text size="xs" c="gray.7">
-          {assistants.find((c) => c.id + '' === option.value)?.description}
-        </Text>
-      </div>
-      {checked && <IconCheck size={20} className={classes.check} />}
-    </Group>
-  );
-
-  return (
-    <Select
-      label={texts.chat.chatSettings.assistant}
-      aria-label={texts.chat.selectAssistant}
-      comboboxProps={{ withinPortal: false, shadow: 'md' }}
-      maxDropdownHeight={320}
-      renderOption={renderSelectOption}
-      onChange={(value) => {
-        if (value) {
-          updateChat.mutate(
-            { configurationId: +value },
-            { onError: async (error) => toast.error(await buildError(texts.chat.chatSettings.saveFailed, error)) },
-          );
-          setPersistentAssistantId(+value);
-        }
-      }}
-      value={chat.configurationId > 0 ? chat.configurationId + '' : null}
-      data={assistants.map((c) => ({ value: c.id + '', label: c.name }))}
-      data-testid="chat-assistant-select"
-      searchable
-      withCheckIcon
-      checkIconPosition="right"
-      placeholder={texts.chat.searchAssistantsPlaceholder}
-    />
-  );
-}
-
 interface ChatSettingsFormProps {
-  chatId: number;
   configuration: ConfigurationDto;
   extensionsWithFilter: ExtensionUserInfoDto[];
   context?: ExtensionContext;
@@ -163,10 +115,6 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
     }
   };
 
-  if (!configurable && extensionsWithFilter.length === 0) {
-    return null;
-  }
-
   return (
     <form
       onSubmit={(event) => {
@@ -175,7 +123,6 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
       }}
     >
       <Stack gap="sm">
-        <Divider />
         {configurable &&
           Object.entries(configurable.properties ?? {}).map(([id, x]) =>
             x.type === 'object' ? (
@@ -242,7 +189,6 @@ function ChatSettingsForm(props: ChatSettingsFormProps) {
 }
 
 interface ChatSettingsProps {
-  chatId: number;
   configuration?: ConfigurationDto;
   extensionsWithFilter: ExtensionUserInfoDto[];
   context?: ExtensionContext;
@@ -253,8 +199,9 @@ interface ChatSettingsProps {
 }
 
 /**
- * The settings of the chat as chips in the composer: the assistant and the current values. All of them open one shared
- * popover (bottom sheet on phones) with the assistant, its settings and the options of the extensions.
+ * The settings of the chat as chips in the composer: a button and the current values. All of them open one shared
+ * popover (bottom sheet on phones) with the settings of the assistant and the options of the extensions. Nothing is
+ * shown when there are no settings. The assistant itself is selected in the header (`AssistantPicker`).
  */
 export function ChatSettings(props: ChatSettingsProps) {
   const { configuration, chips, ...formProps } = props;
@@ -262,6 +209,10 @@ export function ChatSettings(props: ChatSettingsProps) {
   const close = () => setOpened(false);
   const toggle = () => setOpened((x) => !x);
   const hasSettings = !!configuration?.configurableArguments || formProps.extensionsWithFilter.length > 0;
+
+  if (!configuration || !hasSettings) {
+    return null;
+  }
 
   return (
     <ComposerPopover
@@ -277,29 +228,14 @@ export function ChatSettings(props: ChatSettingsProps) {
             variant="default"
             size="compact-sm"
             radius="xl"
-            leftSection={<IconRobot size={14} />}
-            rightSection={<IconChevronUp size={12} />}
+            leftSection={<IconSettings size={14} />}
             onClick={toggle}
             aria-haspopup="dialog"
             aria-expanded={opened}
-            aria-label={`${texts.chat.chatSettings.assistant}: ${configuration?.name ?? ''}`}
-            className={classes.assistantChip}
             data-testid="chat-settings-button"
           >
-            <span className={classes.chipLabel}>{configuration?.name ?? texts.chat.selectAssistant}</span>
+            {texts.chat.chatSettings.options}
           </Button>
-          {hasSettings && (
-            <Button
-              variant="subtle"
-              size="compact-sm"
-              radius="xl"
-              leftSection={<IconSettings size={14} />}
-              onClick={toggle}
-              data-testid="chat-settings-options"
-            >
-              {texts.chat.filters}
-            </Button>
-          )}
           {chips.map((chip) => (
             <Button
               key={chip}
@@ -318,12 +254,7 @@ export function ChatSettings(props: ChatSettingsProps) {
         </Group>
       }
     >
-      <Stack gap="sm">
-        <AssistantSelect />
-        {configuration && (
-          <ChatSettingsForm key={`${configuration.id}-${opened}`} configuration={configuration} onClose={close} {...formProps} />
-        )}
-      </Stack>
+      <ChatSettingsForm key={`${configuration.id}-${opened}`} configuration={configuration} onClose={close} {...formProps} />
     </ComposerPopover>
   );
 }

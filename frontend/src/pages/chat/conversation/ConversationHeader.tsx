@@ -10,6 +10,7 @@ import { useIsCompact } from 'src/hooks/useIsCompact';
 import { texts } from 'src/texts';
 import { useStateOfSelectedChatId } from '../state/chat';
 import { useStateOfChats } from '../state/listOfChats';
+import { ChatAssistantPicker } from './AssistantPicker';
 import classes from './ConversationHeader.module.css';
 
 interface ConversationHeaderProps {
@@ -25,7 +26,7 @@ interface ConversationHeaderProps {
 
 /**
  * The header of the conversation with labeled buttons instead of handles at the edges: the chat list on the left
- * (burger on small screens), the details (inspector) on the right when there are some.
+ * (burger on small screens), the assistant of the chat, the details (inspector) on the right when there are some.
  */
 export function ConversationHeader(props: ConversationHeaderProps) {
   const { isChatListOpen, onToggleChatList, showNewChat, onNewChat, hasDetails, isDetailsOpen, onToggleDetails } = props;
@@ -75,6 +76,7 @@ export function ConversationHeader(props: ConversationHeaderProps) {
           </ActionIcon>
         </Tooltip>
       )}
+      <ChatAssistantPicker />
       <Text size="sm" fw={500} className={classes.title} title={chatName}>
         {chatName}
       </Text>

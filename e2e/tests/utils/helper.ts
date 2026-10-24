@@ -315,7 +315,7 @@ export async function deactivateFileInChatExtensionToConfiguration(page: Page, c
   await save(page);
 }
 
-/** Opens the chat settings (assistant, its settings and the options of the extensions) in the composer. */
+/** Opens the chat settings (the settings of the assistant and the options of the extensions) in the composer. */
 export async function openChatSettings(page: Page) {
   const popover = page.getByTestId('chat-settings-popover');
   // the state of the button, the popover may still be visible while it closes
@@ -412,36 +412,28 @@ export async function addSystemPromptToConfiguration(
   await save(page);
 }
 
-/** The assistant of the chat is shown as the first chip of the composer. */
+/** The assistant of the chat is shown in the header of the conversation. */
 export async function checkSelectedConfiguration(page: Page, configuration: { name: string }) {
-  await expect(page.getByTestId('chat-settings-button')).toHaveText(configuration.name);
+  await expect(page.getByTestId('assistant-picker')).toHaveText(configuration.name);
 }
 
+/** Selects the assistant of the chat with the picker in the header. */
 export async function selectConfiguration(page: Page, configuration: { name: string }) {
-  const chip = page.getByTestId('chat-settings-button');
-  const popover = page.getByTestId('chat-settings-popover');
-  const select = popover.getByTestId('chat-assistant-select');
-  const element = popover.locator('p').getByText(configuration.name, { exact: true });
-  // While a chat is loading, the app focuses the message input, which closes the popover or the dropdown again, and a
-  // click may hit the list while it is rendered again. So retry until the assistant is selected.
+  const picker = page.getByTestId('assistant-picker');
+  const option = page.getByTestId('assistant-picker-dropdown').getByRole('option', { name: configuration.name, exact: true });
+  // While a chat is loading, the app focuses the message input, which may close the list again. So retry.
   await expect(async () => {
-    if ((await chip.textContent()) === configuration.name) {
+    if ((await picker.textContent()) === configuration.name) {
       return;
     }
-    if ((await chip.getAttribute('aria-expanded')) !== 'true') {
-      await chip.click();
+    if ((await picker.getAttribute('aria-expanded')) !== 'true') {
+      await picker.click();
     }
-    if (!(await element.isVisible())) {
-      await select.click();
-    }
-    await element.click({ timeout: 2_000 });
-    await expect(chip).toHaveText(configuration.name, { timeout: 2_000 });
+    await option.click({ timeout: 2_000 });
+    await expect(picker).toHaveText(configuration.name, { timeout: 2_000 });
   }).toPass();
-  await expect(chip).toHaveText(configuration.name);
-  if (await popover.isVisible()) {
-    await page.keyboard.press('Escape');
-    await expect(popover).toBeHidden();
-  }
+  await expect(picker).toHaveText(configuration.name);
+  await expect(picker).toHaveAttribute('aria-expanded', 'false');
 }
 
 export async function navigateToUserAdministration(page: Page) {

@@ -593,9 +593,16 @@ function load() {
       },
     },
     chat: {
+      assistantPicker: {
+        label: translate('chat.assistantPicker.label'),
+        select: translate('chat.assistantPicker.select'),
+        search: translate('chat.assistantPicker.search'),
+        empty: translate('chat.assistantPicker.empty'),
+        saveFailed: translate('chat.assistantPicker.saveFailed'),
+      },
       chatSettings: {
         title: translate('chat.chatSettings.title'),
-        assistant: translate('chat.chatSettings.assistant'),
+        options: translate('chat.chatSettings.options'),
         assistantSettings: translate('chat.chatSettings.assistantSettings'),
         apply: translate('chat.chatSettings.apply'),
         resetAll: translate('chat.chatSettings.resetAll'),
@@ -710,7 +717,6 @@ function load() {
       },
       assistantDeleted: translate('chat.assistantDeleted'),
       assistantDisabled: translate('chat.assistantDisabled'),
-      filters: translate('chat.filters'),
       dragAndDrop: {
         invalidFileType: translate('chat.dragAndDrop.invalidFileType'),
         acceptedFormats: translate('chat.dragAndDrop.acceptedFormats'),
@@ -738,8 +744,6 @@ function load() {
       generationStopped: translate('chat.generationStopped'),
       rateConversation: translate('chat.rateConversation'),
       rateMessage: translate('chat.rateMessage'),
-      selectAssistant: translate('chat.selectAssistant'),
-      searchAssistantsPlaceholder: translate('chat.searchAssistantsPlaceholder'),
       rating: {
         incorrect: translate('chat.rating.incorrect'),
         instructions_not_followed: translate('chat.rating.instructions_not_followed'),

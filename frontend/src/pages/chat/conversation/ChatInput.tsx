@@ -272,7 +272,6 @@ export function ChatInput({
           <div className={classes.inputBox}>
             <Group gap={6} className={classes.context} data-testid="composer-context">
               <ChatSettings
-                chatId={chatId}
                 configuration={configuration}
                 extensionsWithFilter={extensionsWithFilter}
                 context={context}
