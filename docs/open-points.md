@@ -48,15 +48,18 @@ OCR. Es liefert strukturiertes Markdown für PDF, DOCX, PPTX, XLSX und HTML. Heu
 
 Aufwand: M, nach der asynchronen Verarbeitung.
 
+## Nach dem ersten Release
+
+- **`release-as` entfernen:** `.github/release-please-config.json` erzwingt für das erste Release die Version 1.0.0.
+  Direkt nach dem Release muss der Eintrag raus, sonst schlägt release-please jedes Mal wieder 1.0.0 vor.
+
 ## Offene Entscheidungen
 
 - **GitHub Issues und Discussions:** aktivieren oder die Links in `CONTRIBUTING.md` entfernen.
-- **Erstes Release:** den release-please-PR mergen (Version, `latest`-Images, Helm-Chart in der Registry).
 - **ARM-Images für `main`:** zusätzlich arm64 auf nativen ARM-Runnern bauen? Heute müssen ARM-Nutzer `--build`
   verwenden.
-- **npm `allowScripts`:** die 5 Pakete mit Install-Skripten (u. a. `bcrypt`, `protobufjs`) explizit erlauben?
-- **Elicitation im Dev-MCP-Proxy:** Anfragen von stdio-Servern durchreichen (etwa ein halber Tag). Bisher nicht
-  benötigt.
+- **Elicitation im Dev-MCP-Proxy:** Anfragen von stdio-Servern durchreichen (etwa ein halber Tag). Umsetzen, sobald
+  es gebraucht wird.
 
 ## Zurückgestellt
 

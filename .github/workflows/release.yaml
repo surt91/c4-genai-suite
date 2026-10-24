@@ -31,6 +31,7 @@ jobs:
     outputs:
       created: ${{ steps.release.outputs.release_created }}
       version: ${{ steps.release.outputs.version }}
+      tag: ${{ steps.release.outputs.tag_name }}
     steps:
       - id: release
         uses: googleapis/release-please-action@v5
@@ -71,7 +72,8 @@ jobs:
           image="$REGISTRY/${{ matrix.image.name }}"
           tags="$image:main,$image:commit-${{ github.sha }}"
           if [ -n "${{ needs.release-please.outputs.created }}" ]; then
-            tags="$tags,$image:${{ needs.release-please.outputs.version }},$image:latest"
+            # the helm chart uses the git tag (v1.2.3) as default image tag
+            tags="$tags,$image:${{ needs.release-please.outputs.version }},$image:${{ needs.release-please.outputs.tag }},$image:latest"
           fi
           echo "tags=$tags" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v7
