@@ -13,7 +13,6 @@ interface MetricDonutChartProps {
  * A donut chart visualization for individual metric results.
  * No container - meant to be used inside a parent Card.
  */
-/* eslint-disable react/prop-types */
 export function MetricDonutChart({ name, successes, failures, errors = 0 }: MetricDonutChartProps) {
   const total = successes + failures + errors;
   const hasFailures = failures > 0 || errors > 0;

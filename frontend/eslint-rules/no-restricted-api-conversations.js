@@ -32,7 +32,7 @@ export default {
   create(context) {
     const options = context.options[0] || {};
     const allowedPaths = options.allowedPaths || [];
-    const filename = context.getFilename();
+    const filename = context.filename;
 
     const isAllowed = allowedPaths.some((allowedPath) => {
       return filename.includes(allowedPath);

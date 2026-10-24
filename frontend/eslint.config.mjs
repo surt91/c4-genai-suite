@@ -1,26 +1,14 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import react from "eslint-plugin-react";
-import _import from "eslint-plugin-import";
-import reactRefresh from "eslint-plugin-react-refresh";
-import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
-import testingLibrary from "eslint-plugin-testing-library";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import eslintReact from "@eslint-react/eslint-plugin";
+import { importX } from "eslint-plugin-import-x";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 import noRestrictedApiConversations from "./eslint-rules/no-restricted-api-conversations.js";
 import noZustandOutsideState from "./eslint-rules/no-zustand-outside-state.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 
 export default defineConfig([globalIgnores([
     "**/.eslintrc.js",
@@ -33,22 +21,17 @@ export default defineConfig([globalIgnores([
     "**/*.mjs",
     "**/*.cjs",
 ]), {
-    extends: fixupConfigRules(compat.extends(
-        "plugin:react/jsx-runtime",
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:prettier/recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-    )),
+    extends: [
+        js.configs.recommended,
+        tseslint.configs.recommendedTypeChecked,
+        prettierRecommended,
+        reactHooks.configs.flat.recommended,
+    ],
 
     plugins: {
-        react: fixupPluginRules(react),
-        import: fixupPluginRules(_import),
+        "@eslint-react": eslintReact,
+        "import-x": importX,
         "react-refresh": reactRefresh,
-        "@typescript-eslint": fixupPluginRules(typescriptEslintEslintPlugin),
-        "testing-library": fixupPluginRules(testingLibrary),
         "custom": {
             rules: {
                 "no-restricted-api-conversations": noRestrictedApiConversations,
@@ -62,23 +45,11 @@ export default defineConfig([globalIgnores([
             ...globals.browser,
         },
 
-        parser: tsParser,
-        ecmaVersion: 5,
         sourceType: "module",
 
         parserOptions: {
-            project: "tsconfig.json",
-            tsconfigRootDir: __dirname,
-
-            ecmaFeatures: {
-                jsx: true,
-            },
-        },
-    },
-
-    settings: {
-        react: {
-            version: "detect",
+            projectService: true,
+            tsconfigRootDir: import.meta.dirname,
         },
     },
 
@@ -93,11 +64,11 @@ export default defineConfig([globalIgnores([
               "ignoreRestSiblings": true,  // e.g.: c is not unused in ```const {a, ...x} = {a:1, b:2, c:3}```
            }
         ],
-        "import/extensions": ["error", "never"],
-        "import/no-extraneous-dependencies": "off",
-        "import/no-useless-path-segments": "off",
+        "import-x/extensions": ["error", "never"],
+        "import-x/no-extraneous-dependencies": "off",
+        "import-x/no-useless-path-segments": "off",
 
-        "import/order": ["error", {
+        "import-x/order": ["error", {
             pathGroupsExcludedImportTypes: ["builtin"],
 
             pathGroups: [{
@@ -141,13 +112,23 @@ export default defineConfig([globalIgnores([
             ignoreDeclarationSort: true,
         }],
 
-        "react/react-in-jsx-scope": "off",
-        "react/jsx-uses-react": "off",
-        "react/display-name": "off",
-
-        "react/no-unknown-property": [1, {
-            requireDataLowercase: true,
-        }],
+        // The equivalent of the former eslint-plugin-react "recommended" config (the rest is covered by TypeScript).
+        "@eslint-react/no-missing-key": "error",
+        "@eslint-react/no-duplicate-key": "error",
+        "@eslint-react/jsx-no-comment-textnodes": "error",
+        "@eslint-react/jsx-no-children-prop": "error",
+        "@eslint-react/dom-no-dangerously-set-innerhtml-with-children": "error",
+        "@eslint-react/no-direct-mutation-state": "error",
+        "@eslint-react/dom-no-find-dom-node": "error",
+        "@eslint-react/dom-no-render-return-value": "error",
+        "@eslint-react/dom-no-unsafe-target-blank": "error",
+        "@eslint-react/no-component-will-mount": "error",
+        "@eslint-react/no-component-will-receive-props": "error",
+        "@eslint-react/no-component-will-update": "error",
+        "@eslint-react/no-unsafe-component-will-mount": "error",
+        "@eslint-react/no-unsafe-component-will-receive-props": "error",
+        "@eslint-react/no-unsafe-component-will-update": "error",
+        "@eslint-react/dom-no-unknown-property": ["warn", { requireDataLowercase: true }],
 
         "@typescript-eslint/interface-name-prefix": "off",
         "@typescript-eslint/explicit-function-return-type": "off",

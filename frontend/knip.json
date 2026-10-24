@@ -1,4 +1,4 @@
 {
   "ignore": ["**/generated*/**", "**/dist/**", "**/*.d.ts", "lint-staged.config.mjs", "public/**"],
-  "ignoreDependencies": ["eslint-*", "pdfjs-dist"]
+  "ignoreDependencies": ["pdfjs-dist"]
 }
