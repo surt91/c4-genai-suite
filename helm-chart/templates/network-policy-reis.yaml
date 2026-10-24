@@ -1,4 +1,8 @@
-{{- if and .Values.networkPolicy.enabled .Values.reis.enabled }}
+{{- if and .Values.reis.enabled (or .Values.networkPolicy.enabled .Values.reis.networkPolicy.enabled) }}
+{{- /*
+REI-S has no authentication: only the backend may reach its API. When `networkPolicy.enabled` is set, the egress
+of REI-S is restricted as well.
+*/}}
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -12,8 +16,9 @@ spec:
       {{- include "gaible.commonSelectors" . | nindent 6 }}
       app.kubernetes.io/component: reis
   policyTypes:
-    - Egress
     - Ingress
+    {{- if .Values.networkPolicy.enabled }}
+    - Egress
   egress:
     - ports:
         - port: 443
@@ -23,6 +28,7 @@ spec:
           protocol: TCP
         - port: 53
           protocol: UDP
+    {{- end }}
   ingress:
     - from:
         - podSelector:
@@ -32,4 +38,25 @@ spec:
       ports:
         - port: 3201
           protocol: TCP
+    {{- if .Values.reis.metrics.enabled }}
+    - from:
+        - namespaceSelector:
+            {{- with .Values.reis.networkPolicy.metricsNamespace }}
+            matchLabels:
+              kubernetes.io/metadata.name: {{ . | quote }}
+            {{- else }} {}
+            {{- end }}
+          podSelector:
+            {{- with .Values.reis.networkPolicy.metricsPodLabels }}
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+            {{- else }} {}
+            {{- end }}
+      ports:
+        - port: {{ .Values.reis.metrics.port }}
+          protocol: TCP
+    {{- end }}
+    {{- with .Values.reis.networkPolicy.extraIngress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}

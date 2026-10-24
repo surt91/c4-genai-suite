@@ -33,6 +33,8 @@ cd services/reis && cp .env.example .env && uv run fastapi dev rei_s/app.py --po
 ```
 
 The `.env.example` files contain working defaults for this setup.
+Except for the frontend (3333), the Compose ports are only published on `127.0.0.1`, so the infrastructure (and REI-S,
+which has no authentication) is not reachable from other hosts.
 
 ## Tests
 

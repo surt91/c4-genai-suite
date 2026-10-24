@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: NetworkPolicy REIS
+templates:
+  - network-policy-reis.yaml
+set:
+  reis.enabled: true
+tests:
+  - it: is created by default, because REIS has no authentication
+    asserts:
+      - isKind:
+          of: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-gaible-reis
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: gaible
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: reis
+
+  - it: only allows the backend pods to connect to the API
+    asserts:
+      - equal:
+          path: spec.policyTypes
+          value: [Ingress]
+      - notExists:
+          path: spec.egress
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: gaible
+                      app.kubernetes.io/instance: RELEASE-NAME
+                      app.kubernetes.io/component: backend
+              ports:
+                - port: 3201
+                  protocol: TCP
+
+  - it: is not created if disabled
+    set:
+      reis.networkPolicy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: is not created without REIS
+    set:
+      reis.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: restricts the egress as well if all network policies are enabled
+    set:
+      reis.networkPolicy.enabled: false
+      networkPolicy.enabled: true
+    asserts:
+      - equal:
+          path: spec.policyTypes
+          value: [Ingress, Egress]
+      - lengthEqual:
+          path: spec.egress
+          count: 2
+      - lengthEqual:
+          path: spec.ingress
+          count: 1
+
+  - it: allows the monitoring namespace to scrape the metrics port
+    set:
+      reis.metrics.enabled: true
+      reis.metrics.port: 9300
+    asserts:
+      - equal:
+          path: spec.ingress[1]
+          value:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: monitoring
+                podSelector: {}
+            ports:
+              - port: 9300
+                protocol: TCP
+
+  - it: allows the configured monitoring pods to scrape the metrics port
+    set:
+      reis.metrics.enabled: true
+      reis.networkPolicy.metricsNamespace: ""
+      reis.networkPolicy.metricsPodLabels:
+        app.kubernetes.io/name: prometheus
+    asserts:
+      - equal:
+          path: spec.ingress[1].from
+          value:
+            - namespaceSelector: {}
+              podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: prometheus
+
+  - it: adds extra ingress rules
+    set:
+      reis.networkPolicy.extraIngress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  app: importer
+          ports:
+            - port: 3201
+    asserts:
+      - lengthEqual:
+          path: spec.ingress
+          count: 2
+      - equal:
+          path: spec.ingress[1].from[0].podSelector.matchLabels.app
+          value: importer

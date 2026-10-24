@@ -228,6 +228,16 @@ reis:
   ##    maxUnavailable: 25%
   updateStrategy:
     type: RollingUpdate
+  ## REI-S has no authentication: it must only be reachable by the backend.
+  networkPolicy:
+    ## @param reis.networkPolicy.enabled Specifies whether a NetworkPolicy should be created that only allows the backend pods (and, if `reis.metrics.enabled`, the monitoring for the metrics port) to connect to REIS. REIS has no authentication. Also created if `networkPolicy.enabled` is set.
+    enabled: true
+    ## @param reis.networkPolicy.metricsNamespace The namespace of the monitoring (e.g. Prometheus) that may scrape the REIS metrics port (if `reis.metrics.enabled`). Empty allows all namespaces.
+    metricsNamespace: "monitoring"
+    ## @param reis.networkPolicy.metricsPodLabels Labels of the monitoring pods (in `metricsNamespace`) that may scrape the REIS metrics port. Empty allows all pods.
+    metricsPodLabels: {}
+    ## @param reis.networkPolicy.extraIngress Additional ingress rules for REIS (NetworkPolicyIngressRule), e.g. for an importer that calls REIS directly
+    extraIngress: []
   ## @param reis.host The REIS container host to bind to
   host: "0.0.0.0"
   image:

@@ -4,6 +4,18 @@
 
 This server offers RAG functionality for Gaible.
 
+## Security: no authentication
+
+REI-S has no authentication and trusts every caller: whoever can reach its API can read, search and delete all
+documents of all buckets. It must only be reachable by the Gaible backend:
+
+- Kubernetes: the helm chart creates a NetworkPolicy that only allows the backend pods (`reis.networkPolicy.enabled`,
+  enabled by default; needs a CNI that enforces NetworkPolicies). Never expose REI-S with an Ingress or a load balancer.
+- Docker Compose: the backend reaches REI-S inside the compose network; the port is only published on `127.0.0.1` for
+  the natively running backend during development.
+- Elsewhere: use a firewall or a private network so that only the backend can connect to port 3201 (and the monitoring
+  to the metrics port).
+
 ## Getting started
 
 For development, install `python` and `uv`. Then the REI-S can be started with

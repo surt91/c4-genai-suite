@@ -10,6 +10,8 @@
 # Every ${VAR:-default} can be overridden via the shell or a `.env` file next to this file.
 # For hot-reload development start only the infrastructure (`docker compose up postgres s3 reis`)
 # and run backend/frontend natively, see DEVELOPERS.md.
+# Only the frontend is published on all interfaces; all other ports are bound to 127.0.0.1 (for the native
+# development and debugging). REI-S has no authentication and must never be reachable from other hosts.
 
 name: gaible
 
@@ -59,7 +61,7 @@ services:
       # lets the backend reach services on the host, e.g. the mock LLM of the E2E tests
       - host.docker.internal:host-gateway
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -85,7 +87,8 @@ services:
       EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
       EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
     ports:
-      - "3201:3201"
+      # no authentication: only for the natively running backend (hot reload), never publish on all interfaces
+      - "127.0.0.1:3201:3201"
     depends_on:
       postgres:
         condition: service_healthy
@@ -102,7 +105,7 @@ services:
     image: pgvector/pgvector:pg16
     environment: *pg
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -118,7 +121,7 @@ services:
       COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3mockroot
       COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - s3-data:/s3mockroot
 
@@ -127,7 +130,7 @@ services:
     image: ollama/ollama:0.40.10
     profiles: [ollama]
     ports:
-      - "11434:11434"
+      - "127.0.0.1:11434:11434"
     volumes:
       - ollama-data:/root/.ollama
     healthcheck:
@@ -155,7 +158,7 @@ services:
     environment:
       CONFIG: '{"mcpServers":{"mcp-fetch":{"command":"uvx","args":["mcp-server-fetch","--ignore-robots-txt"],"port":8000}}}'
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
 
   # --- profile: eval ---------------------------------------------------------
   eval: &eval
@@ -177,7 +180,7 @@ services:
       GAIBLE_BACKEND_URL: http://backend:3000/api
       GAIBLE_BACKEND_API_KEY: ${EVAL_SERVICE_ACCOUNT_API_KEY:-}
     ports:
-      - "3202:3202"
+      - "127.0.0.1:3202:3202"
     depends_on:
       postgres:
         condition: service_healthy
@@ -199,8 +202,8 @@ services:
       RABBITMQ_DEFAULT_USER: rabbit
       RABBITMQ_DEFAULT_PASS: rabbit
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s

@@ -541,6 +541,32 @@
                         }
                     }
                 },
+                "networkPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Specifies whether a NetworkPolicy should be created that only allows the backend pods (and, if `reis.metrics.enabled`, the monitoring for the metrics port) to connect to REIS. REIS has no authentication. Also created if `networkPolicy.enabled` is set.",
+                            "default": true
+                        },
+                        "metricsNamespace": {
+                            "type": "string",
+                            "description": "The namespace of the monitoring (e.g. Prometheus) that may scrape the REIS metrics port (if `reis.metrics.enabled`). Empty allows all namespaces.",
+                            "default": "monitoring"
+                        },
+                        "metricsPodLabels": {
+                            "type": "object",
+                            "description": "Labels of the monitoring pods (in `metricsNamespace`) that may scrape the REIS metrics port. Empty allows all pods.",
+                            "default": {}
+                        },
+                        "extraIngress": {
+                            "type": "array",
+                            "description": "Additional ingress rules for REIS (NetworkPolicyIngressRule), e.g. for an importer that calls REIS directly",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
                 "host": {
                     "type": "string",
                     "description": "The REIS container host to bind to",

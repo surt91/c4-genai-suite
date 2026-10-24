@@ -123,7 +123,7 @@ Every fixed bug has a regression test. The test suite grew from 88 to 153 tests.
 | P3-10 | Deferred: touches all providers for little gain; better done together with a decision on P3-11 | |
 | P3-11 | Deferred: changes what is indexed for existing HTML/e-mail uploads; needs a product decision (and re-indexing) | |
 | P3-12 | Fixed for PDFs (`9ce7f24`) and the filesystem store (`e247f96`); text formats still read the file at once (they are split in memory anyway) | |
-| P3-13 | Deferred: architectural (shared secret between backend and REI-S, network policy in the helm chart) | |
+| P3-13 | Mitigated: no app-level auth (decision); the helm chart restricts the access with a NetworkPolicy by default and Compose binds the port to 127.0.0.1 (`feat(helm): restrict the access to REI-S with a NetworkPolicy by default`). The document endpoints are still not scoped to a bucket. | |
 | P3-14 | Deferred: unconfirmed, needs a real Azure AI Search service | |
 
 Behavior changes worth knowing:
