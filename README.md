@@ -79,7 +79,7 @@ assistant. The paperclip in the chat then uploads files, and answers come with t
 
 Start the stack without the Ollama profile and add a model extension like **OpenAI** (API key and model name, e.g.
 `gpt-5-mini`), **Azure OpenAI**, **Amazon Bedrock**, **Google GenAI**, **Mistral** or **OpenAI compatible** (any
-endpoint that speaks the OpenAI API, e.g. vLLM or LiteLLM) to your assistant.
+endpoint that speaks the OpenAI API, e.g. vLLM, LiteLLM or llama.cpp's `llama-server`) to your assistant.
 
 The file search needs an embedding model as well. Without Ollama, let REI-S use OpenAI by putting this into a `.env`
 file next to `docker-compose.yml`:
@@ -87,6 +87,15 @@ file next to `docker-compose.yml`:
 ```bash
 REIS_EMBEDDINGS_TYPE=openai
 OPENAI_API_KEY=sk-...
+```
+
+Or use any OpenAI-compatible embedding server, e.g. a local llama.cpp server
+(`llama-server -hf ggml-org/embeddinggemma-300M-GGUF --embeddings --host 0.0.0.0 --port 8081`):
+
+```bash
+REIS_EMBEDDINGS_TYPE=openai-compatible
+REIS_EMBEDDINGS_ENDPOINT=http://<host>:8081/v1
+REIS_EMBEDDINGS_MODEL=embeddinggemma
 ```
 
 ## Screenshots
