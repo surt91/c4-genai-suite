@@ -2,7 +2,6 @@ import { Server } from 'net';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { DataSource } from 'typeorm';
 import { AppModule } from '../../app.module.js';
 import { initAppWithDataBaseAndValidUser, logo } from '../../utils/testUtils.js';
 import { SettingsDto } from './dtos/index.js';
@@ -11,7 +10,6 @@ import { SettingsController } from './settings.controller.js';
 describe('Settings', () => {
   let controller: SettingsController;
   let app: INestApplication<Server>;
-  let dataSource: DataSource;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,13 +18,10 @@ describe('Settings', () => {
 
     controller = module.get(SettingsController);
 
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
-    dataSource = initialized.dataSource;
-    app = initialized.app;
+    ({ app } = await initAppWithDataBaseAndValidUser(module));
   });
 
   afterAll(async () => {
-    await dataSource.destroy();
     await app.close();
   });
 

@@ -47,7 +47,7 @@ describe('Get Files', () => {
     return Promise.resolve(results.length);
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     vi.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({

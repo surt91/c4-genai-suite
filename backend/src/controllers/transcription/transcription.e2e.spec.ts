@@ -4,8 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../../app.module.js';
-import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity, UserEntity } from '../../domain/database/index.js';
-import { schema } from '../../domain/database/typeorm.helper.js';
+import { ConfigurationEntity, ConfigurationStatus, ExtensionEntity } from '../../domain/database/index.js';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 import { TranscriptionController } from './transcription.controller.js';
 
@@ -22,7 +21,6 @@ vi.mock('../../domain/transcription/providers/azure-provider.js', () => {
 
 describe('Transcription', () => {
   let app: INestApplication<Server>;
-  let dataSource: DataSource;
   let controller: TranscriptionController;
   let extensionId: number;
 
@@ -33,17 +31,12 @@ describe('Transcription', () => {
 
     controller = module.get(TranscriptionController);
 
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
-    dataSource = initialized.dataSource;
+    const initialized = await initAppWithDataBaseAndValidUser(module);
     app = initialized.app;
-    await cleanDatabase(dataSource);
-    await seedTestData(dataSource);
-    extensionId = await createTranscribeExtension(dataSource);
+    extensionId = await createTranscribeExtension(initialized.dataSource);
   });
 
   afterAll(async () => {
-    await cleanDatabase(dataSource);
-    await dataSource.destroy();
     await app.close();
   });
 
@@ -107,44 +100,16 @@ describe('Transcription', () => {
   });
 });
 
-async function cleanDatabase(dataSource: DataSource) {
-  const entities = dataSource.entityMetadatas;
-
-  for (const entity of entities) {
-    const repository = dataSource.getRepository(entity.name);
-    await repository.query(`TRUNCATE TABLE ${schema}."${entity.tableName}" RESTART IDENTITY CASCADE`);
-  }
-}
-
-async function seedTestData(dataSource: DataSource) {
-  const userRepository = dataSource.getRepository(UserEntity);
-  const configurationRepository = dataSource.getRepository(ConfigurationEntity);
-
-  const userEntity = new UserEntity();
-  userEntity.id = '1';
-  userEntity.name = 'test-user';
-  userEntity.email = 'test@example.com';
-  await userRepository.save(userEntity);
-
-  const configurationEntity = new ConfigurationEntity();
-  configurationEntity.name = 'Test Configuration';
-  configurationEntity.status = ConfigurationStatus.ENABLED;
-  await configurationRepository.save(configurationEntity);
-}
-
 async function createTranscribeExtension(dataSource: DataSource): Promise<number> {
-  const configRepo = dataSource.getRepository(ConfigurationEntity);
+  const configuration = await dataSource
+    .getRepository(ConfigurationEntity)
+    .save({ name: 'Test Configuration', status: ConfigurationStatus.ENABLED });
+
   const extensionRepo = dataSource.getRepository(ExtensionEntity);
-
-  const config = await configRepo.findOneBy({ id: 1 });
-  if (!config) {
-    throw new Error('Configuration not found');
-  }
-
   const extension = extensionRepo.create({
     name: 'transcribe-azure',
     enabled: true,
-    configuration: config,
+    configuration,
     values: {
       apiKey: 'test-api-key',
       instanceName: 'test-instance',

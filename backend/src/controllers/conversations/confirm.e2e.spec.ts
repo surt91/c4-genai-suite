@@ -1,8 +1,8 @@
+import { randomUUID } from 'crypto';
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { DataSource } from 'typeorm';
 import type { MockInstance } from 'vitest';
 import { AppModule } from '../../app.module.js';
 import { LocalStrategy } from '../../domain/auth/index.js';
@@ -13,21 +13,18 @@ import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 
 describe('Confirm form requests', () => {
   let app: INestApplication<Server>;
-  let dataSource: DataSource;
   let callbacks: CallbackService;
   let validate: MockInstance;
 
-  const user: User = { id: '1', userGroupIds: ['1'], name: 'Test User', email: 'stuff@stuff.com' };
-  const otherUser: User = { id: '2', userGroupIds: ['1'], name: 'Other User', email: 'other@stuff.com' };
+  let user: User;
+  const otherUser: User = { id: randomUUID(), userGroupIds: [], name: 'Other User', email: 'other@example.com' };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
-    dataSource = initialized.dataSource;
-    app = initialized.app;
+    ({ app, user } = await initAppWithDataBaseAndValidUser(module));
     callbacks = app.get(CallbackService);
     validate = vi.spyOn(app.get(LocalStrategy), 'validate');
   });
@@ -37,7 +34,6 @@ describe('Confirm form requests', () => {
   });
 
   afterAll(async () => {
-    await dataSource.destroy();
     await app.close();
   });
 

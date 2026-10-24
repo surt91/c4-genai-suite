@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Server } from 'net';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -16,7 +17,6 @@ import {
   MessageEntity,
   UserEntity,
 } from '../../domain/database/index.js';
-import { schema } from '../../domain/database/typeorm.helper.js';
 import { buildClient } from '../../domain/files/use-cases/utils.js';
 import { initAppWithDataBaseAndValidUser } from '../../utils/testUtils.js';
 import { ConversationsController } from './conversations.controller.js';
@@ -30,8 +30,9 @@ describe('Conversations', () => {
   let app: INestApplication<Server>;
   let dataSource: DataSource;
   let controller: ConversationsController;
-
-  let conversationId: number;
+  let user: UserEntity;
+  let configuration: ConfigurationEntity;
+  let bucket: BucketEntity;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,12 +41,19 @@ describe('Conversations', () => {
 
     controller = module.get(ConversationsController);
 
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
+    const initialized = await initAppWithDataBaseAndValidUser(module);
     dataSource = initialized.dataSource;
     app = initialized.app;
-    await cleanDatabase(dataSource);
-    const conversation = await seedTestData(dataSource);
-    conversationId = conversation.id;
+    user = await dataSource.getRepository(UserEntity).findOneByOrFail({ id: initialized.user.id });
+    configuration = await dataSource
+      .getRepository(ConfigurationEntity)
+      .save({ name: `Conversations ${randomUUID()}`, status: ConfigurationStatus.ENABLED });
+    bucket = await dataSource.getRepository(BucketEntity).save({
+      name: `Conversations ${randomUUID()}`,
+      type: 'conversation',
+      endpoint: 'http://localhost:1234',
+      isDefault: false,
+    });
 
     (buildClient as Mock).mockImplementation(() => ({
       duplicateEmbeddings: vi.fn().mockResolvedValue({}),
@@ -53,53 +61,66 @@ describe('Conversations', () => {
   });
 
   afterAll(async () => {
-    await cleanDatabase(dataSource);
-    await dataSource.destroy();
     await app.close();
   });
+
+  /** Creates a conversation of the user with a unique name, messages and a file. */
+  const createConversation = (name = `Greetings ${randomUUID()}`) =>
+    seedConversation(dataSource, { user, configuration, bucket, name });
+
+  async function duplicate(conversationId: number) {
+    const response = await request(app.getHttpServer()).post(`/conversations/${conversationId}/duplicate`).expect(201);
+    return response.body as ConversationDto;
+  }
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
   it('should retrieve conversation by id', async () => {
-    const response = await request(app.getHttpServer()).get('/conversations/1').expect(200);
+    const conversation = await createConversation();
+
+    const response = await request(app.getHttpServer()).get(`/conversations/${conversation.id}`).expect(200);
     const typedBody = response.body as ConversationDto;
 
     expect(typedBody).toBeDefined();
-    expect(typedBody.id).toBe(1);
-    expect(typedBody.name).toBe('Greetings Exchange');
+    expect(typedBody.id).toBe(conversation.id);
+    expect(typedBody.name).toBe(conversation.name);
   });
   it('should duplicate conversation', async () => {
-    const response = await request(app.getHttpServer()).post(`/conversations/${conversationId}/duplicate`).expect(201);
-    const typedBody = response.body as ConversationDto;
+    const conversation = await createConversation();
+
+    const typedBody = await duplicate(conversation.id);
 
     expect(typedBody).toBeDefined();
-    expect(typedBody.id).not.toBe(conversationId); // must be a new ID
-    expect(typedBody.name).toBe('Greetings Exchange (2)');
+    expect(typedBody.id).not.toBe(conversation.id); // must be a new ID
+    expect(typedBody.name).toBe(`${conversation.name} (2)`);
   });
   it('should duplicate conversation twice with distinct names', async () => {
-    const response = await request(app.getHttpServer()).post(`/conversations/${conversationId}/duplicate`).expect(201);
-    const typedBody = response.body as ConversationDto;
+    const conversation = await createConversation();
+
+    await duplicate(conversation.id);
+    const typedBody = await duplicate(conversation.id);
 
     expect(typedBody).toBeDefined();
-    expect(typedBody.id).not.toBe(conversationId);
-    expect(typedBody.name).toBe('Greetings Exchange (3)');
+    expect(typedBody.id).not.toBe(conversation.id);
+    expect(typedBody.name).toBe(`${conversation.name} (3)`);
   });
   it('should ignore conversations of other users when numbering duplicates', async () => {
-    const other = await dataSource.getRepository(UserEntity).save({ id: 'other', name: 'other', email: 'other@example.com' });
+    const conversation = await createConversation();
+    const other = await createOtherUser(dataSource);
     await dataSource
       .getRepository(ConversationEntity)
-      .save({ name: 'Greetings Exchange (4)', configurationId: 1, userId: other.id });
+      .save({ name: `${conversation.name} (2)`, configurationId: configuration.id, userId: other.id });
 
-    const response = await request(app.getHttpServer()).post(`/conversations/${conversationId}/duplicate`).expect(201);
+    const typedBody = await duplicate(conversation.id);
 
-    expect((response.body as ConversationDto).name).toBe('Greetings Exchange (4)');
+    expect(typedBody.name).toBe(`${conversation.name} (2)`);
   });
 
   it('should delete a conversation softly and restore it', async () => {
     const created = await dataSource
       .getRepository(ConversationEntity)
-      .save({ name: 'To be restored', configurationId: 1, userId: '1' });
+      .save({ name: 'To be restored', configurationId: configuration.id, userId: user.id });
 
     await request(app.getHttpServer()).delete(`/conversations/${created.id}`).expect(200);
     await request(app.getHttpServer()).get(`/conversations/${created.id}`).expect(404);
@@ -113,79 +134,41 @@ describe('Conversations', () => {
 
   it('should not restore conversations of other users or after the restore period', async () => {
     const repository = dataSource.getRepository(ConversationEntity);
-    const ofOther = await repository.save({ name: 'Other', configurationId: 1, userId: 'other' });
+    const other = await createOtherUser(dataSource);
+    const ofOther = await repository.save({ name: 'Other', configurationId: configuration.id, userId: other.id });
     await repository.softDelete({ id: ofOther.id });
     await request(app.getHttpServer()).post(`/conversations/${ofOther.id}/restore`).expect(403);
 
-    const old = await repository.save({ name: 'Old', configurationId: 1, userId: '1' });
+    const old = await repository.save({ name: 'Old', configurationId: configuration.id, userId: user.id });
     await repository.update({ id: old.id }, { deletedAt: new Date(Date.now() - 60 * 60 * 1000) });
     await request(app.getHttpServer()).post(`/conversations/${old.id}/restore`).expect(404);
 
     // deleting another conversation purges the conversations that cannot be restored anymore
-    const next = await repository.save({ name: 'Next', configurationId: 1, userId: '1' });
+    const next = await repository.save({ name: 'Next', configurationId: configuration.id, userId: user.id });
     await request(app.getHttpServer()).delete(`/conversations/${next.id}`).expect(200);
     expect(await repository.findOne({ where: { id: old.id }, withDeleted: true })).toBeNull();
   });
 });
 
-async function cleanDatabase(dataSource: DataSource) {
-  const entities = dataSource.entityMetadatas;
-
-  for (const entity of entities) {
-    const repository = dataSource.getRepository(entity.name);
-    await repository.query(`TRUNCATE TABLE ${schema}."${entity.tableName}" RESTART IDENTITY CASCADE`);
-  }
+function createOtherUser(dataSource: DataSource) {
+  const id = randomUUID();
+  return dataSource.getRepository(UserEntity).save({ id, name: 'other', email: `other-${id}@example.com` });
 }
 
-async function seedTestData(dataSource: DataSource) {
-  const userRepository = dataSource.getRepository(UserEntity);
-  const configurationRepository = dataSource.getRepository(ConfigurationEntity);
-  const conversationRepository = dataSource.getRepository(ConversationEntity);
-  const messageRepository = dataSource.getRepository(MessageEntity);
-  const fileRepository = dataSource.getRepository(FileEntity);
-  const conversationFileRepository = dataSource.getRepository(ConversationFileEntity);
-  const bucketRepository = dataSource.getRepository(BucketEntity);
-
-  const userEntity = await createUser(userRepository);
-  const configurationEntity = await createConfiguration(configurationRepository);
-
-  const conversation = await createConversationEntity(conversationRepository, configurationEntity, userEntity);
-  const bucketEntity = await createBucket(bucketRepository);
-  const file = await createFiles(fileRepository, conversation.id, bucketEntity);
-  await createConversationFiles(conversationFileRepository, conversation.id, file.id);
-  await createMessages(messageRepository, conversation.id, configurationEntity.id);
-
+async function seedConversation(
+  dataSource: DataSource,
+  {
+    user,
+    configuration,
+    bucket,
+    name,
+  }: { user: UserEntity; configuration: ConfigurationEntity; bucket: BucketEntity; name: string },
+) {
+  const conversation = await dataSource.getRepository(ConversationEntity).save({ configuration, user, name });
+  const file = await createFiles(dataSource.getRepository(FileEntity), bucket);
+  await createConversationFiles(dataSource.getRepository(ConversationFileEntity), conversation.id, file.id);
+  await createMessages(dataSource.getRepository(MessageEntity), conversation.id, configuration.id);
   return conversation;
-}
-
-function createConfiguration(configurationRepository: Repository<ConfigurationEntity>): Promise<ConfigurationEntity> {
-  const configurationEntity = new ConfigurationEntity();
-  configurationEntity.name = 'Test Configuration';
-  configurationEntity.status = ConfigurationStatus.ENABLED;
-
-  return configurationRepository.save(configurationEntity);
-}
-
-function createUser(userRepository: Repository<UserEntity>): Promise<UserEntity> {
-  const userEntity = new UserEntity();
-  userEntity.id = '1';
-  userEntity.name = 'test-user';
-  userEntity.email = 'test@example.com';
-
-  return userRepository.save(userEntity);
-}
-
-function createConversationEntity(
-  conversationRepository: Repository<ConversationEntity>,
-  configuration: ConfigurationEntity,
-  user: UserEntity,
-): Promise<ConversationEntity> {
-  const conversationEntity = new ConversationEntity();
-  conversationEntity.configuration = configuration;
-  conversationEntity.user = user;
-  conversationEntity.name = 'Greetings Exchange';
-
-  return conversationRepository.save(conversationEntity);
 }
 
 function createMessages(
@@ -213,11 +196,7 @@ function createMessages(
   return messageRepository.save(messages);
 }
 
-function createFiles(
-  fileRepository: Repository<FileEntity>,
-  conversationId: number,
-  bucketEntity: BucketEntity,
-): Promise<FileEntity> {
+function createFiles(fileRepository: Repository<FileEntity>, bucketEntity: BucketEntity): Promise<FileEntity> {
   const fileEntity = new FileEntity();
   fileEntity.mimeType = 'application/pdf';
   fileEntity.fileName = 'test.pdf';
@@ -238,15 +217,4 @@ function createConversationFiles(
   conversationFileEntity.fileId = fileId;
 
   return conversationFileRepository.save(conversationFileEntity);
-}
-
-function createBucket(bucketRepository: Repository<BucketEntity>): Promise<BucketEntity> {
-  const bucketEntity = new BucketEntity();
-  bucketEntity.id = 1;
-  bucketEntity.name = 'Test Bucket';
-  bucketEntity.type = 'conversation';
-  bucketEntity.endpoint = 'http://localhost:1234';
-  bucketEntity.isDefault = false;
-
-  return bucketRepository.save(bucketEntity);
 }

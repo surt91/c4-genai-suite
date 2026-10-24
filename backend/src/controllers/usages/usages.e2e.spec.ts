@@ -24,7 +24,6 @@ import { UsagesController } from './usages.controller.js';
 describe('Usages', () => {
   let controller: UsagesController;
   let app: INestApplication<Server>;
-  let dataSource: DataSource;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,14 +32,13 @@ describe('Usages', () => {
 
     controller = module.get(UsagesController);
 
-    const initialized = await initAppWithDataBaseAndValidUser(dataSource, module, app);
-    dataSource = initialized.dataSource;
+    // the statistics are about all data, so this relies on the fresh database of each test file (vitest.setup-db.e2e.ts)
+    const initialized = await initAppWithDataBaseAndValidUser(module);
     app = initialized.app;
-    await seedTestData(dataSource);
+    await seedTestData(initialized.dataSource);
   });
 
   afterAll(async () => {
-    await dataSource.destroy();
     await app.close();
   });
 
@@ -167,8 +165,8 @@ async function seedTestData(dataSource: DataSource) {
   const usageRepository = dataSource.getRepository(UsageEntity) as UsageRepository;
 
   const userEntities = await createUserEntities(3, userRepository);
-  const supportAssistant = await createConfigurationEntity(configurationRepository, 1, 'Assistant-E2E');
-  const salesAssistant = await createConfigurationEntity(configurationRepository, 2, 'Assistant-Sales');
+  const supportAssistant = await createConfigurationEntity(configurationRepository, 'Assistant-E2E');
+  const salesAssistant = await createConfigurationEntity(configurationRepository, 'Assistant-Sales');
 
   const now = new Date();
 
@@ -188,10 +186,6 @@ async function seedTestData(dataSource: DataSource) {
     const conversationEntity = await createConversationEntity(userEntities[i].id, supportAssistant.id, conversationRepository);
     await createMessageEntity(conversationEntity.id, supportAssistant.id, startOfMonth(subMonths(now, 1)), messagesRepository);
   }
-
-  const configurations = await configurationRepository.find();
-
-  expect(configurations).toHaveLength(2);
 }
 
 const getMockDates = () => {
@@ -212,7 +206,7 @@ async function createUserEntities(quantity: number, userRepository: Repository<U
     const userEntity = new UserEntity();
     userEntity.id = crypto.randomUUID();
     userEntity.name = `test-${i}`;
-    userEntity.email = `user-${i}@test.com`;
+    userEntity.email = `user-${i}-${userEntity.id}@test.com`;
     userEntities.push(userEntity);
   }
   return userRepository.save(userEntities);
@@ -220,11 +214,9 @@ async function createUserEntities(quantity: number, userRepository: Repository<U
 
 async function createConfigurationEntity(
   configurationRepository: Repository<ConfigurationEntity>,
-  id: number,
   name: string,
 ): Promise<ConfigurationEntity> {
   const configurationEntity = new ConfigurationEntity();
-  configurationEntity.id = id;
   configurationEntity.name = name;
   configurationEntity.status = ConfigurationStatus.ENABLED;
 

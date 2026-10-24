@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Server } from 'http';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,14 +14,14 @@ import { BUILTIN_USER_GROUP_ADMIN } from '../../domain/database/index.js';
 const EVAL_SERVICE_URL = 'http://localhost:3202';
 
 const mockAdminUser = {
-  id: '1',
+  id: randomUUID(),
   name: 'Admin User',
   email: 'admin@test.com',
   userGroups: [{ id: BUILTIN_USER_GROUP_ADMIN }],
 };
 
 const mockNonAdminUser = {
-  id: '2',
+  id: randomUUID(),
   name: 'Regular User',
   email: 'user@test.com',
   userGroups: [{ id: 'regular-group' }],
