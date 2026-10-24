@@ -83,13 +83,18 @@ services:
       STORE_TYPE: pgvector
       STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/gaible
       STORE_PGVECTOR_INDEX_NAME: reis
-      # `ollama` needs the ollama profile, `openai` needs OPENAI_API_KEY,
+      # `ollama` needs the ollama profile, `openai` needs OPENAI_API_KEY, `openai-compatible` needs
+      # REIS_EMBEDDINGS_ENDPOINT and REIS_EMBEDDINGS_MODEL,
       # `random-test-embeddings` runs without any embedding model (no meaningful search)
       EMBEDDINGS_TYPE: ${REIS_EMBEDDINGS_TYPE:-ollama}
       EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
       EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
       EMBEDDINGS_OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       EMBEDDINGS_OPENAI_MODEL_NAME: ${REIS_OPENAI_EMBEDDINGS_MODEL:-text-embedding-3-small}
+      # for REIS_EMBEDDINGS_TYPE=openai-compatible, e.g. a llama.cpp server started with --embeddings
+      EMBEDDINGS_OPENAI_COMPATIBLE_ENDPOINT: ${REIS_EMBEDDINGS_ENDPOINT:-}
+      EMBEDDINGS_OPENAI_COMPATIBLE_API_KEY: ${REIS_EMBEDDINGS_API_KEY:-none}
+      EMBEDDINGS_OPENAI_COMPATIBLE_MODEL_NAME: ${REIS_EMBEDDINGS_MODEL:-}
     ports:
       # no authentication: only for the natively running backend (hot reload), never publish on all interfaces
       - "127.0.0.1:3201:3201"
