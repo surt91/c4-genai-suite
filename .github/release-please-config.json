@@ -9,11 +9,9 @@
           "path": "helm-chart/Chart.yaml",
           "jsonpath": "$.version"
         }
-      ],
-      "release-as": "1.0.0"
+      ]
     }
   },
-  "last-release-sha": "85525a42902b1749dd8347e2c0e9d6b80014b0e4",
   "include-v-in-tag": true,
   "separate-pull-requests": false,
   "pull-request-title-pattern": "chore($component): release ${version}",
