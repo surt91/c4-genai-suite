@@ -15,7 +15,14 @@ interface NavigationBarProps extends PropsWithChildren {
 
 export function NavigationBar({ theme, redirectTo }: NavigationBarProps) {
   const { isDocsButtonVisible, toggleDocs } = useDocsContext();
-  const content = theme.logoUrl ? <Logo key={theme.key} size={{ height: '60%' }} url={theme.logoUrl} /> : theme.name;
+  const content = theme.logoUrl ? (
+    <Logo key={theme.key} size={{ height: '60%' }} url={theme.logoUrl} />
+  ) : (
+    <span className={classes.brand}>
+      <img className={classes.brandMark} src="/logo.svg" alt="" />
+      {theme.name}
+    </span>
+  );
   return (
     <div className={classes.root}>
       <VisuallyHidden component="h1">{theme.name}</VisuallyHidden>

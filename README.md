@@ -1,3 +1,5 @@
+<p align="center"><img src="frontend/public/logo.svg" alt="" width="96"></p>
+
 # Gaible
 
 An AI chatbot application with Model Context Provider (MCP) integration, powered by ai-sdk and compatibility for all major Large Language Models (LLMs) and Embedding Models.

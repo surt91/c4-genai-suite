@@ -11,11 +11,7 @@ export const AiAvatar = ({ llmLogo }: { llmLogo?: string }) => {
     <div className={classes.avatar}>
       {avatarLogoUrl && <Logo url={avatarLogoUrl} />}
       {!avatarLogoUrl && llmLogo && <Logo previewLogo={llmLogo} />}
-      {!avatarLogoUrl && !llmLogo && (
-        <Avatar size={'xs'} variant="filled" color="dark">
-          AI
-        </Avatar>
-      )}
+      {!avatarLogoUrl && !llmLogo && <Avatar size={'xs'} radius="sm" src="/favicon.svg" alt="AI" />}
     </div>
   );
 };

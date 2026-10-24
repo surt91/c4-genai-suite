@@ -6,7 +6,7 @@ export function ThemeStyle() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    setFavicon(theme.avatarLogoUrl || '');
+    setFavicon(theme.avatarLogoUrl || '/favicon.svg');
   }, [theme.avatarLogoUrl]);
 
   return ReactDOM.createPortal(
